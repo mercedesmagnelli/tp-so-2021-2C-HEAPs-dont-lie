@@ -1,7 +1,4 @@
-# tp-2021-1c-Sin-miedo-a-recursar
-
-La base del planificador, ram y filesystem son la misma. Hicimos el planificador y luego los otros dos.
-Tomamos esta decisión para porque permitira un desarrollo donde la arquitectura de todos los modulos sea siempre la misma.
+# tp-2021-2c-HEAPs-dont-lie
 
 Distribución de carpetas:
 - tp-2021
