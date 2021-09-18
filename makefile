@@ -96,6 +96,8 @@ test-s:
 	
 test: test-p test-r test-f test-s
 	-@echo "$(YELLOW) Ejecutados todos los tests $(NOCOLOR)"
+
+check: test
 	
 # Trabajos para correr los procesos con valgrind "make valgrind-s" "make valgrind-d" "make valgrind-r" "make valgrind-m"
 valgrind-s:

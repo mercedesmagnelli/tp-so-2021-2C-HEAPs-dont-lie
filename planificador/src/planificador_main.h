@@ -7,7 +7,6 @@
 
 #include "configuracion/configuracion.h"	// Carga del archivo de configuracion
 
-#include "conexion_filesystem/conexion_filesystem.h"	// Conexión entre Planificador y Filesystem
 #include "conexion_ram/conexion_ram.h"		// Conexión entre Planificador y Ram
 
 #include "../../shared/logger.h"			// Mutex para escribir en consola y en archivo de log

@@ -19,16 +19,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	pthread_t filesystem_handshake = thread_ejecutar_funcion(filesystem_enviar_handshake);
 	pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
-
-	error = thread_join_and_free(filesystem_handshake);
-	if (error != 0) {
-		loggear_error("Filesystem no nos acepto, Error: %d", error);
-		cerrar_todo();
-		thread_detach_and_free(filesystem_handshake);
-		return EXIT_FAILURE;
-	}
 
 	error = thread_join_and_free(ram_handshake);
 	if (error != 0) {
@@ -47,8 +38,6 @@ int main(int argc, char** argv) {
 }
 
 void cerrar_todo() {
-	filesystem_cerrar_conexiones(false);
-	loggear_info("Cerrada conexion con filesystem");
 	ram_cerrar_conexiones(false);
 	loggear_info("Cerrada conexion con ram");
 	destroy_configuracion();
