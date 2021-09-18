@@ -54,4 +54,8 @@ dkms.conf
 *.log
 filesystem.log
 ram.log
-**/tests/build/**
+
+filesystem/tests/build/planificador-test
+
+filesystem/tests/build/*/
+planificador/tests/build/*/
