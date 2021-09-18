@@ -54,3 +54,4 @@ dkms.conf
 *.log
 filesystem.log
 ram.log
+**/tests/build/**
