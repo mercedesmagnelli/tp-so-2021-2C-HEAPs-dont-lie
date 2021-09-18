@@ -4,22 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/conexion.c \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/estructura_compartida.c \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/logger.c \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/manejo_hilos.c \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/protocolo.c \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/shared-test.c \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/thread_safe_value.c 
-
-O_SRCS += \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/conexion.o \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/estructura_compartida.o \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/logger.o \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/manejo_hilos.o \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/protocolo.o \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/shared-test.o \
-/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/thread_safe_value.o 
+/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/conexion.c \
+/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/estructura_compartida.c \
+/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/logger.c \
+/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/manejo_hilos.c \
+/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/protocolo.c \
+/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/shared-test.c \
+/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/thread_safe_value.c 
 
 OBJS += \
 ./shared/conexion.o \
@@ -41,49 +32,49 @@ C_DEPS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
-shared/conexion.o: /home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/conexion.c
+shared/conexion.o: /home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/conexion.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
 	gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-shared/estructura_compartida.o: /home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/estructura_compartida.c
+shared/estructura_compartida.o: /home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/estructura_compartida.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
 	gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-shared/logger.o: /home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/logger.c
+shared/logger.o: /home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/logger.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
 	gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-shared/manejo_hilos.o: /home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/manejo_hilos.c
+shared/manejo_hilos.o: /home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/manejo_hilos.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
 	gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-shared/protocolo.o: /home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/protocolo.c
+shared/protocolo.o: /home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/protocolo.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
 	gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-shared/shared-test.o: /home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/shared-test.c
+shared/shared-test.o: /home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/shared-test.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
 	gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-shared/thread_safe_value.o: /home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared/thread_safe_value.c
+shared/thread_safe_value.o: /home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared/thread_safe_value.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
 	gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"

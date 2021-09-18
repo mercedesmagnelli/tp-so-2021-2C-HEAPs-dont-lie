@@ -6,3 +6,11 @@
 [TRACE] 02:41:52:608 I-Filesystem-Store/(24203:24204): Se desconectara el planificador
 [TRACE] 02:41:52:609 I-Filesystem-Store/(24203:24203): Cerramos todos los threads del planificador que no hayan terminado
 [TRACE] 02:41:52:609 I-Filesystem-Store/(24203:24203): Cerrado los threads y sockets
+[TRACE] 20:42:41:848 I-Filesystem-Store/(27608:27608): Creado el servidor
+[WARNING] 20:42:48:361 I-Filesystem-Store/(27608:27609): Se creo el hilo [0] pendiente para destruir
+[INFO] 20:42:48:361 I-Filesystem-Store/(27608:27626): Recibimos un handshake, es el planificador
+[WARNING] 20:42:48:362 I-Filesystem-Store/(27608:27626): No escuchamos mas mensajes, Socket: 5
+[TRACE] 20:44:24:725 I-Filesystem-Store/(27608:27609): Se desconectara el planificador
+[TRACE] 20:44:24:725 I-Filesystem-Store/(27608:27608): Cerramos todos los threads del planificador que no hayan terminado
+[TRACE] 20:44:24:725 I-Filesystem-Store/(27608:27608): Cerrado los threads y sockets
+[TRACE] 15:19:50:033 I-Filesystem-Store/(9307:9307): Creado el servidor

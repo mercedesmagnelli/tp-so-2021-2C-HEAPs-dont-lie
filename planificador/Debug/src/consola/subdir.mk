@@ -6,9 +6,6 @@
 C_SRCS += \
 ../src/consola/consola.c 
 
-O_SRCS += \
-../src/consola/consola.o 
-
 OBJS += \
 ./src/consola/consola.o 
 

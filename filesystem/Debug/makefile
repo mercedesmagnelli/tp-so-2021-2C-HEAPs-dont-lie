@@ -12,6 +12,8 @@ RM := rm -rf
 -include src/configuracion/subdir.mk
 -include src/conexion_planificador/subdir.mk
 -include src/subdir.mk
+-include shared/tests/subdir.mk
+-include shared/subdir.mk
 -include subdir.mk
 -include objects.mk
 
@@ -32,7 +34,7 @@ all: filesystem
 filesystem: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L/home/utnso/workspace/tp-2021-1c-Sin-miedo-a-recursar/shared -o "filesystem" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared" -L/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared -o "filesystem" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

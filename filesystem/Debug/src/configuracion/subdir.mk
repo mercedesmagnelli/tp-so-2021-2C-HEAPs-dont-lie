@@ -4,16 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/configuracion/imongo_configuracion.c \
-../src/configuracion/imongo_configuracion_guardada.c 
+../src/configuracion/filesystem_configuracion.c \
+../src/configuracion/filesystem_configuracion_guardada.c 
 
 OBJS += \
-./src/configuracion/imongo_configuracion.o \
-./src/configuracion/imongo_configuracion_guardada.o 
+./src/configuracion/filesystem_configuracion.o \
+./src/configuracion/filesystem_configuracion_guardada.o 
 
 C_DEPS += \
-./src/configuracion/imongo_configuracion.d \
-./src/configuracion/imongo_configuracion_guardada.d 
+./src/configuracion/filesystem_configuracion.d \
+./src/configuracion/filesystem_configuracion_guardada.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -26,3 +26,11 @@
 [TRACE] 02:41:52:608 RAM-HQ/(24209:24210): Se desconectara el planificador
 [TRACE] 02:41:52:609 RAM-HQ/(24209:24209): Cerramos todos los threads del planificador que no hayan terminado
 [TRACE] 02:41:52:609 RAM-HQ/(24209:24209): Cerrado los threads y sockets
+[TRACE] 20:42:45:707 RAM-HQ/(27614:27614): Creado el servidor
+[WARNING] 20:42:48:361 RAM-HQ/(27614:27615): Se creo el hilo [0] pendiente para destruir
+[INFO] 20:42:48:361 RAM-HQ/(27614:27627): Recibimos un handshake, es el planificador
+[WARNING] 20:42:48:362 RAM-HQ/(27614:27627): No escuchamos mas mensajes, Socket: 5
+[TRACE] 20:44:24:725 RAM-HQ/(27614:27615): Se desconectara el planificador
+[TRACE] 20:44:24:725 RAM-HQ/(27614:27614): Cerramos todos los threads del planificador que no hayan terminado
+[TRACE] 20:44:24:725 RAM-HQ/(27614:27614): Cerrado los threads y sockets
+[TRACE] 15:19:43:691 RAM-HQ/(9279:9279): Creado el servidor

@@ -7,10 +7,6 @@ C_SRCS += \
 ../src/configuracion/configuracion.c \
 ../src/configuracion/configuracion_guardada.c 
 
-O_SRCS += \
-../src/configuracion/configuracion.o \
-../src/configuracion/configuracion_guardada.o 
-
 OBJS += \
 ./src/configuracion/configuracion.o \
 ./src/configuracion/configuracion_guardada.o 

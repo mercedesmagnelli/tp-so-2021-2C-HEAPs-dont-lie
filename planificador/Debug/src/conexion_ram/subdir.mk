@@ -7,10 +7,6 @@ C_SRCS += \
 ../src/conexion_ram/conexion_ram.c \
 ../src/conexion_ram/manejar_mensajes_ram.c 
 
-O_SRCS += \
-../src/conexion_ram/conexion_ram.o \
-../src/conexion_ram/manejar_mensajes_ram.o 
-
 OBJS += \
 ./src/conexion_ram/conexion_ram.o \
 ./src/conexion_ram/manejar_mensajes_ram.o 

@@ -14,6 +14,8 @@ RM := rm -rf
 -include src/conexion_ram/subdir.mk
 -include src/conexion_filesystem/subdir.mk
 -include src/subdir.mk
+-include shared/tests/subdir.mk
+-include shared/subdir.mk
 -include subdir.mk
 -include objects.mk
 
@@ -34,7 +36,7 @@ all: planificador
 planificador: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L/home/utnso/workspace/tp2/SO-UTN-Basics/shared -o "planificador" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/shared" -o "planificador" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

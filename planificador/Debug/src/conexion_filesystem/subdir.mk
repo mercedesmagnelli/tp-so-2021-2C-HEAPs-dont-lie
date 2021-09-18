@@ -7,10 +7,6 @@ C_SRCS += \
 ../src/conexion_filesystem/conexion_filesystem.c \
 ../src/conexion_filesystem/manejar_mensajes_filesystem.c 
 
-O_SRCS += \
-../src/conexion_filesystem/conexion_filesystem.o \
-../src/conexion_filesystem/manejar_mensajes_filesystem.o 
-
 OBJS += \
 ./src/conexion_filesystem/conexion_filesystem.o \
 ./src/conexion_filesystem/manejar_mensajes_filesystem.o 

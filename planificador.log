@@ -26,3 +26,21 @@
 [INFO] 02:41:52:608 Planificador/(24219:24219): Cerrada conexion con filesystem
 [TRACE] 02:41:52:608 Planificador/(24219:24219): Cerrado los threads y sockets
 [INFO] 02:41:52:608 Planificador/(24219:24219): Cerrada conexion con ram
+[TRACE] 20:42:48:361 Planificador/(27623:27625): Enviado handshake a la ram
+[TRACE] 20:42:48:361 Planificador/(27623:27624): Enviado handshake a Filesystem
+[INFO] 20:42:48:362 Planificador/(27623:27624): Llegó un handshake del planificador! Quedamos esperando sabotajes
+[INFO] 20:42:48:362 Planificador/(27623:27625): Llegó un handshake de la ram! La aceptamos <3
+[TRACE] 20:44:24:724 Planificador/(27623:27623): Cerrado los threads y sockets
+[INFO] 20:44:24:725 Planificador/(27623:27623): Cerrada conexion con filesystem
+[TRACE] 20:44:24:725 Planificador/(27623:27623): Cerrado los threads y sockets
+[INFO] 20:44:24:725 Planificador/(27623:27623): Cerrada conexion con ram
+[ERROR] 15:19:53:565 Planificador/(9326:9327): Ocurrió un error al conectarse al servidor de Filesystem, Ip: 127.0.0.1, Puerto: 8081, Error: -12
+[ERROR] 15:19:53:566 Planificador/(9326:9328): Ocurrió un error al conectarse al servidor de ram, Ip: 127.0.0.1, Puerto: 8082, Error: -12
+[ERROR] 15:19:53:566 Planificador/(9326:9326): Join del hilo devolvió un error, Error: -12
+[ERROR] 15:19:53:566 Planificador/(9326:9326): Filesystem no nos acepto, Error: -12
+[ERROR] 15:19:53:566 Planificador/(9326:9326): Ocurrió un error al conectarse al servidor de Filesystem, Ip: 127.0.0.1, Puerto: 8081, Error: -12
+[TRACE] 15:19:53:566 Planificador/(9326:9326): Cerrado los threads y sockets
+[INFO] 15:19:53:566 Planificador/(9326:9326): Cerrada conexion con filesystem
+[ERROR] 15:19:53:566 Planificador/(9326:9326): Ocurrió un error al conectarse al servidor de ram, Ip: 127.0.0.1, Puerto: 8082, Error: -12
+[TRACE] 15:19:53:566 Planificador/(9326:9326): Cerrado los threads y sockets
+[INFO] 15:19:53:566 Planificador/(9326:9326): Cerrada conexion con ram
