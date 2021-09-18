@@ -53,6 +53,7 @@ dkms.conf
 
 *.log
 filesystem.log
+planificador.log
 ram.log
 
 filesystem/tests/build/planificador-test
