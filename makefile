@@ -33,10 +33,10 @@ FILESYSTEM_TEST_ROUTE := filesystem/tests
 FILESYSTEM_COMPILADO := filesystem.out
 FILESYSTEM_ARCHIVO_CONFIG := filesystem.config
 
-all: d r m
+all: p r f
 	
 # Trabajos de compilacion proyectos y test "make d" "make r" "make m"
-d:
+p:
 	-@echo "$(YELLOW) COMPILANDO '$(PLANIFICADOR_NAME)' 🎮 🎮 🎮 $(NOCOLOR)"
 	-@cd $(PLANIFICADOR_ROUTE) && $(MAKE) all
 	-@echo "$(YELLOW) COMPILANDO TESTS '$(PLANIFICADOR_NAME)' 🎮 🎮 🎮 $(NOCOLOR)"
@@ -50,7 +50,7 @@ r:
 	#-@cd $(RAM_TEST_ROUTE) && $(MAKE) all
 	-@echo "$(GREEN) COMPILADO Tests '$(RAM_NAME)' ✔️✔️✔️✔️✔️✔️✔️✔️✔️✔️ $(NOCOLOR)"
 
-m:
+f:
 	-@echo "$(YELLOW) COMPILANDO '$(FILESYSTEM_NAME)' 📝 📝 📝$(NOCOLOR)"
 	-@cd $(FILESYSTEM_ROUTE) && $(MAKE) all
 	-@echo "$(YELLOW) COMPILANDO TESTS '$(FILESYSTEM_NAME)' 📝 📝 📝 $(NOCOLOR)"
@@ -58,7 +58,7 @@ m:
 	-@echo "$(GREEN) COMPILADO Tests '$(FILESYSTEM_NAME)' ✔️✔️✔️✔️✔️✔️✔️✔️✔️✔️ $(NOCOLOR)"
 
 # Trabajos de clean "make clean-d" "make clean-r" "make clean-m" "make clean-s" "make clean"
-clean-d:
+clean-p:
 	-@cd $(PLANIFICADOR_ROUTE) && $(MAKE) clean
 	-@cd $(PLANIFICADOR_TEST_ROUTE) && $(MAKE) clean
 	
@@ -66,14 +66,14 @@ clean-r:
 	-@cd $(RAM_ROUTE) && $(MAKE) clean
 	-@cd $(RAM_TEST_ROUTE) && $(MAKE) clean
 	
-clean-m:
+clean-f:
 	-@cd $(FILESYSTEM_ROUTE) && $(MAKE) clean
 	-@cd $(FILESYSTEM_TEST_ROUTE) && $(MAKE) clean
 
 clean-s:
 	-@cd $(SHARED_ROUTE) && $(MAKE) clean
 
-clean: clean-d clean-r clean-m clean-s
+clean: clean-p clean-r clean-f clean-s
 	-@find . -name "*.o" -type f -delete
 	-@clear
 	-@echo "$(GREEN) 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️   Limpiado archvos 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️  $(NOCOLOR)"
@@ -82,42 +82,42 @@ clear: clean
 	-@echo "$(YELLOW) Sabía que no te acordarías que el comando es 'clean' no 'clear' así que lo codee igualmente $(NOCOLOR)"
 
 # Trabajos para correr los tests "make test-d" "make test-r" "make test-m" "make test-s" "make test"
-test-d:
+test-p:
 	-@cd $(PLANIFICADOR_TEST_ROUTE) && $(MAKE) test
 
 test-r:
 	-@cd $(RAM_TEST_ROUTE) && $(MAKE) test
 	
-test-m:
+test-f:
 	-@cd $(FILESYSTEM_TEST_ROUTE) && $(MAKE) test
 
 test-s:
 	-@cd $(SHARED_ROUTE) && $(MAKE) test
 	
-test: test-d test-r test-m test-s
+test: test-p test-r test-f test-s
 	-@echo "$(YELLOW) Ejecutados todos los tests $(NOCOLOR)"
 	
 # Trabajos para correr los procesos con valgrind "make valgrind-s" "make valgrind-d" "make valgrind-r" "make valgrind-m"
 valgrind-s:
 	-@cd $(SHARED_ROUTE) && $(MAKE) valgrind
 
-valgrind-d:
+valgrind-p:
 	-@cd $(PLANIFICADOR_ROUTE) && $(MAKE) valgrind
 		
 valgrind-r:
 	-@cd $(RAM_ROUTE) && $(MAKE) valgrind
 
-valgrind-m:
+valgrind-f:
 	-@cd $(FILESYSTEM_ROUTE) && $(MAKE) valgrind
 
 # Trabajos para ejecutar los archivos compilados "make run-d" "make run-r" "make run-m"
-run-d:
+run-p:
 	-@./$(PLANIFICADOR_COMPILADO) $(PLANIFICADOR_ARCHIVO_CONFIG)
 	
 run-r:
 	-@./$(RAM_COMPILADO) $(RAM_ARCHIVO_CONFIG)
 
-run-m:
+run-f:
 	-@./$(FILESYSTEM_COMPILADO) $(FILESYSTEM_ARCHIVO_CONFIG)
 
 .PHONY: all test clean planificador filesystem ram shared
