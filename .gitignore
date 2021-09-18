@@ -64,3 +64,5 @@ planificador/tests/build/*/
 
 ram/tests/build/
 shared/tests/build/
+
+planificador/Debug/
