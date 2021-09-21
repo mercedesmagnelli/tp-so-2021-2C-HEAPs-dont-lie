@@ -19,13 +19,13 @@ int main(int argc, char** argv) {
 
 	// TODO: Iniciar el Filesystem
 
-	loggear_trace("IP: %s", get_ip());
-	loggear_trace("PUERTO: %d", get_puerto());
-	loggear_trace("TAMANIO_SWAP: %d", get_tamanio_swap());
-	loggear_trace("TAMANIO_PAGINA: %d", get_tamanio_pagina());
-	loggear_trace("MARCOS_MAXIMOS: %d", get_marcos_maximos());
-	loggear_trace("RETARDO_SWAP: %d", get_retardo_swap());
-	loggear_trace("CANTIDAD_ARCHIVOS: %d", get_cantidad_archivos());
+	loggear_debug("IP: %s", get_ip());
+	loggear_debug("PUERTO: %d", get_puerto());
+	loggear_debug("TAMANIO_SWAP: %d", get_tamanio_swap());
+	loggear_debug("TAMANIO_PAGINA: %d", get_tamanio_pagina());
+	loggear_debug("MARCOS_MAXIMOS: %d", get_marcos_maximos());
+	loggear_debug("RETARDO_SWAP: %d", get_retardo_swap());
+	loggear_debug("CANTIDAD_ARCHIVOS: %d", get_cantidad_archivos());
 	for (int i = 0; i < get_cantidad_archivos(); ++i) {
 		loggear_debug("ARCHIVOS_SWAP[%d]: \t\t%s", i, get_archivos_swap()[i]);
 	}
