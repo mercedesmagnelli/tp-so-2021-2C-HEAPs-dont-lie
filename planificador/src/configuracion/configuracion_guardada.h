@@ -1,32 +1,27 @@
-/*
- * configuracion_guardada.h
- *
- *  Created on: 2 may. 2021
- *      Author: utnso
- */
 
 #ifndef CONFIGURACION_CONFIGURACION_GUARDADA_H_
 #define CONFIGURACION_CONFIGURACION_GUARDADA_H_
 
 #include <stdbool.h>
-
-#define ROUND_ROBIN "RR"
-
-typedef enum {
-	FIFO,
-	RR
-} t_algoritmo;
+#include "algoritmos_planificacion.h"
 
 // GETTERS
 char * get_ip_ram();
 int get_puerto_ram();
-char * get_ip_filesystem();
-int get_puerto_filesystem();
-int get_grado_multitarea();
+
 t_algoritmo get_algoritmo();
-int get_quantum();
-int get_duracion_sabotaje();
-int get_retardo_ciclo_cpu();
+
+int get_cantidad_dispositivos_io();
+char ** get_dispositivos_io();
+
+int get_cantidad_duraciones_io();
+char ** get_duraciones_io();
+
+int get_retardo_cpu();
+
+int get_grado_multiprogramacion();
+int get_grado_multiprocesamiento();
+
 char * get_log_route();
 char * get_log_app_name();
 int get_log_in_console();
@@ -36,14 +31,18 @@ typedef struct {
 	char * ip_ram;
 	int puerto_ram;
 
-	char * ip_filesystem;
-	int puerto_filesystem;
-
-	int grado_multitarea;
 	t_algoritmo algoritmo;
-	int quantum;
-	int duracion_sabotaje;
-	int retardo_ciclo_cpu;
+
+	int cantidad_dispositivos_io;
+	char ** dispositivos_io;
+
+	int cantidad_duraciones_io;
+	char ** duraciones_io;
+
+	int retardo_cpu;
+
+	int grado_multiprogramacion;
+	int grado_multiprocesamiento;
 
 	// Loggin
 	char * log_route;

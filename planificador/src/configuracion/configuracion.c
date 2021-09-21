@@ -6,11 +6,12 @@ int set_variable_str(t_config * config, char * param_leer, char ** param);
 
 int set_variable_int(t_config * config, char * param_leer, int * param);
 
+int set_variable_array_str(t_config * config, char * param_leer, char *** param, int * cantidad_elementos);
+
 int cargar_archivo();
 
 // Publica
 int iniciar_configuracion(int argc, char ** argv) {
-
 	const bool es_config_valida = son_validos_los_parametros(argc, argv);
 
 	const char * path_config = argv[1];
@@ -35,7 +36,6 @@ bool son_validos_los_parametros(int argc, char ** argv) {
 // Publica
 void destroy_configuracion() {
 	free(config_guardada.ip_ram);
-	free(config_guardada.ip_filesystem);
 	free(config_guardada.log_app_name);
 	free(config_guardada.log_route);
 }
@@ -44,14 +44,21 @@ int cargar_archivo(char * path) {
 	t_config * config = config_create(path);
 	int error = 0;
 
-	error += set_variable_str(config, "IP_MI_RAM_HQ", 			&config_guardada.ip_ram);
-	error += set_variable_int(config, "PUERTO_MI_RAM_HQ", 		&config_guardada.puerto_ram);
-	error += set_variable_str(config, "IP_I_FILESYSTEM_STORE", 		&config_guardada.ip_filesystem);
-	error += set_variable_int(config, "PUERTO_I_FILESYSTEM_STORE", 	&config_guardada.puerto_filesystem);
-	error += set_variable_int(config, "GRADO_MULTITAREA", 		&config_guardada.grado_multitarea);
-	error += set_variable_int(config, "QUANTUM", 				&config_guardada.quantum);
-	error += set_variable_int(config, "DURACION_SABOTAJE", 		&config_guardada.duracion_sabotaje);
-	error += set_variable_int(config, "RETARDO_CICLO_CPU", 		&config_guardada.retardo_ciclo_cpu);
+	error += set_variable_str(config, "IP_MEMORIA", 			&config_guardada.ip_ram);
+	error += set_variable_int(config, "PUERTO_MEMORIA", 		&config_guardada.puerto_ram);
+
+	char * algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
+	config_guardada.algoritmo = obtener_algoritmo(algoritmo_planificacion);
+	if (config_guardada.algoritmo < 0) {
+		return -1;
+	}
+
+	error += set_variable_array_str(config, "DISPOSITIVOS_IO", &config_guardada.dispositivos_io, &config_guardada.cantidad_dispositivos_io);
+	error += set_variable_array_str(config, "DURACIONES_IO", &config_guardada.duraciones_io, &config_guardada.cantidad_duraciones_io);
+
+	error += set_variable_int(config, "RETARDO_CPU", 		&config_guardada.retardo_cpu);
+	error += set_variable_int(config, "GRADO_MULTIPROGRAMACION", 		&config_guardada.grado_multiprogramacion);
+	error += set_variable_int(config, "GRADO_MULTIPROCESAMIENTO", 		&config_guardada.grado_multiprocesamiento);
 
 	// Para loggear
 	error += set_variable_str(config, "LOG_ROUTE", 				&config_guardada.log_route);
@@ -59,12 +66,9 @@ int cargar_archivo(char * path) {
 	error += set_variable_int(config, "LOG_IN_CONSOLE", 		&config_guardada.log_in_console);
 	error += set_variable_int(config, "LOG_LEVEL_INFO", 		&config_guardada.log_level_info);
 
-	if (error != 0) { // TODO: Traer codigo de error
+	if (error != 0) {
 		return -2;
 	}
-
-	char * algoritmo_planificacion = config_get_string_value(config, "ALGORITMO");
-	config_guardada.algoritmo = obtener_algoritmo(algoritmo_planificacion);
 
 	config_destroy(config);
 
@@ -95,11 +99,20 @@ int set_variable_str(t_config * config, char * param_leer, char ** param) {
 	return 0;
 }
 
-t_algoritmo obtener_algoritmo(char * algoritmo) {
-	if (strcmp(algoritmo, ROUND_ROBIN) == 0 && config_guardada.quantum>0) {
-		return RR;
+int set_variable_array_str(t_config * config, char * param_leer, char *** param, int * cantidad_elementos) {
+	if (!config_has_property(config, param_leer)) {
+		return CONFIG_ERROR_EN_ARCHIVO;
 	}
 
-	return FIFO;
+	*param = config_get_array_value(config, param_leer);
+
+	char * ultimo_elemento = (*param)[0];
+	*cantidad_elementos = 0;
+	while(ultimo_elemento != NULL) {
+		(*cantidad_elementos)++;
+		ultimo_elemento = (*param)[*cantidad_elementos];
+	}
+
+	return 0;
 }
 
