@@ -10,11 +10,16 @@ typedef struct{
 }t_posicion;
 
 typedef struct {
-	char * punto_montaje;
+	char * ip;
 	int puerto;
 
-	int tiempo_sincronizacion;
+	int tamanio_swap;
+	int tamanio_pagina;
+	int marcos_maximos;
+	int retardo_swap;
 
+	int cantidad_archivos;
+	char ** archivos_swap;
 
 	// Loggin
 	char * log_route;
@@ -22,29 +27,22 @@ typedef struct {
 	int log_in_console;
 	int log_level_info;
 
-	int cantidad_posiciones;
-	t_list* posiciones_sabotaje;
-
-	//inicializacion FS
-	int cantidad_bloques;
-	int tamanio_bloques;
-
 } t_info_config;
 
 
 // GETTERS
-char * get_punto_montaje();
+char * get_ip();
 int get_puerto();
-
-int get_tiempo_sincronizacion();
+int get_tamanio_swap();
 char * get_log_route();
 char * get_log_app_name();
 int get_log_in_console();
 int get_log_level_info();
-int get_cantidad_posiciones();
-int get_cantidad_bloques();
-int get_tamanio_bloques();
-char* get_posicion_sabotaje(int i);
+int get_tamanio_pagina();
+int get_marcos_maximos();
+int get_retardo_swap();
+int get_cantidad_archivos();
+char ** get_archivos_swap();
 
 
 /**
