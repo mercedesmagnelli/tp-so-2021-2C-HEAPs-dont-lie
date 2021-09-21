@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	// TODO: Iniciar el Filesystem
+	iniciar_swamp();
 
 	loggear_debug("IP: %s", get_ip());
 	loggear_debug("PUERTO: %d", get_puerto());
@@ -30,11 +30,11 @@ int main(int argc, char** argv) {
 		loggear_debug("ARCHIVOS_SWAP[%d]: \t\t%s", i, get_archivos_swap()[i]);
 	}
 
-	int servidor = levantar_servidor();
+	/*int servidor = levantar_servidor();
 	if (servidor != 0) {
 		cerrar_todo();
 		return EXIT_FAILURE;
-	}
+	}*/
 
 	signal(SIGUSR1, manejar_signal);
 
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 }
 
 void cerrar_todo() {
-	cerrar_conexiones(true); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga
+	//cerrar_conexiones(true); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga
 	destroy_configuracion();
 	destroy_log();
 }

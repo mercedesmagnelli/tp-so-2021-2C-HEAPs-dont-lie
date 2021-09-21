@@ -15,4 +15,6 @@
 #include "../../shared/conexion.h"
 #include "../../shared/protocolo.h"
 
+#include "inicializar_filesystem/inicializar_filesystem.h"
+
 #endif /* FILESYSTEM_MAIN_H_ */
