@@ -52,17 +52,24 @@ Mkfile.old
 dkms.conf
 
 *.log
+
 filesystem.log
 planificador.log
 ram.log
 
-filesystem/tests/build/planificador-test
 planificador/tests/build/
-
-filesystem/tests/build/*/
 planificador/tests/build/*/
 
+filesystem/tests/build/
+filesystem/tests/build/*/
+
+ram/tests/build/
+ram/tests/build/*/
+
+planificador/tests/build/
 ram/tests/build/
 shared/tests/build/
 
 planificador/Debug/
+ram/Debug/
+filesystem/Debug/
