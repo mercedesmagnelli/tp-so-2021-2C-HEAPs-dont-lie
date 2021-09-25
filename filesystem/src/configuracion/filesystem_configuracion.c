@@ -52,13 +52,13 @@ int cargar_archivo(char * path) {
 	int error = 0;
 
 	// Lectura del archivo config
-	error += set_variable_str(config, "IP", 			&config_guardada.ip);
+	error += set_variable_str(config, "IP", 					&config_guardada.ip);
 	error += set_variable_int(config, "PUERTO", 		        &config_guardada.puerto);
-	error += set_variable_int(config, "TAMANIO_SWAP", 		        &config_guardada.tamanio_swap);
-	error += set_variable_int(config, "TAMANIO_PAGINA", 		        &config_guardada.tamanio_pagina);
-	error += set_variable_array_str(config, "ARCHIVOS_SWAP", &config_guardada.archivos_swap, &config_guardada.cantidad_archivos);
-	error += set_variable_int(config, "MARCOS_MAXIMOS", 		        &config_guardada.marcos_maximos);
-	error += set_variable_int(config, "RETARDO_SWAP", 		        &config_guardada.retardo_swap);
+	error += set_variable_int(config, "TAMANIO_SWAP", 		    &config_guardada.tamanio_swap);
+	error += set_variable_int(config, "TAMANIO_PAGINA", 		&config_guardada.tamanio_pagina);
+	error += set_variable_array_str(config, "ARCHIVOS_SWAP", 	&config_guardada.archivos_swap, &config_guardada.cantidad_archivos);
+	error += set_variable_int(config, "MARCOS_MAXIMOS", 		&config_guardada.marcos_maximos);
+	error += set_variable_int(config, "RETARDO_SWAP", 		    &config_guardada.retardo_swap);
 
 	// Para loggear
 	error += set_variable_str(config, "LOG_ROUTE", 				&config_guardada.log_route);

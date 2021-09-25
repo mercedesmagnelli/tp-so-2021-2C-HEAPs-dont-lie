@@ -10,15 +10,13 @@
 #include "../../../shared/logger.h"
 #include "../../../shared/protocolo.h"
 
-#include "manejar_mensajes_planificador.h"
-
-sem_t semaforo_detener_ejecucion;
+#include "manejar_mensajes.h"
 
 /**
- * @NAME: conectar_planificador
+ * @NAME: conectar_clientes
  * @DESC: Bloquea el hilo en donde se ejecute para escuchar conexiones del planificador y manejar mensajes.
  * Solo se va a detener cuando maten el hilo desde donde se invoca o el planificador se desconecte.
  */
-int conectar_planificador();
+int conectar_clientes();
 
 #endif /* CONEXION_PLANIFICADOR_COORDINAR_HILOS_H_ */

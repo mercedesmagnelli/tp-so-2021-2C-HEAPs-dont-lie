@@ -1,7 +1,6 @@
 
 #include "conexion_planificador.h"
 
-int conectar_planificador();
 int prender_servidor();
 
 int * socket_servidor; // Socket del servidor donde se conectan
@@ -16,7 +15,7 @@ int levantar_servidor() {
 		return server_error;
 	}
 
-	int error = pthread_create(&thread_escuchar_notificaciones, NULL, (void *) conectar_planificador, (void *) socket_servidor);
+	int error = pthread_create(&thread_escuchar_notificaciones, NULL, (void *) conectar_clientes, (void *) socket_servidor);
 	if (error != 0) {
 		loggear_error("Ocurrió un error al crear el hilo del servidor, Error: %d", error);
 		return error;
@@ -30,15 +29,13 @@ int levantar_servidor() {
 // Publica
 void cerrar_conexiones(bool safe_close) {
 
-	sem_wait(&semaforo_detener_ejecucion);
-
 	if (safe_close) {
 		pthread_join(thread_escuchar_notificaciones, NULL);
 	} else {
 		pthread_detach(thread_escuchar_notificaciones);
 	}
 
-	loggear_trace("Cerramos todos los threads del planificador que no hayan terminado");
+	loggear_trace("Cerramos todos los threads que no hayan terminado");
 
 	if (*socket_servidor > 0) {
 		close(*socket_servidor);
@@ -46,15 +43,12 @@ void cerrar_conexiones(bool safe_close) {
 
 	free(socket_servidor);
 
-	sem_destroy(&semaforo_detener_ejecucion);
-
 	loggear_trace("Cerrado los threads y sockets");
 }
 
 int prender_servidor() {
 	socket_servidor = malloc(sizeof(int));
 	*socket_servidor = crear_servidor(get_puerto());
-	sem_init(&semaforo_detener_ejecucion, 0, 0);
 
 	if (*socket_servidor < 0) {
 		loggear_error("Ocurrio un error al crear el servidor: %d", *socket_servidor);

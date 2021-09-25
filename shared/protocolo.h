@@ -15,51 +15,25 @@
 typedef enum {
 	CONEXION, // Un cliente informa a un servidor que se ha conectado. Payload: Algun t_cliente
 	FALLO_AL_RECIBIR,// Indica que un mensaje no se recibio correctamente en prot_recibir_mensaje
-	DESCONEXION, // Indica que un cliente se ha desconectado (usado para instancias)
-	DESCONEXION_TRIPULANTE,
-	DESCONEXION_PLANIFICADOR,
+	DESCONEXION, // Indica que un cliente se ha desconectado
+	DESCONEXION_TOTAL, // Se apagan los modulos
 
-	// Planificador => Filesystem
-	HANDSHAKE_D_M,
-	ESCUCHAR_SABOTAJES_D_M,
-	NACIO_TRIUPULANTE_D_M,
-	INICIO_TAREA_D_M,
-	FIN_TAREA_D_M,
-	MOVIMIENTO_TRIPULANTE_D_M,
-	CORRER_A_SABOTAJE_D_M,
-	INICIO_RESOLVER_SABOTAJE_D_M,
-	RESOLUCION_SABOTAJE_M_D,
-	RESOLVER_TAREA_IO_D_M,
-	MURIO_TRIPULANTE_D_M,
-	BITACORA_D_M,
+	// Ram => Filesystem
+	HANDSHAKE_R_F,
 
-	// Filesystem => Planificador
-	HANDSHAKE_M_D,
-	SABOTAJE_M_D,
-	DESCONEXION_FILESYSTEM,
-	BITACORA_M_D,
+	// Filesystem => Ram
+	HANDSHAKE_F_R,
 
 	// Ram => Planificador
-	HANDSHAKE_R_D,
-	SIGUIENTE_TAREA_R_D,
-	NO_HAY_MAS_TAREAS_R_D,
-	NUEVA_PATOTA_OK_R_D,
-	NUEVA_PATOTA_ERROR_R_D,
+	HANDSHAKE_R_P,
+
 	DESCONEXION_RAM,
 	RESPUESTA_OK_R_D,
 
 	// Planificador => Ram
-	HANDSHAKE_D_R,
-	CAMBIO_ESTADO_TRIPULANTE_D_R,
-	SIGUIENTE_TAREA_D_R,
-	NUEVA_PATOTA_D_R,
-	NACIO_TRIUPULANTE_D_R,
-	MOVIMIENTO_TRIPULANTE_D_R,
-	INICIO_TAREA_D_R,
-	FIN_TAREA_D_R,
-	MURIO_TRIPULANTE_D_R,
+	HANDSHAKE_P_R,
 
-	// Pruebas RAM => Planificador
+	// Pruebas
 	CACHO_DE_TEXTO
 
 } t_header;

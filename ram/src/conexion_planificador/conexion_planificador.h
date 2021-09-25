@@ -15,8 +15,8 @@
 #include "../../../shared/codigo_error.h"
 #include "../../../shared/thread_safe_value.h"
 
-#include "manejar_mensajes_planificador.h"
 #include "coordinar_hilos.h"
+#include "manejar_mensajes.h"
 
 /**
  * @NAME: levantar_servidor

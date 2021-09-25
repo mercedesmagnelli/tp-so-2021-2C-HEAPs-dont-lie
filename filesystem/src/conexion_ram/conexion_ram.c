@@ -11,7 +11,7 @@ int ram_enviar_handshake() {
 		return socket_ram;
 	}
 
-	int resultado = enviar_mensaje_protocolo(socket_ram, HANDSHAKE_P_R, 0, NULL);
+	int resultado = enviar_mensaje_protocolo(socket_ram, HANDSHAKE_F_R, 0, NULL);
 	if (resultado < 0) {
 		loggear_error("Ocurrió un error al enviar el Handshake a ram, Error: %d", resultado);
 
@@ -25,8 +25,6 @@ int ram_enviar_handshake() {
 		loggear_info("La RAM nos desconoce, no podemos trabajar");
 		return error;
 	}
-
-	close(socket_ram);
 
 	pthread_exit(NULL);
 	return 0;
@@ -48,8 +46,8 @@ void avisar_ram_desconexion() {
 }
 
 int iniciar_conexion_ram() {
-	char * ram_ip = get_ip_ram();
-	int ram_puerto = get_puerto_ram();
+	char * ram_ip = get_ip();
+	int ram_puerto = get_puerto();
 
 	int socket_server = conectar_a_servidor(ram_ip, ram_puerto);
 	if (socket_server < 0) {
