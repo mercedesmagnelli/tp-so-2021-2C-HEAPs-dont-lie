@@ -1,14 +1,15 @@
 #include "ram_configuracion.h"
 
-t_algoritmo_ram obtener_algoritmo(char * algoritmo);
+int set_variable_enum(t_config * config, char * param_leer, int * param, int (*transformar)(char* variable));
 
-t_esquema obtener_esquema(char * esquema);
-
-t_criterio obtener_criterio(char * criterio);
+int set_variable_int(t_config * config, char * param_leer, int * param);
 
 int set_variable_str(t_config * config, char * param_leer, char ** param);
 
-int set_variable_int(t_config * config, char * param_leer, int * param);
+
+int obtener_algoritmo_reemplazo_mmu(char * algoritmo);
+int obtener_tipo_asignacion(char * tipo_asignacion);
+int obtener_algoritmo_reemplazo_tlb(char * tipo_asignacion);
 
 int cargar_archivo();
 
@@ -38,7 +39,6 @@ bool son_validos_los_parametros(int argc, char ** argv) {
 
 // Publica
 void destroy_configuracion() {
-	free(config_guardada.path_swap);
 	free(config_guardada.log_route);
 	free(config_guardada.log_app_name);
 }
@@ -47,12 +47,18 @@ int cargar_archivo(char * path) {
 	t_config * config = config_create(path);
 	int error = 0;
 
-
-	error += set_variable_str(config, "PATH_SWAP", 				&config_guardada.path_swap);
 	error += set_variable_int(config, "PUERTO", 				&config_guardada.puerto);
-	error += set_variable_int(config, "TAMANIO_MEMORIA", 		&config_guardada.tamanio_memoria);
-	error += set_variable_int(config, "TAMANIO_PAGINA", 		&config_guardada.tamanio_pagina);
-	error += set_variable_int(config, "TAMANIO_SWAP", 			&config_guardada.tamanio_swap);
+	error += set_variable_int(config, "TAMANIO", 				&config_guardada.tamanio_memoria);
+
+	error += set_variable_enum(config, "ALGORITMO_REEMPLAZO_MMU", 	&config_guardada.algoritmo_reemplazo_mmu, obtener_algoritmo_reemplazo_mmu);
+	error += set_variable_enum(config, "TIPO_ASIGNACION", 			&config_guardada.tipo_asignacion, obtener_tipo_asignacion);
+	error += set_variable_enum(config, "ALGORITMO_REEMPLAZO_TLB",	&config_guardada.algoritmo_reemplazo_tlb, obtener_algoritmo_reemplazo_tlb);
+
+
+	error += set_variable_int(config, "MARCOS_MAXIMOS", 		&config_guardada.marcos_maximos);
+	error += set_variable_int(config, "CANTIDAD_ENTRADAS_TLB",	&config_guardada.cantidad_entradas_tlb);
+	error += set_variable_int(config, "RETARDO_ACIERTO_TLB", 	&config_guardada.retardo_acierto_tlb);
+	error += set_variable_int(config, "RETARDO_FALLO_TLB", 		&config_guardada.retardo_fallo_tlb);
 
 	// Para loggear
 	error += set_variable_str(config, "LOG_ROUTE", 				&config_guardada.log_route);
@@ -61,23 +67,16 @@ int cargar_archivo(char * path) {
 	error += set_variable_int(config, "LOG_LEVEL_INFO", 		&config_guardada.log_level_info);
 
 
-	if (error != 0) { // TODO: Traer codigo de error
-		return -2;
+	if (error != 0) {
+		return CONFIG_ERROR_EN_ARCHIVO;
 	}
-
-	char * algoritmo_reemplazo = config_get_string_value(config, "ALGORITMO_REEMPLAZO");
-	config_guardada.algoritmo = obtener_algoritmo(algoritmo_reemplazo);
-
-	char * esquema_memoria = config_get_string_value(config, "ESQUEMA_MEMORIA");
-	config_guardada.esquema_memoria = obtener_esquema(esquema_memoria);
-
-	char * criterio_seleccion = config_get_string_value(config, "CRITERIO_SELECCION");
-	config_guardada.criterio = obtener_criterio(criterio_seleccion);
 
 	config_destroy(config);
 
 	return 0;
 }
+
+
 
 int set_variable_int(t_config * config, char * param_leer, int * param) {
 	if (!config_has_property(config, param_leer)) {
@@ -103,26 +102,53 @@ int set_variable_str(t_config * config, char * param_leer, char ** param) {
 	return 0;
 }
 
-t_algoritmo_ram obtener_algoritmo(char * algoritmo) {
-	if (strcmp(algoritmo, LEAST_RECENTLY_USED) == 0) {
-		return LRU;
+int set_variable_enum(t_config * config, char * param_leer, int * param, int (*transformar)(char* variable)) {
+	if (!config_has_property(config, param_leer)) {
+		return CONFIG_ERROR_EN_ARCHIVO;
 	}
 
-	return CLOCK;
-}
-
-t_esquema obtener_esquema(char * esquema) {
-	if (strcmp(esquema, ESQUEMA_PAGINACION) == 0) {
-		return PAGINACION;
+	char * parametro_guardar;
+	int error = set_variable_str(config, param_leer, &parametro_guardar);
+	if (error < 0) {
+		return CONFIG_ERROR_EN_ARCHIVO;
 	}
 
-	return SEGMENTACION;
-}
+	int resultado = transformar(parametro_guardar);
 
-t_criterio obtener_criterio(char * criterio) {
-	if (strcmp(criterio, CRITERIO_BEST_FIT) == 0) {
-		return BEST_FIT;
+	if (resultado < 0) {
+		return CONFIG_ERROR_EN_ARCHIVO;
 	}
 
-	return FIRST_FIT;
+	*param = resultado;
+
+	return 0;
 }
+
+int obtener_algoritmo_reemplazo_mmu(char * algoritmo) {
+	if (strcmp(algoritmo, ALGORITMO_REEMPLAZO_MMU_CLOCK_M) == 0) {
+		return (int) CLOCKM;
+	}
+
+	return (int) CONFIG_ERROR_EN_ARCHIVO;
+}
+
+int obtener_tipo_asignacion(char * tipo_asignacion) {
+	if (strcmp(tipo_asignacion, TIPO_ASIGNACION_FIJA) == 0) {
+		return (int) FIJA;
+	} else if (strcmp(tipo_asignacion, TIPO_ASIGNACION_DINAMICA) == 0) {
+		return (int) DINAMICA;
+	}
+
+	return (int) CONFIG_ERROR_EN_ARCHIVO;
+}
+
+int obtener_algoritmo_reemplazo_tlb(char * tipo_asignacion) {
+	if (strcmp(tipo_asignacion, ALGORITMO_REEMPLAZO_TLB_FIFO) == 0) {
+		return (int) FIFO;
+	} else if (strcmp(tipo_asignacion, ALGORITMO_REEMPLAZO_TLB_LRU) == 0) {
+		return (int) LRU;
+	}
+
+	return (int) CONFIG_ERROR_EN_ARCHIVO;
+}
+
