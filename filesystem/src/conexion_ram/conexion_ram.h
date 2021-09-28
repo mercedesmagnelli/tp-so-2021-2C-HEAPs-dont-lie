@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "../configuracion/configuracion.h"
+#include "../configuracion/filesystem_configuracion_guardada.h"
 
 #include "../../../shared/conexion.h"
 #include "../../../shared/protocolo.h"

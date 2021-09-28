@@ -1,7 +1,7 @@
 
 #include "coordinar_hilos.h"
 
-int conectar_planificador(void * socket_servidor) {
+int conectar_clientes(void * socket_servidor) {
 	int socket = *((int *) socket_servidor);
 
 	bool continuar_escuchando = true;
@@ -13,7 +13,7 @@ int conectar_planificador(void * socket_servidor) {
 		}
 
 		t_prot_mensaje * mensaje = recibir_mensaje_protocolo(socket_planificador);
-		if (mensaje->head == DESCONEXION_PLANIFICADOR) {
+		if (mensaje->head == DESCONEXION_TOTAL) {
 			continuar_escuchando = false;
 			loggear_trace("Se desconectara el planificador");
 
@@ -27,7 +27,7 @@ int conectar_planificador(void * socket_servidor) {
 
 		ret = pthread_attr_init(&tattr);
 		ret = pthread_attr_setdetachstate(&tattr,PTHREAD_CREATE_DETACHED);
-		ret = pthread_create(&tid, &tattr, (void *) manejar_mensaje_planificador, mensaje);
+		ret = pthread_create(&tid, &tattr, (void *) manejar_mensaje, mensaje);
 
 		if (ret != 0) {
 			loggear_error("Ocurrió un error al crear el hilo para escuchar el mensaje, Error: %d", ret);
@@ -38,8 +38,6 @@ int conectar_planificador(void * socket_servidor) {
 
 		loggear_warning("Se creo el hilo [%zu] pendiente para destruir", ret);
 	}
-
-	sem_post(&semaforo_detener_ejecucion);
 
 	return 0;
 }

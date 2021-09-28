@@ -1,26 +1,29 @@
 
-#include "manejar_mensajes_ram.h"
+#include "manejar_mensajes.h"
 
-int recibir_mensaje_ram(int socket_ram) {
+int recibir_mensaje(int socket_ram) {
 	t_prot_mensaje * mensaje = recibir_mensaje_protocolo(socket_ram);
 
-	return manejar_mensajes_ram(mensaje);
+	return manejar_mensajes(mensaje);
 }
 
-int manejar_mensajes_ram(t_prot_mensaje * mensaje) {
+int manejar_mensajes(t_prot_mensaje * mensaje) {
 	switch (mensaje->head) {
-	case HANDSHAKE_R_D:
+	case HANDSHAKE_R_P:
 		loggear_info("Llegó un handshake de la ram! La aceptamos <3");
 
 		destruir_mensaje(mensaje);
 		return 0;
-	case DESCONEXION_RAM:
+	case DESCONEXION_TOTAL:
+		loggear_error("Se cerró la conexión con ram");
+
+		return ERROR_DESCONEXION_RAM;
 	case DESCONEXION:
 		loggear_warning("Se cerró la conexión con ram");
 
 		destruir_mensaje(mensaje);
 
-		return ERROR_DESCONEXION_RAM;
+		return 0;
 	break;
 	case FALLO_AL_RECIBIR:
 		loggear_error("Ocurrió un error al recibir el mensaje de ram");

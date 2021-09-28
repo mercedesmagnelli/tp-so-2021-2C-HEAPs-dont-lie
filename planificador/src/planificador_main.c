@@ -2,6 +2,8 @@
 
 void cerrar_todo();
 
+void debug_variables();
+
 int main(int argc, char** argv) {
 
 	int error = 0;
@@ -19,8 +21,35 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
+	debug_variables();
+
+	pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
+
+	error = thread_join_and_free(ram_handshake);
+	if (error != 0) {
+		loggear_error("RAM no nos acepto, Error: %d", error);
+		cerrar_todo();
+		thread_detach_and_free(ram_handshake);
+		return EXIT_FAILURE;
+	}
 
 
+	//levantar_consola();
+
+	cerrar_todo();
+	return EXIT_SUCCESS;
+}
+
+void cerrar_todo() {
+	ram_cerrar_conexiones(false);
+	loggear_info("Cerrada conexion con ram");
+	destroy_configuracion();
+	puts("Destruido configuraciones");
+	destroy_log();
+	puts("Destruido logs");
+}
+
+void debug_variables() {
 	loggear_debug("---Variables en archivo de configuración---");
 	loggear_debug("IP_MEMORIA: \t\t\t%s", get_ip_ram());
 	loggear_debug("PUERTO_MEMORIA: \t\t%d", get_puerto_ram());
@@ -40,32 +69,5 @@ int main(int argc, char** argv) {
 	loggear_debug("LOG_APP_NAME: \t\t\t%s", get_log_app_name());
 	loggear_debug("LOG_IN_CONSOLE: \t\t%d", get_log_in_console());
 	loggear_debug("LOG_LEVEL_INFO: \t\t%d", get_log_level_info());
-
-	/*
-	pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
-
-	error = thread_join_and_free(ram_handshake);
-	if (error != 0) {
-		loggear_error("RAM no nos acepto, Error: %d", error);
-		cerrar_todo();
-		thread_detach_and_free(ram_handshake);
-		return EXIT_FAILURE;
-	}
-	*/
-
-	// TODO: Iniciar planificador
-
-	//levantar_consola();
-
-	cerrar_todo();
-	return EXIT_SUCCESS;
 }
 
-void cerrar_todo() {
-	ram_cerrar_conexiones(false);
-	loggear_info("Cerrada conexion con ram");
-	destroy_configuracion();
-	puts("Destruido configuraciones");
-	destroy_log();
-	puts("Destruido logs");
-}
