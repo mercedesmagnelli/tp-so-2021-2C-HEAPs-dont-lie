@@ -31,11 +31,11 @@ int main(int argc, char** argv) {
 	}
 
 
-	/*int servidor = levantar_servidor();
+	int servidor = levantar_servidor();
 	if (servidor != 0) {
 		cerrar_todo();
 		return EXIT_FAILURE;
-	}*/
+	}
 
 	signal(SIGUSR1, manejar_signal);
 
@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
 }
 
 void cerrar_todo() {
-	//cerrar_conexiones(true); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga
+	cerrar_conexiones(true); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga
 	destroy_configuracion();
 	destroy_log();
 }
