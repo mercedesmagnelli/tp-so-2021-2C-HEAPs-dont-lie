@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
 		loggear_debug("ARCHIVOS_SWAP[%d]: \t\t%s", i, get_archivos_swap()[i]);
 	}
 
+
 	/*int servidor = levantar_servidor();
 	if (servidor != 0) {
 		cerrar_todo();

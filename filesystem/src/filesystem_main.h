@@ -16,5 +16,6 @@
 #include "../../shared/protocolo.h"
 
 #include "inicializar_filesystem/inicializar_filesystem.h"
+#include "manejo_filesystem/manejo_archivos.h"
 
 #endif /* FILESYSTEM_MAIN_H_ */
