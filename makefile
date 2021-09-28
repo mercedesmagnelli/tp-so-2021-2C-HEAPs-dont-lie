@@ -12,6 +12,9 @@ NOCOLOR :=\033[0m
 SHARED_NAME := SHARED
 SHARED_ROUTE := shared/tests
 
+#MATELIB INFO
+MATELIB_NAME := MATELIB
+
 # PLANIFICADOR INFO
 PLANIFICADOR_NAME := PLANIFICADOR
 PLANIFICADOR_ROUTE := planificador/src
@@ -26,7 +29,7 @@ RAM_TEST_ROUTE := ram/tests
 RAM_COMPILADO := ram.out
 RAM_ARCHIVO_CONFIG := ram.config
 
-# I-FILESYSTEM-STORE INFO
+# FILESYSTEM INFO
 FILESYSTEM_NAME := FILESYSTEM
 FILESYSTEM_ROUTE := filesystem/src
 FILESYSTEM_TEST_ROUTE := filesystem/tests
@@ -35,7 +38,7 @@ FILESYSTEM_ARCHIVO_CONFIG := filesystem.config
 
 all: p r f
 	
-# Trabajos de compilacion proyectos y test "make d" "make r" "make m"
+# Trabajos de compilacion proyectos y test "make d" "make r" "make f"
 p:
 	-@echo "$(YELLOW) COMPILANDO '$(PLANIFICADOR_NAME)' 🎮 🎮 🎮 $(NOCOLOR)"
 	-@cd $(PLANIFICADOR_ROUTE) && $(MAKE) all
@@ -56,7 +59,7 @@ f:
 	-@echo "$(YELLOW) COMPILANDO TESTS '$(FILESYSTEM_NAME)' 📝 📝 📝 $(NOCOLOR)"
 	-@cd $(FILESYSTEM_TEST_ROUTE) && $(MAKE) all
 	-@echo "$(GREEN) COMPILADO Tests '$(FILESYSTEM_NAME)' ✔️✔️✔️✔️✔️✔️✔️✔️✔️✔️ $(NOCOLOR)"
-
+	
 # Trabajos de clean "make clean-d" "make clean-r" "make clean-m" "make clean-s" "make clean"
 clean-p:
 	-@cd $(PLANIFICADOR_ROUTE) && $(MAKE) clean
