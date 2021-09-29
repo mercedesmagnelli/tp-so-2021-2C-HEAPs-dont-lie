@@ -20,10 +20,12 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
+	iniciar_swamp();
 
 	debug_variables();
 
 	pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
+
 
 	error = thread_join_and_free(ram_handshake);
 	if (error != 0) {
