@@ -2,12 +2,13 @@
 #define TLB_TLB_H_
 
 #include <commons/collections/dictionary.h>
-
+#include <sys/time.h>
+#include <stdlib.h>
 t_dictionary* TLB;
 
 typedef struct{
 	int frame;
-	int timestamp; //ver si es necesario, lo agrego por ahora porque no sé como vamos a hacer para seleccionar la entrada que vuela
+	double timestamp; //ver si es necesario, lo agrego por ahora porque no sé como vamos a hacer para seleccionar la entrada que vuela
 }entrada_tlb;
 
 /**
@@ -24,7 +25,7 @@ void inicializar_tlb();
  *
  */
 
-void agregar_entrada_tlb(int pid, int pagina);
+void agregar_entrada_tlb(int pid, int pagina, int frame);
 
 /**
  * @NAME: calcular_hash_key
@@ -59,6 +60,14 @@ void reemplazar_entrada_tlb(entrada_tlb* entradaNueva, int indice);
  **/
 
 int obtener_direccion_de_tlb(char* key);
+
+/**
+ * @NAME:obtener_timestamp_actual
+ * @DESC: se obtiene la timestamp
+ *
+ **/
+
+double obtener_timestamp_actual();
 
 #endif /* TLB_TLB_H_ */
 
