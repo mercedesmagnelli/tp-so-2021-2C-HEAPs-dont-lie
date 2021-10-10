@@ -18,6 +18,19 @@ typedef enum {
 	DESCONEXION, // Indica que un cliente se ha desconectado
 	DESCONEXION_TOTAL, // Se apagan los modulos
 
+	// Mensajes que envia la matelib hacia el KERNEL o la RAM
+	MATELIB_INIT, // Envia un nuevo proceso al Kernel, que lo crea en NEW y luego lo mueve a READY
+	MATELIB_CLOSE, // Avisa al Kernel que hay que mover el proceso a FINISH
+	MATELIB_SEM_INIT, // Inicia un semaforo con el valor que pasen
+	MATELIB_SEM_WAIT, // Le resta uno al contador del semaforo, si es menor a 1, se mueve a BLOCKED el proceso
+	MATELIB_SEM_POST, // Le suma uno al contador del semaforo, si es mayor a 1, se quita un proceso de BLOCKED
+	MATELIB_SEM_DESTROY, // Se destruye el semaforo y los procesos asociados dejan de requerir el semaforo
+	MATELIB_CALL_IO, // Un proceso llama a un recurso de IO, se bloquea y si el recurso esta en uso se bloquea esperando
+	MATELIB_MEM_ALLOC, // El proceso le pide a la ram memoria y devuelve un puntero a la direccion
+	MATELIB_MEM_FREE, // El proceso libera memoria en la RAM si son 2 bloques contiguos, se hacen uno
+	MATELIB_MEM_READ, // Lee el contenido como void * de lo que esta en la RAM
+	MATELIB_MEM_WRITE, // Escribe un void * en la RAM
+
 	// Ram => Filesystem
 	HANDSHAKE_R_F,
 
