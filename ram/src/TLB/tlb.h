@@ -7,7 +7,7 @@
 t_dictionary* TLB;
 
 typedef struct{
-	int frame;
+	uint32_t frame;
 	double timestamp; //ver si es necesario, lo agrego por ahora porque no sé como vamos a hacer para seleccionar la entrada que vuela
 }entrada_tlb;
 
@@ -25,7 +25,7 @@ void inicializar_tlb();
  *
  */
 
-void agregar_entrada_tlb(int pid, int pagina, int frame);
+void agregar_entrada_tlb(uint32_t pid, uint32_t pagina, uint32_t frame);
 
 /**
  * @NAME: calcular_hash_key
@@ -36,14 +36,14 @@ void agregar_entrada_tlb(int pid, int pagina, int frame);
  *
  **/
 
-char* calcular_hash_key(int pid, int pag);
+char* calcular_hash_key(uint32_t pid, uint32_t pag);
 /**
  * @NAME: esta_en_tlb
  * @DESC: funcion que dado un pid y una pagina, retorna si esta presente en la tlb
  *
  **/
 
-bool esta_en_tlb(int pid, int pag);
+bool esta_en_tlb(uint32_t pid, uint32_t pag);
 
 /**
  * @NAME: reemplazar_entrada_tlb
@@ -51,7 +51,7 @@ bool esta_en_tlb(int pid, int pag);
  *
  **/
 
-void reemplazar_entrada_tlb(entrada_tlb* entradaNueva, int indice);
+void reemplazar_entrada_tlb(entrada_tlb* entradaNueva, uint32_t indice);
 
 /**
  * @NAME: leer_direccion_de_tlb
@@ -59,7 +59,7 @@ void reemplazar_entrada_tlb(entrada_tlb* entradaNueva, int indice);
  *
  **/
 
-int obtener_direccion_de_tlb(char* key);
+uint32_t obtener_direccion_de_tlb(char* key);
 
 /**
  * @NAME:obtener_timestamp_actual
