@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-t_dictionary* TLB;
+
 
 typedef struct{
 	uint32_t frame;
