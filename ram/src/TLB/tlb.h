@@ -4,6 +4,9 @@
 #include <commons/collections/dictionary.h>
 #include <sys/time.h>
 #include <stdlib.h>
+#include <stdint.h>
+
+//#include <../../src/configuracion/ram_config_guardada.h>
 t_dictionary* TLB;
 
 typedef struct{

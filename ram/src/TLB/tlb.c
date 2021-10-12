@@ -8,7 +8,7 @@ void inicializar_tlb() {
 	//METER LOG DE TLB CREADA EXITOSAMETNE
 }
 
-void agregar_entrada_tlb(int proceso, int pagina, int frame) {
+void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
 	char* key = calcular_hash_key(proceso, pagina);
 	//TODO
@@ -19,23 +19,23 @@ void agregar_entrada_tlb(int proceso, int pagina, int frame) {
 	dictionary_put(TLB, key, &entrada);
 
 }
-char* calcular_hash_key(int proceso, int pagina) {
-	char** key = string_from_format("%d-%d", proceso,pagina);
+char* calcular_hash_key(uint32_t proceso, uint32_t pagina) {
+	char** key = string_from_format("%d-%d",proceso, pagina);
 	return *key;
 
 }
 
-bool esta_en_tlb(int pid, int pag) {
+bool esta_en_tlb(uint32_t pid, uint32_t pag) {
 	char* key = calcular_hash_key(pid, pag);
 	return dictionary_has_key(TLB, key);
 }
 
-void reemplazar_entrada_tlb(entrada_tlb* entrada, int indice) {
+void reemplazar_entrada_tlb(entrada_tlb* entrada, uint32_t indice) {
 	//TODO
 }
 
-int obtener_direccion_de_tlb(char* key){
-	return *(int*)dictionary_get(TLB, key);
+uint32_t obtener_direccion_de_tlb(char* key){
+	return *(uint32_t*)dictionary_get(TLB, key);
 }
 
 double obtener_timestamp_actual(){
