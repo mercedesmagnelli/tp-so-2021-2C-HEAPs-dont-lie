@@ -18,7 +18,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 		switch (mensaje->head) {
 		case MATELIB_INIT:
 			loggear_info("[MATELIB_INIT], hay que crear un proceso");
-
+			// TODO: Deserializar el numero del proceso
 
 			return 0;
 		case MATELIB_CLOSE:
