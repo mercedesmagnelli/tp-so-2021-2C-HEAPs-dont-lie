@@ -1,9 +1,7 @@
 #include "tlb.h"
 
 void inicializar_tlb() {
-	//COSA IMPORTANTE: POR DEFAULT LAS COMMONS CREAN UN DICCIONARIO CON 20 ENTRADAS.
-	// a. modifico las commons -> no, me caga si usan otra verision
-	// b. copio el codigo y modifico -> hago esto
+
 	TLB = dictionary_create();
 	//METER LOG DE TLB CREADA EXITOSAMETNE
 }
