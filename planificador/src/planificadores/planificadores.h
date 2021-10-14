@@ -3,10 +3,11 @@
 #define PLANIFICADORES_H_
 
 #include <stddef.h>
+#include <stdint.h>
 
 #include "../../../shared/logger.h"
 
-const alfa; // Definido por archivo de configuracion para calcular estimaciones por HRRN.
+const float alfa; // Definido por archivo de configuracion para calcular estimaciones por HRRN.
 
 typedef struct {
     float estimacion_anterior; // Resultado de estimacion anterior. Se obtiene por archivo de configuracion la primera vez.

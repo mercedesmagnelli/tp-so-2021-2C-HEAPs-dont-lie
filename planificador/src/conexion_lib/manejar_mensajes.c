@@ -3,8 +3,8 @@
 
 void desconexion(t_prot_mensaje * mensaje);
 
-int recibir_mensaje(int socket) {
-	t_prot_mensaje * mensaje = recibir_mensaje_protocolo(socket);
+int lib_recibir_mensaje(int socket_ram) {
+	t_prot_mensaje * mensaje = recibir_mensaje_protocolo(socket_ram);
 
 	return manejar_mensaje(mensaje);
 }

@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <commons/collections/queue.h>
 
-#include "../configuracion/ram_configuracion.h"
+#include "../configuracion/configuracion_guardada.h"
 
 #include "../../../shared/logger.h"
 #include "../../../shared/conexion.h"

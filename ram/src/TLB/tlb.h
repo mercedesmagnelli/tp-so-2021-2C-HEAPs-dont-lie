@@ -3,7 +3,7 @@
 
 #include <commons/collections/dictionary.h>
 
-t_dictionary* TLB;
+#include "../../../shared/logger.h"
 
 typedef struct{
 	int frame;
@@ -23,8 +23,7 @@ void inicializar_tlb();
  * @DESC: agrega una entrada a la TLB a partir de un pid y numero de pagina
  *
  */
-
-void agregar_entrada_tlb(int pid, int pagina);
+void agregar_entrada_tlb(int proceso, int pagina, int frame);
 
 /**
  * @NAME: calcular_hash_key
