@@ -13,12 +13,12 @@
 #include "conexion_ram.h"
 
 /**
- * @NAME: recibir_mensaje
+ * @NAME: ram_recibir_mensaje
  * @DESC: Espera un mensaje, y actua segun corresponda.
  * @RETURN:
  * Llama a "manejar_mensajes"
  */
-int recibir_mensaje(int socket_ram);
+int ram_recibir_mensaje(int socket_ram);
 
 /**
  * @NAME: manejar_mensajes
