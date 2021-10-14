@@ -10,7 +10,7 @@ uint32_t memalloc(uint32_t pid, uint32_t size) {
  	 * En ambos casos (fija, dinamica) me tengo que fijar que la última pagina me pueda permitir guardar todo lo que quiero guardar.
  	 * Si no alcanza -> Si es fija: me tengo que fijar si ya llegue al máximo de marcos por proceso. Si ya llegué, entonces => rechazo
  	 * 				 -> Si es dinámica: me tengo que fijar que haya lugar en la RAM
- 	 * */
+ 	 */
 
 	return 0;
 }

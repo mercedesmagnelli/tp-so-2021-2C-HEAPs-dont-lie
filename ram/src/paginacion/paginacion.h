@@ -1,6 +1,8 @@
 #ifndef PAGINACION_PAGINACION_H_
 #define PAGINACION_PAGINACION_H_
 
+#include <stdint.h>
+#include <commons/collections/list.h>
 
 typedef struct{
 	//índice: frame
@@ -15,6 +17,15 @@ typedef struct {
 	uint32_t miss_proceso;
 	uint32_t hits_proceso;
 }t_proceso;
+
+
+/**
+ * @NAME: inicializar_estructuras_administrativas_paginacion
+ * @DESC: Inicializa los diccionarios y las listas
+ **/
+
+void inicializar_estructuras_administrativas_paginacion();
+
 
 
 

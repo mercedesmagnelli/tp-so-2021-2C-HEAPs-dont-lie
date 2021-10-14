@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-//#include <../../src/configuracion/ram_config_guardada.h>
 t_dictionary* TLB;
 
 typedef struct{
@@ -71,6 +70,14 @@ uint32_t obtener_direccion_de_tlb(char* key);
  **/
 
 double obtener_timestamp_actual();
+
+/**
+ * @NAME: limpiar_tlb
+ * @DESC: se eliminan todas las entadas de la TLB. Esta funcion se invoca cuando se llama a la signal sigurs2
+ **/
+
+void limpiar_tlb();
+
 
 #endif /* TLB_TLB_H_ */
 
