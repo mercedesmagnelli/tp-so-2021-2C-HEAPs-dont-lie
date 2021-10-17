@@ -1,41 +1,50 @@
 #include "memoria.h"
 
+void* memoria_principal;
+//t_dictionary* cant_frames_proceso;
+t_list* espacios_memoria;
+
+
 uint32_t memalloc(uint32_t pid, uint32_t size) {
 
-	/*Podría dividir el problema en 3
-	 * 1. Es el primer elemento a agregar -> lo agrego al principio de la lista
-	 * 2. Es un elemento que puede entrar en el medio
-	 * 3. Se inserta al final */
- 	/* Antes de empezar a insertar, tengo que verificar si puedo asignarle al proceso
- 	 * En ambos casos (fija, dinamica) me tengo que fijar que la última pagina me pueda permitir guardar todo lo que quiero guardar.
- 	 * Si no alcanza -> Si es fija: me tengo que fijar si ya llegue al máximo de marcos por proceso. Si ya llegué, entonces => rechazo
- 	 * 				 -> Si es dinámica: me tengo que fijar que haya lugar en la RAM
- 	 */
+	/*Cuando hago el memalloc, tengo que escribir el heapmetadata correcpondiente y */
 
-	return 0;
+
+	return encontrar_espacio_disponible_ff(size);
 }
 
 void memfree(uint32_t* direccionLogicaALiberar) {
 
 }
 
-void* memread(uint32_t* direccionLogicaALeer) {
-	return 0;
+void* memread(uint32_t* direccionLogicaALeer, uint32_t tamanioALeer) {
+
+	void* lectura = malloc(tamanioALeer);
+	memcpy(lectura, direccionLogicaALeer , tamanioALeer);
+	return lectura;
 }
 
-void memwrite(void* valorAEscribir, uint32_t* direccionLogicaAEscribir /*t_list* tablaPaginas*/){
+void memwrite(void* valorAEscribir, uint32_t* direccionLogicaAEscribir, uint32_t tamanioAEscribir){
+
+	memcpy(direccionLogicaAEscribir, valorAEscribir, tamanioAEscribir);
 
 }
 
 void inicializar_memoria_principal() {
 	int tamanio_memoria = get_tamanio_memoria();
 	memoria_principal =  malloc(tamanio_memoria);
+	/*Ya inicializo la memoria con un primer heapmetadata que me divide a la memoria en un gran bloque*/
+
+}
+
+void guardar_heapmetadata(uint32_t donde, uint32_t tamanio) {
+
 }
 
 void inicializar_estructuras_administrativas() {
 
-	adm_memoria = list_create();
-	cant_frames_proceso = dictionary_create();
+	espacios_memoria = list_create();
+	//cant_frames_proceso = dictionary_create();
 
 }
 
@@ -43,9 +52,12 @@ void liberar_estructuras_administrativas() {
 
 }
 
-uint32_t* encontrar_espacio_disponible(uint32_t size) {
+uint32_t* encontrar_espacio_disponible_ff(uint32_t size) {
 
 	return 1;
 }
 
+void consolidar(uint32_t indice_a_consolidar){
+
+}
 

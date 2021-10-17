@@ -19,6 +19,7 @@ typedef struct {
 }t_proceso;
 
 
+
 /**
  * @NAME: inicializar_estructuras_administrativas_paginacion
  * @DESC: Inicializa los diccionarios y las listas

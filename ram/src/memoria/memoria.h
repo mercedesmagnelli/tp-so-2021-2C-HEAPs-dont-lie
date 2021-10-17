@@ -8,30 +8,13 @@
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
 
-/*Variables globales*/
-
-void* memoria_principal;
-t_dictionary* cant_frames_proceso;
-t_list* adm_memoria;
-
-
-
 typedef struct{
-	uint32_t comienzo;
-	bool esta_libre;
+	 uint32_t prevAlloc;
+	 uint32_t nextAlloc;
+	 uint8_t isFree;
+}heap_metadata​;
 
-}t_datos;
 
-typedef struct{
-	uint32_t en_mp; //me sirve de flag para comprobar cuando realmente hacer el swap
-	uint32_t en_mv; // me sirve para tener el control de la cant maxima por proceso
-}asignacion_marcos_fijos;
-// Lo pondría para saber cuándo tengo que mandar a MV, a no ser que mandemos siempre a MV de una
-/* CODIGOS DE ERROR
- *
- * - Frames maximos alcanzados
- * - No hay memoria disponible
- * */
 
 /*Funciones que pide el TP obligatorias*/
 
