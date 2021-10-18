@@ -5,18 +5,20 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
 
+
 typedef struct{
-	 uint32_t prevAlloc;
-	 uint32_t nextAlloc;
-	 uint8_t isFree;
-}heap_metadata​;
 
-
+	uint32_t prevAlloc;
+	uint32_t nextAlloc;
+	uint8_t isFree;
+}heap_metadata;
 
 /*Funciones que pide el TP obligatorias*/
+
 
 /**
  * @NAME: memalloc
@@ -43,7 +45,7 @@ void memfree(uint32_t* direccionLogicaALiberar);
  *
  **/
 
-void* memread(uint32_t* direccionLogicaALeer);
+void* memread(uint32_t* direccionLogicaALeer, uint32_t tamanio);
 
 
 /**
@@ -54,7 +56,7 @@ void* memread(uint32_t* direccionLogicaALeer);
  **/
 
 
-void memwrite(void* valorAEscribir, uint32_t* direccionLogicaAEscribir /*t_list* tablaPaginas*/);
+void memwrite(void* valorAEscribir, uint32_t* direccionLogicaAEscribir, uint32_t tamanio);
 
 /*Funciones desarrolladas extras para correcto funcionamiento de la memoria*/
 
@@ -80,13 +82,13 @@ void inicializar_estructuras_administrativas();
  **/
 void liberar_estructuras_administrativas();
 /**
- * @NAME: encontrar_espacio_disponible
+ * @NAME: encontrar_espacio_disponible_ff
  * @DESC: Busca en la estructura administrativa de la memoria el lugar donde puede
  * guardar información.
  * @RET: Retorna la direccion lógica de donde encontró el espacio
  *
  **/
-uint32_t* encontrar_espacio_disponible(uint32_t tamanio_a_guardar);
+uint32_t* encontrar_espacio_disponible_ff(uint32_t tamanio_a_guardar);
 
 
 #endif /* MEMORIA_MEMORIA_C_ */

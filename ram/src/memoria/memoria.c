@@ -53,8 +53,8 @@ void liberar_estructuras_administrativas() {
 }
 
 uint32_t* encontrar_espacio_disponible_ff(uint32_t size) {
-
-	return 1;
+	uint32_t* a;
+	return a;
 }
 
 void consolidar(uint32_t indice_a_consolidar){
