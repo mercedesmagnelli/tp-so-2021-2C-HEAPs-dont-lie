@@ -34,6 +34,42 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			destruir_mensaje(mensaje);
 
 			return 0;
+		case MATELIB_MEM_ALLOC:
+			/*
+			 * Llega PID y la cantidad de memoria a solicitar (deserealizar)
+			 *
+			 * usamos la funcion int32_t solicitar_espacio_memoria(int32_t PID,int32_t cantMemoria) de paginación
+			 *
+			 * Enviamos a PLANI el puntero logico donde se otorgo la memoria solicitada
+			 */
+			return 0;
+		case MATELIB_MEM_FREE:
+			/*
+			 * Llega PID y el puntero donde esta el alloc a liberar (deserealizar)
+			 *
+			 * usamos la funcion int liberar_espacio_memoria(int32_t PID, int32_t ptroMem) de paginación
+			 *
+			 * Enviamos el HANDSHAKE diciendo que se pudo liberar la memoria
+			 */
+			return 0;
+		case MATELIB_MEM_READ:
+			/*
+			 * Llega PID y puntero de lectura (deserealizar)
+			 *
+			 * usamos la funcion int32_t leer_espacio_memoria(int32_t PID, int32_t ptroMem, void* data)  de paginación
+			 *
+			 * Enviamos tamanio de dato leido y la data
+			 */
+			return 0;
+		case MATELIB_MEM_WRITE:
+			/*
+			 * Llega PID, puntero donde escribir, tamanio data y data a escribir (deserealizar)
+			 *
+			 * usamos la funcion int escribir_espacio_memoria(int32_t PID, int32_t ptroLogicoMem, int32_t tamanioData, void* data) de paginacion
+			 *
+			 * Enviamos un HANDSHAKE diciendo que se pudo escribir en memoria
+			 */
+			return 0;
 		case DESCONEXION:
 			loggear_info("Se desconectaron");
 

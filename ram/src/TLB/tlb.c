@@ -1,18 +1,20 @@
 #include "tlb.h"
 
+t_dictionary* TLB;
+
 void inicializar_tlb() {
 
 	TLB = dictionary_create();
-	//METER LOG DE TLB CREADA EXITOSAMETNE
+
 }
 
 void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
 	char* key = calcular_hash_key(proceso, pagina);
-	//TODO
+
 	entrada_tlb* entrada = malloc(sizeof(entrada_tlb));
 	entrada->timestamp = obtener_timestamp_actual();
-	entrada->frame = frame; //aca ver como obtener la direccion -> podría venir por parametro???
+	entrada->frame = frame;
 
 	dictionary_put(TLB, key, &entrada);
 
