@@ -34,7 +34,36 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			destruir_mensaje(mensaje);
 
 			return 0;
+		case MATELIB_INIT:
+			loggear_info("[MATELIB_INIT], hay que crear un proceso");
+
+			return 0;
+		case MATELIB_CLOSE:
+			loggear_info("[MATELIB_CLOSE], hay que cerrar el proceso");
+
+			return 0;
+		case MATELIB_SEM_INIT:
+			loggear_info("[MATELIB_SEM_INIT], se crea un semaforo");
+
+			return 0;
+		case MATELIB_SEM_WAIT:
+			loggear_info("[MATELIB_SEM_WAIT], reducir en uno el contador del semaforo y tal vez bloquear un proceso");
+
+			return 0;
+		case MATELIB_SEM_POST:
+			loggear_info("[MATELIB_SEM_POST], incrementar en uno el contador del semaforo y tal vez desbloquear un proceso");
+
+			return 0;
+		case MATELIB_SEM_DESTROY:
+			loggear_info("[MATELIB_SEM_DESTROY], destruir un semaforo y eliminar todos los bloqueos que existan");
+
+			return 0;
+		case MATELIB_CALL_IO:
+			loggear_info("[MATELIB_CALL_IO], bloquear un proceso porque llama a IO");
+
+			return 0;
 		case MATELIB_MEM_ALLOC:
+			loggear_info("[MATELIB_MEM_ALLOC], un proceso pide espacio en la RAM");
 			/*
 			 * Llega PID y la cantidad de memoria a solicitar (deserealizar)
 			 *
@@ -44,6 +73,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			 */
 			return 0;
 		case MATELIB_MEM_FREE:
+			loggear_info("[MATELIB_MEM_FREE], un proceso libera memoria de la RAM");
 			/*
 			 * Llega PID y el puntero donde esta el alloc a liberar (deserealizar)
 			 *
@@ -53,6 +83,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			 */
 			return 0;
 		case MATELIB_MEM_READ:
+			loggear_info("[MATELIB_MEM_READ], un proceso quiere leer algo de la RAM");
 			/*
 			 * Llega PID y puntero de lectura (deserealizar)
 			 *
@@ -62,6 +93,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			 */
 			return 0;
 		case MATELIB_MEM_WRITE:
+			loggear_info("[MATELIB_MEM_WRITE], un proceso quiere escribir en la RAM");
 			/*
 			 * Llega PID, puntero donde escribir, tamanio data y data a escribir (deserealizar)
 			 *

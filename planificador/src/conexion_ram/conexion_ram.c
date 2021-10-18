@@ -20,7 +20,7 @@ int ram_enviar_handshake() {
 
 	loggear_trace("Enviado handshake a la ram");
 
-	int error = recibir_mensaje(socket_ram);
+	int error = ram_recibir_mensaje(socket_ram);
 	if (error != 0) {
 		loggear_info("La RAM nos desconoce, no podemos trabajar");
 		return error;
