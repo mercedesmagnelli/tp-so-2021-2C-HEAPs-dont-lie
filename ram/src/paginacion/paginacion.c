@@ -1,8 +1,6 @@
 #include "paginacion.h"
 
-t_list* lista_procesos;
-t_list* lista_frames;
-t_dictionary* cant_frames_por_proceso;
+
 
 // FUNCIONES DE INICIO Y DESTRUCCION ADMINISTRATIVAS
 
@@ -91,4 +89,31 @@ int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam){
 
 	return ptro;
 
+}
+
+int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size) {
+	if(1) {
+		//fijo
+		return MAXIMO_MARCOS_ALCANZADO;
+	}else {
+		return ESPACIO_EN_MEMORIA_INSUF;
+	}
+}
+
+int32_t agregar_proceso(uint32_t PID, uint32_t tam){
+	printf("agregar proceso");
+	return 1;
+}
+
+void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
+	printf("holis");
+}
+
+int32_t se_asigna_memoria_necesaria(uint32_t pid, uint32_t size) {
+	printf("hola, desarrollame, no seas rata");
+	return 1;
+}
+uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size){
+	printf("no, no podés, deja de joder");
+	return 1;
 }

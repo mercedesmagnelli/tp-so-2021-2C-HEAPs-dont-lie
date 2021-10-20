@@ -4,7 +4,12 @@
 #include <stdint.h>
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
+#include "../../../shared/codigo_error.h"
 #include <stdlib.h>
+
+t_list* lista_procesos;
+t_list* lista_frames;
+t_dictionary* cant_frames_por_proceso;
 
 typedef struct{
 	//índice: frame
@@ -25,34 +30,7 @@ typedef struct{
 	uint8_t isFree;
 }heap_metadata;
 
-/*
 
-diccionario_de_frames_fijos
-
-key			| value
-pid			| [mp, mv]
-1			| [1, 1]
-2			| [0, 1]
-3			| [3, 0]
-
-maximo_de_frames = get_config_maximo_proceso
-
-
-get_marcos_del_proceso_en_mv (uint32_t proceso)
-
-get_dictionary(diccionario_de_frames_fijos, proceso);
-
-*/
-
-/*
-quiero leer algo que no esta en memoria
-if (get_marcos_del_proceso_en_MV (pid) < maximo) {
- no hago swapping, lo traigo directamente
-}else {
-//hago el swapping
-}
-
-*/
 typedef struct {
 	uint32_t PID;
 	t_list* tabla_paginas; //t_list pagina
@@ -76,6 +54,7 @@ typedef struct{
  * @NAME: inicializar_estructuras_administrativas_paginacion
  * @DESC: Inicializa los diccionarios y las listas
  **/
+
 void inicializar_estructuras_administrativas_paginacion();
 
 
@@ -90,6 +69,7 @@ void inicializar_estructuras_administrativas_paginacion();
  *   1 existe el proceso
  *   0 no existe el proceso
  **/
+
 int32_t existe_proceso(uint32_t PID);
 
 /**
@@ -99,19 +79,22 @@ int32_t existe_proceso(uint32_t PID);
  *   >=0 Devuelve el puntero al alloc donde se puede guardar la data
  *   <0 Devuelve el puntero al ultimo alloc con valor negativo
  **/
+
 int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam);
 
 /**
  * @NAME: actualizo_proceso
  * @DESC: Actualiza el HEAP seleccionado del proceso y, en caso necesario, agrega uno nuevo
  **/
-void actualizar_proceso(uint32_t PID, uint32_t ptro, uint32_t tamanio);
+
+void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio);
 
 /**
  * @NAME: agrego_proceso
  * @DESC: Agrega el proceso a la lista de procesos y crea los 2 HEAPs necesarios
  * @RET: devuelve el puntero en el cual entra el tamaño solicitado
  **/
+
 int32_t agregar_proceso(uint32_t PID, uint32_t tam);
 /**
  * @NAME: ptro_valido
@@ -120,6 +103,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam);
  *   0 es un puntero valido
  *  -1 espacio no accedible/ existente
  **/
+
 uint32_t ptro_valido(uint32_t PID, uint32_t ptro);
 
 /**
@@ -180,8 +164,30 @@ void inicializar_estructuras_administrativas();
  **/
 void destruir_estructuras_administativas();
 
+/**
+* @NAME: se_asigna_memoria_necesaria
+* @DESC: Dado un proceso  NUEVO y un tamanio, se establece si puede ser guardado en memoria
+* @RET: 0 si no puede
+* 		1 si puede
+**/
 
+int32_t se_asigna_memoria_necesaria(uint32_t pid, uint32_t size);
 
+/**
+* @NAME: no_se_asigna_proceso
+* @DESC: Retorno la razon por la cual no pude asignar la memoria
+* @RET: -42, se posee asignacion fija y se alcanza el maximo de marcos por proceso
+* 		-43, en asignacion global, puede no haber mas lugar
+**/
+
+int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size);
+/**
+* @NAME: puedo_pedir_mas_memoria
+* @DESC: Retorna si un proceso puede pedir mas memoria
+* @RET: 1, si puede
+* 		0, no puede
+**/
+uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size);
 
 // FUNCIONES PRIVADAS DE USO INTERNO
 /**

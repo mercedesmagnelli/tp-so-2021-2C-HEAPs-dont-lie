@@ -8,15 +8,8 @@
 #include <string.h>
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
-#include <shared/codigo_error.h>
-#include "paginacion.c"
+#include "../paginacion/paginacion.h"
 
-typedef struct{
-
-	uint32_t prevAlloc;
-	uint32_t nextAlloc;
-	uint8_t isFree;
-}heap_metadata;
 
 /*Funciones que pide el TP obligatorias*/
 
@@ -32,7 +25,7 @@ typedef struct{
  *   -43  No hay mas espacio de memoria del cual solicitar (Asig Global)
  **/
 
-int32_t memalloc(uint32_t pid, uint32_t size, uint32_t puntero);
+int32_t memalloc(uint32_t pid, uint32_t size);
 
 /**
  * @NAME: memfree
@@ -79,25 +72,13 @@ void memwrite(void* valorAEscribir, uint32_t* direccionLogicaAEscribir, uint32_t
 
 
 void inicializar_memoria_principal();
-/**
- * @NAME: inicializar_estructuras_administrativas
- * @DESC: Se inicializan las estructuras auxiliares
- *
- **/
-void inicializar_estructuras_administrativas();
+
 /**
  * @NAME: liberar_estructuras_administrativas
  * @DESC: Se liberan las estructuras administrativas
  *
  **/
-void liberar_estructuras_administrativas();
-/**
- * @NAME: encontrar_espacio_disponible_ff
- * @DESC: Busca en la estructura administrativa de la memoria el lugar donde puede
- * guardar información.
- * @RET: Retorna la direccion lógica de donde encontró el espacio
- *
- **/
+
 uint32_t* encontrar_espacio_disponible_ff(uint32_t tamanio_a_guardar);
 
 
