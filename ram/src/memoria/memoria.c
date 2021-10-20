@@ -23,6 +23,7 @@ int32_t memalloc(uint32_t pid, uint32_t size) {
 				} else {
 					return ESPACIO_EN_MEMORIA_INSUF;
 				}
+
 			}
 		} else {
 			//si no existe, entonces tengo que crear el nuevo proceso
@@ -36,14 +37,6 @@ int32_t memalloc(uint32_t pid, uint32_t size) {
 		}
 
 	}
-
-
-
-
-
-
-
-	return 1;
 }
 
 
