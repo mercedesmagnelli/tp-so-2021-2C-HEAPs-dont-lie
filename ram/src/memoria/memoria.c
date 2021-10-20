@@ -42,18 +42,27 @@ int32_t memalloc(uint32_t pid, uint32_t size) {
 
 
 
-void memfree(uint32_t* direccionLogicaALiberar) {
+int32_t memfree(uint32_t direccionLogicaALiberar, uint32_t pid) {
+
+	if(ptro_valido(pid, direccionLogicaALiberar) || ptro_liberado(direccionLogicaALiberar,pid)){
+		return -5; // MATE_FREE_FAULT
+	}else{
+		//Ya aca llegue a un punto donde el puntero puede liberarse
+		liberar_memoria(pid, direccionLogicaALiberar);
+		consolidar_memoria(pid);
+		return 0; //ta to' bien
+	}
 
 }
 
-void* memread(uint32_t* direccionLogicaALeer, uint32_t tamanioALeer) {
+void* memread(uint32_t direccionLogicaALeer, uint32_t tamanioALeer) {
 
 	void* lectura = malloc(tamanioALeer);
 	memcpy(lectura, direccionLogicaALeer, tamanioALeer);
 	return lectura;
 }
 
-void memwrite(void* valorAEscribir, uint32_t* direccionLogicaAEscribir, uint32_t tamanioAEscribir){
+void memwrite(void* valorAEscribir, uint32_t direccionLogicaAEscribir, uint32_t tamanioAEscribir){
 
 	memcpy(direccionLogicaAEscribir, valorAEscribir, tamanioAEscribir);
 

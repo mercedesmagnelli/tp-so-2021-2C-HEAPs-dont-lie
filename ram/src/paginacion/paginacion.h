@@ -100,8 +100,8 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam);
  * @NAME: ptro_valido
  * @DESC: Avisa si el puntero del proceso es uno valido
  * @RET:
- *   0 es un puntero valido
- *  -1 espacio no accedible/ existente
+ *   1 es un puntero valido
+ *   0 espacio no accedible/ existente
  **/
 
 uint32_t ptro_valido(uint32_t PID, uint32_t ptro);

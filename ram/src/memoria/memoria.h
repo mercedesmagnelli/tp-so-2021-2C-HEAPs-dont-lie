@@ -37,7 +37,7 @@ int32_t memalloc(uint32_t pid, uint32_t size);
  *  -2 el espacio estaba liberado
  **/
 
-void memfree(uint32_t* direccionLogicaALiberar);
+int32_t memfree(uint32_t direccionLogicaALiberar, uint32_t pid);
 
 /**
  * @NAME: memread
@@ -46,7 +46,7 @@ void memfree(uint32_t* direccionLogicaALiberar);
  **/
 
 
-void* memread(uint32_t* direccionLogicaALeer, uint32_t tamanio);
+void* memread(uint32_t direccionLogicaALeer, uint32_t tamanio);
 
 /**
  * @NAME: memwrite
@@ -59,7 +59,7 @@ void* memread(uint32_t* direccionLogicaALeer, uint32_t tamanio);
  **/
 
 
-void memwrite(void* valorAEscribir, uint32_t* direccionLogicaAEscribir, uint32_t tamanio);
+void memwrite(void* valorAEscribir, uint32_t direccionLogicaAEscribir, uint32_t tamanio);
 
 /*Funciones desarrolladas extras para correcto funcionamiento de la memoria*/
 
@@ -79,13 +79,6 @@ void inicializar_memoria_principal();
  *
  **/
 
-uint32_t* encontrar_espacio_disponible_ff(uint32_t tamanio_a_guardar);
-
-
-/*
- * @NAME: cantidad_valida
- * @DESC: Se comprueba que la cantidad que se quiera alocar no sea negativa ni 0.
- */
 
 bool cantidad_valida(uint32_t size);
 
