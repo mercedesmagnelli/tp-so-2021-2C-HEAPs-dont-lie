@@ -14,6 +14,4 @@
 #include "../../shared/protocolo.h"			// Enviar mensajes a travez de sockets
 #include "../../shared/manejo_hilos.h"		// Manejar cierre de hilos y loggear en caso de error
 
-#include "consola/consola.h"
-
 #endif /* PLANIFICADOR_MAIN_H_ */

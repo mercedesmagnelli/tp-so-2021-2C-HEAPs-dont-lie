@@ -26,6 +26,8 @@ int ram_enviar_handshake() {
 		return error;
 	}
 
+	close(socket_ram);
+
 	pthread_exit(NULL);
 	return 0;
 }

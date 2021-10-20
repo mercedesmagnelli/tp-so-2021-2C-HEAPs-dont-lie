@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "../../../shared/logger.h"
 
 
 typedef struct{
@@ -28,6 +29,7 @@ void inicializar_tlb();
  */
 
 void agregar_entrada_tlb(uint32_t pid, uint32_t pagina, uint32_t frame);
+
 
 /**
  * @NAME: calcular_hash_key
@@ -56,12 +58,12 @@ bool esta_en_tlb(uint32_t pid, uint32_t pag);
 void reemplazar_entrada_tlb(entrada_tlb* entradaNueva, uint32_t indice);
 
 /**
- * @NAME: leer_direccion_de_tlb
- * @DESC: se retorna la direccion de una pagina de un proceso dada
+ * @NAME: obtener_frame_de_tlb
+ * @DESC: se retorna el frame de una pagina de un proceso dada
  *
  **/
 
-uint32_t obtener_direccion_de_tlb(char* key);
+uint32_t obtener_frame_de_tlb(char* key);
 
 /**
  * @NAME:obtener_timestamp_actual

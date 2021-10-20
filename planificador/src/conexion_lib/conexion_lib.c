@@ -1,5 +1,4 @@
-
-#include "conexion_planificador.h"
+#include "conexion_lib.h"
 
 int prender_servidor();
 
@@ -48,7 +47,7 @@ void cerrar_conexiones(bool safe_close) {
 
 int prender_servidor() {
 	socket_servidor = malloc(sizeof(int));
-	*socket_servidor = crear_servidor(get_puerto());
+	*socket_servidor = crear_servidor(get_puerto_ram());
 
 	if (*socket_servidor < 0) {
 		loggear_error("Ocurrio un error al crear el servidor: %d", *socket_servidor);

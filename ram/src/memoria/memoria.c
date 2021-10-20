@@ -34,7 +34,6 @@ void inicializar_memoria_principal() {
 }
 
 
-
 void consolidar(uint32_t indice_a_consolidar){
 
 }

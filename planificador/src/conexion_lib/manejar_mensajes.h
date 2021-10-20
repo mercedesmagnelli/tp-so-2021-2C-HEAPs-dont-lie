@@ -11,12 +11,12 @@
 #include "../../../shared/estructura_compartida.h"
 
 /**
- * @NAME: recibir_mensaje
+ * @NAME: lib_recibir_mensaje
  * @DESC: Espera un mensaje, y actua segun corresponda.
  * @RETURN:
  * Llama a "manejar_mensaje"
  */
-int recibir_mensaje(int socket);
+int lib_recibir_mensaje(int socket);
 
 /**
  * @NAME: manejar_mensaje
