@@ -46,7 +46,7 @@ int32_t memfree(uint32_t direccionLogicaALiberar, uint32_t pid);
  **/
 
 
-void* memread(uint32_t direccionLogicaALeer, uint32_t tamanio);
+void* memread(uint32_t direccionLogicaALeer, uint32_t pid);
 
 /**
  * @NAME: memwrite
