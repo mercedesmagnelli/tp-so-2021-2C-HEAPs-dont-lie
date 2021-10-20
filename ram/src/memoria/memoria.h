@@ -8,7 +8,8 @@
 #include <string.h>
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
-
+#include <shared/codigo_error.h>
+#include "paginacion.c"
 
 typedef struct{
 
@@ -26,12 +27,12 @@ typedef struct{
  * lista de direcciones. Si usa un espacio entre lugares ocupados y sobra, genera dos divisiones: la ocupada y la del espacio estante.
  * @RET:
  *   >=0 puntero lógico dirigido al espacio de memoria solicitado
- *   -1  se solicito un valor erroneo de memoria (negativo o 0)
- *   -2  el proceso no tiene mas espacio del cual solicitar (Asig Fija)
- *   -3  No hay mas espacio de memoria del cual solicitar (Asig Global)
+ *   -41  se solicito un valor erroneo de memoria (negativo o 0)
+ *   -42  el proceso no tiene mas espacio del cual solicitar (Asig Fija)
+ *   -43  No hay mas espacio de memoria del cual solicitar (Asig Global)
  **/
 
-uint32_t memalloc(uint32_t pid, uint32_t size);
+int32_t memalloc(uint32_t pid, uint32_t size, uint32_t puntero);
 
 /**
  * @NAME: memfree
@@ -51,13 +52,8 @@ void memfree(uint32_t* direccionLogicaALiberar);
 
  **/
 
-<<<<<<< HEAD
 
-void* memread(uint32_t* direccionLogicaALeer);
-=======
 void* memread(uint32_t* direccionLogicaALeer, uint32_t tamanio);
->>>>>>> 91fa06043830f7d7088df4cc6b6170859f3031f1
-
 
 /**
  * @NAME: memwrite
@@ -103,6 +99,14 @@ void liberar_estructuras_administrativas();
  *
  **/
 uint32_t* encontrar_espacio_disponible_ff(uint32_t tamanio_a_guardar);
+
+
+/*
+ * @NAME: cantidad_valida
+ * @DESC: Se comprueba que la cantidad que se quiera alocar no sea negativa ni 0.
+ */
+
+bool cantidad_valida(uint32_t size);
 
 
 #endif /* MEMORIA_MEMORIA_C_ */
