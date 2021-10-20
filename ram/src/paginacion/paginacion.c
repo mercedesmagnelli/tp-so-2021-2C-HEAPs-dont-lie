@@ -32,15 +32,19 @@ void destruir_proceso(void* proceso) {
 
 
 // FUNCIONES PUBLICAS
-uint32_t existe_proceso(uint32_t PID){
-	return 0;
+int32_t existe_proceso(uint32_t PID){
+	t_proceso* proceso = get_proceso_PID(PID);
+	return proceso != NULL ? 0 : -1;
 
 }
 
 
-uint32_t ptro_donde_entra_data(PID,tam){
-	t_proceso* proceso = get_proceso(PID);
-	return 1;
+int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
+	t_proceso* proceso = get_proceso_PID(PID);
+
+	t_list* listaHMD = proceso->lista_hmd;
+
+	return get_ptro_con_tam_min(listaHMD, tam);
 
 }
 
@@ -48,9 +52,43 @@ uint32_t ptro_donde_entra_data(PID,tam){
 
 // FUNCIONES PRIVADAS DE USO INTERNO
 
-t_proceso* get_proceso(uint32_tPID){
-	t_proceso* a;
-	//TODO desarrollar funcion
-	return a;
+t_proceso* get_proceso_PID(uint32_t PID){
+
+	bool proceso_PID(void* element) {
+			t_proceso* proceso = (t_proceso*) element;
+			return proceso->PID == PID;
+		}
+
+	t_proceso* proceso = list_find(lista_procesos, proceso_PID);
+	return proceso;
+
+}
+
+int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam){
+
+	int32_t ptro;
+
+	bool heap_tam_min(void* element){
+		bool rta;
+		heap_metadata* heap = (heap_metadata*) element;
+		if(heap->nextAlloc==NULL){
+			rta = true;
+		}else{
+			if((heap->nextAlloc - heap->currAlloc - 9)>= tam){
+				rta = true;
+			}else{
+				rta = false;
+			}
+		}
+		return rta;
+	}
+
+	heap_metadata* heap = list_find(listaHMD,heap_tam_min);
+
+	if(heap->nextAlloc==NULL){
+		ptro = (-1)* heap->currAlloc;
+	}
+
+	return ptro;
 
 }

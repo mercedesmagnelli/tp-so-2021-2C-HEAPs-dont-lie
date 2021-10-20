@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <commons/collections/list.h>
+#include <commons/collections/dictionary.h>
+#include <stdlib.h>
 
 typedef struct{
 	//índice: frame
@@ -17,7 +19,7 @@ typedef struct{
 }asignacion_marcos_fijos;
 
 typedef struct{
-
+	uint32_t currAlloc;
 	uint32_t prevAlloc;
 	uint32_t nextAlloc;
 	uint8_t isFree;
@@ -52,6 +54,7 @@ if (get_marcos_del_proceso_en_MV (pid) < maximo) {
 
 */
 typedef struct {
+	uint32_t PID;
 	t_list* tabla_paginas; //t_list pagina
 	t_list* lista_hmd;
 	uint32_t miss_proceso;
@@ -84,19 +87,19 @@ void inicializar_estructuras_administrativas_paginacion();
  * @NAME: existe_proceso
  * @DESC: Se fija si existe el proceso en la lista administrativa
  * @RET:
- *   0 existe el proceso
- *  -1 no existe el proceso
+ *   1 existe el proceso
+ *   0 no existe el proceso
  **/
-uint32_t existe_proceso(uint32_t PID);
+int32_t existe_proceso(uint32_t PID);
 
 /**
  * @NAME: ptro_donde_entra_data
- * @DESC: Dado un proceso y el tamaño de la data te devuelve el alloc donde puede entrar, sin pedir memoria a la RAM
+ * @DESC: Dado un proceso(ya allocado) y el tamaño de la data te devuelve el alloc donde puede entrar, sin pedir memoria a la RAM
  * @RET:
  *   >=0 Devuelve el puntero al alloc donde se puede guardar la data
  *   <0 Devuelve el puntero al ultimo alloc con valor negativo
  **/
-uint32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam);
+int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam);
 
 /**
  * @NAME: actualizo_proceso
@@ -107,8 +110,9 @@ void actualizar_proceso(uint32_t PID, uint32_t ptro, uint32_t tamanio);
 /**
  * @NAME: agrego_proceso
  * @DESC: Agrega el proceso a la lista de procesos y crea los 2 HEAPs necesarios
+ * @RET: devuelve el puntero en el cual entra el tamaño solicitado
  **/
-void agregar_proceso(uint32_t PID, uint32_t tam);
+int32_t agregar_proceso(uint32_t PID, uint32_t tam);
 /**
  * @NAME: ptro_valido
  * @DESC: Avisa si el puntero del proceso es uno valido
@@ -137,7 +141,7 @@ void liberar_memoria(uint32_t PID, uint32_t ptro);
  * @NAME: consolidar_memoria
  * @DESC: Se fija los cambios administrativos que se tengan que hacer por liberar memoria
  **/
-void consolidar_memoria(PID);
+void consolidar_memoria(uint32_t PID);
 
 /**
  * @NAME: leer_de_memoria
@@ -183,8 +187,18 @@ void destruir_estructuras_administativas();
 /**
 * @NAME: get_proceso
 * @DESC: devuelve el proceso con el PID asociado
+* @RET:
+*    t_proceso*		si el proceso buscado existe
+*    NULL			si no existe el proceso buscado
 **/
-t_proceso* get_proceso(uint32_t PID);
+t_proceso* get_proceso_PID(uint32_t PID);
+
+/*
+ * @NAME: get_heap_metadata_con_tam_min
+ * @DES: busca el metadata en el cual entra el dato de tamaio solicitado
+ * @RET: devuelve el metadata que puede contenerlo; caso que ninguno pueda: devuelve el ultimo HEAP
+ * */
+int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam);
 
 
  /**
