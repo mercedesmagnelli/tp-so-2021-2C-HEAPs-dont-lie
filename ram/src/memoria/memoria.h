@@ -22,8 +22,11 @@ typedef struct{
  * @NAME: memalloc
  * @DESC: Asigna un espacio dentro de la memoria principal. Si tiene que generar un espacio, lo hace al final de la
  * lista de direcciones. Si usa un espacio entre lugares ocupados y sobra, genera dos divisiones: la ocupada y la del espacio estante.
- * @RET: Retorna la direccion logica del comienzo de la asignación y NULL en caso de que no pueda asignarlo.
- *
+ * @RET:
+ *   >=0 puntero lógico dirigido al espacio de memoria solicitado
+ *   -1  se solicito un valor erroneo de memoria (negativo o 0)
+ *   -2  el proceso no tiene mas espacio del cual solicitar (Asig Fija)
+ *   -3  No hay mas espacio de memoria del cual solicitar (Asig Global)
  **/
 
 uint32_t memalloc(uint32_t pid, uint32_t size);
@@ -32,7 +35,10 @@ uint32_t memalloc(uint32_t pid, uint32_t size);
  * @NAME: memfree
  * @DESC: Libera espacios de memoria. Se encarga de consolidar en caso de que queden dos espacios contiguos libres
  * y de liberar paginas en caso de que con la liberación una página quede vacía.
- *
+  * @RET:
+ *   0 se pudo liberar el espacio de memoria
+ *  -1 espacio no accedible/existente
+ *  -2 el espacio estaba liberado
  **/
 
 void memfree(uint32_t* direccionLogicaALiberar);
@@ -40,8 +46,9 @@ void memfree(uint32_t* direccionLogicaALiberar);
 /**
  * @NAME: memread
  * @DESC: A partir de una direccion lógica a leer, se retorna lo que está guardado en esa posición.
- *
+
  **/
+
 
 void* memread(uint32_t* direccionLogicaALeer);
 
@@ -49,7 +56,10 @@ void* memread(uint32_t* direccionLogicaALeer);
 /**
  * @NAME: memwrite
  * @DESC: Se encarga de escribir informacion en memoria a partir de una direccion lógica
- * Puede llegar a llamar a memalloc si lo que quiere escribirse excede.
+  * @RET:
+ *   0 se guardo exitosamente la data en memoria
+ *  -1 espacio no accedible/ existente
+ *  -2 el espacio estaba liberado
  *
  **/
 
