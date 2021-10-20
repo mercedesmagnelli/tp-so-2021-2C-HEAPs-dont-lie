@@ -67,21 +67,21 @@ void* memread(uint32_t direccionLogicaALeer, uint32_t pid) {
 	}
 }
 
-void memwrite(void* valorAEscribir, uint32_t direccionLogicaAEscribir, uint32_t tamanioAEscribir){
+uint32_t memwrite(void* valorAEscribir, uint32_t direccionLogicaAEscribir,uint32_t pid){
 
-	memcpy(direccionLogicaAEscribir, valorAEscribir, tamanioAEscribir);
+	if(ptro_valido(pid, direccionLogicaAEscribir) || ptro_liberado(direccionLogicaAEscribir,pid)){
+			return -7; // MEM_WRITE_FAULT
+	}else {
+		uint32_t tamanioAEscribir = tamanio_de_direccion(direccionLogicaAEscribir, pid);
+		memcpy(memoria_principal + traducir_a_dir_fisica(direccionLogicaAEscribir), valorAEscribir, tamanioAEscribir);
+		return 0;
 
+	}
 }
 
 void inicializar_memoria_principal() {
 	int tamanio_memoria = get_tamanio_memoria();
 	memoria_principal =  malloc(tamanio_memoria);
-
-
-}
-
-
-void consolidar(uint32_t indice_a_consolidar){
 
 }
 

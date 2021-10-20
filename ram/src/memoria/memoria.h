@@ -59,7 +59,7 @@ void* memread(uint32_t direccionLogicaALeer, uint32_t pid);
  **/
 
 
-void memwrite(void* valorAEscribir, uint32_t direccionLogicaAEscribir, uint32_t tamanio);
+void memwrite(void* valorAEscribir, uint32_t direccionLogicaAEscribir, uint32_t tamanio, uint32_t pid);
 
 /*Funciones desarrolladas extras para correcto funcionamiento de la memoria*/
 

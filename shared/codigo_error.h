@@ -37,6 +37,7 @@
 #define ESPACIO_EN_MEMORIA_INSUF -43
 #define PUNTERO_INVALIDO -44
 #define PUNTERO_YA_LIBERADO -45
+#define DATA_MUY_GRANDE -46
 
 
 #endif
