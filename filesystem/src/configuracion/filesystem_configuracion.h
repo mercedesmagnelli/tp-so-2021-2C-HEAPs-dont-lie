@@ -18,6 +18,7 @@
 typedef struct {
 	char* ruta_archivo;
 	t_list * carpinchos;
+	int espacio_libre;
 } t_archivo_swamp;
 
 

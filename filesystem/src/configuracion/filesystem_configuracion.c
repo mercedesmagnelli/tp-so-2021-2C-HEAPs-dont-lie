@@ -79,6 +79,7 @@ int cargar_archivo(char * path) {
 		t_archivo_swamp * archivo = malloc(sizeof(t_archivo_swamp));
 		archivo->carpinchos = list_create();
 		archivo->ruta_archivo = config_guardada.archivos_swap[j];
+		archivo->espacio_libre = config_guardada.tamanio_swap;
 		list_add(lista_swamp, archivo);
 	}
 
