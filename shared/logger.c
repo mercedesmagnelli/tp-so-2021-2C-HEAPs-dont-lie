@@ -80,7 +80,6 @@ int loggear_error(const char* mensaje, ...){
 
 int loggear(const char * mensaje, void (*log_function)(t_log * logg, const char* message, ...), va_list arguments) {
 	if (logger == NULL) {
-		// TODO: Loguear en modo debug
 		return RECURSO_NO_DECLARADO;
 	}
 
@@ -97,7 +96,6 @@ int loggear(const char * mensaje, void (*log_function)(t_log * logg, const char*
 
 int destroy_log() {
 	if (logger == NULL) {
-		// TODO: Loguear en modo debug
 		return RECURSO_NO_DECLARADO;
 	}
 

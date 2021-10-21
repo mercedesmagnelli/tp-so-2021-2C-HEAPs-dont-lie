@@ -10,84 +10,65 @@
 
 #include "logger.h"
 
+/// NUEVO
+
 typedef enum {
-	NUEVO,
-	READY,
-	EXEC,
-	BLOCK,
-	FINISH
-} t_estado_tripulante;
+	MATELIB,
+	KERNEL,
+	MEMORIA,
+	FILESYSTEM
+} t_mensajero;
 
+// Todos los modulos usan esta estructura para enviar mensajes
 typedef struct {
-	int tid;
+	t_mensajero emisor;
+	t_mensajero receptor;
+
+	int status;
+
+	void * mensaje;
+} t_mensaje;
+
+// Matelib la usa para enviarle a Kernel y/o Memoria
+typedef struct {
 	int pid;
-	int inicial_x;
-	int inicial_y;
-	int fin_x;
-	int fin_y;
-	char * nombre_tarea;
-	int cantidad;
-} t_tripulante_bitacora_d_m;
 
-typedef struct {
-	char * tarea;
-	uint32_t parametro;
-	uint32_t pos_x;
-	uint32_t pos_y;
-	uint32_t tiempo;
-} t_tarea;
+	char * semaforo_nombre;
+	int semaforo_valor;
 
-typedef struct {
-	uint32_t tid;
-	uint32_t pid;
-	uint32_t pos_x;
-	uint32_t pos_y;
-	t_estado_tripulante estado;
-} t_tripulante;
+	char * io_nombre;
+	void * io_msg;
+	// TODO: Tal vez se agregue el tamaño del mensaje
 
-typedef struct{
-	uint32_t pos_x;
-	uint32_t pos_y;
-}t_origen;
+	int mem_size;
+	int32_t mem_mate_pointer;
+	void * mem_write;
+	// TODO: SIempre se va a querer leer todo el contenido de una variable?
+} t_matelib_mensaje;
 
-typedef struct {
-	uint32_t pid;
 
-	char * tareas;
+t_matelib_mensaje * crear_matelib_mensaje_init(int pid);
 
-	uint32_t size_tripulantes;
-	t_tripulante ** tripulantes;
-} t_patota;
+t_matelib_mensaje * crear_matelib_mensaje_semaforo(int pid, char * semaforo);
 
-char* convertir_estado_a_texto(t_estado_tripulante estado);
+t_matelib_mensaje * crear_matelib_mensaje_semaforo_init(int pid, char * semaforo, int valor);
 
-t_tripulante * mock_tripulante(uint32_t pid, uint32_t tid, uint32_t x, uint32_t y);
-t_tripulante * crear_tripulante(uint32_t pid, uint32_t tid, uint32_t x, uint32_t y);
-t_patota * mock_patota(uint32_t pid, uint32_t cantidad_tripulantes, uint32_t cantidad_tareas);
-t_patota * crear_patota(uint32_t pid, uint32_t cantidad_tripulantes, char* tareas);
+t_matelib_mensaje * crear_matelib_mensaje_io(int pid, char * io, void * msg);
 
-t_tarea * mock_tarea(uint32_t max_x, uint32_t max_y, uint32_t max_espera);
+t_matelib_mensaje * crear_matelib_mensaje_mem_alloc(int pid, int size);
 
-t_tarea * mock_tarea_sabotaje(uint32_t max_x, uint32_t max_y, uint32_t max_espera);
+t_matelib_mensaje * crear_matelib_mensaje_mem_free(int pid, int32_t mate_pointer);
 
-void * serializar_tripulante(t_tripulante * tripulante);
+t_matelib_mensaje * crear_matelib_mensaje_mem_read(int pid, int32_t mate_pointer, int size);
 
-t_tripulante * deserializar_tripulante(void * puntero);
+t_matelib_mensaje * crear_matelib_mensaje_mem_write(int pid, int32_t mate_pointer, int size, void * mem_write);
 
-void * serializar_tarea(t_tarea * tarea, size_t * size_final);
 
-t_tarea * deserializar_tarea(void * tarea);
+size_t size_matelib_mensaje_serializar(t_matelib_mensaje * matelib_mensaje);
 
-void * serializar_patota(t_patota * patota, size_t * size_final);
+void * serializar_matelib_mensaje(t_matelib_mensaje * matelib_mensaje);
 
-t_patota * deserializar_patota(void * puntero);
+t_matelib_mensaje * deserializar_matelib_mensaje(void * puntero);
 
-char obtener_estado(t_estado_tripulante estado);
-
-void destruir_patota_sin_tripulantes(t_patota * patota);
-
-void destruir_patota(t_patota * patota);
-
-void destruir_tripulantes(t_patota * patota);
 
 #endif /* ESTRUCTURA_COMPARTIDA_H_ */

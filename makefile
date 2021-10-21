@@ -36,7 +36,14 @@ FILESYSTEM_TEST_ROUTE := filesystem/tests
 FILESYSTEM_COMPILADO := filesystem.out
 FILESYSTEM_ARCHIVO_CONFIG := filesystem.config
 
-all: p r f
+# MATELIB
+MATELIB_NAME := MATELIB
+MATELIB_ROUTE := matelib/src
+MATELIB_TEST_ROUTE := matelib/tests
+MATELIB_COMPILADO := matelib.out
+MATELIB_ARCHIVO_CONFIG := matelib.config
+
+all: p r f m
 	
 # Trabajos de compilacion proyectos y test "make d" "make r" "make f"
 p:
@@ -60,6 +67,13 @@ f:
 	-@cd $(FILESYSTEM_TEST_ROUTE) && $(MAKE) all
 	-@echo "$(GREEN) COMPILADO Tests '$(FILESYSTEM_NAME)' ✔️✔️✔️✔️✔️✔️✔️✔️✔️✔️ $(NOCOLOR)"
 	
+m:
+	-@echo "$(YELLOW) COMPILANDO '$(MATELIB_NAME)' 📝 📝 📝$(NOCOLOR)"
+	-@cd $(MATELIB_ROUTE) && $(MAKE) all
+	-@echo "$(YELLOW) COMPILANDO TESTS '$(MATELIB_NAME)' 📝 📝 📝 $(NOCOLOR)"
+	-@cd $(MATELIB_TEST_ROUTE) && $(MAKE) all
+	-@echo "$(GREEN) COMPILADO Tests '$(MATELIB_NAME)' ✔️✔️✔️✔️✔️✔️✔️✔️✔️✔️ $(NOCOLOR)"
+	
 # Trabajos de clean "make clean-d" "make clean-r" "make clean-m" "make clean-s" "make clean"
 clean-p:
 	-@cd $(PLANIFICADOR_ROUTE) && $(MAKE) clean
@@ -75,8 +89,12 @@ clean-f:
 
 clean-s:
 	-@cd $(SHARED_ROUTE) && $(MAKE) clean
+	
+clean-m:
+	-@cd $(MATELIB_ROUTE) && $(MAKE) clean
+	-@cd $(MATELIB_TEST_ROUTE) && $(MAKE) clean
 
-clean: clean-p clean-r clean-f clean-s
+clean: clean-p clean-r clean-f clean-s clean-m
 	-@find . -name "*.o" -type f -delete
 	-@clear
 	-@echo "$(GREEN) 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️   Limpiado archvos 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️ 🗑️  $(NOCOLOR)"
@@ -93,6 +111,9 @@ test-r:
 	
 test-f:
 	-@cd $(FILESYSTEM_TEST_ROUTE) && $(MAKE) test
+	
+test-m:
+	-@cd $(MATELIB_TEST_ROUTE) && $(MAKE) test
 
 test-s:
 	-@cd $(SHARED_ROUTE) && $(MAKE) test
@@ -114,6 +135,9 @@ valgrind-r:
 
 valgrind-f:
 	-@cd $(FILESYSTEM_ROUTE) && $(MAKE) valgrind
+	
+valgrind-m:
+	-@cd $(MATELIB_ROUTE) && $(MAKE) valgrind
 
 # Trabajos para ejecutar los archivos compilados "make run-d" "make run-r" "make run-m"
 run-p:
@@ -125,4 +149,7 @@ run-r:
 run-f:
 	-@./$(FILESYSTEM_COMPILADO) $(FILESYSTEM_ARCHIVO_CONFIG)
 
-.PHONY: all test clean planificador filesystem ram shared
+run-m:
+	-@./$(MATELIB_COMPILADO) $(MATELIB_ARCHIVO_CONFIG)
+
+.PHONY: all test clean planificador filesystem ram matelib shared

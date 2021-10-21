@@ -18,5 +18,9 @@ run: build-example
 	cd examples/lib_usage && \
 	LD_LIBRARY_PATH="../lib_implementation/" ./example
 
+test:
+	export LD_LIBRARY_PATH="../lib_implementation/";\
+	echo $$LD_LIBRARY_PATH
+
 clean:
 	rm examples/lib_implementation/libmate.so examples/lib_usage/example

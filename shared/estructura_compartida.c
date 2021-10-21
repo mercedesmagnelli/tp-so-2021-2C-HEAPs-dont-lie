@@ -1,350 +1,168 @@
 
 #include "estructura_compartida.h"
 
-const size_t SIZE_PID = sizeof(uint32_t);
-const size_t SIZE_TID = sizeof(uint32_t);
-const size_t SIZE_TAMANIO_TAREAS = sizeof(uint32_t);
-const size_t SIZE_TAMANIO_TRIPUS = sizeof(uint32_t);
-const size_t SIZE_POSICION = sizeof(uint32_t);
-const size_t SIZE_ESTADO = sizeof(t_estado_tripulante);
-
-const size_t SIZE_PARAMETRO_TAREA = sizeof(uint32_t);
-const size_t SIZE_ESPERA_TAREA = sizeof(uint32_t);
-
-const size_t SIZE_TAREA = sizeof(uint32_t) + sizeof(char*) + sizeof(uint32_t)*4;
-const size_t SIZE_TRIPULANTE = sizeof(uint32_t) * 4 + sizeof(t_estado_tripulante);
-
-
-char* convertir_estado_a_texto(t_estado_tripulante estado){
-   switch (estado) {
-	   case NUEVO: return "NEW";
-	   case READY: return "READY";
-	   case EXEC: return "EXEC";
-	   case BLOCK: return "BLOCK I/O";
-	   case FINISH: return "FINISH";
-   }
-   return "No tiene estado conocido";
+t_matelib_mensaje * crear_matelib_mensaje_init(int pid) {
+	t_matelib_mensaje * mensaje = malloc(sizeof(t_matelib_mensaje));
+	mensaje->pid = pid;
+	return mensaje;
 }
 
-size_t SIZE_TAREAS(uint32_t cantidad_tareas) { return cantidad_tareas * sizeof(char); }
-
-void * serializar_tripulante(t_tripulante * tripulante) {
-	size_t offset = 0;
-
-	void * buffer = malloc(SIZE_TRIPULANTE);
-
-	memcpy(buffer + offset, &tripulante->pid, SIZE_PID);
-	offset += SIZE_PID;
-
-	memcpy(buffer + offset, &tripulante->tid, SIZE_TID);
-	offset += SIZE_TID;
-
-	memcpy(buffer + offset, &tripulante->pos_x, SIZE_POSICION);
-	offset += SIZE_POSICION;
-
-	memcpy(buffer + offset, &tripulante->pos_y, SIZE_POSICION);
-	offset += SIZE_POSICION;
-
-	memcpy(buffer + offset, &tripulante->estado, SIZE_ESTADO);
-	offset += SIZE_ESTADO;
-
-	return buffer;
+t_matelib_mensaje * crear_matelib_mensaje_semaforo(int pid, char * semaforo) {
+	t_matelib_mensaje * mensaje = crear_matelib_mensaje_init(pid);
+	mensaje->semaforo_nombre = semaforo;
+	return mensaje;
 }
 
-t_tripulante * deserializar_tripulante(void * puntero) {
-	size_t offset = 0;
-	t_tripulante * tripulante = malloc(sizeof(t_tripulante));
+t_matelib_mensaje * crear_matelib_mensaje_semaforo_init(int pid, char * semaforo, int valor) {
+	t_matelib_mensaje * mensaje = crear_matelib_mensaje_init(pid);
+	mensaje->semaforo_nombre = semaforo;
+	mensaje->semaforo_valor = valor;
+	return mensaje;
+}
 
-	memcpy(&tripulante->pid, puntero + offset, SIZE_PID);
-	offset += SIZE_PID;
+t_matelib_mensaje * crear_matelib_mensaje_io(int pid, char * io, void * msg) {
+	t_matelib_mensaje * mensaje = crear_matelib_mensaje_init(pid);
+	mensaje->io_nombre = io;
+	mensaje->io_msg = msg;
+	return mensaje;
+}
 
-	memcpy(&tripulante->tid, puntero + offset, SIZE_TID);
-	offset += SIZE_TID;
-	memcpy(&tripulante->pos_x, puntero + offset, SIZE_POSICION);
-	offset += SIZE_POSICION;
+t_matelib_mensaje * crear_matelib_mensaje_mem_alloc(int pid, int size) {
+	t_matelib_mensaje * mensaje = crear_matelib_mensaje_init(pid);
+	mensaje->mem_size = size;
+	return mensaje;
+}
 
-	memcpy(&tripulante->pos_y, puntero + offset, SIZE_POSICION);
-	offset += SIZE_POSICION;
+t_matelib_mensaje * crear_matelib_mensaje_mem_free(int pid, int32_t mate_pointer) {
+	t_matelib_mensaje * mensaje = crear_matelib_mensaje_init(pid);
+	mensaje->mem_mate_pointer = mate_pointer;
+	return mensaje;
+}
 
-	memcpy(&tripulante->estado, puntero + offset, SIZE_ESTADO);
-	offset += SIZE_ESTADO;
+t_matelib_mensaje * crear_matelib_mensaje_mem_read(int pid, int32_t mate_pointer, int size) {
+	t_matelib_mensaje * mensaje = crear_matelib_mensaje_init(pid);
+	mensaje->mem_mate_pointer = mate_pointer;
+	mensaje->mem_size = size;
+	return mensaje;
+}
 
-	return tripulante;
+t_matelib_mensaje * crear_matelib_mensaje_mem_write(int pid, int32_t mate_pointer, int size, void * mem_write) {
+	t_matelib_mensaje * mensaje = crear_matelib_mensaje_init(pid);
+	mensaje->mem_mate_pointer = mate_pointer;
+	mensaje->mem_size = size;
+	mensaje->mem_write = mem_write;
+	return mensaje;
 }
 
 
-void * serializar_tarea(t_tarea * tarea, size_t * size_final) {
+size_t size_matelib_mensaje_serializar(t_matelib_mensaje * matelib_mensaje) {
+	size_t size_tamanio_char = sizeof(size_t);
 
-	size_t SIZE_NOMBRE_TAREA = strlen(tarea->tarea) + 1;
+	size_t size_pid = sizeof(int);
 
-	size_t tamanio_buffer = sizeof(uint32_t) + SIZE_NOMBRE_TAREA + SIZE_PARAMETRO_TAREA + SIZE_POSICION *2 + SIZE_ESPERA_TAREA;
+	size_t size_tamanio_semaforo_nombre = size_tamanio_char;
+	size_t size_semaforo_nombre = strlen(matelib_mensaje->semaforo_nombre) + 1;
+	size_t size_semaforo_valor = sizeof(int);
 
+	size_t size_tamanio_io_nombre = size_tamanio_char;
+	size_t size_io_nombre = strlen(matelib_mensaje->io_nombre) + 1;
+	// TODO: Calcular el io_msg
+
+	size_t size_mem_size = sizeof(int);
+	size_t size_mem_mate_pointer = sizeof(int32_t);
+	// TODO: Calcular el mem_write
+
+	return size_pid + size_tamanio_semaforo_nombre + size_semaforo_nombre + size_semaforo_valor + size_tamanio_io_nombre + size_io_nombre + size_mem_size + size_mem_mate_pointer;
+}
+
+void * serializar_matelib_mensaje(t_matelib_mensaje * matelib_mensaje) {
 	size_t offset = 0;
 
+	size_t tamanio_buffer = size_matelib_mensaje_serializar(matelib_mensaje);
 	void * buffer = malloc(tamanio_buffer);
 
-	memcpy(buffer + offset, &SIZE_NOMBRE_TAREA, sizeof(uint32_t));
-	offset += sizeof(uint32_t);
+	memcpy(buffer + offset, &matelib_mensaje->pid, sizeof(int));
+	offset += sizeof(int);
 
-	memcpy(buffer + offset, tarea->tarea, SIZE_NOMBRE_TAREA);
-	offset += SIZE_NOMBRE_TAREA;
+	size_t size_semaforo_nombre = strlen(matelib_mensaje->semaforo_nombre) + 1;
+	memcpy(buffer + offset, &size_semaforo_nombre, sizeof(size_t));
+	offset += sizeof(size_t);
+	memcpy(buffer + offset, &matelib_mensaje->semaforo_nombre, size_semaforo_nombre);
+	offset += size_semaforo_nombre;
 
-	memcpy(buffer + offset, &tarea->parametro, SIZE_PARAMETRO_TAREA);
-	offset += SIZE_PARAMETRO_TAREA;
 
-	memcpy(buffer + offset, &tarea->pos_x, SIZE_POSICION);
-	offset += SIZE_POSICION;
+	memcpy(buffer + offset, &matelib_mensaje->semaforo_valor, sizeof(int));
+	offset += sizeof(int);
 
-	memcpy(buffer + offset, &tarea->pos_y, SIZE_POSICION);
-	offset += SIZE_POSICION;
 
-	memcpy(buffer + offset, &tarea->tiempo, SIZE_ESPERA_TAREA);
-	offset += SIZE_ESPERA_TAREA;
+	size_t size_io_nombre = strlen(matelib_mensaje->io_nombre) + 1;
+	memcpy(buffer + offset, &size_io_nombre, sizeof(size_t));
+	offset += sizeof(size_t);
+	memcpy(buffer + offset, &matelib_mensaje->io_nombre, size_io_nombre);
+	offset += size_io_nombre;
 
-	if (size_final != NULL) {
-		*size_final = tamanio_buffer;
-	}
+
+	// TODO: "void * io_msg" Ver el tamaño del mensaje
+
+	memcpy(buffer + offset, &matelib_mensaje->mem_size, sizeof(int));
+	offset += sizeof(int);
+
+	memcpy(buffer + offset, &matelib_mensaje->mem_mate_pointer, sizeof(int32_t));
+	offset += sizeof(int32_t);
+
+	// TODO: "char * mem_write" Ver el tamaño del mensaje
+
 	return buffer;
 }
 
-t_tarea * deserializar_tarea(void * puntero) {
+t_matelib_mensaje * deserializar_matelib_mensaje(void * puntero) {
 	size_t offset = 0;
 
-	t_tarea * tarea = malloc(sizeof(t_tarea));
+	// FIXME: Cambiar esto, por un calculo del tamaño de las variables
+	t_matelib_mensaje * matelib_mensaje = malloc(sizeof(t_matelib_mensaje));
 
-	size_t * SIZE_NOMBRE_TAREA = malloc(sizeof(size_t));
+	// PID
+	memcpy(&matelib_mensaje->pid, puntero + offset, sizeof(int));
+	offset += sizeof(int);
 
-	memcpy(SIZE_NOMBRE_TAREA, puntero + offset, sizeof(uint32_t));
-	offset += sizeof(uint32_t);
+	// SEMAFORO_NOMBRE
+	// TODO: DELETE THIS si no lo necesitamos al mandar char*
+	size_t * cantidad_char_semaforo_nombre = malloc(sizeof(size_t));
+	memcpy(cantidad_char_semaforo_nombre, puntero + offset, sizeof(size_t));
+	free(cantidad_char_semaforo_nombre);
+	offset += sizeof(size_t);
 
-	free(SIZE_NOMBRE_TAREA);
+	matelib_mensaje->semaforo_nombre = string_new();
+	string_append(&matelib_mensaje->semaforo_nombre, puntero + offset);
+	offset += string_length(matelib_mensaje->semaforo_nombre) + 1;
 
-	tarea->tarea = string_new();
-	string_append(&tarea->tarea, puntero + offset);
-	offset += string_length(tarea->tarea) + 1;
 
-	memcpy(&tarea->parametro, puntero + offset, SIZE_PARAMETRO_TAREA);
-	offset += SIZE_PARAMETRO_TAREA;
+	// SEMAFORO_VALOR
+	memcpy(&matelib_mensaje->semaforo_valor, puntero + offset, sizeof(int));
+	offset += sizeof(int);
 
-	memcpy(&tarea->pos_x, puntero + offset, SIZE_POSICION);
-	offset += SIZE_POSICION;
+	// TODO: DELETE THIS si no lo necesitamos al mandar char*
+	size_t * cantidad_char_io_nombre = malloc(sizeof(size_t));
+	memcpy(cantidad_char_io_nombre, puntero + offset, sizeof(size_t));
+	offset += sizeof(size_t);
+	free(cantidad_char_io_nombre);
 
-	memcpy(&tarea->pos_y, puntero + offset, SIZE_POSICION);
-	offset += SIZE_POSICION;
+	matelib_mensaje->io_nombre = string_new();
+	string_append(&matelib_mensaje->io_nombre, puntero + offset);
+	offset += string_length(matelib_mensaje->io_nombre) + 1;
 
-	memcpy(&tarea->tiempo, puntero + offset, SIZE_ESPERA_TAREA);
-	offset += SIZE_ESPERA_TAREA;
 
-	return tarea;
+	// TODO: "void * io_msg" Ver el tamaño del mensaje
+
+	memcpy(&matelib_mensaje->mem_size, puntero + offset, sizeof(int));
+	offset += sizeof(int);
+
+	memcpy(&matelib_mensaje->mem_mate_pointer, puntero + offset, sizeof(int32_t));
+	offset += sizeof(int32_t);
+
+	// TODO: "char * mem_write" Ver el tamaño del mensaje
+
+	return matelib_mensaje;
 }
-
-void * serializar_patota(t_patota * patota, size_t * size_final) {
-    const size_t SIZE_TRIPUS = patota->size_tripulantes * SIZE_TRIPULANTE;
-    size_t SIZE_TAREAS = strlen(patota->tareas) + 1;
-
-    size_t tamanio_buffer = sizeof(uint32_t) * 2 + SIZE_TAREAS + SIZE_TRIPUS;
-    size_t offset = 0;
-
-    void * buffer = malloc(tamanio_buffer);
-
-    memcpy(buffer + offset, &patota->pid, SIZE_PID);
-    offset += SIZE_PID;
-
-    memcpy(buffer + offset, patota->tareas, SIZE_TAREAS);
-    offset += SIZE_TAREAS;
-
-    memcpy(buffer + offset, &patota->size_tripulantes, SIZE_TAMANIO_TRIPUS);
-    offset += SIZE_TAMANIO_TRIPUS;
-
-    for (int i = 0; i < patota->size_tripulantes; i++) {
-        void * tripulante = serializar_tripulante(patota->tripulantes[i]);
-
-        memcpy(buffer + offset, tripulante, SIZE_TRIPULANTE);
-        offset += SIZE_TRIPULANTE;
-
-        free(tripulante);
-    }
-
-    if (size_final != NULL) {
-        *size_final = tamanio_buffer;
-    }
-
-    return buffer;
-}
-
-t_patota * deserializar_patota(void * puntero) {
-    t_patota * patota = malloc(sizeof(t_patota));
-
-    size_t offset = 0;
-
-    memcpy(&patota->pid, puntero + offset, SIZE_PID);
-    offset += SIZE_PID;
-
-    patota->tareas = string_new();
-    string_append(&patota->tareas, puntero + offset);
-    offset += string_length(patota->tareas) + 1;
-
-    //patota->size_tareas = string_length(patota->tareas) + 1;
-
-    memcpy(&patota->size_tripulantes, puntero + offset, SIZE_TAMANIO_TRIPUS);
-    offset += SIZE_TAMANIO_TRIPUS;
-
-    void* tripulante_serializado = malloc(SIZE_TRIPULANTE);
-    t_tripulante* tripulante;
-
-    patota->tripulantes = calloc(patota->size_tripulantes, sizeof(t_tripulante));
-    for (int i = 0; i < patota->size_tripulantes; i++) {
-
-        memcpy(tripulante_serializado, puntero + offset, SIZE_TRIPULANTE);
-        offset += SIZE_TRIPULANTE;
-
-        tripulante = deserializar_tripulante(tripulante_serializado);
-        patota->tripulantes[i] = tripulante;
-    }
-
-    free(tripulante_serializado);
-
-    return patota;
-}
-
-t_tripulante * mock_tripulante(uint32_t pid, uint32_t tid, uint32_t x, uint32_t y) {
-	t_tripulante * tripulante = malloc(sizeof(t_tripulante));
-
-	tripulante->pid = pid;
-	tripulante->tid = tid;
-	tripulante->pos_x = x;
-	tripulante->pos_y = y;
-	tripulante->estado = NUEVO;
-
-	return tripulante;
-}
-
-t_patota * mock_patota(uint32_t pid, uint32_t cantidad_tripulantes, uint32_t cantidad_tareas) {
-	t_patota * patota = malloc(sizeof(t_patota));
-
-	static int tid = 1;
-
-	patota->pid = pid;
-
-	patota->size_tripulantes = cantidad_tripulantes;
-
-	patota->tareas = string_new();
-
-	string_append(&patota->tareas, "BARRER;7;7;4\n");
-	string_append(&patota->tareas, "GENERAR_OXIGENO 12;0;0;5\n");
-
-	patota->tripulantes = calloc(cantidad_tripulantes, sizeof(t_tripulante));
-	for (int i = 0; i < cantidad_tripulantes; i++) {
-		t_tripulante * mock_tripu = mock_tripulante(pid, tid++, i + rand() % 10 + 1, i + rand() % 10 + 1);
-
-		patota->tripulantes[i] = mock_tripu;
-	}
-
-	return patota;
-}
-
-t_tripulante * crear_tripulante(uint32_t pid, uint32_t tid, uint32_t x, uint32_t y) {
-	t_tripulante * tripulante = malloc(sizeof(t_tripulante));
-
-	tripulante->pid = pid;
-	tripulante->tid = tid;
-	tripulante->pos_x = x;
-	tripulante->pos_y = y;
-	tripulante->estado = NUEVO;
-
-	return tripulante;
-}
-
-t_patota * crear_patota(uint32_t pid, uint32_t cantidad_tripulantes, char* tareas) {
-	t_patota * patota = malloc(sizeof(t_patota));
-
-	patota->pid = pid;
-
-	patota->size_tripulantes = cantidad_tripulantes;
-
-	patota->tareas = string_new();
-
-	string_append(&patota->tareas, tareas);
-
-
-	patota->tripulantes = calloc(cantidad_tripulantes, sizeof(t_tripulante));
-	for (int i = 0; i < cantidad_tripulantes; i++) {
-		t_tripulante * mock_tripu = mock_tripulante(pid,0,0,0);
-		patota->tripulantes[i] = mock_tripu;
-	}
-
-	return patota;
-}
-
-t_tarea * mock_tarea(uint32_t max_x, uint32_t max_y, uint32_t max_espera) {
-	t_tarea * tarea = malloc(sizeof(t_tarea));
-
-	tarea->tarea = "GENERAR_BASURA";
-	tarea->parametro = 222;
-
-	tarea->pos_x = rand() % max_x;
-	tarea->pos_y = rand() % max_y;
-
-	tarea->tiempo = max_x + max_y;
-
-	return tarea;
-}
-
-char obtener_estado(t_estado_tripulante estado) {
-	switch (estado) {
-	case NUEVO:
-		return 'N';
-	case READY:
-		return 'R';
-	case EXEC:
-		return 'E';
-	case BLOCK:
-		return 'B';
-	case FINISH:
-		return 'F';
-	default:
-		return 'N';
-	}
-}
-
-t_tarea * mock_tarea_sabotaje(uint32_t max_x, uint32_t max_y, uint32_t max_espera) {
-	t_tarea * tarea = malloc(sizeof(t_tarea));
-
-	tarea->tarea = "SABOTAJE!!!";
-	tarea->parametro = 0;
-
-	tarea->pos_x = max_x;
-	tarea->pos_y = max_y;
-
-	tarea->tiempo = max_espera;
-
-	return tarea;
-
-}
-
-void destruir_patota_sin_tripulantes(t_patota * patota)
-{
-	free(patota->tareas);
-	free(patota->tripulantes);
-	free(patota);
-}
-
-void destruir_patota(t_patota * patota
-		) {
-	free(patota->tareas);
-	destruir_tripulantes(patota);
-	free(patota->tripulantes);
-	free(patota);
-}
-
-void destruir_tripulantes(t_patota * patota)
-{
-	for (int i = 0; i < patota->size_tripulantes; ++i)
-	{
-		free(patota->tripulantes[i]);
-	}
-}
-
-
 
 
