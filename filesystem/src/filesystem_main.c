@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
 
 	iniciar_swamp();
 
+
 	/*loggear_trace("vamos dale");
 	t_archivo_swamp * mostrar = malloc(sizeof(t_archivo_swamp));
 	t_archivo_swamp * mostrar2 = malloc(sizeof(t_archivo_swamp));
