@@ -24,11 +24,12 @@ int main(int argc, char** argv) {
 	}
 
 	iniciar_swamp();
-
+/*
 	escribir_particion(3, "gola don jose", archivo_a_escribir());
 	escribir_particion(2, "gola don jose", archivo_a_escribir());
-
-	/*loggear_trace("vamos dale");
+*/
+	/*NO LO BORREN LO USO PARA PRUEBAS
+	 * loggear_trace("vamos dale");
 	t_archivo_swamp * mostrar = malloc(sizeof(t_archivo_swamp));
 	t_archivo_swamp * mostrar2 = malloc(sizeof(t_archivo_swamp));
 	mostrar = list_get(lista_swamp, 1);
@@ -49,7 +50,7 @@ int main(int argc, char** argv) {
 */
 	debug_variables();
 
-	/*pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
+	pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
 
 
 	error = thread_join_and_free(ram_handshake);
@@ -58,7 +59,7 @@ int main(int argc, char** argv) {
 		cerrar_todo();
 		thread_detach_and_free(ram_handshake);
 		return EXIT_FAILURE;
-	}*/
+	}
 
 
 
