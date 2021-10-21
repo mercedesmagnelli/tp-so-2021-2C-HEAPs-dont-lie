@@ -13,8 +13,15 @@
 #include "filesystem_configuracion_guardada.h"
 
 #include "../../../shared/codigo_error.h"
+#include "../../../shared/logger.h"
+
+typedef struct {
+	char* ruta_archivo;
+	t_list * carpinchos;
+} t_archivo_swamp;
 
 
+t_list* lista_swamp;
 
 /**
  * @NAME: son_validos_los_parametros

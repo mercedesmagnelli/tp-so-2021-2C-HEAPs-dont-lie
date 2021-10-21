@@ -1,5 +1,7 @@
 #include "filesystem_configuracion.h"
 
+
+
 // Declaracion de funciones privadas
 int set_variable_str(t_config * config, char * param_leer, char ** param); // Se usa para setear un string leyendo del archivo config
 
@@ -51,6 +53,7 @@ int cargar_archivo(char * path) {
 	t_config * config = config_create(path);
 	int error = 0;
 
+	loggear_trace("cargo la config");
 	// Lectura del archivo config
 	error += set_variable_str(config, "IP", 					&config_guardada.ip);
 	error += set_variable_int(config, "PUERTO", 		        &config_guardada.puerto);
@@ -69,6 +72,16 @@ int cargar_archivo(char * path) {
 	if (error != 0) {
 		return -2;
 	}
+
+	//para probar
+	lista_swamp = list_create();
+	for(int j = 0; j < config_guardada.cantidad_archivos; j ++){
+		t_archivo_swamp * archivo = malloc(sizeof(t_archivo_swamp));
+		archivo->carpinchos = list_create();
+		archivo->ruta_archivo = config_guardada.archivos_swap[j];
+		list_add(lista_swamp, archivo);
+	}
+
 
 	config_destroy(config);
 
