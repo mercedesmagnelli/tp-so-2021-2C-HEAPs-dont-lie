@@ -46,6 +46,34 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
 }
 
+void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
+	heap_metadata* heap = get_HEAP(PID,ptro);
+	heap->isFree = 0;
+	if(heap->nextAlloc == NULL){
+		heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
+		nuevoHeap->currAlloc = heap->nextAlloc - heap->currAlloc -9 -tamanio ;
+		nuevoHeap->prevAlloc = heap->currAlloc;
+		nuevoHeap->nextAlloc = heap->nextAlloc;
+		nuevoHeap->isFree    = 1;
+		heap->nextAlloc = nuevoHeap->currAlloc;
+		agregar_HEAP_a_PID(PID,nuevoHeap);
+	}else{
+		if((heap->nextAlloc-heap->currAlloc-9) > (tamanio+9)){
+			heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
+			nuevoHeap->currAlloc = heap->nextAlloc - heap->currAlloc -9 -tamanio ;
+			nuevoHeap->prevAlloc = heap->currAlloc;
+			nuevoHeap->nextAlloc = heap->nextAlloc;
+			nuevoHeap->isFree    = 1;
+			heap->nextAlloc = nuevoHeap->currAlloc;
+			heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
+			heapSig->prevAlloc = nuevoHeap->currAlloc;
+			agregar_HEAP_a_PID(PID,nuevoHeap);
+		}
+	}
+}
+
+
+
 
 
 // FUNCIONES PRIVADAS DE USO INTERNO
@@ -84,12 +112,45 @@ int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam){
 	heap_metadata* heap = list_find(listaHMD,heap_tam_min);
 
 	if(heap->nextAlloc==NULL){
-		ptro = (-1)* heap->currAlloc;
+		ptro = (-1)* (heap->currAlloc+9);
 	}
 
 	return ptro;
 
 }
+
+heap_metadata* get_HEAP(uint32_t PID, int32_t ptro){
+
+	bool heap_ptro(void* element){
+		heap_metadata* heap = (heap_metadata*) element;
+		return heap->currAlloc == (ptro-9);
+
+	}
+
+	t_proceso* proceso = get_proceso_PID(PID);
+	t_list* listaHMD = proceso->lista_hmd;
+	heap_metadata* heap = list_find(listaHMD,heap_ptro);
+	return heap;
+
+}
+
+void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
+
+	bool condicion(void* elementoListado, void* datoAInsertar){
+		heap_metadata* elemList = (heap_metadata*) elementoListado;
+		heap_metadata* elemInsertar = (heap_metadata*) datoAInsertar;
+
+		return elemList->currAlloc < elemInsertar->currAlloc;
+	}
+
+	t_proceso* proceso = get_proceso_PID(PID);
+	t_list* listaHMD = proceso->lista_hmd;
+
+	list_add_sorted(listaHMD, (void*) heap, condicion);
+	//TODO testear que el insert se haga en la posicion correcta
+
+}
+
 
 int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size) {
 	if(1) {
@@ -103,10 +164,6 @@ int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size) {
 int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	printf("agregar proceso");
 	return 1;
-}
-
-void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
-	printf("holis");
 }
 
 int32_t se_asigna_memoria_necesaria(uint32_t pid, uint32_t size) {

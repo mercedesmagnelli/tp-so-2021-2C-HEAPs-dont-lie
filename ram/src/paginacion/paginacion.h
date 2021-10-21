@@ -54,8 +54,8 @@ typedef struct{
  * @NAME: inicializar_estructuras_administrativas_paginacion
  * @DESC: Inicializa los diccionarios y las listas
  **/
-
 void inicializar_estructuras_administrativas_paginacion();
+
 
 
 
@@ -69,7 +69,6 @@ void inicializar_estructuras_administrativas_paginacion();
  *   1 existe el proceso
  *   0 no existe el proceso
  **/
-
 int32_t existe_proceso(uint32_t PID);
 
 /**
@@ -79,14 +78,12 @@ int32_t existe_proceso(uint32_t PID);
  *   >=0 Devuelve el puntero al alloc donde se puede guardar la data
  *   <0 Devuelve el puntero al ultimo alloc con valor negativo
  **/
-
 int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam);
 
 /**
  * @NAME: actualizo_proceso
  * @DESC: Actualiza el HEAP seleccionado del proceso y, en caso necesario, agrega uno nuevo
  **/
-
 void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio);
 
 /**
@@ -94,8 +91,8 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio);
  * @DESC: Agrega el proceso a la lista de procesos y crea los 2 HEAPs necesarios
  * @RET: devuelve el puntero en el cual entra el tamaño solicitado
  **/
-
 int32_t agregar_proceso(uint32_t PID, uint32_t tam);
+
 /**
  * @NAME: ptro_valido
  * @DESC: Avisa si el puntero del proceso es uno valido
@@ -103,7 +100,6 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam);
  *   0 es un puntero valido
  *  -1 espacio no accedible/ existente
  **/
-
 uint32_t ptro_valido(uint32_t PID, uint32_t ptro);
 
 /**
@@ -170,7 +166,6 @@ void destruir_estructuras_administativas();
 * @RET: 0 si no puede
 * 		1 si puede
 **/
-
 int32_t se_asigna_memoria_necesaria(uint32_t pid, uint32_t size);
 
 /**
@@ -179,8 +174,8 @@ int32_t se_asigna_memoria_necesaria(uint32_t pid, uint32_t size);
 * @RET: -42, se posee asignacion fija y se alcanza el maximo de marcos por proceso
 * 		-43, en asignacion global, puede no haber mas lugar
 **/
-
 int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size);
+
 /**
 * @NAME: puedo_pedir_mas_memoria
 * @DESC: Retorna si un proceso puede pedir mas memoria
@@ -188,6 +183,10 @@ int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size);
 * 		0, no puede
 **/
 uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size);
+
+
+
+
 
 // FUNCIONES PRIVADAS DE USO INTERNO
 /**
@@ -200,12 +199,23 @@ uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size);
 t_proceso* get_proceso_PID(uint32_t PID);
 
 /*
- * @NAME: get_heap_metadata_con_tam_min
- * @DES: busca el metadata en el cual entra el dato de tamaio solicitado
+ * @NAME: get_ptro_con_tam_min
+ * @DES: busca el metadata en el cual entra el dato de tamaño solicitado
  * @RET: devuelve el metadata que puede contenerlo; caso que ninguno pueda: devuelve el ultimo HEAP
  * */
 int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam);
 
+/*
+ * @NAME: get_HEAP
+ * @DES: busca el heap del ptro asociado del PID
+ * */
+heap_metadata* get_HEAP(uint32_t PID, int32_t ptro);
+
+/*
+ * @NAME: agregar_HEAP_a_PID
+ * @DES: agrega el HEAP en la posicion correcta dentro de la lista de HMD del PID
+ * */
+void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap);
 
  /**
  * @NAME: destruir_proceso
