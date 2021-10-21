@@ -74,8 +74,6 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 
 
 
-
-
 // FUNCIONES PRIVADAS DE USO INTERNO
 
 t_proceso* get_proceso_PID(uint32_t PID){
@@ -119,6 +117,7 @@ int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam){
 
 }
 
+
 heap_metadata* get_HEAP(uint32_t PID, int32_t ptro){
 
 	bool heap_ptro(void* element){
@@ -152,6 +151,8 @@ void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////////
+
 int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size) {
 	if(1) {
 		//fijo
@@ -173,4 +174,29 @@ int32_t se_asigna_memoria_necesaria(uint32_t pid, uint32_t size) {
 uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size){
 	printf("no, no podés, deja de joder");
 	return 1;
+}
+
+uint32_t ptro_valido(uint32_t PID, uint32_t ptro) {
+	return 0;
+}
+
+uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t pid){
+	return 1;
+}
+
+uint32_t traducir_a_dir_fisica(uint32_t logica){
+	return 1;
+}
+
+
+uint32_t ptro_liberado(uint32_t PID, uint32_t ptro){
+	return 1;
+}
+
+void liberar_memoria(uint32_t PID, uint32_t ptro){
+	printf("libera la memoria rataaa");
+}
+
+void consolidar_memoria(uint32_t PID){
+	printf("don't mess with me, i have the power of god and anime by my side");
 }

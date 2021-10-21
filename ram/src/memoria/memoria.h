@@ -32,34 +32,33 @@ int32_t memalloc(uint32_t pid, uint32_t size);
  * @DESC: Libera espacios de memoria. Se encarga de consolidar en caso de que queden dos espacios contiguos libres
  * y de liberar paginas en caso de que con la liberación una página quede vacía.
   * @RET:
- *   0 se pudo liberar el espacio de memoria
- *  -1 espacio no accedible/existente
- *  -2 el espacio estaba liberado
- **/
+ *   -5, hubo un error en la lectura
+ *   0, no hay error pipi
+ */
 
-void memfree(uint32_t* direccionLogicaALiberar);
+int32_t memfree(uint32_t direccionLogicaALiberar, uint32_t pid);
 
 /**
  * @NAME: memread
  * @DESC: A partir de una direccion lógica a leer, se retorna lo que está guardado en esa posición.
-
+ * @RET: -6, error al leer
+ * 		  0, esta to' bien
  **/
 
 
-void* memread(uint32_t* direccionLogicaALeer, uint32_t tamanio);
+void* memread(uint32_t direccionLogicaALeer, uint32_t pid);
 
 /**
  * @NAME: memwrite
  * @DESC: Se encarga de escribir informacion en memoria a partir de una direccion lógica
   * @RET:
- *   0 se guardo exitosamente la data en memoria
- *  -1 espacio no accedible/ existente
- *  -2 el espacio estaba liberado
+ *  -7, hubo algun tipo de error
+ *   0, no hay error de ningun tipo
  *
  **/
 
 
-void memwrite(void* valorAEscribir, uint32_t* direccionLogicaAEscribir, uint32_t tamanio);
+int32_t memwrite(void* valorAEscribir, uint32_t direccionLogicaAEscribir, uint32_t pid);
 
 /*Funciones desarrolladas extras para correcto funcionamiento de la memoria*/
 
@@ -79,13 +78,6 @@ void inicializar_memoria_principal();
  *
  **/
 
-uint32_t* encontrar_espacio_disponible_ff(uint32_t tamanio_a_guardar);
-
-
-/*
- * @NAME: cantidad_valida
- * @DESC: Se comprueba que la cantidad que se quiera alocar no sea negativa ni 0.
- */
 
 bool cantidad_valida(uint32_t size);
 

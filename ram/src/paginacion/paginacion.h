@@ -97,8 +97,8 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam);
  * @NAME: ptro_valido
  * @DESC: Avisa si el puntero del proceso es uno valido
  * @RET:
- *   0 es un puntero valido
- *  -1 espacio no accedible/ existente
+ *   1 es un puntero valido
+ *   0 espacio no accedible/ existente
  **/
 uint32_t ptro_valido(uint32_t PID, uint32_t ptro);
 
@@ -224,5 +224,19 @@ void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap);
  **/
 void destruir_proceso(void* proceso);
 
+/**
+ * @NAME: tamanio_de_direccion
+ * @DESC: retorna el tamanio de una direccion, obtenido mediante el hmd
+ */
+
+uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t pid);
+
+/**
+ * @NAME: traducir_a_dir_fisica
+ * @DESC: traduce de direccion logica a fisica
+ * @RET:  la direccion logica + frame * tam_pag + offset (si lo hay)
+*/
+
+uint32_t traducir_a_dir_fisica(uint32_t logica);
 
 #endif /* PAGINACION_PAGINACION_H_ */
