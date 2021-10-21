@@ -31,4 +31,12 @@ int escribir_particion(uint32_t pagina, char* texto_escribir, t_archivo_swamp* s
 
 char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp);
 
+
+/*
+ * archivo_a_escribir
+ * Indica en que archivo se debe escribir la pagina que llega desde la RAM
+ *
+ */
+t_archivo_swamp* archivo_a_escribir();
+
 #endif /* MANEJO_FILESYSTEM_MANEJO_ARCHIVOS_H_ */

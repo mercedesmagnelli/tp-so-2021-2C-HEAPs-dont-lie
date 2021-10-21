@@ -25,6 +25,8 @@ int main(int argc, char** argv) {
 
 	iniciar_swamp();
 
+	escribir_particion(3, "gola don jose", archivo_a_escribir());
+	escribir_particion(2, "gola don jose", archivo_a_escribir());
 
 	/*loggear_trace("vamos dale");
 	t_archivo_swamp * mostrar = malloc(sizeof(t_archivo_swamp));

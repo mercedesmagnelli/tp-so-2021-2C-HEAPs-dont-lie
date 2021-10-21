@@ -59,5 +59,22 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp){
 	return contenido_pagina;
 }
 
+t_archivo_swamp* archivo_a_escribir(){
+	int libre = 0;
+	t_archivo_swamp* archivo_a_escribir;
+	for(int i = 0; i < list_size(lista_swamp); i++){
+		t_archivo_swamp* archivo = list_get(lista_swamp, i);
+		if(archivo->espacio_libre > libre){
+			libre = archivo->espacio_libre;
+			archivo_a_escribir = archivo;
+		}
+	}
+
+	loggear_trace("EL archivo a ecribir es  %s", archivo_a_escribir->ruta_archivo);
+
+	return archivo_a_escribir;
+
+}
+
 
 
