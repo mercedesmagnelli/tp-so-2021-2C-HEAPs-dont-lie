@@ -137,3 +137,22 @@ int set_variable_array_str(t_config * config, char * param_leer, char *** param,
 	return 0;
 }
 
+
+void destroy_lista_swamp(){
+	for(int i = 0; i < list_size(lista_swamp); i++){
+		destruir_archivo_swamp(list_get(lista_swamp, i));
+	}
+
+	list_destroy(lista_swamp);
+}
+
+
+void destruir_archivo_swamp(t_archivo_swamp* swamp){ //TODO ver luego donde conviene moverlo.
+	list_clean_and_destroy_elements(swamp->carpinchos, destruir_string);
+	list_destroy(swamp->carpinchos);
+	free(swamp);
+}
+
+void destruir_string(void* el_String){
+	free(el_String);
+}

@@ -3,9 +3,7 @@
 void cerrar_todo();
 void manejar_signal(int n);
 void debug_variables();
-void destroy_variables();
-void destruir_archivo_swamp(t_archivo_swamp* swamp);
-void destruir_string(void* el_String);
+
 
 int main(int argc, char** argv) {
 	signal(SIGUSR1, manejar_signal);
@@ -50,7 +48,7 @@ int main(int argc, char** argv) {
 */
 	debug_variables();
 
-	pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
+	/*pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
 
 
 	error = thread_join_and_free(ram_handshake);
@@ -61,7 +59,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-
+*/
 
 	cerrar_todo();
 
@@ -71,27 +69,9 @@ int main(int argc, char** argv) {
 void cerrar_todo() {
 	destroy_configuracion();
 	destroy_log();
-	destroy_variables();
+	destroy_lista_swamp();
 }
 
-void destroy_variables(){
-	for(int i = 0; i < list_size(lista_swamp); i++){
-		destruir_archivo_swamp(list_get(lista_swamp, i));
-	}
-
-	list_destroy(lista_swamp);
-}
-
-void destruir_archivo_swamp(t_archivo_swamp* swamp){ //TODO ver luego donde conviene moverlo.
-	list_clean_and_destroy_elements(swamp->carpinchos, destruir_string);
-	list_destroy(swamp->carpinchos);
-	free(swamp);
-	//free(swamp->ruta_archivo);
-}
-
-void destruir_string(void* el_String){
-	free(el_String);
-}
 
 void manejar_signal(int n){
 	loggear_warning("Llego la signal para mandar sabotaje, TODO: Cambiar la funcion en filesystem_main.c:35 para que cumpla la funcion");
