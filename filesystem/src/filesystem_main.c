@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 */
 	debug_variables();
 
-	/*pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
+	pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
 
 
 	error = thread_join_and_free(ram_handshake);
@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-*/
+
 
 	cerrar_todo();
 

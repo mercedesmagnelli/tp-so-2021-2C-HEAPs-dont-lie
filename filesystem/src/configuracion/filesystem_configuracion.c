@@ -53,7 +53,6 @@ int cargar_archivo(char * path) {
 	t_config * config = config_create(path);
 	int error = 0;
 
-	loggear_trace("cargo la config");
 	// Lectura del archivo config
 	error += set_variable_str(config, "IP", 					&config_guardada.ip);
 	error += set_variable_int(config, "PUERTO", 		        &config_guardada.puerto);
