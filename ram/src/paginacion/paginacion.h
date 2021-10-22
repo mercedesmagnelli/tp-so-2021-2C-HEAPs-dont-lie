@@ -225,13 +225,6 @@ void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap);
 void destruir_proceso(void* proceso);
 
 /**
- * @NAME: tamanio_de_direccion
- * @DESC: retorna el tamanio de una direccion, obtenido mediante el hmd
- */
-
-uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t pid);
-
-/**
  * @NAME: traducir_a_dir_fisica
  * @DESC: traduce de direccion logica a fisica
  * @RET:  la direccion logica + frame * tam_pag + offset (si lo hay)

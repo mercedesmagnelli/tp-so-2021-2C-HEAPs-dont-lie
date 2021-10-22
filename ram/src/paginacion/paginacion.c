@@ -180,9 +180,7 @@ uint32_t ptro_valido(uint32_t PID, uint32_t ptro) {
 	return 0;
 }
 
-uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t pid){
-	return 1;
-}
+
 
 uint32_t traducir_a_dir_fisica(uint32_t logica){
 	return 1;
