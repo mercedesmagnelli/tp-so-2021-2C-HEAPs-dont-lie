@@ -4,6 +4,7 @@ void cerrar_todo();
 void manejar_signal(int n);
 void debug_variables();
 
+
 int main(int argc, char** argv) {
 	signal(SIGUSR1, manejar_signal);
 
@@ -21,7 +22,30 @@ int main(int argc, char** argv) {
 	}
 
 	iniciar_swamp();
+/*
+	escribir_particion(3, "gola don jose", archivo_a_escribir());
+	escribir_particion(2, "gola don jose", archivo_a_escribir());
+*/
+	/*NO LO BORREN LO USO PARA PRUEBAS
+	 * loggear_trace("vamos dale");
+	t_archivo_swamp * mostrar = malloc(sizeof(t_archivo_swamp));
+	t_archivo_swamp * mostrar2 = malloc(sizeof(t_archivo_swamp));
+	mostrar = list_get(lista_swamp, 1);
 
+	mostrar2 = list_get(lista_swamp, 0);
+
+	loggear_trace("EL PRIMERO ES %s", mostrar->ruta_archivo);
+
+	loggear_trace("EL SEGUNDO ES %s", mostrar->ruta_archivo);
+
+	list_add(mostrar->carpinchos, "proceso");
+	list_add(mostrar2->carpinchos, "procesa");
+	list_add(mostrar2->carpinchos, "procesa2");
+
+	loggear_info("EL PRIMERO PROCESOS %s", list_get(mostrar->carpinchos, 0));
+	loggear_info("EL SEGUNDO PROCESOS %s", list_get(mostrar2->carpinchos, 1));
+
+*/
 	debug_variables();
 
 	pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
@@ -36,6 +60,7 @@ int main(int argc, char** argv) {
 	}
 
 
+
 	cerrar_todo();
 
 	return EXIT_SUCCESS;
@@ -44,7 +69,9 @@ int main(int argc, char** argv) {
 void cerrar_todo() {
 	destroy_configuracion();
 	destroy_log();
+	destroy_lista_swamp();
 }
+
 
 void manejar_signal(int n){
 	loggear_warning("Llego la signal para mandar sabotaje, TODO: Cambiar la funcion en filesystem_main.c:35 para que cumpla la funcion");
