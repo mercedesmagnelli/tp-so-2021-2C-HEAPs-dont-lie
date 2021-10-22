@@ -191,7 +191,7 @@ t_hilo * colas_mover_block_ready_ready() {
 
 	// TODO: Asegurarse que inserte en 0 o al final
 	pthread_mutex_lock(&mutex_ready_list);
-	list_add_in_index(ready_list, hilo, 0);
+	list_add_in_index(ready_list, 0, hilo);
 	pthread_mutex_unlock(&mutex_ready_list);
 
 	return hilo;

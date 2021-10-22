@@ -1,24 +1,13 @@
 #ifndef COLAS_H_
 #define COLAS_H_
 
+#include <pthread.h>
+#include <stdlib.h>
+
 #include <commons/collections/queue.h>
 #include <commons/collections/list.h>
-#include <pthread.h>
 
-typedef enum {
-	NEW,
-	READY,
-	EXEC,
-	BLOCK,
-	FINISH,
-	SUSPENDED_BLOCK,
-	SUSPENDED_READY
-} t_estado_hilo;
-
-typedef struct {
-	void * proceso;
-	t_estado_hilo estado;
-} t_hilo;
+#include "estructuras.h"
 
 /**
  * Aca se guardaran todas las colas, listas y/o pilas que sea necesaria para mover entre hilos

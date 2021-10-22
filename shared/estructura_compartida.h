@@ -1,4 +1,4 @@
-#ifndef ESTRUCTURA_COMPARTIDA_H_
+ #ifndef ESTRUCTURA_COMPARTIDA_H_
 #define ESTRUCTURA_COMPARTIDA_H_
 
 #include <stdio.h>
@@ -31,44 +31,66 @@ typedef struct {
 
 // Matelib la usa para enviarle a Kernel y/o Memoria
 typedef struct {
-	int pid;
+	uint32_t pid;
+} t_matelib_nuevo_proceso;
 
+typedef struct {
+	uint32_t pid;
 	char * semaforo_nombre;
-	int semaforo_valor;
+	int32_t semaforo_valor;
+} t_matelib_semaforo;
 
+typedef struct {
+	uint32_t pid;
 	char * io_nombre;
-	void * io_msg;
-	// TODO: Tal vez se agregue el tamaño del mensaje
+} t_matelib_io;
 
-	int mem_size;
-	int32_t mem_mate_pointer;
-	void * mem_write;
-	// TODO: SIempre se va a querer leer todo el contenido de una variable?
-} t_matelib_mensaje;
-
-
-t_matelib_mensaje * crear_matelib_mensaje_init(int pid);
-
-t_matelib_mensaje * crear_matelib_mensaje_semaforo(int pid, char * semaforo);
-
-t_matelib_mensaje * crear_matelib_mensaje_semaforo_init(int pid, char * semaforo, int valor);
-
-t_matelib_mensaje * crear_matelib_mensaje_io(int pid, char * io, void * msg);
-
-t_matelib_mensaje * crear_matelib_mensaje_mem_alloc(int pid, int size);
-
-t_matelib_mensaje * crear_matelib_mensaje_mem_free(int pid, int32_t mate_pointer);
-
-t_matelib_mensaje * crear_matelib_mensaje_mem_read(int pid, int32_t mate_pointer, int size);
-
-t_matelib_mensaje * crear_matelib_mensaje_mem_write(int pid, int32_t mate_pointer, int size, void * mem_write);
+typedef struct {
+	uint32_t pid;
+	uint32_t memoria_size;
+} t_matelib_memoria_alloc;
+typedef struct {
+	uint32_t pid;
+	uint32_t memoria_size;
+	int32_t memoria_mate_pointer;
+} t_matelib_memoria_read;
+typedef struct {
+	uint32_t pid;
+	uint32_t memoria_size;
+	int32_t memoria_mate_pointer;
+	void * memoria_write;
+} t_matelib_memoria_write;
+typedef struct {
+	uint32_t pid;
+	int32_t memoria_mate_pointer;
+} t_matelib_memoria_free;
 
 
-size_t size_matelib_mensaje_serializar(t_matelib_mensaje * matelib_mensaje);
+t_matelib_nuevo_proceso * shared_crear_nuevo_proceso(uint32_t pid);
+void * serializiar_crear_proceso(t_matelib_nuevo_proceso * mensaje);
+t_matelib_nuevo_proceso * deserializar_crear_proceso(void * puntero);
 
-void * serializar_matelib_mensaje(t_matelib_mensaje * matelib_mensaje);
+t_matelib_semaforo * shared_crear_nuevo_semaforo(uint32_t pid, char * nombre, int32_t valor_inicial);
+t_matelib_semaforo * shared_crear_usar_semaforo(uint32_t pid, char * nombre);
+void * serializar_semaforo(t_matelib_semaforo * mensaje);
+t_matelib_semaforo * deserializar_semaforo(void * puntero);
 
-t_matelib_mensaje * deserializar_matelib_mensaje(void * puntero);
+t_matelib_io * shared_crear_io(uint32_t pid, char * io_nombre);
+void * serializar_io(t_matelib_io * mensaje);
+t_matelib_io * deserializar_io(void * puntero);
+
+t_matelib_memoria_alloc * shared_crear_nuevo_alloc(uint32_t pid, uint32_t memoria_size);
+t_matelib_memoria_read * shared_crear_nuevo_read(uint32_t pid, uint32_t memoria_size, int32_t mate_pointer);
+t_matelib_memoria_write * shared_crear_nuevo_write(uint32_t pid, uint32_t memoria_size, int32_t mate_pointer, void * write);
+t_matelib_memoria_free * shared_crear_nuevo_free(uint32_t pid, int32_t mate_pointer);
+void * serializar_memoria_alloc(t_matelib_memoria_alloc * mensaje);
+void * serializar_memoria_read(t_matelib_memoria_read * mensaje);
+void * serializar_memoria_write(t_matelib_memoria_write * mensaje);
+void * serializar_memoria_free(t_matelib_memoria_free * mensaje);
+t_matelib_memoria_alloc * deserializar_memoria_alloc(void * puntero);
+t_matelib_memoria_read * deserializar_memoria_read(void * puntero);
+t_matelib_memoria_write * deserializar_memoria_write(void * puntero);
+t_matelib_memoria_free * deserializar_memoria_free(void * puntero);
 
 
 #endif /* ESTRUCTURA_COMPARTIDA_H_ */

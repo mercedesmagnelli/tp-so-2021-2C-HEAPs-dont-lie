@@ -21,7 +21,40 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	debug_variables();
+	//debug_variables();
+
+
+	loggear_trace("----MATELIB-----");
+
+	t_matelib_memoria_write * proceso1 = shared_crear_nuevo_write(1, sizeof(char) * 8, 30, "PRINTER");
+
+	loggear_trace("PROCESO 1: PID %d", proceso1->pid);
+	loggear_trace("PROCESO 1: SIZE %d", proceso1->memoria_size);
+	loggear_trace("PROCESO 1: POINTER %d", proceso1->memoria_mate_pointer);
+	loggear_trace("PROCESO 1: WRITE %s", proceso1->memoria_write);
+
+	void * serializado = serializar_memoria_write(proceso1);
+
+	t_matelib_memoria_write * proceso2 = deserializar_memoria_write(serializado);
+
+	loggear_trace("PROCESO 2: PID %d", proceso2->pid);
+	loggear_trace("PROCESO 2: SIZE %d", proceso2->memoria_size);
+	loggear_trace("PROCESO 2: POINTER %d", proceso2->memoria_mate_pointer);
+	loggear_trace("PROCESO 1: WRITE %s", proceso2->memoria_write);
+
+	loggear_trace("----MATELIB-----");
+
+	/*
+	crear_matelib_mensaje_semaforo(int pid, char * semaforo);
+	crear_matelib_mensaje_semaforo_init(int pid, char * semaforo, int valor);
+	crear_matelib_mensaje_io(int pid, char * io, void * msg);
+	crear_matelib_mensaje_mem_alloc(int pid, int size);
+	crear_matelib_mensaje_mem_free(int pid, int32_t mate_pointer);
+	crear_matelib_mensaje_mem_read(int pid, int32_t mate_pointer, int size);
+	crear_matelib_mensaje_mem_write(int pid, int32_t mate_pointer, int size, void * mem_write);
+	*/
+
+	/*
 
 	pthread_t ram_handshake = thread_ejecutar_funcion(ram_enviar_handshake);
 
@@ -32,6 +65,7 @@ int main(int argc, char** argv) {
 		thread_detach_and_free(ram_handshake);
 		return EXIT_FAILURE;
 	}
+	*/
 
 
 	//levantar_consola();
