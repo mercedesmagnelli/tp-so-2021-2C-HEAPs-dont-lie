@@ -23,7 +23,7 @@
  * 	0 nos acepta
  * 	X Error, no nos acepta
  */
-int ram_enviar_handshake();
+int enviar_handshake();
 
 /**
  * @NAME: ram_cerrar_conexiones
@@ -32,12 +32,12 @@ int ram_enviar_handshake();
  * safe_close = true, hace pthread_join
  * safe_close = false, hace pthread_detach
  */
-void ram_cerrar_conexiones(bool safe_close);
+void conexiones_cerrar_conexiones(bool safe_close);
 
 /**
  * @NAME: iniciar_conexion_ram
  * @DESC: Genera y devuelve un socket de la conexion con la ram
  */
-int iniciar_conexion_ram();
+int conexiones_iniciar();
 
 #endif /* CONEXION_RAM_H_ */

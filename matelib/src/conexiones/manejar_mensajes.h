@@ -1,6 +1,6 @@
 
-#ifndef CONEXION_RAM_MANEJAR_MENSAJES_H_
-#define CONEXION_RAM_MANEJAR_MENSAJES_H_
+#ifndef CONEXIONES_MANEJAR_MENSAJES_H_
+#define CONEXIONES_MANEJAR_MENSAJES_H_
 
 #include <pthread.h>
 #include <unistd.h>
@@ -10,7 +10,7 @@
 #include "../../../shared/protocolo.h"
 #include "../../../shared/codigo_error.h"
 #include "../../../shared/estructura_compartida.h"
-#include "conexion_ram.h"
+#include "../conexion/conexion_ram.h"
 
 /**
  * @NAME: recibir_mensaje
@@ -31,4 +31,4 @@ int recibir_mensaje(int socket_ram);
  */
 int manejar_mensajes(t_prot_mensaje * mensaje);
 
-#endif /* CONEXION_RAM_MANEJAR_MENSAJES_H_ */
+#endif /* CONEXIONES_MANEJAR_MENSAJES_H_ */

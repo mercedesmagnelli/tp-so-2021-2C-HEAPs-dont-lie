@@ -1,5 +1,5 @@
 
-#include "manejar_mensajes.h"
+#include "../conexiones/manejar_mensajes.h"
 
 int recibir_mensaje(int socket_ram) {
 	t_prot_mensaje * mensaje = recibir_mensaje_protocolo(socket_ram);

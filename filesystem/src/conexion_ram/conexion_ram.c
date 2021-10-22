@@ -1,12 +1,12 @@
 #include "conexion_ram.h"
 
-int iniciar_conexion_ram();
+int conexiones_iniciar();
 
 void avisar_ram_desconexion();
 
 // Publica
-int ram_enviar_handshake() {
-	int socket_ram = iniciar_conexion_ram();
+int enviar_handshake() {
+	int socket_ram = conexiones_iniciar();
 	if (socket_ram < 0) {
 		return socket_ram;
 	}
@@ -33,21 +33,21 @@ int ram_enviar_handshake() {
 }
 
 // Publica
-void ram_cerrar_conexiones(bool safe_close) {
+void conexiones_cerrar_conexiones(bool safe_close) {
 	avisar_ram_desconexion();
 
 	loggear_trace("Cerrado los threads y sockets");
 }
 
 void avisar_ram_desconexion() {
-	int socket_avisar = iniciar_conexion_ram();
+	int socket_avisar = conexiones_iniciar();
 
 	enviar_mensaje_protocolo(socket_avisar, DESCONEXION_TOTAL, 0, NULL);
 
 	close(socket_avisar);
 }
 
-int iniciar_conexion_ram() {
+int conexiones_iniciar() {
 	char * ram_ip = get_ip();
 	int ram_puerto = get_puerto();
 

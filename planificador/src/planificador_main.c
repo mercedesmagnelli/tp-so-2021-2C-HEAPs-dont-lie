@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
 }
 
 void cerrar_todo() {
-	ram_cerrar_conexiones(false);
+	conexiones_cerrar_conexiones(false);
 	loggear_info("Cerrada conexion con ram");
 	destroy_configuracion();
 	puts("Destruido configuraciones");

@@ -66,20 +66,26 @@ t_matelib_memoria_free * shared_crear_nuevo_free(uint32_t pid, int32_t mate_poin
 }
 
 
-void * serializiar_crear_proceso(t_matelib_nuevo_proceso * mensaje) {
+void * serializiar_crear_proceso(t_matelib_nuevo_proceso * mensaje, size_t * size_final) {
 	size_t offset = 0;
-	void * buffer = malloc(SIZE_PID);
+	size_t tamanio_buffer = SIZE_PID;
+	void * buffer = malloc(tamanio_buffer);
 
 	memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
 	offset += SIZE_PID;
 
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
+
 	return buffer;
 }
 
-void * serializar_semaforo(t_matelib_semaforo * mensaje) {
+void * serializar_semaforo(t_matelib_semaforo * mensaje, size_t * size_final) {
 	size_t offset = 0;
 	size_t size_semaforo_nombre = strlen(mensaje->semaforo_nombre) + 1;
-	void * buffer = malloc(SIZE_PID + SIZE_SEMAFORO_VALOR + size_semaforo_nombre);
+	size_t tamanio_buffer = SIZE_PID + SIZE_SEMAFORO_VALOR + size_semaforo_nombre;
+	void * buffer = malloc(tamanio_buffer);
 
 	memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
 	offset += SIZE_PID;
@@ -90,13 +96,18 @@ void * serializar_semaforo(t_matelib_semaforo * mensaje) {
 	memcpy(buffer + offset, mensaje->semaforo_nombre, size_semaforo_nombre);
 	offset += size_semaforo_nombre;
 
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
+
 	return buffer;
 }
 
-void * serializar_io(t_matelib_io * mensaje) {
+void * serializar_io(t_matelib_io * mensaje, size_t * size_final) {
 	size_t offset = 0;
 	size_t size_io_nombre = strlen(mensaje->io_nombre) + 1;
-	void * buffer = malloc(SIZE_PID + SIZE_CHAR * size_io_nombre);
+	size_t tamanio_buffer = SIZE_PID + SIZE_CHAR * size_io_nombre;
+	void * buffer = malloc(tamanio_buffer);
 
 	memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
 	offset += SIZE_PID;
@@ -104,12 +115,17 @@ void * serializar_io(t_matelib_io * mensaje) {
 	memcpy(buffer + offset, mensaje->io_nombre, size_io_nombre);
 	offset += size_io_nombre;
 
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
+
 	return buffer;
 }
 
-void * serializar_memoria_alloc(t_matelib_memoria_alloc * mensaje) {
+void * serializar_memoria_alloc(t_matelib_memoria_alloc * mensaje, size_t * size_final) {
 	size_t offset = 0;
-	void * buffer = malloc(SIZE_PID + SIZE_MEMORIA_SIZE);
+	size_t tamanio_buffer = SIZE_PID + SIZE_MEMORIA_SIZE;
+	void * buffer = malloc(tamanio_buffer);
 
 	memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
 	offset += SIZE_PID;
@@ -117,12 +133,17 @@ void * serializar_memoria_alloc(t_matelib_memoria_alloc * mensaje) {
 	memcpy(buffer + offset, &mensaje->memoria_size, SIZE_MEMORIA_SIZE);
 	offset += SIZE_MEMORIA_SIZE;
 
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
+
 	return buffer;
 }
 
-void * serializar_memoria_read(t_matelib_memoria_read * mensaje) {
+void * serializar_memoria_read(t_matelib_memoria_read * mensaje, size_t * size_final) {
 	size_t offset = 0;
-	void * buffer = malloc(SIZE_PID + SIZE_MEMORIA_SIZE + SIZE_MEMORIA_MATE_POINTER);
+	size_t tamanio_buffer = SIZE_PID + SIZE_MEMORIA_SIZE + SIZE_MEMORIA_MATE_POINTER;
+	void * buffer = malloc(tamanio_buffer);
 
 	memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
 	offset += SIZE_PID;
@@ -133,14 +154,19 @@ void * serializar_memoria_read(t_matelib_memoria_read * mensaje) {
 	memcpy(buffer + offset, &mensaje->memoria_mate_pointer, SIZE_MEMORIA_MATE_POINTER);
 	offset += SIZE_MEMORIA_MATE_POINTER;
 
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
+
 	return buffer;
 }
 
-void * serializar_memoria_write(t_matelib_memoria_write * mensaje) {
+void * serializar_memoria_write(t_matelib_memoria_write * mensaje, size_t * size_final) {
 
 	size_t offset = 0;
 	size_t size_memoria_write = SIZE_CHAR * mensaje->memoria_size;
-	void * buffer = malloc(SIZE_PID + SIZE_MEMORIA_SIZE + SIZE_MEMORIA_MATE_POINTER + SIZE_CHAR * size_memoria_write);
+	size_t tamanio_buffer = SIZE_PID + SIZE_MEMORIA_SIZE + SIZE_MEMORIA_MATE_POINTER + SIZE_CHAR * size_memoria_write;
+	void * buffer = malloc(tamanio_buffer);
 
 	memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
 	offset += SIZE_PID;
@@ -154,18 +180,27 @@ void * serializar_memoria_write(t_matelib_memoria_write * mensaje) {
 	memcpy(buffer + offset, mensaje->memoria_write, size_memoria_write);
 	offset += size_memoria_write;
 
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
+
 	return buffer;
 }
 
-void * serializar_memoria_free(t_matelib_memoria_free * mensaje) {
+void * serializar_memoria_free(t_matelib_memoria_free * mensaje, size_t * size_final) {
 	size_t offset = 0;
-	void * buffer = malloc(SIZE_PID + SIZE_MEMORIA_MATE_POINTER);
+	size_t tamanio_buffer = SIZE_PID + SIZE_MEMORIA_MATE_POINTER;
+	void * buffer = malloc(tamanio_buffer);
 
 	memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
 	offset += SIZE_PID;
 
 	memcpy(buffer + offset, &mensaje->memoria_mate_pointer, SIZE_MEMORIA_MATE_POINTER);
 	offset += SIZE_MEMORIA_MATE_POINTER;
+
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
 
 	return buffer;
 }

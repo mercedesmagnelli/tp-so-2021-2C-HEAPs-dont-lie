@@ -67,26 +67,26 @@ typedef struct {
 
 
 t_matelib_nuevo_proceso * shared_crear_nuevo_proceso(uint32_t pid);
-void * serializiar_crear_proceso(t_matelib_nuevo_proceso * mensaje);
+void * serializiar_crear_proceso(t_matelib_nuevo_proceso * mensaje, size_t * size_final);
 t_matelib_nuevo_proceso * deserializar_crear_proceso(void * puntero);
 
 t_matelib_semaforo * shared_crear_nuevo_semaforo(uint32_t pid, char * nombre, int32_t valor_inicial);
 t_matelib_semaforo * shared_crear_usar_semaforo(uint32_t pid, char * nombre);
-void * serializar_semaforo(t_matelib_semaforo * mensaje);
+void * serializar_semaforo(t_matelib_semaforo * mensaje, size_t * size_final);
 t_matelib_semaforo * deserializar_semaforo(void * puntero);
 
 t_matelib_io * shared_crear_io(uint32_t pid, char * io_nombre);
-void * serializar_io(t_matelib_io * mensaje);
+void * serializar_io(t_matelib_io * mensaje, size_t * size_final);
 t_matelib_io * deserializar_io(void * puntero);
 
 t_matelib_memoria_alloc * shared_crear_nuevo_alloc(uint32_t pid, uint32_t memoria_size);
 t_matelib_memoria_read * shared_crear_nuevo_read(uint32_t pid, uint32_t memoria_size, int32_t mate_pointer);
 t_matelib_memoria_write * shared_crear_nuevo_write(uint32_t pid, uint32_t memoria_size, int32_t mate_pointer, void * write);
 t_matelib_memoria_free * shared_crear_nuevo_free(uint32_t pid, int32_t mate_pointer);
-void * serializar_memoria_alloc(t_matelib_memoria_alloc * mensaje);
-void * serializar_memoria_read(t_matelib_memoria_read * mensaje);
-void * serializar_memoria_write(t_matelib_memoria_write * mensaje);
-void * serializar_memoria_free(t_matelib_memoria_free * mensaje);
+void * serializar_memoria_alloc(t_matelib_memoria_alloc * mensaje, size_t * size_final);
+void * serializar_memoria_read(t_matelib_memoria_read * mensaje, size_t * size_final);
+void * serializar_memoria_write(t_matelib_memoria_write * mensaje, size_t * size_final);
+void * serializar_memoria_free(t_matelib_memoria_free * mensaje, size_t * size_final);
 t_matelib_memoria_alloc * deserializar_memoria_alloc(void * puntero);
 t_matelib_memoria_read * deserializar_memoria_read(void * puntero);
 t_matelib_memoria_write * deserializar_memoria_write(void * puntero);

@@ -6,36 +6,29 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "../configuracion/configuracion.h"
+#include "../configuracion/matelib_configuracion_guardada.h"
 
 #include "../../../shared/conexion.h"
 #include "../../../shared/protocolo.h"
 #include "../../../shared/codigo_error.h"
 #include "../../../shared/logger.h"
 
-#include "manejar_mensajes.h"
+#include "../conexiones/manejar_mensajes.h"
 
 /**
- * @NAME: ram_enviar_handshake
- * @DESC: Antes de empezar a trabajar con la ram, se debe llamar esta funcion y verificar que la ram nos acepta.
- * De ser asi podemos empezar a manipular tripulantes
- * @RETURN:
- * 	0 nos acepta
- * 	X Error, no nos acepta
+ * @NAME: enviar_mate_init
+ * @DESC: Envia el nuevo proceso a la memoria o al KErnel
  */
-int enviar_handshake();
+int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso);
 
 /**
- * @NAME: ram_cerrar_conexiones
+ * @NAME: conexiones_cerrar_conexiones
  * @DESC: Cierra los hilos y libera toda la memoria ocupada
- * @PARAM:
- * safe_close = true, hace pthread_join
- * safe_close = false, hace pthread_detach
  */
 void conexiones_cerrar_conexiones(bool safe_close);
 
 /**
- * @NAME: iniciar_conexion_ram
+ * @NAME: conexiones_iniciar
  * @DESC: Genera y devuelve un socket de la conexion con la ram
  */
 int conexiones_iniciar();

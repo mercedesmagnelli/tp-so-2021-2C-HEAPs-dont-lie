@@ -9,6 +9,8 @@ int mate_close(mate_instance *lib_ref) {
 	return 0;
 }
 
+
+
 int mate_sem_init(mate_instance *lib_ref, mate_sem_name sem, unsigned int value) {
 	return 0;
 }
@@ -26,9 +28,12 @@ int mate_sem_destroy(mate_instance *lib_ref, mate_sem_name sem) {
 }
 
 
+
 int mate_call_io(mate_instance *lib_ref, mate_io_resource io, void *msg) {
 	return 0;
 }
+
+
 
 mate_pointer mate_memalloc(mate_instance *lib_ref, int size) {
 	return 0;

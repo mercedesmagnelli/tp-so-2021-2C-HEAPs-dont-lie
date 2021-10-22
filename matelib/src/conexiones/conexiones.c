@@ -1,32 +1,37 @@
-#include "conexion_ram.h"
+#include "conexiones.h"
 
 int conexiones_iniciar();
 
 void avisar_ram_desconexion();
 
 // Publica
-int enviar_handshake() {
-	int socket_ram = conexiones_iniciar();
-	if (socket_ram < 0) {
-		return socket_ram;
+int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
+	int socket = conexiones_iniciar();
+	if (socket < 0) {
+		return socket;
 	}
 
-	int resultado = enviar_mensaje_protocolo(socket_ram, HANDSHAKE_P_R, 0, NULL);
+	// TODO: Cambiar este mensaje por un t_mensaje
+	size_t * size = malloc(sizeof(size_t));
+	void * mensaje = serializiar_crear_proceso(nuevo_proceso, size);
+	free(size);
+
+	int resultado = enviar_mensaje_protocolo(socket, MATELIB_INIT, size, mensaje);
 	if (resultado < 0) {
-		loggear_error("Ocurrió un error al enviar el Handshake a ram, Error: %d", resultado);
+		loggear_error("Ocurrió un error al realizar el MATELIB_INIT, Error: %d", resultado);
 
 		return resultado;
 	}
 
-	loggear_trace("Enviado handshake a la ram");
+	loggear_trace("Enviado handshake al señor X");
 
-	int error = ram_recibir_mensaje(socket_ram);
+	int error = recibir_mensaje(socket);
 	if (error != 0) {
-		loggear_info("La RAM nos desconoce, no podemos trabajar");
+		loggear_info("Nos descnocimos, no podemos trabajar");
 		return error;
 	}
 
-	close(socket_ram);
+	close(socket);
 
 	pthread_exit(NULL);
 	return 0;
@@ -48,8 +53,8 @@ void avisar_ram_desconexion() {
 }
 
 int conexiones_iniciar() {
-	char * ram_ip = get_ip_ram();
-	int ram_puerto = get_puerto_ram();
+	char * ram_ip = get_ip();
+	int ram_puerto = get_puerto();
 
 	int socket_server = conectar_a_servidor(ram_ip, ram_puerto);
 	if (socket_server < 0) {
