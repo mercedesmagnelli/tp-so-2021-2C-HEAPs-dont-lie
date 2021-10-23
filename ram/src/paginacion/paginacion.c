@@ -131,8 +131,16 @@ uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size){
 	return 1;
 }
 
-uint32_t ptro_valido(uint32_t PID, uint32_t ptro) {
-	return 0;
+bool ptro_valido(uint32_t PID, uint32_t ptro) {
+
+	t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
+
+	bool condition(void* heap) {
+		heap_metadata* heap_md = (heap_metadata*) heap;
+		return (heap_md->currAlloc + 9) == ptro;
+	}
+
+	return list_any_satisfy(lista_heaps,condition);
 }
 
 uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t pid){
@@ -144,12 +152,30 @@ uint32_t traducir_a_dir_fisica(uint32_t logica){
 }
 
 
-uint32_t ptro_liberado(uint32_t PID, uint32_t ptro){
-	return 1;
+bool ptro_liberado(uint32_t PID, uint32_t ptro){
+
+	t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
+
+	bool condicion(void* heap_i) {
+		heap_metadata* heap = (heap_metadata*) heap_i;
+		return (heap->currAlloc + 9) == ptro;
+	}
+
+	heap_metadata* heap_encontrado = (heap_metadata*) list_find(lista_heaps, condicion);
+	return heap_encontrado -> isFree;
 }
 
+
 void liberar_memoria(uint32_t PID, uint32_t ptro){
-	printf("libera la memoria rataaa");
+	t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
+
+		bool condicion(void* heap_i) {
+			heap_metadata* heap = (heap_metadata*) heap_i;
+			return (heap->currAlloc + 9) == ptro;
+		}
+
+		heap_metadata* heap_encontrado = (heap_metadata*) list_find(lista_heaps, condicion);
+		heap_encontrado ->isFree = 1;
 }
 
 void consolidar_memoria(uint32_t PID){
@@ -217,9 +243,9 @@ heap_metadata* get_HEAP(uint32_t PID, int32_t ptro){
 }
 
 t_list* conseguir_listaHMD_mediante_PID(uint32_t PID){
-	t_proceso* proceso = get_proceso_PID(PID);
-	t_list* listaHMD;
-	return listaHMD = proceso->lista_hmd;
+    t_proceso* proceso = get_proceso_PID(PID);
+    t_list* listaHMD = proceso->lista_hmd;
+    return listaHMD;
 }
 
 void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
@@ -242,4 +268,3 @@ t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag){
 	t_pagina* a;
 	return a;
 }
-
