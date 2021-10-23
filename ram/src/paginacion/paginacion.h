@@ -96,20 +96,15 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam);
 /**
  * @NAME: ptro_valido
  * @DESC: Retorna si la el puntero pertenece a la direccion de punteros asignados al proceso
- * @RET:
- *   1 es un puntero valido
- *   0 espacio no accedible/ existente
- **/
+*/
 bool ptro_valido(uint32_t PID, uint32_t ptro);
 
 /**
  * @NAME: ptro_liberado
  * @DESC: Avisa si el puntero del proceso esta liberado
- * @RET:
- *   0 es un puntero liberado
- *  -2 es un puntero ocupado
  **/
-uint32_t ptro_liberado(uint32_t PID, uint32_t ptro);
+
+bool ptro_liberado(uint32_t PID, uint32_t ptro);
 
 /**
  * @NAME: liberar_memoria

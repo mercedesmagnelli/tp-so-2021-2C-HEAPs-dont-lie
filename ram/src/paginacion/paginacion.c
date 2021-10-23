@@ -117,9 +117,19 @@ uint32_t traducir_a_dir_fisica(uint32_t logica){
 }
 
 
-uint32_t ptro_liberado(uint32_t PID, uint32_t ptro){
-	return 1;
+bool ptro_liberado(uint32_t PID, uint32_t ptro){
+
+	t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
+
+	bool condicion(void* heap_i) {
+		heap_metadata* heap = (heap_metadata*) heap_i;
+		return (heap->currAlloc + 9) == ptro;
+	}
+
+	heap_metadata* heap_encontrado = (heap_metadata*) list_find(lista_heaps, condicion);
+	return heap_encontrado -> isFree;
 }
+
 
 void liberar_memoria(uint32_t PID, uint32_t ptro){
 	printf("libera la memoria rataaa");
