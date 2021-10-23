@@ -30,7 +30,6 @@ int32_t memalloc(uint32_t pid, uint32_t size) {
 
 			if (se_asigna_memoria_necesaria(pid, size)) {
 				int32_t ptro_nuevo_proc = agregar_proceso(pid, size);
-				agregar_proceso(pid, size);
 				return ptro_nuevo_proc;
 			} else {
 				return no_se_asigna_proceso(pid, size);

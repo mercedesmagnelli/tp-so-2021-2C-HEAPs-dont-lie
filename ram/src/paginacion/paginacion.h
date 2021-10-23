@@ -7,8 +7,8 @@
 #include "../../../shared/codigo_error.h"
 #include <stdlib.h>
 
-t_list* lista_procesos;
-t_list* lista_frames;
+t_list* listaProcesos;
+t_list* listaFrames;
 t_dictionary* cant_frames_por_proceso;
 
 typedef struct{
@@ -40,7 +40,6 @@ typedef struct {
 }t_proceso;
 
 typedef struct{
-	uint32_t num_pag; // creo que va indexado por esto
 	uint32_t bit_presencia;
 	uint32_t frame;
 	uint32_t timestamp;
@@ -233,10 +232,23 @@ int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam);
 heap_metadata* get_HEAP(uint32_t PID, int32_t ptro);
 
 /*
+ * @NAME: conseguir_listaHMD_mediante_PID
+ * @DES: busca la lista de HEAPs asociado al PID
+ * */
+t_list* conseguir_listaHMD_mediante_PID(uint32_t PID);
+
+/*
  * @NAME: agregar_HEAP_a_PID
  * @DES: agrega el HEAP en la posicion correcta dentro de la lista de HMD del PID
  * */
 void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap);
+
+/*
+ * @NAME: obtener_pagina_de_memoria
+ * @DES: se fija si la pagina esta en memoria RAM, en caso de no ser asi la trae del SWAP. Actualiza TLB y Pag para algoritmo de reemplazo
+ * 		 Luego devuelvo la pagina en cuestion
+ * */
+t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag);
 
 
 #endif /* PAGINACION_PAGINACION_H_ */

@@ -5,15 +5,15 @@
 // FUNCIONES DE INICIO Y DESTRUCCION ADMINISTRATIVAS
 
 void inicializar_estructuras_administrativas() {
-    lista_procesos = list_create();
-    lista_frames = list_create();
+    listaProcesos = list_create();
+    listaFrames = list_create();
     cant_frames_por_proceso = dictionary_create();
 
 }
 
 void destruir_estructuras_administativas() {
-    list_destroy_and_destroy_elements(lista_procesos, destruir_proceso);
-    list_destroy_and_destroy_elements(lista_frames, free);
+    list_destroy_and_destroy_elements(listaProcesos, destruir_proceso);
+    list_destroy_and_destroy_elements(listaFrames, free);
     //TODO: ver que puede ser que tengamos que llamar a dictionary_destroy_and_destroy_elements
     dictionary_destroy(cant_frames_por_proceso);
 
@@ -38,38 +38,28 @@ int32_t existe_proceso(uint32_t PID){
 
 
 int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
-	t_proceso* proceso = get_proceso_PID(PID);
 
-	t_list* listaHMD = proceso->lista_hmd;
+	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
 
 	return get_ptro_con_tam_min(listaHMD, tam);
 
 }
 
-void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
+//TODO tenemos que traer a memoria los HEAPS modificados creados
+void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){//TODO vamos a hacer agregar pag y actualizar proceso
 	heap_metadata* heap = get_HEAP(PID,ptro);
 	heap->isFree = 0;
-	if(heap->nextAlloc == NULL){
-		heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
-		nuevoHeap->currAlloc = heap->nextAlloc - heap->currAlloc -9 -tamanio ;
-		nuevoHeap->prevAlloc = heap->currAlloc;
-		nuevoHeap->nextAlloc = heap->nextAlloc;
-		nuevoHeap->isFree    = 1;
-		heap->nextAlloc = nuevoHeap->currAlloc;
-		agregar_HEAP_a_PID(PID,nuevoHeap);
-	}else{
-		if((heap->nextAlloc-heap->currAlloc-9) > (tamanio+9)){
-			heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
-			nuevoHeap->currAlloc = heap->nextAlloc - heap->currAlloc -9 -tamanio ;
-			nuevoHeap->prevAlloc = heap->currAlloc;
-			nuevoHeap->nextAlloc = heap->nextAlloc;
-			nuevoHeap->isFree    = 1;
-			heap->nextAlloc = nuevoHeap->currAlloc;
-			heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
-			heapSig->prevAlloc = nuevoHeap->currAlloc;
-			agregar_HEAP_a_PID(PID,nuevoHeap);
-		}
+	heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
+	nuevoHeap->currAlloc = heap->nextAlloc;
+	nuevoHeap->prevAlloc = heap->currAlloc;
+	nuevoHeap->nextAlloc = heap->nextAlloc;
+	nuevoHeap->isFree    = 1;
+	heap->nextAlloc = nuevoHeap->currAlloc;
+	if(heap->nextAlloc != NULL){//en caso de que no sea el último el alloc siguiente apunta al nuevo HEAP ingresado
+		heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
+		heapSig->prevAlloc = nuevoHeap->currAlloc;
 	}
+	agregar_HEAP_a_PID(PID,nuevoHeap);
 }
 
 
@@ -83,8 +73,53 @@ int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size) {
 }
 
 int32_t agregar_proceso(uint32_t PID, uint32_t tam){
-	printf("agregar proceso");
-	return 1;
+	//creo el proceso y lo inicializo
+	t_proceso* nuevoProceso = malloc(sizeof(t_proceso));
+	nuevoProceso->PID = PID;
+	nuevoProceso->tabla_paginas = list_create();
+	nuevoProceso->lista_hmd = list_create();
+	nuevoProceso->hits_proceso = 0;
+	nuevoProceso->miss_proceso = 0;
+
+
+	//agrego las paginas que me dieron
+	int cantPags = (tam + 9) / get_tamanio_pagina();
+	if((tam+9)%get_tamanio_pagina() > 0){//TODO agregar en las configuraciones las variables faltantes de la config
+		cantPags++;
+	}
+
+	t_pagina* nuevaPagina;
+	for(int i = 0;i<cantPags;i++){
+		nuevaPagina = malloc(sizeof(nuevaPagina));
+		nuevaPagina->bit_presencia=0;//es el unico dato que llenamos
+		list_add(nuevoProceso->tabla_paginas,nuevaPagina);
+	}
+
+	//traer paginas a memoria y crear HEAPs
+	t_pagina* pag = obtener_pagina_de_memoria(PID,0);
+	heap_metadata* nuevoHeapPrimero = malloc(sizeof(heap_metadata));
+	nuevoHeapPrimero->currAlloc = 0;
+	nuevoHeapPrimero->prevAlloc = NULL;
+	nuevoHeapPrimero->nextAlloc = tam + 9;
+	nuevoHeapPrimero->isFree    = 0;
+	agregar_HEAP_a_PID(PID,nuevoHeapPrimero);
+	//TODO si queremos volcar este HEAP en la memoria efectivamente, necesitariamos llamar a memoria. recibe heap, y lugar donde guardarlo
+
+
+	pag = obtener_pagina_de_memoria(PID,cantPags-1);
+	heap_metadata* nuevoHeapUltimo = malloc(sizeof(heap_metadata));
+	nuevoHeapUltimo->currAlloc = tam+9;
+	nuevoHeapUltimo->prevAlloc = 0;
+	nuevoHeapUltimo->nextAlloc = NULL;
+	nuevoHeapUltimo->isFree    = 1;
+	agregar_HEAP_a_PID(PID,nuevoHeapPrimero);
+	//TODO si queremos volcar este HEAP en la memoria efectivamente, necesitariamos llamar a memoria
+
+
+	//lo agrego a la lista
+	list_add(listaProcesos, nuevoProceso);
+
+	return nuevoHeapPrimero->currAlloc+9;//siempre el primer alloc va a ser 9 porque
 }
 
 int32_t se_asigna_memoria_necesaria(uint32_t pid, uint32_t size) {
@@ -131,7 +166,7 @@ t_proceso* get_proceso_PID(uint32_t PID){
 			return proceso->PID == PID;
 		}
 
-	t_proceso* proceso = list_find(lista_procesos, proceso_PID);
+	t_proceso* proceso = list_find(listaProcesos, proceso_PID);
 	return proceso;
 
 }
@@ -146,7 +181,7 @@ int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam){
 		if(heap->nextAlloc==NULL){
 			rta = true;
 		}else{
-			if((heap->nextAlloc - heap->currAlloc - 9)>= tam){
+			if((heap->nextAlloc - heap->currAlloc - 9)>= tam+9){
 				rta = true;
 			}else{
 				rta = false;
@@ -181,6 +216,12 @@ heap_metadata* get_HEAP(uint32_t PID, int32_t ptro){
 
 }
 
+t_list* conseguir_listaHMD_mediante_PID(uint32_t PID){
+	t_proceso* proceso = get_proceso_PID(PID);
+	t_list* listaHMD;
+	return listaHMD = proceso->lista_hmd;
+}
+
 void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
 
 	bool condicion(void* elementoListado, void* datoAInsertar){
@@ -190,11 +231,15 @@ void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
 		return elemList->currAlloc < elemInsertar->currAlloc;
 	}
 
-	t_proceso* proceso = get_proceso_PID(PID);
-	t_list* listaHMD = proceso->lista_hmd;
+	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
 
 	list_add_sorted(listaHMD, (void*) heap, condicion);
 	//TODO testear que el insert se haga en la posicion correcta
 
+}
+
+t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag){
+	t_pagina* a;
+	return a;
 }
 
