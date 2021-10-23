@@ -14,14 +14,15 @@ int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 	// TODO: Cambiar este mensaje por un t_mensaje
 	size_t * size = malloc(sizeof(size_t));
 	void * mensaje = serializiar_crear_proceso(nuevo_proceso, size);
-	free(size);
 
-	int resultado = enviar_mensaje_protocolo(socket, MATELIB_INIT, size, mensaje);
+
+	int resultado = enviar_mensaje_protocolo(socket, MATELIB_INIT, *size, mensaje);
 	if (resultado < 0) {
 		loggear_error("Ocurrió un error al realizar el MATELIB_INIT, Error: %d", resultado);
 
 		return resultado;
 	}
+	free(size);
 
 	loggear_trace("Enviado handshake al señor X");
 

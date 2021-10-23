@@ -10,7 +10,7 @@
 #include "../../../shared/protocolo.h"
 #include "../../../shared/codigo_error.h"
 #include "../../../shared/estructura_compartida.h"
-#include "../conexion/conexion_ram.h"
+#include "conexiones.h"
 
 /**
  * @NAME: recibir_mensaje
