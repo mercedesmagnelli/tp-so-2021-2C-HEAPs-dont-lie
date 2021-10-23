@@ -132,7 +132,15 @@ bool ptro_liberado(uint32_t PID, uint32_t ptro){
 
 
 void liberar_memoria(uint32_t PID, uint32_t ptro){
-	printf("libera la memoria rataaa");
+	t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
+
+		bool condicion(void* heap_i) {
+			heap_metadata* heap = (heap_metadata*) heap_i;
+			return (heap->currAlloc + 9) == ptro;
+		}
+
+		heap_metadata* heap_encontrado = (heap_metadata*) list_find(lista_heaps, condicion);
+		heap_encontrado ->isFree = 1;
 }
 
 void consolidar_memoria(uint32_t PID){
