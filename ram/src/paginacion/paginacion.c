@@ -96,8 +96,16 @@ uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size){
 	return 1;
 }
 
-uint32_t ptro_valido(uint32_t PID, uint32_t ptro) {
-	return 0;
+bool ptro_valido(uint32_t PID, uint32_t ptro) {
+
+	t_list* lista_heaps = conseguir_listaHDM_mediante_PID(PID);
+
+	bool condition(void* heap) {
+		heap_metadata* heap_md = (heap_metadata*) heap;
+		return (heap_md->currAlloc + 9) == ptro;
+	}
+
+	return list_any_satisfy(lista_heaps,condition);
 }
 
 uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t pid){
@@ -181,6 +189,12 @@ heap_metadata* get_HEAP(uint32_t PID, int32_t ptro){
 
 }
 
+t_list* conseguir_listaHMD_mediante_PID(uint32_t PID){
+    t_proceso* proceso = get_proceso_PID(PID);
+    t_list* listaHMD;
+    return listaHMD = proceso->lista_hmd;
+}
+
 void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
 
 	bool condicion(void* elementoListado, void* datoAInsertar){
@@ -197,4 +211,6 @@ void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
 	//TODO testear que el insert se haga en la posicion correcta
 
 }
+
+
 

@@ -95,12 +95,12 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam);
 
 /**
  * @NAME: ptro_valido
- * @DESC: Avisa si el puntero del proceso es uno valido
+ * @DESC: Retorna si la el puntero pertenece a la direccion de punteros asignados al proceso
  * @RET:
  *   1 es un puntero valido
  *   0 espacio no accedible/ existente
  **/
-uint32_t ptro_valido(uint32_t PID, uint32_t ptro);
+bool ptro_valido(uint32_t PID, uint32_t ptro);
 
 /**
  * @NAME: ptro_liberado
@@ -233,10 +233,18 @@ int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam);
 heap_metadata* get_HEAP(uint32_t PID, int32_t ptro);
 
 /*
+ * @NAME: conseguir_listaHMD_mediante_PID
+ * @DES: busca la lista de HEAPs asociado al PID
+ * */
+t_list* conseguir_listaHMD_mediante_PID(uint32_t PID);
+
+
+/*
  * @NAME: agregar_HEAP_a_PID
  * @DES: agrega el HEAP en la posicion correcta dentro de la lista de HMD del PID
  * */
 void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap);
+
 
 
 #endif /* PAGINACION_PAGINACION_H_ */
