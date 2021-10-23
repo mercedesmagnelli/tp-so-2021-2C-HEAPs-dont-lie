@@ -1,10 +1,11 @@
 #include "manejo_archivos.h"
 
-int escribir_particion(uint32_t pagina, char* texto_escribir, char* ruta_particion){
-
-	loggear_debug("SE PROCEDE A ESCRIBIR LA PAGINA %d DE LA PARTICION %s", pagina, ruta_particion);
+int escribir_particion(uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
 
 	FILE* archivo;
+	char* ruta_particion = swamp->ruta_archivo;
+
+	loggear_debug("SE PROCEDE A ESCRIBIR LA PAGINA %d DE LA PARTICION %s", pagina, ruta_particion);
 
 	archivo = fopen(ruta_particion, "r+");
 
@@ -21,6 +22,8 @@ int escribir_particion(uint32_t pagina, char* texto_escribir, char* ruta_partici
 
 	fclose(archivo);
 
+	swamp->espacio_libre = swamp->espacio_libre - 1;
+
 	loggear_debug("Se escribio con exito la pagina %d", pagina);
 
 	return 0;
@@ -28,8 +31,9 @@ int escribir_particion(uint32_t pagina, char* texto_escribir, char* ruta_partici
 
 
 
-char* leer_particion(uint32_t pagina, char* ruta_particion){
+char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp){
 
+	char* ruta_particion = swamp->ruta_archivo;
 	loggear_debug("Se comienza a leer la pagina %d de la particion %s", pagina, ruta_particion);
 
 	FILE* archivo_lectura;
@@ -53,6 +57,23 @@ char* leer_particion(uint32_t pagina, char* ruta_particion){
 	loggear_debug("Se termino la lectura de la pagina %d de la particion %s", pagina, ruta_particion);
 
 	return contenido_pagina;
+}
+
+t_archivo_swamp* archivo_a_escribir(){
+	int libre = 0;
+	t_archivo_swamp* archivo_a_escribir;
+	for(int i = 0; i < list_size(lista_swamp); i++){
+		t_archivo_swamp* archivo = list_get(lista_swamp, i);
+		if(archivo->espacio_libre > libre){
+			libre = archivo->espacio_libre;
+			archivo_a_escribir = archivo;
+		}
+	}
+
+	loggear_trace("EL archivo a ecribir es  %s", archivo_a_escribir->ruta_archivo);
+
+	return archivo_a_escribir;
+
 }
 
 
