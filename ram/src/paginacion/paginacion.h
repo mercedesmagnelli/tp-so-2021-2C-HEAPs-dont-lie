@@ -143,6 +143,20 @@ uint32_t leer_de_memoria(uint32_t PID, uint32_t ptroMem, void* data);
 uint32_t entra_data(uint32_t PID, uint32_t ptroMem, uint32_t tamanioData);
 
 /**
+ * @NAME: tamanio_de_direccion
+ * @DESC: retorna el tamanio de una direccion, obtenido mediante el hmd
+ */
+uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t pid);
+
+/**
+* @NAME: traducir_a_dir_fisica
+* @DESC: traduce de direccion logica a fisica
+* @RET:  la direccion logica + frame * tam_pag + offset (si lo hay)
+*/
+uint32_t traducir_a_dir_fisica(uint32_t logica);
+
+
+/**
  * @NAME: escribir_en_memoria
  * @DESC: Escribe en el ptro de un proceso los datos
  **/
@@ -184,6 +198,13 @@ int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size);
 **/
 uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size);
 
+/**
+* @NAME: destruir_proceso
+* @DESC: funcion de orden superior que invoca la destruccion de la
+* lista de procesos. Libera la memoria de las listas del struct y el resto de la memoria asociada.
+**/
+void destruir_proceso(void* proceso);
+
 
 
 
@@ -217,19 +238,5 @@ heap_metadata* get_HEAP(uint32_t PID, int32_t ptro);
  * */
 void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap);
 
- /**
- * @NAME: destruir_proceso
- * @DESC: funcion de orden superior que invoca la destruccion de la
- * lista de procesos. Libera la memoria de las listas del struct y el resto de la memoria asociada.
- **/
-void destruir_proceso(void* proceso);
-
-/**
- * @NAME: traducir_a_dir_fisica
- * @DESC: traduce de direccion logica a fisica
- * @RET:  la direccion logica + frame * tam_pag + offset (si lo hay)
-*/
-
-uint32_t traducir_a_dir_fisica(uint32_t logica);
 
 #endif /* PAGINACION_PAGINACION_H_ */
