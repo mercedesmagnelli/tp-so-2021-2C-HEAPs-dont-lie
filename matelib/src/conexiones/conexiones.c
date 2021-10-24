@@ -38,6 +38,141 @@ int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 	return 0;
 }
 
+int enviar_mate_close(t_matelib_nuevo_proceso * nuevo_proceso) {
+	int socket = conexiones_iniciar();
+	if (socket < 0) {
+		return socket;
+	}
+
+	// TODO: Cambiar este mensaje por un t_mensaje
+	size_t * size = malloc(sizeof(size_t));
+	void * mensaje = serializiar_crear_proceso(nuevo_proceso, size);
+
+
+	int resultado = enviar_mensaje_protocolo(socket, MATELIB_CLOSE, *size, mensaje);
+	if (resultado < 0) {
+		loggear_error("Ocurrió un error al realizar el MATELIB_CLOSE, Error: %d", resultado);
+
+		return resultado;
+	}
+	free(size);
+
+	loggear_trace("Enviado handshake al señor X");
+
+	int error = recibir_mensaje(socket);
+	if (error != 0) {
+		loggear_info("Nos descnocimos, no podemos trabajar");
+		return error;
+	}
+
+	close(socket);
+
+	pthread_exit(NULL);
+	return 0;
+}
+
+int enviar_mate_sem_init(t_matelib_semaforo* nuevo_semaforo){
+
+	int socket = conexiones_iniciar();
+	if (socket < 0) {
+		return socket;
+	}
+
+	// TODO: ver tema de size
+	size_t * size = malloc(sizeof(size_t));
+	void * mensaje = serializar_semaforo(nuevo_semaforo, size);
+
+	int resultado = enviar_mensaje_protocolo(socket, MATELIB_SEM_INIT, *size, mensaje);
+	if (resultado < 0) {
+		loggear_error("Ocurrió un error al realizar el MATELIB_SEM_INIT, Error: %d", resultado);
+
+		return resultado;
+	}
+	free(size);
+
+	loggear_trace("Enviado handshake al señor X");
+
+	int error = recibir_mensaje(socket);
+	if (error != 0) {
+		loggear_info("Nos descnocimos, no podemos trabajar");
+		return error;
+	}
+
+	close(socket);
+
+	pthread_exit(NULL);
+	return 0;
+
+}
+
+int enviar_mate_sem_wait(t_matelib_semaforo* semaforo){
+
+	int socket = conexiones_iniciar();
+	if (socket < 0) {
+		return socket;
+	}
+
+	// TODO: ver tema de size
+	size_t * size = malloc(sizeof(size_t));
+	void * mensaje = serializar_semaforo(semaforo, size);
+
+	int resultado = enviar_mensaje_protocolo(socket, MATELIB_SEM_WAIT, *size, mensaje);
+	if (resultado < 0) {
+		loggear_error("Ocurrió un error al realizar el MATELIB_SEM_WAIT, Error: %d", resultado);
+
+		return resultado;
+	}
+	free(size);
+
+	loggear_trace("Enviado handshake al señor X");
+
+	int error = recibir_mensaje(socket);
+	if (error != 0) {
+		loggear_info("Nos descnocimos, no podemos trabajar");
+		return error;
+	}
+
+	close(socket);
+
+	pthread_exit(NULL);
+	return 0;
+}
+
+int enviar_mate_sem_post(t_matelib_semaforo* semaforo){
+
+	int socket = conexiones_iniciar();
+	if (socket < 0) {
+		return socket;
+	}
+
+	// TODO: ver tema de size
+	size_t * size = malloc(sizeof(size_t));
+	void * mensaje = serializar_semaforo(semaforo, size);
+
+	int resultado = enviar_mensaje_protocolo(socket, MATELIB_SEM_POST, *size, mensaje);
+	if (resultado < 0) {
+		loggear_error("Ocurrió un error al realizar el MATELIB_SEM_POST, Error: %d", resultado);
+
+		return resultado;
+	}
+	free(size);
+
+	loggear_trace("Enviado handshake al señor X");
+
+	int error = recibir_mensaje(socket);
+	if (error != 0) {
+		loggear_info("Nos descnocimos, no podemos trabajar");
+		return error;
+	}
+
+	close(socket);
+
+	pthread_exit(NULL);
+	return 0;
+}
+
+
+
 // Publica
 void conexiones_cerrar_conexiones(bool safe_close) {
 	avisar_ram_desconexion();

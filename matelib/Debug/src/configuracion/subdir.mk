@@ -7,10 +7,6 @@ C_SRCS += \
 ../src/configuracion/matelib_configuracion.c \
 ../src/configuracion/matelib_configuracion_guardada.c 
 
-O_SRCS += \
-../src/configuracion/matelib_configuracion.o \
-../src/configuracion/matelib_configuracion_guardada.o 
-
 OBJS += \
 ./src/configuracion/matelib_configuracion.o \
 ./src/configuracion/matelib_configuracion_guardada.o 

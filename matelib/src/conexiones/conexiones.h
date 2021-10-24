@@ -17,9 +17,19 @@
 
 /**
  * @NAME: enviar_mate_init
- * @DESC: Envia el nuevo proceso a la memoria o al KErnel
+ * @DESC: Envia el nuevo proceso a la memoria o al Kernel
  */
 int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso);
+
+int enviar_mate_close(t_matelib_nuevo_proceso * nuevo_proceso);
+
+int enviar_mate_sem_init(t_matelib_semaforo* nuevo_semaforo);
+
+int enviar_mate_sem_wait(t_matelib_semaforo* semaforo);
+
+int enviar_mate_sem_post(t_matelib_semaforo* semaforo);
+
+
 
 /**
  * @NAME: conexiones_cerrar_conexiones

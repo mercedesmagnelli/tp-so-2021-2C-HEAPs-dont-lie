@@ -6,9 +6,6 @@
 C_SRCS += \
 ../src/matelib.c 
 
-O_SRCS += \
-../src/matelib.o 
-
 OBJS += \
 ./src/matelib.o 
 
