@@ -29,7 +29,7 @@ typedef struct {
 
     t_estado_hilo estado;
 
-    void * proceso;
+    uint32_t pid;
 } t_hilo;
 
 #endif /* PLANIFICADORES_ESTRUCTURAS_H_ */
