@@ -239,12 +239,19 @@ t_list* conseguir_listaHMD_mediante_PID(uint32_t PID);
 void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap);
 
 /*
+ * @NAME: actualizar_HEAP_en_memoria
+ * @DES: Se encarga de mandar el msj a memoria de efectivamente guardar data.
+ * 		 En caso de que el dato este partido en dos o mas paginas, esta funcion se encarga de traer las pags a memoria y mandar la señal a memoria para
+ * 		 que guarde los datos.
+ * */
+void actualizar_HEAP_en_memoria(uint32_t PID, int pag, heap_metadata* heap);
+
+/*
  * @NAME: obtener_pagina_de_memoria
- * @DES: se fija si la pagina esta en memoria RAM, en caso de no ser asi la trae del SWAP. Actualiza TLB y Pag para algoritmo de reemplazo
+ * @DES: se fija si la pagina esta en memoria RAM (se usa TLB), en caso de no ser asi la trae del SWAP. Actualiza TLB y Pag para algoritmo de reemplazo
  * 		 Luego devuelvo la pagina en cuestion
  * */
-t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag);
-
+t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modificado);
 
 
 #endif /* PAGINACION_PAGINACION_H_ */
