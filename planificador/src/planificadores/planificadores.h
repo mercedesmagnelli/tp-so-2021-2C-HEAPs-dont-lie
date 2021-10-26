@@ -3,8 +3,12 @@
 #define PLANIFICADORES_H_
 
 #include <stddef.h>
+#include <pthread.h>
 
+#include "colas.h"
 #include "estructuras.h"
+#include "hilos_planificador.h"
+#include "ejecutar_hilo.h"
 
 #include "../../../shared/logger.h"
 
@@ -43,7 +47,7 @@ void planificadores_destruir();
  * @DESC: Encola un nuevo proceso en el planificador de largo plazo como NEW
  * @RETURN: 0 si salio todo bien
  * */
-int planificadores_proceso_iniciar(void * proceso);
+int planificadores_proceso_iniciar(uint32_t pid);
 
 /**
  * @NAME: planificadores_proceso_cerrar

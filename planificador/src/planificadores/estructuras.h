@@ -32,4 +32,10 @@ typedef struct {
     uint32_t pid;
 } t_hilo;
 
+/**
+ * @NAME: pid
+ * @DESC: Retorna el pid del hilo actual (es para ahorarme hilo->pid, constantemente)
+ */
+uint32_t pid(t_hilo * hilo);
+
 #endif /* PLANIFICADORES_ESTRUCTURAS_H_ */

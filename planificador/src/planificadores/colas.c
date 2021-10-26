@@ -5,8 +5,8 @@
  * 1. [Listo] Crear todas las colas y listas
  * 2. [Listo] Crear la destruccion de las colas y listas
  * 3. [Listo] Pensar en que estructuras se van a pasar entre estados, todos t_hilo excepto en NEW
- * 4. Modificar los void * y los return donde corresponda para pasarlo por parametro o retornarlo
- * 5. Programar la forma de comparar hilos (supongo que comparacion por .pid)
+ * 4. [Listo] Modificar los void * y los return donde corresponda para pasarlo por parametro o retornarlo
+ * 5. [Listo] Programar la forma de comparar hilos (supongo que comparacion por .pid)
  * 6. Recibir algoritmo de corto plazo para mover entre READY->EXEC
  * 7. Recibir algoritmo de mediano plazo para mover de BLOCK->SUSP/BLOCK
  * */
@@ -96,7 +96,6 @@ t_hilo * colas_insertar_new(uint32_t pid) {
 }
 
 t_hilo * colas_mover_new_ready() {
-
 	pthread_mutex_lock(&mutex_new_queue);
 	t_hilo * hilo = queue_pop(new_queue);
 	pthread_mutex_unlock(&mutex_new_queue);
@@ -105,7 +104,7 @@ t_hilo * colas_mover_new_ready() {
 
 	pthread_mutex_lock(&mutex_ready_list);
 	list_add(ready_list, hilo);
-	pthread_mutex_lock(&mutex_ready_list);
+	pthread_mutex_unlock(&mutex_ready_list);
 
     return hilo;
 }
@@ -113,10 +112,9 @@ t_hilo * colas_mover_new_ready() {
 t_hilo * colas_mover_ready_exec() {
 	// TODO: Pasar un criterio para seleccionar el que se toma de ready
 	// TODO: DE momento se toma el primero
-
 	pthread_mutex_lock(&mutex_ready_list);
-	t_hilo * hilo = list_get(ready_list, 0);
-	pthread_mutex_lock(&mutex_ready_list);
+	t_hilo * hilo = list_remove(ready_list, 0);
+	pthread_mutex_unlock(&mutex_ready_list);
 
 	hilo->estado = EXEC;
 
@@ -165,7 +163,7 @@ t_hilo * colas_mover_block_ready(t_hilo * hilo_mover) {
 	hilo->estado = READY;
 
 	pthread_mutex_lock(&mutex_ready_list);
-	list_add_in_index(ready_list, hilo, 0);
+	list_add_in_index(ready_list, 0, hilo);
 	pthread_mutex_unlock(&mutex_ready_list);
 
     return hilo;
@@ -175,7 +173,7 @@ t_hilo * colas_mover_block_block_susp() {
 	// TODO: Armar criterio de busqueda
 	pthread_mutex_lock(&mutex_blocked_list);
 	int ultimo_bloqueado_pos = list_size(blocked_list);
-	t_hilo * hilo = list_get(blocked_list, ultimo_bloqueado_pos - 1);
+	t_hilo * hilo = list_remove(blocked_list, ultimo_bloqueado_pos - 1);
 	pthread_mutex_unlock(&mutex_blocked_list);
 
 	hilo->estado = SUSPENDED_BLOCK;
