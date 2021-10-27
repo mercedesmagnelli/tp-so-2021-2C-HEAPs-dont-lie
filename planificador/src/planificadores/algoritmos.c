@@ -2,6 +2,7 @@
 
 float alfa;
 t_algoritmo algoritmo;
+t_timestamp current_timestamp;
 
 t_hilo * hilo_obtener_siguiente_sjf(t_list * procesos);
 t_hilo * hilo_obtener_siguiente_hrrn(t_list * procesos);
@@ -44,9 +45,9 @@ void aplicar_formula_hrrn(void * proceso) {
 
 	aplicar_formula_sjf(proceso);
 
-	float tiempo_ready = estructuras_timestamp_diff(hilo->timestamp_entrar_ready, estructuras_current_timestamp());
+	float tiempo_ready = estructuras_timestamp_diff(hilo->timestamp_entrar_ready, current_timestamp);
 
-	hilo->estimacion_actual_hrrn = 1 + (tiempo_ready / hilo->estimacion_actual_sjf);
+	hilo->estimacion_actual_hrrn = 1.0 + (tiempo_ready / hilo->estimacion_actual_sjf);
 }
 
 void * get_hilo_minimo_sjf(void * hilo1, void * hilo2) {
@@ -65,10 +66,10 @@ void * get_hilo_minimo_hrrn(void * hilo1, void * hilo2) {
 	t_hilo * hilo_2 = (t_hilo *) hilo2;
 
 	if (hilo_1->estimacion_actual_hrrn <= hilo_2->estimacion_actual_hrrn) {
-		return hilo1;
+		return hilo2;
 	}
 
-	return hilo2;
+	return hilo1;
 }
 
 t_hilo * hilo_obtener_siguiente_sjf(t_list * procesos) {
@@ -80,6 +81,8 @@ t_hilo * hilo_obtener_siguiente_sjf(t_list * procesos) {
 }
 
 t_hilo * hilo_obtener_siguiente_hrrn(t_list * procesos) {
+	current_timestamp = estructuras_current_timestamp();
+
 	list_iterate(procesos, aplicar_formula_hrrn);
 
 	t_hilo * hilo_menor = list_get_minimum(procesos, get_hilo_minimo_hrrn);
