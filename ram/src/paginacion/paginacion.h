@@ -6,7 +6,9 @@
 #include <commons/collections/dictionary.h>
 #include "../../../shared/codigo_error.h"
 #include "../../src/conexion_swap/conexion_swap.h"
+#include "../../src/memoria/memoria.h"
 #include <stdlib.h>
+#include <string.h>
 
 t_list* listaProcesos;
 t_list* listaFrames;
@@ -46,7 +48,6 @@ typedef struct{
 	uint32_t timestamp;
 	uint32_t bit_uso;
 	uint32_t bit_modificacion;
-	uint32_t espacio_ocupado;
 }t_pagina;
 
 
@@ -241,12 +242,18 @@ t_list* conseguir_listaHMD_mediante_PID(uint32_t PID);
 void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap);
 
 /*
+ * @NAME: actualizar_HEAP
+ * @DES: realiza las acciones necesarias para guardar HEAP en la memoria
+ * */
+void guardar_HEAP_en_memoria(uint32_t PID, heap_metadata* heap);
+
+/*
  * @NAME: actualizar_HEAP_en_memoria
  * @DES: Se encarga de mandar el msj a memoria de efectivamente guardar data.
  * 		 En caso de que el dato este partido en dos o mas paginas, esta funcion se encarga de traer las pags a memoria y mandar la señal a memoria para
  * 		 que guarde los datos.
  * */
-void actualizar_HEAP_en_memoria(uint32_t PID, int pag, heap_metadata* heap);
+void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* data, int tamDato);
 
 /*
  * @NAME: obtener_pagina_de_memoria
@@ -254,6 +261,13 @@ void actualizar_HEAP_en_memoria(uint32_t PID, int pag, heap_metadata* heap);
  * 		 Luego devuelvo la pagina en cuestion
  * */
 t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modificado);
+
+/*
+ * @NAME: serializar_HEAP
+ * @DES: devuelve un ptro donde esta serializada toda la data del HEAP.
+ * 		 Se debe liberar el puntero devuelto
+ * */
+void * serializar_HEAP(heap_metadata* nuevoHeapPrimero);
 
 
 #endif /* PAGINACION_PAGINACION_H_ */

@@ -52,8 +52,7 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	int nextNextAlloc = heap->nextAlloc;
 	heap->nextAlloc = ptro+tamanio;
 	heap->isFree = 0;
-	int nroPag = heap->currAlloc /get_tamanio_pagina();
-	actualizar_HEAP_en_memoria(PID, nroPag, heap);
+	guardar_HEAP_en_memoria(PID, heap);
 
 	//creamos el HEAP nuevo que vamos a ingresar y actualizamos en mem
 	heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
@@ -62,15 +61,13 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	nuevoHeap->nextAlloc = nextNextAlloc;
 	nuevoHeap->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeap);
-	nroPag = nuevoHeap->currAlloc/get_tamanio_pagina();
-	actualizar_HEAP_en_memoria(PID, nroPag, nuevoHeap);
+	guardar_HEAP_en_memoria(PID, nuevoHeap);
 
 	//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
 	if(heap->nextAlloc != NULL){
 		heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
 		heapSig->prevAlloc = nuevoHeap->currAlloc;
-		nroPag = (heapSig->currAlloc)/get_tamanio_pagina();
-		actualizar_HEAP_en_memoria(PID, nroPag, nuevoHeap);
+		guardar_HEAP_en_memoria(PID, heapSig);
 	}
 }
 
@@ -114,8 +111,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	nuevoHeapPrimero->nextAlloc = tam + 9;
 	nuevoHeapPrimero->isFree    = 0;
 	agregar_HEAP_a_PID(PID,nuevoHeapPrimero);
-	int nroPag = nuevoHeapPrimero->currAlloc/get_tamanio_pagina();
-	actualizar_HEAP_en_memoria(PID, nroPag, nuevoHeapPrimero);
+	guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
 
 
 	//creamos el segundo HEAP nuevo que vamos a ingresar y actualizamos en mem
@@ -125,8 +121,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	nuevoHeapUltimo->nextAlloc = NULL;
 	nuevoHeapUltimo->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeapUltimo);
-	nroPag = nuevoHeapUltimo->currAlloc/get_tamanio_pagina();
-	actualizar_HEAP_en_memoria(PID, nroPag, nuevoHeapPrimero);
+	guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
 
 
 	//agrego proceso a la lista
@@ -290,8 +285,32 @@ void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
 
 }
 
-void actualizar_HEAP_en_memoria(uint32_t PID, int nroPag, heap_metadata* heap){
-	printf("damn daniel, back at it again with the white vans!");
+void guardar_HEAP_en_memoria(uint32_t PID, heap_metadata* heap){
+	int nroPag = heap->currAlloc / get_tamanio_pagina();
+	int offset = heap->currAlloc % get_tamanio_pagina();
+	void* dataHeap = serializar_HEAP(heap);
+	guardar_en_memoria_paginada(PID, nroPag, offset, dataHeap, 9);
+	free(dataHeap);
+}
+
+void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* data, int tamDato){
+	int desplazamientoEnDato = 0;
+	t_pagina* pag;
+	int ptro_escritura;
+	while(tamDato>0){
+		pag = obtener_pagina_de_memoria(PID, nroPag, 1);
+		ptro_escritura = pag->frame * get_tamanio_pagina() + offset;
+		if((offset+tamDato) <= get_tamanio_pagina()){
+			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
+			tamDato=0;
+		}else{
+			int tamDatoParcial = get_tamanio_pagina()- offset;
+			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDatoParcial, ptro_escritura);
+			desplazamientoEnDato += tamDatoParcial;
+			tamDato -= tamDatoParcial;
+			offset = 0;
+		}
+	}
 }
 
 t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modificado){
@@ -302,5 +321,13 @@ t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modifica
 	//					- NO está: traigo la PAG de SWAP (segun asignacion), agrego entrada a la TLB y actualizo datos de pagina (timestamp/ bit_uso, bit_modificacion)
 	t_pagina* a = NULL;
 	return a;
+}
+
+void* serializar_HEAP(heap_metadata* heap){//TODO revisar serializacion
+	void * dataHEAP = malloc(sizeof(heap_metadata));
+	memcpy(dataHEAP, &heap->prevAlloc,4);
+	memcpy(dataHEAP+4, &heap->nextAlloc,4);
+	memcpy(dataHEAP+8, &heap->isFree,1);
+	return dataHEAP;
 }
 
