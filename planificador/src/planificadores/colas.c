@@ -90,7 +90,7 @@ t_hilo * colas_insertar_new(uint32_t pid) {
 	t_hilo * hilo = malloc(sizeof(t_hilo));
 
 	hilo->pid = pid;
-	hilo->estado = NEW;
+	hilo->estado = ESTADO_NEW;
 	hilo->estimacion_anterior = get_estimacion_inicial();
 	hilo->timestamp_tiempo_exec = 0.0;
 
@@ -107,7 +107,7 @@ t_hilo * colas_mover_new_ready() {
 	pthread_mutex_unlock(&mutex_new_queue);
 
 	hilo->timestamp_entrar_ready = estructuras_current_timestamp();
-	hilo->estado = READY;
+	hilo->estado = ESTADO_READY;
 
 	pthread_mutex_lock(&mutex_ready_list);
 	list_add(ready_list, hilo);
@@ -141,7 +141,7 @@ t_hilo * colas_mover_exec_finish(t_hilo * hilo_mover) {
 	t_hilo * hilo = list_remove_by_condition(exec_list, son_iguales);
 	pthread_mutex_unlock(&mutex_exec_list);
 
-	hilo->estado = FINISH;
+	hilo->estado = ESTADO_FINISH;
 
 	pthread_mutex_lock(&mutex_finish_queue);
 	queue_push(finish_queue, hilo);
@@ -156,7 +156,7 @@ t_hilo * colas_mover_exec_block(t_hilo * hilo_mover) {
 	t_hilo * hilo = list_remove_by_condition(exec_list, son_iguales);
 	pthread_mutex_unlock(&mutex_exec_list);
 
-	hilo->estado = BLOCK;
+	hilo->estado = ESTADO_BLOCK;
 	hilo->timestamp_salir_exec = estructuras_current_timestamp();
 	hilo->timestamp_tiempo_exec = estructuras_timestamp_diff(hilo->timestamp_entrar_exec, hilo->timestamp_salir_exec);
 
@@ -175,7 +175,7 @@ t_hilo * colas_mover_block_ready(t_hilo * hilo_mover) {
 	t_hilo * hilo = list_remove_by_condition(blocked_list, son_iguales);
 	pthread_mutex_unlock(&mutex_blocked_list);
 
-	hilo->estado = READY;
+	hilo->estado = ESTADO_READY;
 	hilo->timestamp_entrar_ready = estructuras_current_timestamp();
 
 	pthread_mutex_lock(&mutex_ready_list);
@@ -192,7 +192,7 @@ t_hilo * colas_mover_block_block_susp() {
 	t_hilo * hilo = list_remove(blocked_list, ultimo_bloqueado_pos - 1);
 	pthread_mutex_unlock(&mutex_blocked_list);
 
-	hilo->estado = SUSPENDED_BLOCK;
+	hilo->estado = ESTADO_SUSPENDED_BLOCK;
 
 	pthread_mutex_lock(&mutex_suspended_blocked_list);
 	list_add(suspended_blocked_list, hilo);
@@ -207,7 +207,7 @@ t_hilo * colas_mover_block_susp_block_ready(t_hilo * hilo_mover) {
 	t_hilo * hilo = list_remove_by_condition(suspended_blocked_list, son_iguales);
 	pthread_mutex_unlock(&mutex_suspended_blocked_list);
 
-	hilo->estado = SUSPENDED_READY;
+	hilo->estado = ESTADO_SUSPENDED_READY;
 
 	pthread_mutex_lock(&mutex_suspended_ready_queue);
 	queue_push(suspended_ready_queue, hilo);
@@ -221,7 +221,7 @@ t_hilo * colas_mover_block_ready_ready() {
 	t_hilo * hilo = queue_pop(suspended_ready_queue);
 	pthread_mutex_unlock(&mutex_suspended_ready_queue);
 
-	hilo->estado = READY;
+	hilo->estado = ESTADO_READY;
 	hilo->timestamp_entrar_ready = estructuras_current_timestamp();
 
 	pthread_mutex_lock(&mutex_ready_list);

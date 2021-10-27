@@ -11,13 +11,13 @@
 typedef struct timespec t_timestamp;
 
 typedef enum {
-	NEW,
-	READY,
+	ESTADO_NEW,
+	ESTADO_READY,
 	ESTADO_EXEC,
-	BLOCK,
-	FINISH,
-	SUSPENDED_BLOCK,
-	SUSPENDED_READY
+	ESTADO_BLOCK,
+	ESTADO_FINISH,
+	ESTADO_SUSPENDED_BLOCK,
+	ESTADO_SUSPENDED_READY
 } t_estado_hilo;
 
 
