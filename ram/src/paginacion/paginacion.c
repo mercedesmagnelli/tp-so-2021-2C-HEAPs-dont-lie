@@ -281,77 +281,23 @@ void guardar_HEAP_en_memoria(uint32_t PID, heap_metadata* heap){
 }
 
 void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* data, int tamDato){
-	int desplazamientEnDato = 0;
-	t_proceso* carpincho = get_proceso_PID(PID);
-	t_pagina* pag = list_get(carpincho->tabla_paginas, nroPag);
+	int desplazamientoEnDato = 0;
+	t_pagina* pag;
+	int ptro_escritura;
 	while(tamDato>0){
-		if((offset+tamDato) < get_tamanio_pagina()){
-
+		pag = obtener_pagina_de_memoria(PID, nroPag, 1);
+		ptro_escritura = pag->frame * get_tamanio_pagina() + offset;
+		if((offset+tamDato) <= get_tamanio_pagina()){
+			//TODO usar la funcion de escritura en memoria (ptro_escritura, data + desplazamientoEnDato, tamDato)
+			tamDato=0;
 		}else{
-			if((offset+tamDato) == get_tamanio_pagina()){
-
-			}else{
-
-			}
+			int tamDatoParcial = get_tamanio_pagina()- offset;
+			//TODO usar la funcion de escritura en memoria (ptro_escritura, data + desplazamientoEnDato, tamDatoParcial)
+			desplazamientoEnDato = tamDatoParcial;
+			tamDato -= tamDatoParcial;
 		}
 	}
 }
-/*
-void guardamosEnMemoriaPaginada(void* datos, int tamDato, int* offset, int* idPagina, pagina** pagina, patotaPaginada* tablaPatota){
-	int desplazamientoEnDato = 0;
-	while(tamDato>0){
-		if(((*offset) + tamDato) < tamanioPagina){
-			if((*pagina)->bitP == 1){
-				memcpy(memoriaPrincipal + (*pagina)->frame * tamanioPagina + (*offset), datos + desplazamientoEnDato, tamDato);
-				actualizarValorDeLista(listaMarcos,tablaPatota->idP,(*idPagina), (*pagina));
-			}else{
-				char* datoAux = malloc(tamDato);
-				memcpy(datoAux, datos + desplazamientoEnDato, tamDato);
-				guardarInformacionEnSWAP(datoAux, tamDato, ((*pagina)->frame*tamanioPagina+*offset));
-                actualizarValorDeLista(listaMarcosMV,tablaPatota->idP,(*idPagina), (*pagina));
-			}
-			if((*offset)==0){
-				list_add(tablaPatota->tablaPaginas,(*pagina));
-			}
-			(*pagina)->espacioOcupado+=tamDato;
-			(*offset)+= tamDato;
-			tamDato = 0;
-		}else{
-			if(((*offset) + tamDato)==tamanioPagina){
-				if((*pagina)->bitP == 1){
-					memcpy(memoriaPrincipal + (*pagina)->frame * tamanioPagina + (*offset), datos + desplazamientoEnDato, tamDato);
-					actualizarValorDeLista(listaMarcos,tablaPatota->idP,(*idPagina), (*pagina));
-				}else{
-					guardarInformacionEnSWAP(datos+desplazamientoEnDato, tamDato, ((*pagina)->frame*tamanioPagina+(*offset)));
-					actualizarValorDeLista(listaMarcosMV,tablaPatota->idP,(*idPagina), (*pagina));
-				}
-				if((*offset)==0){
-					list_add(tablaPatota->tablaPaginas,(*pagina));
-				}
-				(*pagina)->espacioOcupado+=tamDato;
-				tamDato = 0;
-				(*offset) = 0;
-				(*idPagina)++;
-				(*pagina) = conseguirFrame((*idPagina));
-			}else{//este es el caso donde sigo con la pagina y aun asi me falta de otra pagina
-				int tamanioDatoAGuardar = tamanioPagina - (*offset);
-				tamDato-=tamanioDatoAGuardar;
-				if((*pagina)->bitP == 1){
-					memcpy(memoriaPrincipal + (*pagina)->frame * tamanioPagina + (*offset), datos + desplazamientoEnDato, tamanioDatoAGuardar);
-					actualizarValorDeLista(listaMarcos,tablaPatota->idP,(*idPagina), (*pagina));
-				}else{
-					guardarInformacionEnSWAP(datos+desplazamientoEnDato, tamanioDatoAGuardar, ((*pagina)->frame*tamanioPagina+(*offset)));
-					actualizarValorDeLista(listaMarcosMV,tablaPatota->idP,(*idPagina), (*pagina));
-				}
-				(*pagina)->espacioOcupado+=tamanioDatoAGuardar;
-				(*offset)=0;
-				desplazamientoEnDato+= tamanioDatoAGuardar;
-				(*idPagina)++;
-				(*pagina) = conseguirFrame((*idPagina));
-			}
-		}
-	}
-}*/
 
 t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modificado){
 	//se fija si esta en la TLB

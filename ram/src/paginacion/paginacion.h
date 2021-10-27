@@ -46,7 +46,6 @@ typedef struct{
 	uint32_t timestamp;
 	uint32_t bit_uso;
 	uint32_t bit_modificacion;
-	uint32_t espacio_ocupado;
 }t_pagina;
 
 
