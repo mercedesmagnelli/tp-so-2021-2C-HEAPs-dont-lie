@@ -76,7 +76,7 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 
 
 int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size) {
-	if(1) {
+	if(get_tipo_asignacion() == FIJA) {
 		//fijo
 		return MAXIMO_MARCOS_ALCANZADO;
 	}else {
