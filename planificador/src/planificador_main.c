@@ -21,17 +21,28 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	//debug_variables();
+	debug_variables();
 
-	/*
-	crear_matelib_mensaje_semaforo(int pid, char * semaforo);
-	crear_matelib_mensaje_semaforo_init(int pid, char * semaforo, int valor);
-	crear_matelib_mensaje_io(int pid, char * io, void * msg);
-	crear_matelib_mensaje_mem_alloc(int pid, int size);
-	crear_matelib_mensaje_mem_free(int pid, int32_t mate_pointer);
-	crear_matelib_mensaje_mem_read(int pid, int32_t mate_pointer, int size);
-	crear_matelib_mensaje_mem_write(int pid, int32_t mate_pointer, int size, void * mem_write);
-	*/
+
+	error = planificadores_iniciar();
+	loggear_debug("Se creo el planificador con el estatus en %d", error);
+
+	planificadores_proceso_iniciar(1);
+	loggear_debug("Se creo el proceso 1");
+
+	planificadores_proceso_iniciar(2);
+	loggear_debug("Se creo el proceso 2");
+
+	planificadores_proceso_iniciar(3);
+	loggear_debug("Se creo el proceso 3");
+
+	planificadores_proceso_iniciar(4);
+	loggear_debug("Se creo el proceso 4");
+
+	planificadores_proceso_iniciar(5);
+	loggear_debug("Se creo el proceso 5");
+
+
 
 	/*
 
@@ -48,7 +59,7 @@ int main(int argc, char** argv) {
 
 
 	//levantar_consola();
-
+	sleep(20);
 	cerrar_todo();
 	return EXIT_SUCCESS;
 }
@@ -56,6 +67,9 @@ int main(int argc, char** argv) {
 void cerrar_todo() {
 	conexiones_cerrar_conexiones(false);
 	loggear_info("Cerrada conexion con ram");
+
+	planificadores_destruir();
+
 	destroy_configuracion();
 	puts("Destruido configuraciones");
 	destroy_log();
@@ -66,7 +80,10 @@ void debug_variables() {
 	loggear_debug("---Variables en archivo de configuración---");
 	loggear_debug("IP_MEMORIA: \t\t\t%s", get_ip_ram());
 	loggear_debug("PUERTO_MEMORIA: \t\t%d", get_puerto_ram());
+	loggear_debug("PUERTO_ESCUCHA: \t\t%d", get_puerto_escucha());
 	loggear_debug("ALGORITMO_PLANIFICACION: \t%d", get_algoritmo());
+	loggear_debug("ALFA: \t\t\t%d", get_alfa());
+	loggear_debug("ESTIMACION_INICIAL: \t\t%d", get_estimacion_inicial());
 	loggear_debug("CANTIDAD_DISPOSITIVOS_IO: \t%d", get_cantidad_dispositivos_io());
 	for (int i = 0; i < get_cantidad_dispositivos_io(); ++i) {
 		loggear_debug("DISPOSITIVOS_IO[%d]: \t\t%s", i, get_dispositivos_io()[i]);

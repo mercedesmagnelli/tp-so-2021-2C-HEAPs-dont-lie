@@ -9,7 +9,12 @@
 char * get_ip_ram();
 int get_puerto_ram();
 
+int get_puerto_escucha();
+
 t_algoritmo get_algoritmo();
+
+int get_estimacion_inicial();
+int get_alfa();
 
 int get_cantidad_dispositivos_io();
 char ** get_dispositivos_io();
@@ -31,7 +36,12 @@ typedef struct {
 	char * ip_ram;
 	int puerto_ram;
 
+	int puerto_escucha;
+
 	t_algoritmo algoritmo;
+
+	int estimacion_inicial;
+	int alfa;
 
 	int cantidad_dispositivos_io;
 	char ** dispositivos_io;

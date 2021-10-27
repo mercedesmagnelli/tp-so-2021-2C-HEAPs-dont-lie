@@ -5,6 +5,8 @@
 #include <pthread.h>
 #include <readline/readline.h>
 
+#include "planificadores/planificadores.h"
+
 #include "configuracion/configuracion.h"	// Carga del archivo de configuracion
 
 #include "conexion_ram/conexion_ram.h"		// Conexión entre Planificador y Ram

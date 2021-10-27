@@ -3,20 +3,16 @@
 #define PLANIFICADORES_H_
 
 #include <stddef.h>
+#include <pthread.h>
 
+#include "colas.h"
 #include "estructuras.h"
+#include "hilos_planificador.h"
+#include "ejecutar_hilo.h"
 
 #include "../../../shared/logger.h"
 
 const float alfa; // Definido por archivo de configuracion para calcular estimaciones por HRRN.
-
-/**
- * @NAME: planificador_corto_plazo_media_exponencial
- * @DESC: Usando los datos de la rafaga, devuelve el valor estimado de la rafaga para posteriormente usarse en calcular
- * quien se mueve de READY a EXEC.
- * */
-// TODO: Mover de lugar
-float planificador_corto_plazo_media_exponencial(t_rafaga_cpu rafaga);
 
 /**
  * @NAME: suspender_hilo
@@ -43,7 +39,7 @@ void planificadores_destruir();
  * @DESC: Encola un nuevo proceso en el planificador de largo plazo como NEW
  * @RETURN: 0 si salio todo bien
  * */
-int planificadores_proceso_iniciar(void * proceso);
+int planificadores_proceso_iniciar(uint32_t pid);
 
 /**
  * @NAME: planificadores_proceso_cerrar
