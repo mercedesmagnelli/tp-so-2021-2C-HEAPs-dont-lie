@@ -2,7 +2,13 @@
 #ifndef PLANIFICADORES_ESTRUCTURAS_H_
 #define PLANIFICADORES_ESTRUCTURAS_H_
 
+#include <stddef.h>
 #include <stdint.h>
+
+#include <sys/time.h>
+#include <time.h>
+
+typedef struct timespec t_timestamp;
 
 typedef enum {
 	NEW,
@@ -14,22 +20,24 @@ typedef enum {
 	SUSPENDED_READY
 } t_estado_hilo;
 
-typedef struct {
-    float estimacion_anterior; // Resultado de estimacion anterior. Se obtiene por archivo de configuracion la primera vez.
-    float estimacion_actual; // Resultado de la nueva estimacion. Se usa para comparar quien se mueve a EXEC.
-    uint32_t rafaga_real_anterior; // Milisegundos que estuvo dentro de EXEC. Por defecto es 0 la primera vez. =Salir-Entrar.
-    uint32_t timestamp_entrar_exec; // Se toma el timestamp cuando entra en EXEC.
-    uint32_t timestamp_salir_exec; // Se toma el timestamp cuando sale de EXEC.
-} t_rafaga_cpu;
 
 // Contiene la informacion necesaria para mover un proceso como un hilo entre las colas
 typedef struct {
-    t_rafaga_cpu rafaga_actual;
-    uint32_t numero_proceso;
+	uint32_t pid;
 
     t_estado_hilo estado;
 
-    uint32_t pid;
+    float estimacion_anterior; // Viene por configuracion la primera vez
+    float estimacion_actual_sjf; // Guarda el resultado de la estimacion
+    float estimacion_actual_hrrn;
+
+    t_timestamp timestamp_entrar_exec;
+    t_timestamp timestamp_salir_exec;
+    float timestamp_tiempo_exec; // 0 la primera vez, guarda la diferenca entre entrar y salir de EXEC
+
+    t_timestamp timestamp_entrar_ready;
+    // t_timestamp timestamp_salir_ready; No se neceista este valor, se calcula cuando se llama un algoritmo
+    //float timestamp_tiempo_ready;
 } t_hilo;
 
 /**
@@ -37,5 +45,17 @@ typedef struct {
  * @DESC: Retorna el pid del hilo actual (es para ahorarme hilo->pid, constantemente)
  */
 uint32_t pid(t_hilo * hilo);
+
+/**
+ * @NAME: estructuras_current_timestamp
+ * @DESC: Retorna el timestamp actual
+ */
+t_timestamp estructuras_current_timestamp();
+
+/**
+ * @NAME: float estructuras_timestamp_diff(t_timestamp time1, t_timestamp time2
+ * @DESC: Retorna la diferencia de tiempo entre los 2
+ */
+float estructuras_timestamp_diff(t_timestamp time1, t_timestamp time2);
 
 #endif /* PLANIFICADORES_ESTRUCTURAS_H_ */

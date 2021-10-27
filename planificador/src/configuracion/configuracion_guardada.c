@@ -4,7 +4,12 @@
 char * get_ip_ram() { return config_guardada.ip_ram; }
 int get_puerto_ram() { return config_guardada.puerto_ram; }
 
+int get_puerto_escucha() { return config_guardada.puerto_escucha; }
+
 t_algoritmo get_algoritmo() { return config_guardada.algoritmo; }
+
+int get_estimacion_inicial() { return config_guardada.estimacion_inicial; }
+int get_alfa() { return config_guardada.alfa; }
 
 int get_cantidad_dispositivos_io() { return config_guardada.cantidad_dispositivos_io; }
 char ** get_dispositivos_io() { return config_guardada.dispositivos_io; }

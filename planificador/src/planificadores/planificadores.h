@@ -15,14 +15,6 @@
 const float alfa; // Definido por archivo de configuracion para calcular estimaciones por HRRN.
 
 /**
- * @NAME: planificador_corto_plazo_media_exponencial
- * @DESC: Usando los datos de la rafaga, devuelve el valor estimado de la rafaga para posteriormente usarse en calcular
- * quien se mueve de READY a EXEC.
- * */
-// TODO: Mover de lugar
-float planificador_corto_plazo_media_exponencial(t_rafaga_cpu rafaga);
-
-/**
  * @NAME: suspender_hilo
  * @DESC: Luego de cada movimiento entre colas (algunas, no todas), 
  * analiza si se cumplen las condiciones para moverlo a suspendido y avisa a RAM

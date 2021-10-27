@@ -8,7 +8,8 @@
 #include <commons/collections/queue.h>
 #include <commons/collections/list.h>
 
-#include "./estructuras.h"
+#include "estructuras.h"
+#include "algoritmos.h"
 
 /**
  * Aca se guardaran todas las colas, listas y/o pilas que sea necesaria para mover entre hilos
@@ -103,5 +104,6 @@ t_hilo * colas_mover_block_susp_block_ready(t_hilo * hilo_mover);
  * @DESC: Mueve un hilo de BLOCKED READY a READY, se deberia hacer cuando el grado de multiprocesamiento lo permita.
  * */
 t_hilo * colas_mover_block_ready_ready();
+
 
 #endif

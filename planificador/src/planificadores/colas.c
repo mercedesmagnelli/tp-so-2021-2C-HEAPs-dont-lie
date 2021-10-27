@@ -7,7 +7,7 @@
  * 3. [Listo] Pensar en que estructuras se van a pasar entre estados, todos t_hilo excepto en NEW
  * 4. [Listo] Modificar los void * y los return donde corresponda para pasarlo por parametro o retornarlo
  * 5. [Listo] Programar la forma de comparar hilos (supongo que comparacion por .pid)
- * 6. Recibir algoritmo de corto plazo para mover entre READY->EXEC
+ * 6. [Listo] Recibir algoritmo de corto plazo para mover entre READY->EXEC
  * 7. Recibir algoritmo de mediano plazo para mover de BLOCK->SUSP/BLOCK
  * */
 
@@ -100,6 +100,7 @@ t_hilo * colas_mover_new_ready() {
 	t_hilo * hilo = queue_pop(new_queue);
 	pthread_mutex_unlock(&mutex_new_queue);
 
+	hilo->timestamp_entrar_ready = estructuras_current_timestamp();
 	hilo->estado = READY;
 
 	pthread_mutex_lock(&mutex_ready_list);
@@ -110,13 +111,13 @@ t_hilo * colas_mover_new_ready() {
 }
 
 t_hilo * colas_mover_ready_exec() {
-	// TODO: Pasar un criterio para seleccionar el que se toma de ready
-	// TODO: DE momento se toma el primero
 	pthread_mutex_lock(&mutex_ready_list);
-	t_hilo * hilo = list_remove(ready_list, 0);
+	t_hilo * hilo_mover = hilo_obtener_siguiente_hilo_a_mover_exec(ready_list);
+	t_hilo * hilo = list_remove_by_condition(exec_list, son_mismo_hilo(hilo_mover));
 	pthread_mutex_unlock(&mutex_ready_list);
 
 	hilo->estado = EXEC;
+	hilo->timestamp_entrar_exec = estructuras_current_timestamp();
 
 	pthread_mutex_lock(&mutex_exec_list);
 	list_add(exec_list, hilo);
@@ -145,6 +146,8 @@ t_hilo * colas_mover_exec_block(t_hilo * hilo_mover) {
 	pthread_mutex_unlock(&mutex_exec_list);
 
 	hilo->estado = BLOCK;
+	hilo->timestamp_salir_exec = estructuras_current_timestamp();
+	hilo->timestamp_tiempo_exec = estructuras_timestamp_diff(hilo->timestamp_entrar_exec, hilo->timestamp_salir_exec);
 
 	pthread_mutex_lock(&mutex_blocked_list);
 	list_add(blocked_list, 0);
@@ -161,6 +164,7 @@ t_hilo * colas_mover_block_ready(t_hilo * hilo_mover) {
 	pthread_mutex_unlock(&mutex_blocked_list);
 
 	hilo->estado = READY;
+	hilo->timestamp_entrar_ready = estructuras_current_timestamp();
 
 	pthread_mutex_lock(&mutex_ready_list);
 	list_add_in_index(ready_list, 0, hilo);
@@ -205,6 +209,7 @@ t_hilo * colas_mover_block_ready_ready() {
 	pthread_mutex_unlock(&mutex_suspended_ready_queue);
 
 	hilo->estado = READY;
+	hilo->timestamp_entrar_ready = estructuras_current_timestamp();
 
 	pthread_mutex_lock(&mutex_ready_list);
 	list_add_in_index(ready_list, 0, hilo);
@@ -212,3 +217,5 @@ t_hilo * colas_mover_block_ready_ready() {
 
 	return hilo;
 }
+
+
