@@ -13,7 +13,7 @@ typedef struct timespec t_timestamp;
 typedef enum {
 	NEW,
 	READY,
-	EXEC,
+	ESTADO_EXEC,
 	BLOCK,
 	FINISH,
 	SUSPENDED_BLOCK,
@@ -23,21 +23,19 @@ typedef enum {
 
 // Contiene la informacion necesaria para mover un proceso como un hilo entre las colas
 typedef struct {
-	uint32_t pid;
+	uint32_t pid; // Viene de la matelib
 
-    t_estado_hilo estado;
+    t_estado_hilo estado; // Inicia como NEW
 
-    float estimacion_anterior; // Viene por configuracion la primera vez
-    float estimacion_actual_sjf; // Guarda el resultado de la estimacion
+    float estimacion_anterior; // Viene de la LIB
+    float estimacion_actual_sjf;
     float estimacion_actual_hrrn;
 
     t_timestamp timestamp_entrar_exec;
     t_timestamp timestamp_salir_exec;
-    float timestamp_tiempo_exec; // 0 la primera vez, guarda la diferenca entre entrar y salir de EXEC
+    float timestamp_tiempo_exec; // 0 la primera vez
 
     t_timestamp timestamp_entrar_ready;
-    // t_timestamp timestamp_salir_ready; No se neceista este valor, se calcula cuando se llama un algoritmo
-    //float timestamp_tiempo_ready;
 } t_hilo;
 
 /**

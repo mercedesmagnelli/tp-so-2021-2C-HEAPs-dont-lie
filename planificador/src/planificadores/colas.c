@@ -59,6 +59,8 @@ int colas_iniciar() {
 	pthread_mutex_init(&mutex_suspended_blocked_list, NULL);
 	pthread_mutex_init(&mutex_suspended_ready_queue, NULL);
 
+	algoritmos_iniciar();
+
     return 0;
 }
 
@@ -79,6 +81,8 @@ int colas_destruir() {
 	pthread_mutex_destroy(&mutex_suspended_blocked_list);
 	pthread_mutex_destroy(&mutex_suspended_ready_queue);
 
+	algoritmos_destruir();
+
     return 0;
 }
 
@@ -87,6 +91,8 @@ t_hilo * colas_insertar_new(uint32_t pid) {
 
 	hilo->pid = pid;
 	hilo->estado = NEW;
+	hilo->estimacion_anterior = get_estimacion_inicial();
+	hilo->timestamp_tiempo_exec = 0.0;
 
 	pthread_mutex_lock(&mutex_new_queue);
 	queue_push(new_queue, hilo);
@@ -111,12 +117,15 @@ t_hilo * colas_mover_new_ready() {
 }
 
 t_hilo * colas_mover_ready_exec() {
+	t_hilo * hilo_mover;
+	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
+
 	pthread_mutex_lock(&mutex_ready_list);
-	t_hilo * hilo_mover = hilo_obtener_siguiente_hilo_a_mover_exec(ready_list);
-	t_hilo * hilo = list_remove_by_condition(exec_list, son_mismo_hilo(hilo_mover));
+	hilo_mover = hilo_obtener_siguiente_hilo_a_mover_exec(ready_list);
+	t_hilo * hilo = list_remove_by_condition(ready_list, son_iguales);
 	pthread_mutex_unlock(&mutex_ready_list);
 
-	hilo->estado = EXEC;
+	hilo->estado = ESTADO_EXEC;
 	hilo->timestamp_entrar_exec = estructuras_current_timestamp();
 
 	pthread_mutex_lock(&mutex_exec_list);
@@ -127,8 +136,9 @@ t_hilo * colas_mover_ready_exec() {
 }
 
 t_hilo * colas_mover_exec_finish(t_hilo * hilo_mover) {
+	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
 	pthread_mutex_lock(&mutex_exec_list);
-	t_hilo * hilo = list_remove_by_condition(exec_list, son_mismo_hilo(hilo_mover));
+	t_hilo * hilo = list_remove_by_condition(exec_list, son_iguales);
 	pthread_mutex_unlock(&mutex_exec_list);
 
 	hilo->estado = FINISH;
@@ -141,8 +151,9 @@ t_hilo * colas_mover_exec_finish(t_hilo * hilo_mover) {
 }
 
 t_hilo * colas_mover_exec_block(t_hilo * hilo_mover) {
+	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
 	pthread_mutex_lock(&mutex_exec_list);
-	t_hilo * hilo = list_remove_by_condition(exec_list, son_mismo_hilo(hilo_mover));
+	t_hilo * hilo = list_remove_by_condition(exec_list, son_iguales);
 	pthread_mutex_unlock(&mutex_exec_list);
 
 	hilo->estado = BLOCK;
@@ -159,8 +170,9 @@ t_hilo * colas_mover_exec_block(t_hilo * hilo_mover) {
 }
 
 t_hilo * colas_mover_block_ready(t_hilo * hilo_mover) {
+	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
 	pthread_mutex_lock(&mutex_blocked_list);
-	t_hilo * hilo = list_remove_by_condition(blocked_list, son_mismo_hilo(hilo_mover));
+	t_hilo * hilo = list_remove_by_condition(blocked_list, son_iguales);
 	pthread_mutex_unlock(&mutex_blocked_list);
 
 	hilo->estado = READY;
@@ -190,8 +202,9 @@ t_hilo * colas_mover_block_block_susp() {
 }
 
 t_hilo * colas_mover_block_susp_block_ready(t_hilo * hilo_mover) {
+	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
 	pthread_mutex_lock(&mutex_suspended_blocked_list);
-	t_hilo * hilo = list_remove_by_condition(suspended_blocked_list, son_mismo_hilo(hilo_mover));
+	t_hilo * hilo = list_remove_by_condition(suspended_blocked_list, son_iguales);
 	pthread_mutex_unlock(&mutex_suspended_blocked_list);
 
 	hilo->estado = SUSPENDED_READY;

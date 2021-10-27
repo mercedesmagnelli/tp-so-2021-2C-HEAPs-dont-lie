@@ -8,6 +8,8 @@
 #include <commons/collections/queue.h>
 #include <commons/collections/list.h>
 
+#include "../../../shared/logger.h"
+
 #include "estructuras.h"
 #include "algoritmos.h"
 

@@ -80,7 +80,10 @@ void debug_variables() {
 	loggear_debug("---Variables en archivo de configuración---");
 	loggear_debug("IP_MEMORIA: \t\t\t%s", get_ip_ram());
 	loggear_debug("PUERTO_MEMORIA: \t\t%d", get_puerto_ram());
+	loggear_debug("PUERTO_ESCUCHA: \t\t%d", get_puerto_escucha());
 	loggear_debug("ALGORITMO_PLANIFICACION: \t%d", get_algoritmo());
+	loggear_debug("ALFA: \t\t\t%d", get_alfa());
+	loggear_debug("ESTIMACION_INICIAL: \t\t%d", get_estimacion_inicial());
 	loggear_debug("CANTIDAD_DISPOSITIVOS_IO: \t%d", get_cantidad_dispositivos_io());
 	for (int i = 0; i < get_cantidad_dispositivos_io(); ++i) {
 		loggear_debug("DISPOSITIVOS_IO[%d]: \t\t%s", i, get_dispositivos_io()[i]);
