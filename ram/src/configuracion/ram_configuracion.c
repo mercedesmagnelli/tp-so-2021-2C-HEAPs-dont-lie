@@ -49,6 +49,7 @@ int cargar_archivo(char * path) {
 
 	error += set_variable_int(config, "PUERTO", 				&config_guardada.puerto);
 	error += set_variable_int(config, "TAMANIO", 				&config_guardada.tamanio_memoria);
+	error += set_variable_int(config, "TAMANIO_PAGINA",			&config_guardada.tamanio_pagina);
 
 	error += set_variable_enum(config, "ALGORITMO_REEMPLAZO_MMU", 	&config_guardada.algoritmo_reemplazo_mmu, obtener_algoritmo_reemplazo_mmu);
 	error += set_variable_enum(config, "TIPO_ASIGNACION", 			&config_guardada.tipo_asignacion, obtener_tipo_asignacion);
@@ -59,6 +60,8 @@ int cargar_archivo(char * path) {
 	error += set_variable_int(config, "CANTIDAD_ENTRADAS_TLB",	&config_guardada.cantidad_entradas_tlb);
 	error += set_variable_int(config, "RETARDO_ACIERTO_TLB", 	&config_guardada.retardo_acierto_tlb);
 	error += set_variable_int(config, "RETARDO_FALLO_TLB", 		&config_guardada.retardo_fallo_tlb);
+
+	error += set_variable_str(config, "PATH_DUMP_TLB",			&config_guardada.path_dump_tlb);
 
 	// Para loggear
 	error += set_variable_str(config, "LOG_ROUTE", 				&config_guardada.log_route);
