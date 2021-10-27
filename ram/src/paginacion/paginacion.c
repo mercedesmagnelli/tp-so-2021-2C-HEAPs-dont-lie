@@ -135,13 +135,13 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	return nuevoHeapPrimero->currAlloc+9;//siempre el primer alloc va a ser 9 porque el primer dato se guarda al comienzo, y el metadata ocupa 9 bytes
 }
 
-int32_t se_asigna_memoria_necesaria(uint32_t pid, uint32_t size) {
+int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, uint32_t size) {
 	//funcion cuando un proceso pide memoria
 	//consguir socket
 	void* mensaje = serializar_pedido_memoria(pid, size);
 
 	//semaforo_socket
-	int a = enviar_mensaje_protocolo(1,R_S_ESPACIO_PROCESO_NUEVO, 8, mensaje);
+	int a = enviar_mensaje_protocolo(1,header, 8, mensaje);
 	if (a < 0 ) {
 		//imprimir que hubo un pronlema
 	}
@@ -156,14 +156,6 @@ int32_t se_asigna_memoria_necesaria(uint32_t pid, uint32_t size) {
 }
 
 
-
-
-
-
-uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size){
-	printf("no, no podés, deja de joder");
-	return 1;
-}
 
 bool ptro_valido(uint32_t PID, uint32_t ptro) {
 
