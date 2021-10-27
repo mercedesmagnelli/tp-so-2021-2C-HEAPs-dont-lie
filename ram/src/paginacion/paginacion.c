@@ -301,13 +301,14 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 		pag = obtener_pagina_de_memoria(PID, nroPag, 1);
 		ptro_escritura = pag->frame * get_tamanio_pagina() + offset;
 		if((offset+tamDato) <= get_tamanio_pagina()){
-			//TODO usar la funcion de escritura en memoria (ptro_escritura, data + desplazamientoEnDato, tamDato)
+			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
 			tamDato=0;
 		}else{
 			int tamDatoParcial = get_tamanio_pagina()- offset;
-			//TODO usar la funcion de escritura en memoria (ptro_escritura, data + desplazamientoEnDato, tamDatoParcial)
-			desplazamientoEnDato = tamDatoParcial;
+			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDatoParcial, ptro_escritura);
+			desplazamientoEnDato += tamDatoParcial;
 			tamDato -= tamDatoParcial;
+			offset = 0;
 		}
 	}
 }

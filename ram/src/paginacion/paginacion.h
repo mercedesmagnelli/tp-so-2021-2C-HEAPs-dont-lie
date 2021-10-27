@@ -6,6 +6,7 @@
 #include <commons/collections/dictionary.h>
 #include "../../../shared/codigo_error.h"
 #include "../../src/conexion_swap/conexion_swap.h"
+#include "../../src/memoria/memoria.h"
 #include <stdlib.h>
 #include <string.h>
 
