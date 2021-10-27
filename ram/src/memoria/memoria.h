@@ -82,4 +82,14 @@ void inicializar_memoria_principal();
 bool cantidad_valida(uint32_t size);
 
 
+/**
+ * @NAME: escribir_directamente_en_memoria
+ * @DESC: funcion que escribe en la memoria a partir de una direccion logica (es la que tiene delegada la logica del memcpy)
+ *
+ **/
+
+
+void escribir_directamente_en_memoria(void* valorAEscribir, int32_t tamanio, uint32_t direccionLogica);
+
+
 #endif /* MEMORIA_MEMORIA_C_ */
