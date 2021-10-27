@@ -56,7 +56,7 @@ int32_t memfree(uint32_t direccionLogicaALiberar, uint32_t pid) {
 
 void* memread(uint32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer) {
 
-    if(ptro_valido(pid, direccionLogicaALeer) || ptro_liberado(direccionLogicaALeer,pid) || tamanio_de_direccion(direccionLogicaALeer, pid) >= tamanioALeer){
+    if(!ptro_valido(pid, direccionLogicaALeer) || ptro_liberado(direccionLogicaALeer,pid) || tamanio_de_direccion(direccionLogicaALeer, pid) < tamanioALeer){
         return (void*) -6; //MEM_READ_FAULT
     }else{
         void* lectura = malloc(tamanioALeer);

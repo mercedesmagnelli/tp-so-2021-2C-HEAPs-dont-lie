@@ -64,7 +64,7 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	guardar_HEAP_en_memoria(PID, nuevoHeap);
 
 	//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
-	if(heap->nextAlloc != NULL){
+	if(heap->nextAlloc == -1){
 		heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
 		heapSig->prevAlloc = nuevoHeap->currAlloc;
 		guardar_HEAP_en_memoria(PID, heapSig);
@@ -107,7 +107,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	//creamos el primer HEAP nuevo que vamos a ingresar y actualizamos en mem
 	heap_metadata* nuevoHeapPrimero = malloc(sizeof(heap_metadata));
 	nuevoHeapPrimero->currAlloc = 0;
-	nuevoHeapPrimero->prevAlloc = NULL;
+	nuevoHeapPrimero->prevAlloc = -1;
 	nuevoHeapPrimero->nextAlloc = tam + 9;
 	nuevoHeapPrimero->isFree    = 0;
 	agregar_HEAP_a_PID(PID,nuevoHeapPrimero);
@@ -118,7 +118,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	heap_metadata* nuevoHeapUltimo = malloc(sizeof(heap_metadata));
 	nuevoHeapUltimo->currAlloc = tam+9;
 	nuevoHeapUltimo->prevAlloc = 0;
-	nuevoHeapUltimo->nextAlloc = NULL;
+	nuevoHeapUltimo->nextAlloc = -1;
 	nuevoHeapUltimo->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeapUltimo);
 	guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
@@ -164,8 +164,9 @@ bool ptro_valido(uint32_t PID, uint32_t ptro) {
 	return list_any_satisfy(lista_heaps,condition);
 }
 
-uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t pid){
-    return 1;
+uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t PID){
+	heap_metadata* heap = get_HEAP(PID, direccionLogicaALeer);
+    return espacio_de_HEAP(heap);
 }
 
 uint32_t traducir_a_dir_fisica(uint32_t logica){
@@ -188,15 +189,8 @@ bool ptro_liberado(uint32_t PID, uint32_t ptro){
 
 
 void liberar_memoria(uint32_t PID, uint32_t ptro){
-	t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
-
-		bool condicion(void* heap_i) {
-			heap_metadata* heap = (heap_metadata*) heap_i;
-			return (heap->currAlloc + 9) == ptro;
-		}
-
-		heap_metadata* heap_encontrado = (heap_metadata*) list_find(lista_heaps, condicion);
-		heap_encontrado ->isFree = 1;
+	heap_metadata* heap_encontrado = get_HEAP(PID, ptro);
+	heap_encontrado ->isFree = 1;
 }
 
 void consolidar_memoria(uint32_t PID){
@@ -225,10 +219,10 @@ int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam){
 	bool heap_tam_min(void* element){
 		bool rta;
 		heap_metadata* heap = (heap_metadata*) element;
-		if(heap->nextAlloc==NULL){
+		if(heap->nextAlloc==-1){
 			rta = true;
 		}else{
-			if((heap->nextAlloc - heap->currAlloc - 9)>= tam+9){
+			if(espacio_de_HEAP(heap)>= tam+9){
 				rta = true;
 			}else{
 				rta = false;
@@ -239,12 +233,16 @@ int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam){
 
 	heap_metadata* heap = list_find(listaHMD,heap_tam_min);
 
-	if(heap->nextAlloc==NULL){
+	if(heap->nextAlloc==-1){
 		ptro = (-1)* (heap->currAlloc+9);
 	}
 
 	return ptro;
 
+}
+
+int espacio_de_HEAP(heap_metadata* heap){
+	return heap->nextAlloc - heap->currAlloc - 9;
 }
 
 
@@ -256,8 +254,7 @@ heap_metadata* get_HEAP(uint32_t PID, int32_t ptro){
 
 	}
 
-	t_proceso* proceso = get_proceso_PID(PID);
-	t_list* listaHMD = proceso->lista_hmd;
+	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
 	heap_metadata* heap = list_find(listaHMD,heap_ptro);
 	return heap;
 
