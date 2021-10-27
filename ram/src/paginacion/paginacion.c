@@ -169,8 +169,13 @@ uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t PID){
     return espacio_de_HEAP(heap);
 }
 
-uint32_t traducir_a_dir_fisica(uint32_t logica){
-	return 1;
+uint32_t traducir_a_dir_fisica(uint32_t PID, uint32_t ptroHEAP, uint32_t bitModificado){
+	heap_metadata* heap = get_HEAP(PID, ptroHEAP);
+	int nroPag = heap->currAlloc / get_tamanio_pagina();
+	int offset = heap->currAlloc % get_tamanio_pagina();
+	t_pagina* pag = obtener_pagina_de_memoria(PID, nroPag, bitModificado);
+	uint32_t ptroEscritura = pag->frame * get_tamanio_pagina() + offset;
+	return ptroEscritura;
 }
 
 
@@ -310,7 +315,7 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 	}
 }
 
-t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modificado){
+t_pagina* obtener_pagina_de_memoria(uint32_t PID, int nroPag, uint32_t bit_modificado){
 	//se fija si esta en la TLB
 	// 		- si está: actualiza datos de entrada TLB (timestamp) y los datos de la pagina (timestamp/ bit_uso, bit_modificacion )
 	//		- no está: va a buscar a la RAM

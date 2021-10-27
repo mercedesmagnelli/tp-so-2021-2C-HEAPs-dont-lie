@@ -157,9 +157,9 @@ uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t pid);
 /**
 * @NAME: traducir_a_dir_fisica
 * @DESC: traduce de direccion logica a fisica
-* @RET:  la direccion logica + frame * tam_pag + offset (si lo hay)
+* @RET:  frame * tam_pag + offset (si lo hay)
 */
-uint32_t traducir_a_dir_fisica(uint32_t logica);
+uint32_t traducir_a_dir_fisica(uint32_t PID,  uint32_t logica, uint32_t bitModificado);
 
 /**
  * @NAME: escribir_en_memoria

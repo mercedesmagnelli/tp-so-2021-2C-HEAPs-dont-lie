@@ -60,17 +60,17 @@ void* memread(uint32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer
         return (void*) -6; //MEM_READ_FAULT
     }else{
         void* lectura = malloc(tamanioALeer);
-        memcpy(lectura, memoria_principal + traducir_a_dir_fisica(direccionLogicaALeer), tamanioALeer);
+        memcpy(lectura, memoria_principal + traducir_a_dir_fisica(pid, direccionLogicaALeer, 0), tamanioALeer);
         return lectura;
     }
 }
 
 int32_t memwrite(void* valorAEscribir, uint32_t direccionLogicaAEscribir,uint32_t pid, uint32_t tamanioAEscribir){
 
-    if(ptro_valido(pid, direccionLogicaAEscribir) || ptro_liberado(direccionLogicaAEscribir,pid) || tamanio_de_direccion(direccionLogicaAEscribir, pid) >= tamanioAEscribir){
+    if(!ptro_valido(pid, direccionLogicaAEscribir) || ptro_liberado(direccionLogicaAEscribir,pid) || tamanio_de_direccion(direccionLogicaAEscribir, pid) < tamanioAEscribir){
             return -7; // MEM_WRITE_FAULT
     }else {
-        escribir_directamente_en_memoria(valorAEscribir, tamanioAEscribir, traducir_a_dir_fisica(direccionLogicaAEscribir));
+        escribir_directamente_en_memoria(valorAEscribir, tamanioAEscribir, traducir_a_dir_fisica(pid, direccionLogicaAEscribir, 1));
     	return 0;
 
     }
