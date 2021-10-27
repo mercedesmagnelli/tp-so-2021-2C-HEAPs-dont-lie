@@ -52,8 +52,7 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	int nextNextAlloc = heap->nextAlloc;
 	heap->nextAlloc = ptro+tamanio;
 	heap->isFree = 0;
-	int nroPag = heap->currAlloc /get_tamanio_pagina();
-	actualizar_HEAP_en_memoria(PID, nroPag, heap);
+	guardar_HEAP_en_memoria(PID, heap);
 
 	//creamos el HEAP nuevo que vamos a ingresar y actualizamos en mem
 	heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
@@ -62,15 +61,13 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	nuevoHeap->nextAlloc = nextNextAlloc;
 	nuevoHeap->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeap);
-	nroPag = nuevoHeap->currAlloc/get_tamanio_pagina();
-	actualizar_HEAP_en_memoria(PID, nroPag, nuevoHeap);
+	guardar_HEAP_en_memoria(PID, nuevoHeap);
 
 	//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
 	if(heap->nextAlloc != NULL){
 		heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
 		heapSig->prevAlloc = nuevoHeap->currAlloc;
-		nroPag = (heapSig->currAlloc)/get_tamanio_pagina();
-		actualizar_HEAP_en_memoria(PID, nroPag, nuevoHeap);
+		guardar_HEAP_en_memoria(PID, heapSig);
 	}
 }
 
@@ -114,8 +111,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	nuevoHeapPrimero->nextAlloc = tam + 9;
 	nuevoHeapPrimero->isFree    = 0;
 	agregar_HEAP_a_PID(PID,nuevoHeapPrimero);
-	int nroPag = nuevoHeapPrimero->currAlloc/get_tamanio_pagina();
-	actualizar_HEAP_en_memoria(PID, nroPag, nuevoHeapPrimero);
+	guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
 
 
 	//creamos el segundo HEAP nuevo que vamos a ingresar y actualizamos en mem
@@ -125,8 +121,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	nuevoHeapUltimo->nextAlloc = NULL;
 	nuevoHeapUltimo->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeapUltimo);
-	nroPag = nuevoHeapUltimo->currAlloc/get_tamanio_pagina();
-	actualizar_HEAP_en_memoria(PID, nroPag, nuevoHeapPrimero);
+	guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
 
 
 	//agrego proceso a la lista
@@ -277,9 +272,86 @@ void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
 
 }
 
-void actualizar_HEAP_en_memoria(uint32_t PID, int nroPag, heap_metadata* heap){
-	printf("damn daniel, back at it again with the white vans!");
+void guardar_HEAP_en_memoria(uint32_t PID, heap_metadata* heap){
+	int nroPag = heap->currAlloc / get_tamanio_pagina();
+	int offset = heap->currAlloc % get_tamanio_pagina();
+	void* dataHeap = serializar_HEAP(heap);
+	guardar_en_memoria_paginada(PID, nroPag, offset, dataHeap, 9);
+	free(dataHeap);
 }
+
+void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* data, int tamDato){
+	int desplazamientEnDato = 0;
+	t_proceso* carpincho = get_proceso_PID(PID);
+	t_pagina* pag = list_get(carpincho->tabla_paginas, nroPag);
+	while(tamDato>0){
+		if((offset+tamDato) < get_tamanio_pagina()){
+
+		}else{
+			if((offset+tamDato) == get_tamanio_pagina()){
+
+			}else{
+
+			}
+		}
+	}
+}
+/*
+void guardamosEnMemoriaPaginada(void* datos, int tamDato, int* offset, int* idPagina, pagina** pagina, patotaPaginada* tablaPatota){
+	int desplazamientoEnDato = 0;
+	while(tamDato>0){
+		if(((*offset) + tamDato) < tamanioPagina){
+			if((*pagina)->bitP == 1){
+				memcpy(memoriaPrincipal + (*pagina)->frame * tamanioPagina + (*offset), datos + desplazamientoEnDato, tamDato);
+				actualizarValorDeLista(listaMarcos,tablaPatota->idP,(*idPagina), (*pagina));
+			}else{
+				char* datoAux = malloc(tamDato);
+				memcpy(datoAux, datos + desplazamientoEnDato, tamDato);
+				guardarInformacionEnSWAP(datoAux, tamDato, ((*pagina)->frame*tamanioPagina+*offset));
+                actualizarValorDeLista(listaMarcosMV,tablaPatota->idP,(*idPagina), (*pagina));
+			}
+			if((*offset)==0){
+				list_add(tablaPatota->tablaPaginas,(*pagina));
+			}
+			(*pagina)->espacioOcupado+=tamDato;
+			(*offset)+= tamDato;
+			tamDato = 0;
+		}else{
+			if(((*offset) + tamDato)==tamanioPagina){
+				if((*pagina)->bitP == 1){
+					memcpy(memoriaPrincipal + (*pagina)->frame * tamanioPagina + (*offset), datos + desplazamientoEnDato, tamDato);
+					actualizarValorDeLista(listaMarcos,tablaPatota->idP,(*idPagina), (*pagina));
+				}else{
+					guardarInformacionEnSWAP(datos+desplazamientoEnDato, tamDato, ((*pagina)->frame*tamanioPagina+(*offset)));
+					actualizarValorDeLista(listaMarcosMV,tablaPatota->idP,(*idPagina), (*pagina));
+				}
+				if((*offset)==0){
+					list_add(tablaPatota->tablaPaginas,(*pagina));
+				}
+				(*pagina)->espacioOcupado+=tamDato;
+				tamDato = 0;
+				(*offset) = 0;
+				(*idPagina)++;
+				(*pagina) = conseguirFrame((*idPagina));
+			}else{//este es el caso donde sigo con la pagina y aun asi me falta de otra pagina
+				int tamanioDatoAGuardar = tamanioPagina - (*offset);
+				tamDato-=tamanioDatoAGuardar;
+				if((*pagina)->bitP == 1){
+					memcpy(memoriaPrincipal + (*pagina)->frame * tamanioPagina + (*offset), datos + desplazamientoEnDato, tamanioDatoAGuardar);
+					actualizarValorDeLista(listaMarcos,tablaPatota->idP,(*idPagina), (*pagina));
+				}else{
+					guardarInformacionEnSWAP(datos+desplazamientoEnDato, tamanioDatoAGuardar, ((*pagina)->frame*tamanioPagina+(*offset)));
+					actualizarValorDeLista(listaMarcosMV,tablaPatota->idP,(*idPagina), (*pagina));
+				}
+				(*pagina)->espacioOcupado+=tamanioDatoAGuardar;
+				(*offset)=0;
+				desplazamientoEnDato+= tamanioDatoAGuardar;
+				(*idPagina)++;
+				(*pagina) = conseguirFrame((*idPagina));
+			}
+		}
+	}
+}*/
 
 t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modificado){
 	//se fija si esta en la TLB
@@ -289,5 +361,13 @@ t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modifica
 	//					- NO está: traigo la PAG de SWAP (segun asignacion), agrego entrada a la TLB y actualizo datos de pagina (timestamp/ bit_uso, bit_modificacion)
 	t_pagina* a = NULL;
 	return a;
+}
+
+void* serializar_HEAP(heap_metadata* heap){//TODO revisar serializacion
+	void * dataHEAP = malloc(sizeof(heap_metadata));
+	memcpy(dataHEAP, &heap->prevAlloc,4);
+	memcpy(dataHEAP+4, &heap->nextAlloc,4);
+	memcpy(dataHEAP+8, &heap->isFree,1);
+	return dataHEAP;
 }
 
