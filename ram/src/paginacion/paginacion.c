@@ -136,9 +136,30 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 }
 
 int32_t se_asigna_memoria_necesaria(uint32_t pid, uint32_t size) {
-	printf("hola, desarrollame, no seas rata");  //estas joyitas que uno se encuentra leyendo el codigo
-	return 1;
+	//funcion cuando un proceso pide memoria
+	//consguir socket
+	void* mensaje = serializar_pedido_memoria(pid, size);
+
+	//semaforo_socket
+	int a = enviar_mensaje_protocolo(1,R_S_ESPACIO_PROCESO_NUEVO, 8, mensaje);
+	if (a < 0 ) {
+		//imprimir que hubo un pronlema
+	}
+	//como consigo el socket del swap?
+	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(1);
+	//semaforo_socket
+	uint32_t respuesta_final = *(uint32_t*)(respuesta->payload);
+	//loggear la respuesta
+	free(mensaje);
+
+	return respuesta_final;
 }
+
+
+
+
+
+
 uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size){
 	printf("no, no podés, deja de joder");
 	return 1;

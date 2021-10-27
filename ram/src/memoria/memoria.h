@@ -9,6 +9,7 @@
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
 #include "../paginacion/paginacion.h"
+#include "../../../shared/protocolo.h"
 
 
 /*Funciones que pide el TP obligatorias*/

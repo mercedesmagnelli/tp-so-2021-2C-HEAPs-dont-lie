@@ -5,6 +5,7 @@
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
 #include "../../../shared/codigo_error.h"
+#include "../../src/conexion_swap/conexion_swap.h"
 #include <stdlib.h>
 
 t_list* listaProcesos;
