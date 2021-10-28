@@ -8,6 +8,8 @@ sem_t hilos_grado_multiprogramacion;
 sem_t hilos_semaforo_exec;
 sem_t hilos_grado_multitarea;
 
+sem_t hilos_nuevo_bloqueado;
+
 t_list * list_hilos_ejecutando;
 pthread_mutex_t mutex_hilos;
 
@@ -22,6 +24,8 @@ int hilos_planificador_iniciar() {
 	sem_init(&hilos_semaforo_exec, 0, 0);
 	sem_init(&hilos_grado_multitarea, 0, get_grado_multiprocesamiento());
 
+	sem_init(&hilos_nuevo_bloqueado, 0, 0);
+
 	return 0;
 }
 
@@ -34,8 +38,14 @@ void hilos_planificador_destruir() {
 	list_destroy_and_destroy_elements(list_hilos_ejecutando, limpiar_hilo);
 
 	sem_destroy(&hilos_semaforo_new);
+
 	sem_destroy(&hilos_semaforo_ready);
+	sem_destroy(&hilos_grado_multiprogramacion);
+
 	sem_destroy(&hilos_semaforo_exec);
+	sem_destroy(&hilos_grado_multitarea);
+
+	sem_destroy(&hilos_nuevo_bloqueado);
 }
 
 pthread_t * hilos_crear_hilo() {
@@ -77,7 +87,6 @@ void hilos_post_exec() { sem_post(&hilos_semaforo_exec); }
 void hilos_wait_exec() { sem_wait(&hilos_semaforo_exec); }
 void hilos_post_multitarea() { sem_post(&hilos_grado_multitarea); }
 void hilos_wait_multitarea() { sem_wait(&hilos_grado_multitarea); }
-
-
-
+void hilos_post_nuevo_bloqueado() { sem_post(&hilos_nuevo_bloqueado); }
+void hilos_wait_nuevo_bloqueado() { sem_wait(&hilos_nuevo_bloqueado); }
 

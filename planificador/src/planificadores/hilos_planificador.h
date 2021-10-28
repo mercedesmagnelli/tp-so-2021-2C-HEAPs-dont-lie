@@ -60,5 +60,10 @@ void hilos_wait_exec();
 void hilos_post_multitarea();
 void hilos_wait_multitarea();
 
+void hilos_post_nuevo_bloqueado();
+void hilos_wait_nuevo_bloqueado();
+void hilos_post_suspendido_ready();
+void hilos_wait_suspendido_ready();
+
 
 #endif /* PLANIFICADORES_HILOS_PLANIFICADOR_H_ */

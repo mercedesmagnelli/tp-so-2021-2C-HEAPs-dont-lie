@@ -12,6 +12,7 @@
 
 #include "estructuras.h"
 #include "algoritmos.h"
+#include "hilos_planificador.h"
 
 /**
  * Aca se guardaran todas las colas, listas y/o pilas que sea necesaria para mover entre hilos
@@ -107,5 +108,16 @@ t_hilo * colas_mover_block_susp_block_ready(t_hilo * hilo_mover);
  * */
 t_hilo * colas_mover_block_ready_ready();
 
+/**
+ * @NAME: deberia_suspenderse_procesos
+ * @DESC: Avisa el grado de multiprogramacion esta copado por procesos que no usan la CPU
+ */
+bool deberia_suspenderse_procesos();
+
+/**
+ * @NAME: hay_procesos_en_suspendido_ready
+ * @DESC: Retorna true si hay proceso en SUSPENDIDO-READY
+ */
+bool hay_procesos_en_suspendido_ready();
 
 #endif
