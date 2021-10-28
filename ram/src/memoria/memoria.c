@@ -41,7 +41,7 @@ int32_t memalloc(uint32_t pid, uint32_t size) {
 
 
 
-int32_t memfree(uint32_t direccionLogicaALiberar, uint32_t pid) {
+int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
 
 	if(ptro_valido(pid, direccionLogicaALiberar) || ptro_liberado(direccionLogicaALiberar,pid)){
 		return -5; // MATE_FREE_FAULT
@@ -54,23 +54,23 @@ int32_t memfree(uint32_t direccionLogicaALiberar, uint32_t pid) {
 
 }
 
-void* memread(uint32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer) {
+int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer, void* lectura) {
 
-    if(ptro_valido(pid, direccionLogicaALeer) || ptro_liberado(direccionLogicaALeer,pid) || tamanio_de_direccion(direccionLogicaALeer, pid) >= tamanioALeer){
-        return (void*) -6; //MEM_READ_FAULT
+    if(!ptro_valido(pid, direccionLogicaALeer) || ptro_liberado(direccionLogicaALeer,pid) || tamanio_de_direccion(direccionLogicaALeer, pid) < tamanioALeer){
+        return -6; //MEM_READ_FAULT
     }else{
-        void* lectura = malloc(tamanioALeer);
-        memcpy(lectura, memoria_principal + traducir_a_dir_fisica(direccionLogicaALeer), tamanioALeer);
-        return lectura;
+        lectura = malloc(tamanioALeer);
+        memcpy(lectura, memoria_principal + traducir_a_dir_fisica(pid, direccionLogicaALeer, 0), tamanioALeer);
+        return 0;
     }
 }
 
-int32_t memwrite(void* valorAEscribir, uint32_t direccionLogicaAEscribir,uint32_t pid, uint32_t tamanioAEscribir){
+int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir,uint32_t pid, uint32_t tamanioAEscribir){
 
-    if(ptro_valido(pid, direccionLogicaAEscribir) || ptro_liberado(direccionLogicaAEscribir,pid) || tamanio_de_direccion(direccionLogicaAEscribir, pid) >= tamanioAEscribir){
+    if(!ptro_valido(pid, direccionLogicaAEscribir) || ptro_liberado(direccionLogicaAEscribir,pid) || tamanio_de_direccion(direccionLogicaAEscribir, pid) < tamanioAEscribir){
             return -7; // MEM_WRITE_FAULT
     }else {
-        escribir_directamente_en_memoria(valorAEscribir, tamanioAEscribir, traducir_a_dir_fisica(direccionLogicaAEscribir));
+        escribir_directamente_en_memoria(valorAEscribir, tamanioAEscribir, traducir_a_dir_fisica(pid, direccionLogicaAEscribir, 1));
     	return 0;
 
     }

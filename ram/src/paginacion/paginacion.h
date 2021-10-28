@@ -8,6 +8,8 @@
 #include "../../src/conexion_swap/conexion_swap.h"
 #include "../../src/configuracion/ram_config_guardada.h"
 #include "../../src/memoria/memoria.h"
+#include "../../src/configuracion/ram_config_guardada.h"
+#include "../../../shared/logger.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -29,8 +31,8 @@ typedef struct{
 
 typedef struct{
 	uint32_t currAlloc;
-	uint32_t prevAlloc;
-	uint32_t nextAlloc;
+	int32_t prevAlloc;
+	int32_t nextAlloc;
 	uint8_t isFree;
 }heap_metadata;
 
@@ -96,6 +98,15 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio);
 int32_t agregar_proceso(uint32_t PID, uint32_t tam);
 
 /**
+* @NAME: se_puede_almacenar_el_alloc_para_proceso
+* @DESC: Dado un proceso  (nuevo o existente) y un tamanio, se establece si puede ser guardado en memoria. Se usa para preguntarle a
+*         la swap si tiene espacion para guardarlo.
+* @RET: 0 si no puede
+*         1 si puede
+**/
+int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, uint32_t size);
+
+/**
  * @NAME: ptro_valido
  * @DESC: Retorna si la el puntero pertenece a la direccion de punteros asignados al proceso
 */
@@ -121,25 +132,6 @@ void liberar_memoria(uint32_t PID, uint32_t ptro);
 void consolidar_memoria(uint32_t PID);
 
 /**
- * @NAME: leer_de_memoria
- * @DESC: Lectura de la data de un proceso de memoria
- * @PARAM:
- *   data: ptro donde se guardara la data leida de memoria
- * @RET:
- *   >0 tamanio del dato leido
- **/
-uint32_t leer_de_memoria(uint32_t PID, uint32_t ptroMem, void* data);
-
-/**
- * @NAME: entra_data
- * @DESC: Se fija si en el alloc apuntado puede entrar el tamanio del dato seleccionado
- * @RET:
- *    0 ptro permite el tamanio de la data
- *   -3 ptro no permite el tamanio de la data
- **/
-uint32_t entra_data(uint32_t PID, uint32_t ptroMem, uint32_t tamanioData);
-
-/**
  * @NAME: tamanio_de_direccion
  * @DESC: retorna el tamanio de una direccion, obtenido mediante el hmd
  */
@@ -148,16 +140,9 @@ uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t pid);
 /**
 * @NAME: traducir_a_dir_fisica
 * @DESC: traduce de direccion logica a fisica
-* @RET:  la direccion logica + frame * tam_pag + offset (si lo hay)
+* @RET:  frame * tam_pag + offset (si lo hay)
 */
-uint32_t traducir_a_dir_fisica(uint32_t logica);
-
-
-/**
- * @NAME: escribir_en_memoria
- * @DESC: Escribe en el ptro de un proceso los datos
- **/
-void escribir_en_memoria(int32_t PID, int32_t ptroLogicoMem, int32_t tamanioData, void* data);
+uint32_t traducir_a_dir_fisica(uint32_t PID,  uint32_t logica, uint32_t bitModificado);
 
 /**
  * @NAME: inicializar_estructuras_administrativas()
@@ -223,6 +208,12 @@ t_proceso* get_proceso_PID(uint32_t PID);
 int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam);
 
 /*
+ * @NAME: espacio_de_HEAP
+ * @DES: Informa el espacio asociado al heap
+ * */
+uint32_t espacio_de_HEAP(heap_metadata* heap);
+
+/*
  * @NAME: get_HEAP
  * @DES: busca el heap del ptro asociado del PID
  * */
@@ -268,6 +259,13 @@ t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modifica
  * */
 
 void * serializar_HEAP(heap_metadata* nuevoHeapPrimero);
+
+/*
+ * @NAME: obtener_tabla_paginas_mediante_PID
+ * @DES: Informa la tabla de paginas del proceso asociado al PID
+ * */
+t_list* obtener_tabla_paginas_mediante_PID(uint32_t PID);
+
 
 
 /*
