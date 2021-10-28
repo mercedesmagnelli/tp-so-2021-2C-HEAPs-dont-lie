@@ -200,9 +200,134 @@ void liberar_memoria(uint32_t PID, uint32_t ptro){
 }
 
 void consolidar_memoria(uint32_t PID){
-	printf("don't mess with me, i have the power of god and anime by my side"); //HAHAHHA no lo habia leido
+
+	t_list* heaps = conseguir_listaHMD_mediante_PID(PID);
+
+	uint32_t indice=0;
+
+	uint32_t frees_contiguos = cantidad_de_frees_contiguos(heaps, &indice);
+
+	switch(frees_contiguos) {
+
+	case 1:
+		//no hay nada para consolidar, logguear
+		loggear_info("[MEMORIA] - La memoria no tiene nada para consolidar");
+		break;
+	case 2:
+		//caso en el que modifico el heap del que parto y el siguiente del siguiente
+		modificar_heaps(heaps, indice, PID, 2);
+		break;
+	case 3:
+		//caso en el que puede que modifique mas de uno
+		modificar_heaps(heaps, indice, PID,3);
+		break;
+
+	}
+	heap_metadata* ultimo_heap = (heap_metadata*)list_get(heaps, list_size(heaps) - 1);
+	t_list* tabla_paginas = obtener_tabla_paginas_mediante_PID(PID);
+
+	if(el_ultimo_heap_libera_paginas(ultimo_heap)){
+		liberar_paginas(ultimo_heap, tabla_paginas);
+	}
+
 }
 
+void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp) {
+
+
+	uint32_t tamanio_heap = espacio_de_HEAP(ultimo_heap);
+	uint32_t cant_pag_extras;
+	uint32_t cantPagNOBORRAR = ultimo_heap->currAlloc/get_tamanio_pagina();
+
+	if(((ultimo_heap->currAlloc)%get_tamanio_pagina()) > 0){
+	  cantPagNOBORRAR++;
+	}
+
+	uint32_t paginasUsadas = list_size(tp);
+	uint32_t cantPagABorrar = paginasUsadas - cantPagNOBORRAR;
+
+	for(int i = 0; i < cantPagABorrar; i++){
+		list_remove_and_destroy_element(tp, cantPagNOBORRAR, free);
+	}
+
+
+}
+
+t_list* obtener_tabla_paginas_mediante_PID(uint32_t PID){
+    t_proceso* proceso = get_proceso_PID(PID);
+    return proceso->tabla_paginas;
+}
+
+bool el_ultimo_heap_libera_paginas(heap_metadata* ultimo_heap){
+
+	uint32_t tamanio = espacio_de_HEAP(ultimo_heap);
+	return tamanio > get_tamanio_pagina();
+
+}
+
+void modificar_heaps(t_list* heaps, uint32_t indice, uint32_t pid, uint32_t cantidad){
+
+	heap_metadata* heap_inicial = (heap_metadata*) list_get(heaps, indice);
+	heap_metadata* heap_final = (heap_metadata*) list_get(heaps, indice+cantidad);
+
+	heap_inicial->nextAlloc = heap_final->currAlloc;
+	heap_final->prevAlloc = heap_inicial->currAlloc;
+
+	for(int i = 0; i < cantidad - 1; i++){
+
+		list_remove_and_destroy_element(heaps, indice + cantidad - i, free);
+
+	}
+
+
+	guardar_HEAP_en_memoria(pid, heap_inicial);
+	guardar_HEAP_en_memoria(pid, heap_final);
+
+
+
+}
+
+
+uint32_t cantidad_de_frees_contiguos(t_list* lista_heaps, uint32_t* indice) {
+
+	uint32_t cantidad = 1, i;
+	bool no_encontrado = true;
+	while(*indice < (list_size(lista_heaps) - 1)  && no_encontrado) {
+
+		heap_metadata* heap = (heap_metadata*)list_get(lista_heaps, *indice);
+
+		if(!heap->isFree) {
+			cantidad = calcular_seguidos(lista_heaps, *indice);
+			if(cantidad >=2) {
+				no_encontrado = false;
+				(*indice)--;
+			}
+		}
+		(*indice)++;
+	}
+
+	return cantidad;
+
+
+}
+
+uint32_t calcular_seguidos(t_list* lista, uint32_t indice) {
+
+	uint32_t s = 0;
+	int i = indice;
+	heap_metadata* obtenido = (heap_metadata*) list_get(lista, indice);
+	while(i < list_size(lista) && obtenido->isFree){
+
+		i++;
+		obtenido = (heap_metadata*) list_get(lista, i);
+		s++;
+
+	}
+
+
+	return s;
+
+}
 
 // FUNCIONES PRIVADAS DE USO INTERNO
 

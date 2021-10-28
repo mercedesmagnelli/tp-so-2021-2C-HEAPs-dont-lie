@@ -77,7 +77,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			/*
 			 * Llega PID y el puntero donde esta el alloc a liberar (deserealizar)
 			 *
-			 * usamos la funcion int liberar_espacio_memoria(int32_t PID, int32_t ptroMem) de paginación
+			 * usamos la funcion int memfree(int32_t PID, int32_t ptroMem) de memoria.c
 			 *
 			 * Enviamos el HANDSHAKE diciendo que se pudo liberar la memoria
 			 */

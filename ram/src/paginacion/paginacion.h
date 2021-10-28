@@ -6,6 +6,7 @@
 #include <commons/collections/dictionary.h>
 #include "../../../shared/codigo_error.h"
 #include "../../src/conexion_swap/conexion_swap.h"
+#include "../../src/configuracion/ram_config_guardada.h"
 #include "../../src/memoria/memoria.h"
 #include <stdlib.h>
 #include <string.h>
@@ -204,8 +205,6 @@ void destruir_proceso(void* proceso);
 
 
 
-
-
 // FUNCIONES PRIVADAS DE USO INTERNO
 /**
 * @NAME: get_proceso
@@ -267,7 +266,51 @@ t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modifica
  * @DES: devuelve un ptro donde esta serializada toda la data del HEAP.
  * 		 Se debe liberar el puntero devuelto
  * */
+
 void * serializar_HEAP(heap_metadata* nuevoHeapPrimero);
 
+
+/*
+ * @NAME: obtener_tabla_paginas_mediante_PID
+ * @DES: Informa la tabla de paginas del proceso asociado al PID
+ * */
+
+t_list* obtener_tabla_paginas_mediante_PID(uint32_t PID);
+
+/*
+ * @NAME: cantidad_de_frees_contiguos
+ * @DESC: retorna la cantidad de frees seguidos posbles para consolidar
+ * @RET: 1 - No hay que consolidar
+ * 		 2 o 3: hay para consolidar
+
+*/
+uint32_t cantidad_de_frees_contiguos(t_list* lista_heaps, uint32_t* indice);
+
+/**
+ * @NAME: calcular_seguidos
+ * @DESC: calcula la cantidad de frees seguidos
+*/
+
+uint32_t calcular_seguidos(t_list* lista, uint32_t indice);
+
+/**
+ * @NAME: modificar_heaps
+ * @DESC: hace efectivos los cambios de los heaps en memoria y elimina aquellos heaps que se liberaron
+*/
+void modificar_heaps(t_list* heaps, uint32_t indice, uint32_t pid, uint32_t cantidad);
+
+/**
+ * @NAME: el_ultimo_heap_libera_paginas
+ * @DESC: retorna si el ultimo heap es más grande que el tamaño de pagina
+*/
+bool el_ultimo_heap_libera_paginas(heap_metadata* ultimo_heap);
+
+
+/**
+ * @NAME: liberar_páginas
+ * @DESC: libera la cantidad de paginas que estan de mas en el proceos porque
+ * el último heap es mas gande que el restante dentro de una pagina
+*/
+void liberar_paginas(heap_metadata* ultimo_heap, t_list* tabla_paginas);
 
 #endif /* PAGINACION_PAGINACION_H_ */
