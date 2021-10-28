@@ -33,9 +33,20 @@ typedef enum {
 
 	// Ram => Filesystem
 	HANDSHAKE_R_F,
+	R_S_TRAER_PAGINA, // Mandamos pid_pedido y pag_pedida a traer a la RAM
+	R_S_ELIMINAR_PAGINA, // Mandamos pid y pag a eliminar en SWAP
+	R_S_LIBERAR_PROCESO, // Mandamos pid de proceso a eliminar
+	R_S_SWAP_PAG, //Mandamos pid y pag a guardar en SWAP y enviamos pid_pedido y pag_pedida a traer a la RAM
+	R_S_ESPACIO_PROCESO_NUEVO, //mandamos pid y size para consultar espacio para un proceso nuevo
+	R_S_ESPACIO_PROCESO_EXISTENTE, //idem arriba pero proceso ya existente
 
 	// Filesystem => Ram
 	HANDSHAKE_F_R,
+	S_R_MEMORIA_CONCEDIDA, // cant pag = 0(no concede) | 1 (concede) segun corresponda
+	S_R_ENTREGAR_PAG, // pid_pedido con la pag_pedida y la data asociada a la misma
+	S_R_ELIMINAR_PAG, // cant pag = 0(no concede) | 1 (concede) segun corresponda
+	S_R_LIBERAR_PROCESO, // cant pag = 0(no concede) | 1 (concede) segun corresponda
+	S_R_SWAP_PAG,
 
 	// Ram => Planificador
 	HANDSHAKE_R_P,
