@@ -130,25 +130,6 @@ void liberar_memoria(uint32_t PID, uint32_t ptro);
 void consolidar_memoria(uint32_t PID);
 
 /**
- * @NAME: leer_de_memoria
- * @DESC: Lectura de la data de un proceso de memoria
- * @PARAM:
- *   data: ptro donde se guardara la data leida de memoria
- * @RET:
- *   >0 tamanio del dato leido
- **/
-uint32_t leer_de_memoria(uint32_t PID, uint32_t ptroMem, void* data);
-
-/**
- * @NAME: entra_data
- * @DESC: Se fija si en el alloc apuntado puede entrar el tamanio del dato seleccionado
- * @RET:
- *    0 ptro permite el tamanio de la data
- *   -3 ptro no permite el tamanio de la data
- **/
-uint32_t entra_data(uint32_t PID, uint32_t ptroMem, uint32_t tamanioData);
-
-/**
  * @NAME: tamanio_de_direccion
  * @DESC: retorna el tamanio de una direccion, obtenido mediante el hmd
  */
@@ -160,12 +141,6 @@ uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t pid);
 * @RET:  frame * tam_pag + offset (si lo hay)
 */
 uint32_t traducir_a_dir_fisica(uint32_t PID,  uint32_t logica, uint32_t bitModificado);
-
-/**
- * @NAME: escribir_en_memoria
- * @DESC: Escribe en el ptro de un proceso los datos
- **/
-void escribir_en_memoria(int32_t PID, int32_t ptroLogicoMem, int32_t tamanioData, void* data);
 
 /**
  * @NAME: inicializar_estructuras_administrativas()
@@ -236,7 +211,7 @@ int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam);
  * @NAME: espacio_de_HEAP
  * @DES: Informa el espacio asociado al heap
  * */
-int espacio_de_HEAP(heap_metadata* heap);
+uint32_t espacio_de_HEAP(heap_metadata* heap);
 
 /*
  * @NAME: get_HEAP
@@ -283,6 +258,13 @@ t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modifica
  * 		 Se debe liberar el puntero devuelto
  * */
 void * serializar_HEAP(heap_metadata* nuevoHeapPrimero);
+
+/*
+ * @NAME: obtener_tabla_paginas_mediante_PID
+ * @DES: Informa la tabla de paginas del proceso asociado al PID
+ * */
+t_list* obtener_tabla_paginas_mediante_PID(uint32_t PID);
+
 
 
 #endif /* PAGINACION_PAGINACION_H_ */

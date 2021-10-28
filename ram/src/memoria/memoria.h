@@ -37,7 +37,7 @@ int32_t memalloc(uint32_t pid, uint32_t size);
  *   0, no hay error pipi
  */
 
-int32_t memfree(uint32_t direccionLogicaALiberar, uint32_t pid);
+int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid);
 
 /**
  * @NAME: memread
@@ -47,7 +47,7 @@ int32_t memfree(uint32_t direccionLogicaALiberar, uint32_t pid);
  **/
 
 
-void* memread(uint32_t direccionLogicaALeer, uint32_t pid, uint32_t size);
+int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t size, void* lectura);
 
 /**
  * @NAME: memwrite
@@ -59,7 +59,7 @@ void* memread(uint32_t direccionLogicaALeer, uint32_t pid, uint32_t size);
  **/
 
 
-int32_t memwrite(void* valorAEscribir, uint32_t direccionLogicaAEscribir, uint32_t pid, uint32_t size);
+int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir, uint32_t pid, uint32_t size);
 
 /*Funciones desarrolladas extras para correcto funcionamiento de la memoria*/
 

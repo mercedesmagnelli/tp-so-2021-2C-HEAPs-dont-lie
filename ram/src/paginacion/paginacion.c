@@ -238,15 +238,17 @@ int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam){
 
 	heap_metadata* heap = list_find(listaHMD,heap_tam_min);
 
+	ptro = heap->currAlloc + 9;
+
 	if(heap->nextAlloc==-1){
-		ptro = (-1)* (heap->currAlloc+9);
+		ptro = (-1)* ptro;
 	}
 
 	return ptro;
 
 }
 
-int espacio_de_HEAP(heap_metadata* heap){
+uint32_t espacio_de_HEAP(heap_metadata* heap){
 	return heap->nextAlloc - heap->currAlloc - 9;
 }
 
@@ -331,5 +333,10 @@ void* serializar_HEAP(heap_metadata* heap){//TODO revisar serializacion
 	memcpy(dataHEAP+4, &heap->nextAlloc,4);
 	memcpy(dataHEAP+8, &heap->isFree,1);
 	return dataHEAP;
+}
+
+t_list* obtener_tabla_paginas_mediante_PID(uint32_t PID){
+    t_proceso* proceso = get_proceso_PID(PID);
+    return proceso->tabla_paginas;
 }
 
