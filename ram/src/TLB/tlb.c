@@ -80,6 +80,8 @@ bool esta_en_tlb(uint32_t pid, uint32_t pag) {
 
 	bool condicion(void* entrada_i){
 		entrada_tlb* entrada = (entrada_tlb*) entrada_i;
+		//TODO: ver si esta bien este return o deberia ser:
+				//  strcmp(entrada->hash_key, key) == 0 ? 1: 0
 		return strcmp(key, entrada->hash_key);
 	}
 
@@ -93,18 +95,18 @@ void actualizar_datos_TLB(uint32_t PID, uint32_t nroPag){
 
 	bool buscar_key(void* entrada_i) {
 			entrada_tlb* entrada_a = (entrada_tlb*) entrada_i;
+
 			return strcmp(entrada_a->hash_key, key) == 0 ? 1: 0;
 	}
 
 		entrada_tlb* entrada_encontrada = (entrada_tlb*)list_find(TLB, buscar_key);
 
-		entrada_encontrada->timestamp = calcular_timestamp();
+		entrada_encontrada->timestamp = obtener_timestamp_actual();
 
 		free(key);
 
 
 }
-
 
 
 
@@ -123,8 +125,9 @@ double obtener_timestamp_actual(){
 	return a;
 }
 
-uint32_t obtener_frame_de_tlb(char* key){
+uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina){
 
+	char* key = calcular_hash_key(proceso, pagina);
 	bool buscar_key(void* entrada_i) {
 		entrada_tlb* entrada_a = (entrada_tlb*) entrada_i;
 		return strcmp(entrada_a->hash_key, key) == 0 ? 1: 0;
@@ -132,5 +135,6 @@ uint32_t obtener_frame_de_tlb(char* key){
 
 	entrada_tlb* entrada_encontrada = (entrada_tlb*)list_find(TLB, buscar_key);
 	return entrada_encontrada->frame;
+	free(key);
 }
 
