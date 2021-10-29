@@ -14,6 +14,7 @@
 #include "swaping.h"
 #include <stdlib.h>
 #include <string.h>
+#include <sys/param.h>
 
 t_list* listaProcesos;
 t_list* listaFrames;
@@ -50,7 +51,7 @@ typedef struct {
 typedef struct{
 	uint32_t bit_presencia;
 	uint32_t frame;
-	uint32_t timestamp;
+	double timestamp;
 	uint32_t bit_uso;
 	uint32_t bit_modificacion;
 }t_pagina;
@@ -332,5 +333,21 @@ uint32_t obtener_frame_de_RAM(uint32_t PID, uint32_t nroPag);
 * @DESC: calcula el tamanio del ultimo heap del proceso asociado al PID
 **/
 uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID);
+
+/**
+* @NAME: actualizar_cantidad_frames_por_proceso_RAM
+* @DESC: se encarga de mantener actualizado el valor de paginas en RAM
+**/
+void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant);
+
+/**
+ * @NAME: calcular_hash_key
+ * @DESC: calcula un hash que va a ser usado como key del diccionario de la TLB.
+ *
+ * @EXAMPLE: calcular_hash_key(1);
+ * 			 hash = "1"
+ *
+ **/
+char* calcular_hash_key_dic(uint32_t pid);
 
 #endif /* PAGINACION_PAGINACION_H_ */

@@ -62,6 +62,9 @@ uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina);
  **/
 void actualizar_datos_TLB(uint32_t PID, uint32_t nroPag);
 
+
+
+
 //	FUNCIONES PRIVADAS
 
 /**
