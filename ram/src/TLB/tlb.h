@@ -1,15 +1,18 @@
 #ifndef TLB_TLB_H_
 #define TLB_TLB_H_
 
-#include <commons/collections/dictionary.h>
+#include <commons/collections/list.h>
 #include <sys/time.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
+#include "../../src/configuracion/ram_config_guardada.h"
 
 #include "../../../shared/logger.h"
 
 
 typedef struct{
+	char* hash_key;
 	uint32_t frame;
 	double timestamp; //ver si es necesario, lo agrego por ahora porque no sé como vamos a hacer para seleccionar la entrada que vuela
 }entrada_tlb;
@@ -80,6 +83,10 @@ double obtener_timestamp_actual();
 
 void limpiar_tlb();
 
+
+uint32_t conseguir_victima_entrada_LRU() ;
+void eliminar_entrada(uint32_t indice_victima);
+uint32_t obtener_entrada_victima();
 
 #endif /* TLB_TLB_H_ */
 

@@ -1,22 +1,68 @@
 #include "tlb.h"
 
 
-t_dictionary* TLB;
+t_list* TLB;
+uint32_t max_entradas;
 
 void inicializar_tlb() {
-	TLB = dictionary_create();
-
-	loggear_debug("TLB creada exitosamente");
+	TLB = list_create();
+	max_entradas = get_cantidad_entradas_tlb();
+	loggear_debug("[RAM] - TLB creada exitosamente");
 }
 
 void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
-	char* key = calcular_hash_key(proceso, pagina);
 
 	entrada_tlb* entrada = malloc(sizeof(entrada_tlb));
 	entrada->timestamp = obtener_timestamp_actual();
 	entrada->frame = frame;
-	dictionary_put(TLB, key, entrada);
+	entrada->hash_key = calcular_hash_key(proceso, pagina);
+
+	if(max_entradas == list_size(TLB)) {
+		uint32_t indice_victima = obtener_entrada_victima();
+		eliminar_entrada(indice_victima);
+	}
+
+	list_add(TLB, entrada);
+}
+
+
+void eliminar_entrada(uint32_t indice_victima) {
+	void destructor_de_entradas(void* entrada) {
+		entrada_tlb* e_tlb = (entrada_tlb*) entrada;
+		free(e_tlb->hash_key);
+		free(e_tlb);
+	}
+
+	list_remove_and_destroy_element(TLB, indice_victima, destructor_de_entradas);
+
+}
+uint32_t obtener_entrada_victima() {
+	uint32_t victima;
+	if(get_algoritmo_reemplazo_tlb() == FIFO){
+		victima = 0;
+	}else {
+		victima =  conseguir_victima_entrada_LRU();
+	}
+	return victima;
+}
+
+uint32_t conseguir_victima_entrada_LRU() {
+
+	uint32_t ultimo_usado = 0;
+	entrada_tlb* entrada_anterior = (entrada_tlb*) list_get(TLB, 0);
+	for (int i = 0; i < list_size(TLB); i++){
+
+		entrada_tlb* entrada_actual = (entrada_tlb*) list_get(TLB,i);
+
+		if (entrada_actual->timestamp < entrada_anterior->timestamp) {
+			ultimo_usado = i;
+		}
+		entrada_anterior = entrada_actual;
+
+	}
+
+	return ultimo_usado;
 
 }
 
@@ -27,12 +73,15 @@ char* calcular_hash_key(uint32_t proceso, uint32_t pagina) {
 
 bool esta_en_tlb(uint32_t pid, uint32_t pag) {
 	char* key = calcular_hash_key(pid, pag);
-	return dictionary_has_key(TLB, key);
+
+	bool condicion(void* entrada_i){
+		entrada_tlb* entrada = (entrada_tlb*) entrada_i;
+		return strcmp(key, entrada->hash_key);
+	}
+
+	return list_any_satisfy(TLB, condicion);
 }
 
-void reemplazar_entrada_tlb(entrada_tlb* entrada, uint32_t indice) {
-	//TODO
-}
 
 double obtener_timestamp_actual(){
 
@@ -44,6 +93,12 @@ double obtener_timestamp_actual(){
 }
 
 uint32_t obtener_frame_de_tlb(char* key){
-	entrada_tlb* entrada = (entrada_tlb*)dictionary_get(TLB, key);
-	return entrada->frame ;
+
+	bool buscar_key(void* entrada_i) {
+		entrada_tlb* entrada_a = (entrada_tlb*) entrada_i;
+		return strcmp(entrada_a->hash_key, key) == 0 ? 1: 0;
+	}
+
+	entrada_tlb* entrada_encontrada = (entrada_tlb*)list_find(TLB, buscar_key);
+	return entrada_encontrada->frame;
 }
