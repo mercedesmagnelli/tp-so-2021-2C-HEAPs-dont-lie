@@ -56,6 +56,14 @@ typedef enum {
 
 	// Planificador => Ram
 	HANDSHAKE_P_R,
+	ALLOC_SUC_R_P,
+	ALLOC_ERR_R_P,
+	FREE_SUC_R_P,
+	FREE_ERR_R_P,
+	READ_ERR_R_P,
+	READ_SUC_R_P,
+	WRITE_SUC_R_P,
+	WRITE_ERR_R_P,
 
 	// Pruebas
 	CACHO_DE_TEXTO

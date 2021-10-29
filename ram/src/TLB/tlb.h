@@ -1,14 +1,17 @@
 #ifndef TLB_TLB_H_
 #define TLB_TLB_H_
 
-#include <commons/collections/dictionary.h>
+#include <commons/collections/list.h>
 #include <sys/time.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
+#include "../../src/configuracion/ram_config_guardada.h"
 
 #include "../../../shared/logger.h"
 
 typedef struct{
+	char* hash_key;
 	uint32_t frame;
 	double timestamp; //ver si es necesario, lo agrego por ahora porque no sé como vamos a hacer para seleccionar la entrada que vuela
 }entrada_tlb;
@@ -85,8 +88,28 @@ void reemplazar_entrada_tlb(entrada_tlb* entradaNueva, uint32_t indice);
  **/
 double obtener_timestamp_actual();
 
+/**
+ * @NAME: conseguir_victima_entrada_LRU
+ * @DESC: Encuentra el índice de la entrada que fue la que hace mas tiempo
+ * permanece igual
+*/
 
+uint32_t conseguir_victima_entrada_LRU();
 
+/**
+ * @NAME: elimina_entrada
+ * @DESC: se elimina una entrada en un índice
+ */
+
+void eliminar_entrada(uint32_t indice_victima);
+
+/**
+ * @NAME: obtener_entrada_victima
+ * @DESC: retorna el indice de la entrada a eliminar. Llama a, si es necesario, a
+ * una funcion de calculo de victima
+ */
+
+uint32_t obtener_entrada_victima();
 
 #endif /* TLB_TLB_H_ */
 
