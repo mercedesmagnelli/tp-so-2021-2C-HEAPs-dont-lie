@@ -173,8 +173,8 @@ uint32_t traducir_a_dir_fisica(uint32_t PID, uint32_t ptroHEAP, uint32_t bitModi
 	heap_metadata* heap = get_HEAP(PID, ptroHEAP);
 	int nroPag = heap->currAlloc / get_tamanio_pagina();
 	int offset = heap->currAlloc % get_tamanio_pagina();
-	t_pagina* pag = obtener_pagina_de_memoria(PID, nroPag, bitModificado);
-	uint32_t ptroEscritura = pag->frame * get_tamanio_pagina() + offset;
+	uint32_t framePag = obtener_marco_de_pagina_en_memoria(PID, nroPag, bitModificado);
+	uint32_t ptroEscritura = framePag * get_tamanio_pagina() + offset;
 	return ptroEscritura;
 }
 
@@ -422,11 +422,11 @@ void guardar_HEAP_en_memoria(uint32_t PID, heap_metadata* heap){
 
 void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* data, int tamDato){
 	int desplazamientoEnDato = 0;
-	t_pagina* pag;
+	uint32_t marcoPag;
 	int ptro_escritura;
 	while(tamDato>0){
-		pag = obtener_pagina_de_memoria(PID, nroPag, 1);
-		ptro_escritura = pag->frame * get_tamanio_pagina() + offset;
+		marcoPag = obtener_marco_de_pagina_en_memoria(PID, nroPag, 1);
+		ptro_escritura = marcoPag * get_tamanio_pagina() + offset;
 		if((offset+tamDato) <= get_tamanio_pagina()){
 			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
 			tamDato=0;
@@ -440,14 +440,21 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 	}
 }
 
-t_pagina* obtener_pagina_de_memoria(uint32_t PID, int nroPag, uint32_t bit_modificado){
-	//se fija si esta en la TLB
-	// 		- si está: actualiza datos de entrada TLB (timestamp) y los datos de la pagina (timestamp/ bit_uso, bit_modificacion )
-	//		- no está: va a buscar a la RAM
-	//					- SI está: agrega entrada a la TLB y actualizo datos de pagina (timestamp/ bit_uso, bit_modificacion)
-	//					- NO está: traigo la PAG de SWAP (segun asignacion), agrego entrada a la TLB y actualizo datos de pagina (timestamp/ bit_uso, bit_modificacion)
-	t_pagina* a = NULL;
-	return a;
+uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t bitModificado){
+	uint32_t marco;
+	if(esta_en_tlb(PID, nroPag)){
+		actualizar_datos_TLB(PID, nroPag);
+		marco = obtener_frame_de_tlb(PID, nroPag);
+	}else{
+		if(esta_en_RAM(PID, nroPag)){
+			marco = obtener_frame_de_RAM(PID, nroPag);
+		}else{
+			marco = traer_pagina_de_SWAP(PID, nroPag);
+		}
+		agregar_entrada_tlb(PID, nroPag, marco);
+	}
+	actualizar_datos_pagina(PID, nroPag, marco, bitModificado);
+	return marco;
 }
 
 void* serializar_HEAP(heap_metadata* heap){//TODO revisar serializacion
@@ -458,5 +465,14 @@ void* serializar_HEAP(heap_metadata* heap){//TODO revisar serializacion
 	return dataHEAP;
 }
 
+bool esta_en_RAM(uint32_t PID, uint32_t nroPag){
+	return true;
+}
 
+uint32_t obtener_frame_de_RAM(uint32_t PID, uint32_t nroPag){
+	return 1;
+}
 
+void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado){
+
+}

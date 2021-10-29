@@ -3,10 +3,19 @@
 
 t_dictionary* TLB;
 
+
+
+
+//	FUNCIONES PUBLICAS
+
 void inicializar_tlb() {
 	TLB = dictionary_create();
 
 	loggear_debug("TLB creada exitosamente");
+}
+
+void limpiar_tlb(){
+
 }
 
 void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
@@ -20,14 +29,28 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
 }
 
-char* calcular_hash_key(uint32_t proceso, uint32_t pagina) {
-	char** key = string_from_format("%d-%d",proceso, pagina);
-	return *key;
-}
-
 bool esta_en_tlb(uint32_t pid, uint32_t pag) {
 	char* key = calcular_hash_key(pid, pag);
 	return dictionary_has_key(TLB, key);
+}
+
+uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina){
+	char* key = calcular_hash_key(proceso, pagina);
+	entrada_tlb* entrada = (entrada_tlb*)dictionary_get(TLB, key);
+	return entrada->frame ;
+}
+
+void actualizar_datos_TLB(uint32_t PID, uint32_t nroPag){
+
+}
+
+
+
+
+// FUNCIONES PRIVADAS
+char* calcular_hash_key(uint32_t proceso, uint32_t pagina) {
+	char** key = string_from_format("%d-%d",proceso, pagina);
+	return *key;
 }
 
 void reemplazar_entrada_tlb(entrada_tlb* entrada, uint32_t indice) {
@@ -41,9 +64,4 @@ double obtener_timestamp_actual(){
 	unsigned long long result = (((unsigned long long)tv.tv_sec) * 1000 + ((unsigned long long)tv.tv_usec) / 1000);
 	double a = result;
 	return a;
-}
-
-uint32_t obtener_frame_de_tlb(char* key){
-	entrada_tlb* entrada = (entrada_tlb*)dictionary_get(TLB, key);
-	return entrada->frame ;
 }

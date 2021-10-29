@@ -9,7 +9,9 @@
 #include "../../src/configuracion/ram_config_guardada.h"
 #include "../../src/memoria/memoria.h"
 #include "../../src/configuracion/ram_config_guardada.h"
+#include "../../src/TLB/tlb.h"
 #include "../../../shared/logger.h"
+#include "swaping.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -250,7 +252,7 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
  * @DES: se fija si la pagina esta en memoria RAM (se usa TLB), en caso de no ser asi la trae del SWAP. Actualiza TLB y Pag para algoritmo de reemplazo
  * 		 Luego devuelvo la pagina en cuestion
  * */
-t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modificado);
+uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int pag, uint32_t bit_modificado);
 
 /*
  * @NAME: serializar_HEAP
@@ -303,12 +305,29 @@ void modificar_heaps(t_list* heaps, uint32_t indice, uint32_t pid, uint32_t cant
 */
 bool el_ultimo_heap_libera_paginas(heap_metadata* ultimo_heap);
 
-
 /**
  * @NAME: liberar_páginas
  * @DESC: libera la cantidad de paginas que estan de mas en el proceos porque
  * el último heap es mas gande que el restante dentro de una pagina
 */
 void liberar_paginas(heap_metadata* ultimo_heap, t_list* tabla_paginas);
+
+/**
+* @NAME: actualizar_datos_pagina
+* @DESC: actualiza los datos de la pagina tras su uso
+**/
+void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado);
+
+/**
+* @NAME: esta_en_RAM
+* @DESC: Avisa si la pagina del proceso con el PID asociado esta en la RAM
+**/
+bool esta_en_RAM(uint32_t PID, uint32_t nroPag);
+
+/**
+* @NAME: obtener_frame_de_RAM
+* @DESC: retorna el frame de la pagina del proceso con el PID asociado
+**/
+uint32_t obtener_frame_de_RAM(uint32_t PID, uint32_t nroPag);
 
 #endif /* PAGINACION_PAGINACION_H_ */
