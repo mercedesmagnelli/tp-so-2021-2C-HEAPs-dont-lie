@@ -4,10 +4,19 @@
 t_list* TLB;
 uint32_t max_entradas;
 
+
+
+
+//	FUNCIONES PUBLICAS
+
 void inicializar_tlb() {
 	TLB = list_create();
 	max_entradas = get_cantidad_entradas_tlb();
 	loggear_debug("[RAM] - TLB creada exitosamente");
+}
+
+void limpiar_tlb(){
+
 }
 
 void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
@@ -66,11 +75,6 @@ uint32_t conseguir_victima_entrada_LRU() {
 
 }
 
-char* calcular_hash_key(uint32_t proceso, uint32_t pagina) {
-	char** key = string_from_format("%d-%d",proceso, pagina);
-	return *key;
-}
-
 bool esta_en_tlb(uint32_t pid, uint32_t pag) {
 	char* key = calcular_hash_key(pid, pag);
 
@@ -82,6 +86,33 @@ bool esta_en_tlb(uint32_t pid, uint32_t pag) {
 	return list_any_satisfy(TLB, condicion);
 }
 
+void actualizar_datos_TLB(uint32_t PID, uint32_t nroPag){
+
+
+	char* key = calcular_hash_key(PID, nroPag);
+
+	bool buscar_key(void* entrada_i) {
+			entrada_tlb* entrada_a = (entrada_tlb*) entrada_i;
+			return strcmp(entrada_a->hash_key, key) == 0 ? 1: 0;
+	}
+
+		entrada_tlb* entrada_encontrada = (entrada_tlb*)list_find(TLB, buscar_key);
+
+		entrada_encontrada->timestamp = calcular_timestamp();
+
+		free(key);
+
+
+}
+
+
+
+
+// FUNCIONES PRIVADAS
+char* calcular_hash_key(uint32_t proceso, uint32_t pagina) {
+	char** key = string_from_format("%d-%d",proceso, pagina);
+	return *key;
+}
 
 double obtener_timestamp_actual(){
 
@@ -102,3 +133,4 @@ uint32_t obtener_frame_de_tlb(char* key){
 	entrada_tlb* entrada_encontrada = (entrada_tlb*)list_find(TLB, buscar_key);
 	return entrada_encontrada->frame;
 }
+
