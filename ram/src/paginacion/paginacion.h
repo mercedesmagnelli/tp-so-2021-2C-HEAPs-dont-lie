@@ -203,13 +203,6 @@ void destruir_proceso(void* proceso);
 t_proceso* get_proceso_PID(uint32_t PID);
 
 /*
- * @NAME: get_ptro_con_tam_min
- * @DES: busca el metadata en el cual entra el dato de tamaño solicitado
- * @RET: devuelve el metadata que puede contenerlo; caso que ninguno pueda: devuelve el ultimo HEAP
- * */
-int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam);
-
-/*
  * @NAME: espacio_de_HEAP
  * @DES: Informa el espacio asociado al heap
  * */
@@ -268,8 +261,6 @@ void * serializar_HEAP(heap_metadata* nuevoHeapPrimero);
  * */
 t_list* obtener_tabla_paginas_mediante_PID(uint32_t PID);
 
-
-
 /*
  * @NAME: obtener_tabla_paginas_mediante_PID
  * @DES: Informa la tabla de paginas del proceso asociado al PID
@@ -314,9 +305,15 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tabla_paginas);
 
 /**
 * @NAME: actualizar_datos_pagina
-* @DESC: actualiza los datos de la pagina tras su uso
+* @DESC: actualiza los datos administrativos de la pagina tras su uso
 **/
-void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado);
+void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModificado, uint32_t bitTLB);
+
+/**
+* @NAME: inicializar_datos_pagina
+* @DESC: inicializa los datos administrativos de la pagina traido a memoria
+**/
+void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado);
 
 /**
 * @NAME: esta_en_RAM
@@ -329,5 +326,11 @@ bool esta_en_RAM(uint32_t PID, uint32_t nroPag);
 * @DESC: retorna el frame de la pagina del proceso con el PID asociado
 **/
 uint32_t obtener_frame_de_RAM(uint32_t PID, uint32_t nroPag);
+
+/**
+* @NAME: calcular_tamanio_ultimo_HEAP
+* @DESC: calcula el tamanio del ultimo heap del proceso asociado al PID
+**/
+uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID);
 
 #endif /* PAGINACION_PAGINACION_H_ */

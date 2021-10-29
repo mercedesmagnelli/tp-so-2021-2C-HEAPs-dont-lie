@@ -7,6 +7,11 @@
 void inicializar_estructuras_administrativas() {
     listaProcesos = list_create();
     listaFrames = list_create();
+    for(int i=0;i<get_tamanio_pagina();i++){
+    	t_frame* frame = malloc(sizeof(t_frame));
+    	frame->estado=0;
+    	list_add(listaFrames, frame);
+    }
     cant_frames_por_proceso = dictionary_create();
 
 }
@@ -41,7 +46,32 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
 	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
 
-	return get_ptro_con_tam_min(listaHMD, tam);
+	int32_t ptro;
+
+	bool heap_tam_min(void* element){
+		bool rta;
+		heap_metadata* heap = (heap_metadata*) element;
+		if(heap->nextAlloc==-1){
+			rta = true;
+		}else{
+			if(espacio_de_HEAP(heap)>= tam+9){
+				rta = true;
+			}else{
+				rta = false;
+			}
+		}
+		return rta;
+	}
+
+	heap_metadata* heap = list_find(listaHMD,heap_tam_min);
+
+	ptro = heap->currAlloc + 9;
+
+	if(heap->nextAlloc==-1 && calcular_tamanio_ultimo_HEAP(PID)<tam){
+		ptro = (-1)* ptro;
+	}
+
+	return ptro;
 
 }
 
@@ -340,36 +370,6 @@ t_proceso* get_proceso_PID(uint32_t PID){
 
 }
 
-int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam){
-
-	int32_t ptro;
-
-	bool heap_tam_min(void* element){
-		bool rta;
-		heap_metadata* heap = (heap_metadata*) element;
-		if(heap->nextAlloc==-1){
-			rta = true;
-		}else{
-			if(espacio_de_HEAP(heap)>= tam+9){
-				rta = true;
-			}else{
-				rta = false;
-			}
-		}
-		return rta;
-	}
-
-	heap_metadata* heap = list_find(listaHMD,heap_tam_min);
-
-	ptro = heap->currAlloc + 9;
-
-	if(heap->nextAlloc==-1){
-		ptro = (-1)* ptro;
-	}
-
-	return ptro;
-
-}
 
 uint32_t espacio_de_HEAP(heap_metadata* heap){
 	return heap->nextAlloc - heap->currAlloc - 9;
@@ -445,15 +445,17 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 	if(esta_en_tlb(PID, nroPag)){
 		actualizar_datos_TLB(PID, nroPag);
 		marco = obtener_frame_de_tlb(PID, nroPag);
+		actualizar_datos_pagina(PID, nroPag, bitModificado, 1);
 	}else{
 		if(esta_en_RAM(PID, nroPag)){
 			marco = obtener_frame_de_RAM(PID, nroPag);
+			actualizar_datos_pagina(PID, nroPag, bitModificado, 0);//podriamos poner esta funcion dentro de obtener fram asi tmbn se encarga de modificar lo administrativo dsps del cambio de pags?
 		}else{
 			marco = traer_pagina_de_SWAP(PID, nroPag);
+			inicializar_datos_pagina(PID, nroPag, marco, bitModificado);
 		}
 		agregar_entrada_tlb(PID, nroPag, marco);
 	}
-	actualizar_datos_pagina(PID, nroPag, marco, bitModificado);
 	return marco;
 }
 
@@ -466,13 +468,60 @@ void* serializar_HEAP(heap_metadata* heap){//TODO revisar serializacion
 }
 
 bool esta_en_RAM(uint32_t PID, uint32_t nroPag){
-	return true;
+
+	bool frame_contiene_pagina(void* element){
+		t_frame* frame = (t_frame*) element;
+		return frame->estado==1 && frame->proceso==PID && frame->pagina==nroPag;
+	}
+
+	return list_any_satisfy(listaFrames, frame_contiene_pagina);
 }
 
 uint32_t obtener_frame_de_RAM(uint32_t PID, uint32_t nroPag){
-	return 1;
+
+	int contadorPosicion = 0;
+	int* ptroContador = &contadorPosicion;
+
+	bool frame_contiene_pagina(void* element){
+		t_frame* frame = (t_frame*) element;
+		(*ptroContador)++;
+		return frame->estado==1 && frame->proceso==PID && frame->pagina==nroPag;
+	}
+
+	list_find(listaFrames, frame_contiene_pagina);
+
+	return contadorPosicion;
 }
 
-void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado){
+void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModificado, uint32_t bitTLB){
+	t_proceso* proceso = get_proceso_PID(PID);
+	if(bitTLB){
+		proceso->hits_proceso++;
+	}else{
+		proceso->miss_proceso++;
+	}
+	t_pagina* pag = list_get(proceso->tabla_paginas, nroPag);
+	pag->timestamp;
+	pag->bit_uso = 1;
+	if(bitModificado){
+		pag->bit_modificacion = bitModificado;
+	}
+}
 
+void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado){
+	t_proceso* proceso = get_proceso_PID(PID);
+	proceso->miss_proceso++;
+	t_pagina* pag = list_get(proceso->tabla_paginas, nroPag);
+	pag->frame = marco;
+	pag->timestamp;
+	pag->bit_uso = 1;
+	pag->bit_modificacion = bitModificado;
+}
+
+uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
+	t_proceso* proceso = get_proceso_PID(PID);
+	int tamanioProceso = list_size(proceso->tabla_paginas) * get_tamanio_pagina();
+	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
+	heap_metadata* ultimoHeap = list_get(listaHMD, list_size(listaHMD));
+	return tamanioProceso - ultimoHeap->currAlloc;
 }
