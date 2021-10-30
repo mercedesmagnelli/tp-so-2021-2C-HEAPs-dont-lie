@@ -20,6 +20,12 @@ typedef enum {
 	ESTADO_SUSPENDED_READY
 } t_estado_hilo;
 
+typedef enum {
+	NINGUNO,
+	SEMAFORO,
+	IO
+} t_dispositivo_bloqueante;
+
 
 // Contiene la informacion necesaria para mover un proceso como un hilo entre las colas
 typedef struct {
@@ -36,6 +42,9 @@ typedef struct {
     float timestamp_tiempo_exec; // 0 la primera vez
 
     t_timestamp timestamp_entrar_ready;
+
+    t_dispositivo_bloqueante bloqueante;
+    char * nombre_bloqueante;
 } t_hilo;
 
 /**

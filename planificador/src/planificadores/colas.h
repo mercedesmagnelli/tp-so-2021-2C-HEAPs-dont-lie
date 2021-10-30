@@ -120,4 +120,18 @@ bool deberia_suspenderse_procesos();
  */
 bool hay_procesos_en_suspendido_ready();
 
+/**
+ * @NAME: colas_desbloquear_1_hilo
+ * @DESC: Primero revisa la lista de bloqueados si hay algun hilo bloqueado para desbloquear, lo mueve a ready y retorna.
+ * SI no encuentra en bloqueados, revisa la lista de SUSPENDIDO-BLOQUEADO, lo mueve a SUSPENDIDO-LISTO y retorna;
+ * SI no encuentra ninguno, retorna NULL;
+ */
+t_hilo * colas_desbloquear_1_hilo(t_dispositivo_bloqueante dispositivo_bloqueante, char * semaforo_nombre);
+
+/**
+ * @NAME: colas_desbloquear_todos_hilos
+ * @DESC: Recorre las listas de BLOQUEADO y SUSPENDIDO-BLOQUEADO y mueve los hilos a donde corresponda
+ */
+void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloqueante, char * semaforo_nombre);
+
 #endif

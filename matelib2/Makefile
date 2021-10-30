@@ -19,7 +19,7 @@ run: build-example
 	LD_LIBRARY_PATH="../lib_implementation/" ./example
 
 test:
-	export LD_LIBRARY_PATH="../lib_implementation/";\
+	LD_LIBRARY_PATH="../lib_implementation/";\
 	echo $$LD_LIBRARY_PATH
 
 clean:
