@@ -1,23 +1,26 @@
 
 #include "planificadores.h"
 
-// CERRADO, falta apagar el hilo
 void planificador_largo_plazo() {
 	loggear_debug("[SYSTEM] --- Se creo el planificador de largo plazo");
 
-	// TODO: Cambiar while true, para que se detenga cuando corresponda
 	while (true) {
 		hilos_wait_new();
 		hilos_wait_multiprogramacion();
 
-		t_hilo * hilo = colas_mover_new_ready();
-		loggear_debug("[PID: %d] --- [Largo Plazo] --- Se movió de NEW a READY", pid(hilo));
+		t_hilo * hilo;
+		if (hay_procesos_en_suspendido_ready()) {
+			hilo = colas_mover_block_ready_ready();
+			loggear_debug("[PID: %d] --- [Mediano Plazo] --- Se movió de SUSP-READY a READY", pid(hilo));
+		} else {
+			hilo = colas_mover_new_ready();
+			loggear_debug("[PID: %d] --- [Largo Plazo] --- Se movió de NEW a READY", pid(hilo));
+		}
 
 		hilos_post_ready();
 	}
 }
 
-// CERRADO, falta modificar el archivo de colas para que pueda seleccionar bien que hilo mover de READY => EXEC
 void planificador_corto_plazo() {
 	loggear_debug("[SYSTEM] --- Se creo el planificador de corto plazo");
 
@@ -32,6 +35,28 @@ void planificador_corto_plazo() {
 	}
 }
 
+void planificador_medio_plazo() {
+	loggear_debug("[SYSTEM] --- Se creo el planificador de mediano plazo");
+
+	while (true) {
+		hilos_wait_nuevo_bloqueado();
+
+		hilos_post_multitarea();
+
+		bool multiprogramacion_copada = deberia_suspenderse_procesos();
+
+		if (multiprogramacion_copada) {
+			t_hilo * hilo = colas_mover_block_block_susp();
+
+			loggear_debug("[PID: %d] --- [Mediano Plazo] --- Se movió de BLOCK a SUSP-BLOCK", pid(hilo));
+
+			hilos_post_multiprogramacion();
+
+			loggear_error("[PID: %d] --- [Mediano Plazo] --- TODO: Avisar a la RAM de la suspension", pid(hilo));
+		}
+	}
+}
+
 int planificadores_iniciar() {
 	colas_iniciar();
 	hilos_planificador_iniciar();
@@ -40,6 +65,7 @@ int planificadores_iniciar() {
 
 	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_largo_plazo, NULL);
 	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_corto_plazo, NULL);
+	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_medio_plazo, NULL);
 
     return error;
 }

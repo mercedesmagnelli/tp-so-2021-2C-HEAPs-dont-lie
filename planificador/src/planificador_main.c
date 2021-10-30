@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 
 
 	//levantar_consola();
-	sleep(20);
+	sleep(30);
 	cerrar_todo();
 	return EXIT_SUCCESS;
 }

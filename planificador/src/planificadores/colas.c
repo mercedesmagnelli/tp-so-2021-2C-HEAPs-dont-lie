@@ -161,10 +161,10 @@ t_hilo * colas_mover_exec_block(t_hilo * hilo_mover) {
 	hilo->timestamp_tiempo_exec = estructuras_timestamp_diff(hilo->timestamp_entrar_exec, hilo->timestamp_salir_exec);
 
 	pthread_mutex_lock(&mutex_blocked_list);
-	list_add(blocked_list, 0);
+	list_add(blocked_list, hilo);
 	pthread_mutex_unlock(&mutex_blocked_list);
 
-	// TODO: Llamar funcion para consultar si hay que moverlo a bloqueado-suspendido
+	hilos_post_nuevo_bloqueado();
 
     return hilo;
 }
@@ -186,7 +186,6 @@ t_hilo * colas_mover_block_ready(t_hilo * hilo_mover) {
 }
 
 t_hilo * colas_mover_block_block_susp() {
-	// TODO: Armar criterio de busqueda
 	pthread_mutex_lock(&mutex_blocked_list);
 	int ultimo_bloqueado_pos = list_size(blocked_list);
 	t_hilo * hilo = list_remove(blocked_list, ultimo_bloqueado_pos - 1);
@@ -213,6 +212,8 @@ t_hilo * colas_mover_block_susp_block_ready(t_hilo * hilo_mover) {
 	queue_push(suspended_ready_queue, hilo);
 	pthread_mutex_unlock(&mutex_suspended_ready_queue);
 
+	hilos_post_new();
+
     return hilo;
 }
 
@@ -231,4 +232,36 @@ t_hilo * colas_mover_block_ready_ready() {
 	return hilo;
 }
 
+
+bool deberia_suspenderse_procesos() {
+	pthread_mutex_lock(&mutex_suspended_blocked_list);
+	bool hay_procesos_bloqueados = list_size(blocked_list) > 0;
+	pthread_mutex_unlock(&mutex_suspended_blocked_list);
+
+	if (hay_procesos_bloqueados) {
+		pthread_mutex_lock(&mutex_ready_list);
+		bool no_hay_procesos_ready = list_size(ready_list) == 0;
+		pthread_mutex_unlock(&mutex_ready_list);
+
+		if (no_hay_procesos_ready) {
+			pthread_mutex_lock(&mutex_new_queue);
+			bool hay_procesos_new = queue_size(new_queue) > 0;
+			pthread_mutex_unlock(&mutex_new_queue);
+
+			if (hay_procesos_new) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool hay_procesos_en_suspendido_ready() {
+	pthread_mutex_lock(&mutex_suspended_ready_queue);
+	bool hay_procesos = queue_size(suspended_ready_queue) > 0;
+	pthread_mutex_unlock(&mutex_suspended_ready_queue);
+
+	return hay_procesos;
+}
 

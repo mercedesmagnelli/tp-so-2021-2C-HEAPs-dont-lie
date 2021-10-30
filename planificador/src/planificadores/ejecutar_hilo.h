@@ -12,6 +12,8 @@
 
 #include "../../../shared/logger.h"
 
+#include "colas.h" // TODO: DElete
+
 /**
  * @NAME: ejecutar_hilo_iniciar_ejecucion
  * @DESC: Se crea un pthread para ejecutar el hilo que entro en EJECUCION
