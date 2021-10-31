@@ -10,6 +10,7 @@
 #include "configuracion/configuracion.h"	// Carga del archivo de configuracion
 
 #include "conexion_ram/conexion_ram.h"		// Conexión entre Planificador y Ram
+#include "conexion_lib/conexion_lib.h"		// Conexión entre Planificador y Lib
 
 #include "../../shared/logger.h"			// Mutex para escribir en consola y en archivo de log
 #include "../../shared/conexion.h"			// Crear y conectarse a servidor

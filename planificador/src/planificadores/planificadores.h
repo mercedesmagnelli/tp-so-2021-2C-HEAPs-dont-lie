@@ -8,6 +8,8 @@
 #include "colas.h"
 #include "estructuras.h"
 #include "hilos_planificador.h"
+#include "semaforo.h"
+#include "dispositivo_io.h"
 
 #include "../../../shared/logger.h"
 

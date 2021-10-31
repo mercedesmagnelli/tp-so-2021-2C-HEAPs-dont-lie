@@ -60,6 +60,8 @@ void planificador_medio_plazo() {
 int planificadores_iniciar() {
 	colas_iniciar();
 	hilos_planificador_iniciar();
+	semaforo_estructuras_crear();
+	dispositivo_io_estructuras_crear();
 
 	int error = 0;
 
@@ -73,6 +75,8 @@ int planificadores_iniciar() {
 void planificadores_destruir() {
 	colas_destruir();
 	hilos_planificador_destruir();
+	semaforo_estructuras_destruir();
+	dispositivo_io_estructuras_destruir();
 }
 
 // CERRADO
