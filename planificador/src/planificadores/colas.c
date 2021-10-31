@@ -152,13 +152,15 @@ t_hilo * colas_mover_exec_finish(t_hilo * hilo_mover) {
     return hilo;
 }
 
-t_hilo * colas_mover_exec_block(t_hilo * hilo_mover) {
-	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
+t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante, char * nombre_bloqueante, uint32_t pid) {
+	bool son_iguales(void * hilo2) { return pid == ((t_hilo *) hilo2)->pid; }
 	pthread_mutex_lock(&mutex_exec_list);
 	t_hilo * hilo = list_remove_by_condition(exec_list, son_iguales);
 	pthread_mutex_unlock(&mutex_exec_list);
 
 	hilo->estado = ESTADO_BLOCK;
+	hilo->bloqueante = dispositivo_bloqueante;
+	hilo->nombre_bloqueante = nombre_bloqueante;
 	hilo->timestamp_salir_exec = estructuras_current_timestamp();
 	hilo->timestamp_tiempo_exec = estructuras_timestamp_diff(hilo->timestamp_entrar_exec, hilo->timestamp_salir_exec);
 
@@ -315,17 +317,6 @@ void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloquean
 
 		return dispositivo_bloqueante == hilo_comparar->bloqueante && dispositivo_nombre == hilo_comparar->nombre_bloqueante;
 	}
-
-	int en_bloqueado;
-	int en_suspendido;
-
-	pthread_mutex_lock(&mutex_blocked_list);
-	en_bloqueado = list_count_satisfying(blocked_list, esta_bloqueado);
-	pthread_mutex_unlock(&mutex_blocked_list);
-
-	pthread_mutex_lock(&mutex_suspended_blocked_list);
-	en_suspendido = list_count_satisfying(suspended_blocked_list, esta_bloqueado);
-	pthread_mutex_unlock(&mutex_suspended_blocked_list);
 
 	t_hilo * hilo_mover = NULL;
 	while (hilo_mover == NULL) {

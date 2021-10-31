@@ -6,14 +6,21 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdlib.h>
+#include <stdint.h>
 
+#include <commons/string.h>
+#include <commons/collections/dictionary.h>
 #include <commons/collections/list.h>
 
 #include "../configuracion/configuracion_guardada.h"
 
-/**
- * Se encarga de la gestion de los hilos del planificador
- */
+typedef struct {
+	sem_t sem_ejecutar;
+	sem_t sem_finalizo;
+
+	void * mensaje;
+} t_hilos_semaforo;
+
 
 /**
  * @NAME: hilos_planificador_iniciar
@@ -32,6 +39,25 @@ void hilos_planificador_destruir();
  * @DESC: Crea un hilo nuevo y lo añade a un listado de hilos, para poder limpiarlos todos juntos de ser necesario
  */
 pthread_t * hilos_crear_hilo();
+
+
+/**
+ * @NAME: hilos_agregar_nuevo_hilo
+ * @DESC: Crea una estructura para manejar los mensajes entre protocolo y la ejecucion
+ */
+void hilos_agregar_nuevo_hilo(uint32_t pid);
+
+/**
+ * @NAME: hilos_post_ejecucion
+ * @DESC: Hace un post en el semaforo del hilo para avisar que esta en ejecucion
+ */
+void hilos_post_ejecucion(uint32_t pid);
+
+/**
+ * @NAME: hilos_wait_ejecucion
+ * @DESC: HAce un wait en el semaforo del hilo para esperar que entre en ejecucion
+ */
+void hilos_wait_ejecucion(uint32_t pid);
 
 /**
  * @NAME: hilos_destruir_hilo_actual

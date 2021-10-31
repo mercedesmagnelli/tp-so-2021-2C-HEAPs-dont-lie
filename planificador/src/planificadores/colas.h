@@ -69,8 +69,7 @@ t_hilo * colas_mover_exec_finish(t_hilo * hilo);
  * @NAME: colas_mover_exec_blocked
  * @DESC: Recibe un hilo y lo mueve de EXEC a BLOCKED
  * */
-// TODO: Llamar funcion para consultar si hay que moverlo a bloqueado-suspendido
-t_hilo * colas_mover_exec_block(t_hilo * hilo_mover);
+t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante, char * nombre_bloqueante, uint32_t pid);
 
 /**
  * @NAME: colas_mover_block_ready

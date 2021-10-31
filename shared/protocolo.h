@@ -46,6 +46,10 @@ typedef enum {
 	// Planificador => Ram
 	HANDSHAKE_P_R,
 
+	// Mensajes genericos
+	EXITO_EN_LA_TAREA,
+	FALLO_EN_LA_TAREA,
+
 	// Pruebas
 	CACHO_DE_TEXTO
 

@@ -31,7 +31,7 @@ void planificador_corto_plazo() {
 		t_hilo * hilo = colas_mover_ready_exec();
 		loggear_debug("[PID: %d] --- [Corto Plazo] --- Se movió de READY a EXEC", pid(hilo));
 
-		ejecutar_hilo_iniciar_ejecucion(hilo);
+		hilos_post_ejecucion(hilo->pid); // Avisa que se encuentra en EXEC
 	}
 }
 
@@ -80,6 +80,7 @@ int planificadores_proceso_iniciar(uint32_t ppid) {
 	loggear_debug("[SYSTEM] --- Llego un nuevo proceso al planificador");
 
 	t_hilo * hilo = colas_insertar_new(ppid);
+	hilos_agregar_nuevo_hilo(ppid);
 	hilos_post_new();
 
 	loggear_debug("[PID: %d] --- [SYSTEM] --- Se movió a NEW", pid(hilo));

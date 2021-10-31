@@ -3,6 +3,9 @@
 
 #include <commons/collections/dictionary.h>
 
+#include "colas.h"
+
+#include "../../../shared/estructura_compartida.h"
 #include "../../../shared/logger.h"
 
 typedef struct {

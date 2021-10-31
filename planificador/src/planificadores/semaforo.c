@@ -74,6 +74,8 @@ t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
 
 	semaforo->valor++;
 
+	colas_desbloquear_1_hilo(SEMAFORO, semaforo->nombre);
+
 	return SEM_OK;
 }
 
@@ -83,7 +85,9 @@ t_estado_ejecucion semaforo_destruir(t_matelib_semaforo * sem) {
 		return SEM_ERROR_NO_EXISTE;
 	}
 
-	dictionary_remove_and_destroy(semaforos, sem->semaforo_nombre);
+	colas_desbloquear_todos_hilos(SEMAFORO, sem->semaforo_nombre);
+
+	dictionary_remove_and_destroy(semaforos, sem->semaforo_nombre, free);
 
     return SEM_OK;
 }
