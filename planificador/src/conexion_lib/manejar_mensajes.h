@@ -4,6 +4,10 @@
 
 #include <string.h>
 
+#include "../planificadores/planificadores.h"
+#include "../planificadores/semaforo.h"
+#include "../planificadores/dispositivo_io.h"
+
 #include "../../../shared/logger.h"
 #include "../../../shared/protocolo.h"
 #include "../../../shared/codigo_error.h"

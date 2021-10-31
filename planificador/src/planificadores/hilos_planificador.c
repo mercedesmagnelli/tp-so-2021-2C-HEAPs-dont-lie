@@ -13,8 +13,11 @@ sem_t hilos_nuevo_bloqueado;
 t_list * list_hilos_ejecutando;
 pthread_mutex_t mutex_hilos;
 
+t_dictionary * dict_hilos;
+
 int hilos_planificador_iniciar() {
 	list_hilos_ejecutando = list_create();
+	dict_hilos = dictionary_create();
 
 	sem_init(&hilos_semaforo_new, 0, 0);
 
@@ -35,7 +38,20 @@ void hilos_planificador_destruir() {
 		free(hilo);
 	}
 
+	void limpiar_semaforo(void * sem) {
+		t_hilos_semaforo * hilo = (t_hilos_semaforo *) sem;
+
+		sem_destroy(&hilo->sem_ejecutar);
+		sem_destroy(&hilo->sem_finalizo);
+		if (hilo->mensaje != NULL) {
+			free(hilo->mensaje);
+		}
+		free(hilo);
+	}
+
 	list_destroy_and_destroy_elements(list_hilos_ejecutando, limpiar_hilo);
+
+	dictionary_destroy_and_destroy_elements(dict_hilos, limpiar_semaforo);
 
 	sem_destroy(&hilos_semaforo_new);
 
@@ -56,6 +72,32 @@ pthread_t * hilos_crear_hilo() {
 	pthread_mutex_unlock(&mutex_hilos);
 
 	return hilo;
+}
+
+char * hilos_get_key(uint32_t pid) {
+	return string_from_format("%zu", pid);
+}
+
+void hilos_agregar_nuevo_hilo(uint32_t pid) {
+	t_hilos_semaforo * hilo_semaforo = malloc(sizeof(t_hilos_semaforo));
+
+	sem_init(&hilo_semaforo->sem_ejecutar, 0, 0);
+	sem_init(&hilo_semaforo->sem_finalizo, 0, 0);
+	hilo_semaforo->mensaje = NULL;
+
+	dictionary_put(dict_hilos, hilos_get_key(pid), hilo_semaforo);
+}
+
+void hilos_post_ejecucion(uint32_t pid) {
+	t_hilos_semaforo * hilo_semaforo = dictionary_get(dict_hilos, hilos_get_key(pid));
+
+	sem_post(&hilo_semaforo->sem_ejecutar);
+}
+
+void hilos_wait_ejecucion(uint32_t pid) {
+	t_hilos_semaforo * hilo_semaforo = dictionary_get(dict_hilos, hilos_get_key(pid));
+
+	sem_wait(&hilo_semaforo->sem_ejecutar);
 }
 
 void hilos_destruir_hilo_actual() {
