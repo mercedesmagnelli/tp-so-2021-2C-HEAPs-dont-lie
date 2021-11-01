@@ -8,6 +8,11 @@ void iniciar_swamp(){
 
 	crear_particion();
 
+	//INICIALIZO UNA LISTA PARA TENER TODOS LOS CARPINCHOS QUE VAN APARECIENDO
+
+	lista_carpinchos = list_create();
+
+
 	loggear_info("SE INICIO EL SWAMP");
 
 }
@@ -41,5 +46,10 @@ int crear_particion(){
 	}
 
 	return 0;
+}
+
+
+void destroy_lista_carpinchos(){
+	list_destroy(lista_carpinchos);
 }
 

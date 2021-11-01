@@ -23,7 +23,23 @@ int main(int argc, char** argv) {
 
 	iniciar_swamp();
 
+	escribir_particion(9, 11, "gola don pepito9", particion_a_escribir(9));
+	escribir_particion(9, 13, "gola don pepito9", particion_a_escribir(9));
+	escribir_particion(10, 13, "gola don pepito9", particion_a_escribir(10));
 
+
+/*
+ * SIRVE PARA MOSTRAR EL BITMAP DE LA PARTICION TENERLO POR AHORA
+	t_archivo_swamp* asd = list_get(lista_swamp, 0);
+
+	for(int w = 0; w < get_cantidad_paginas(); w++){
+		if(bitarray_test_bit(asd->bitmap_bitarray, w)){
+			loggear_trace("1");
+		}else{
+			loggear_trace("0");
+		}
+	}
+*/
 /*
 		escribir_particion(9, 11, "gola don pepito9", particion_a_escribir(9)); // 1
 	escribir_particion(10, 15, "gola don pepito10", particion_a_escribir(10));//2
@@ -80,6 +96,7 @@ void cerrar_todo() {
 	destroy_configuracion();
 	destroy_log();
 	destroy_lista_swamp();
+	destroy_lista_carpinchos();
 }
 
 
@@ -94,6 +111,7 @@ void debug_variables() {
 	loggear_debug("TAMANIO_PAGINA: %d", get_tamanio_pagina());
 	loggear_debug("MARCOS_MAXIMOS: %d", get_marcos_maximos());
 	loggear_debug("RETARDO_SWAP: %d", get_retardo_swap());
+	loggear_debug("CANTIDAD_PAGINAS: %d", get_cantidad_paginas());
 	loggear_debug("CANTIDAD_ARCHIVOS: %d", get_cantidad_archivos());
 	for (int i = 0; i < get_cantidad_archivos(); ++i) {
 		loggear_debug("ARCHIVOS_SWAP[%d]: \t\t%s", i, get_archivos_swap()[i]);

@@ -27,6 +27,8 @@ typedef struct {
 	int log_in_console;
 	int log_level_info;
 
+	//utiles
+	int cantidad_paginas;
 } t_info_config;
 
 
@@ -43,6 +45,7 @@ int get_marcos_maximos();
 int get_retardo_swap();
 int get_cantidad_archivos();
 char ** get_archivos_swap();
+int get_cantidad_paginas();
 
 
 /**
