@@ -22,9 +22,11 @@ int main(int argc, char** argv) {
 	}
 
 	iniciar_swamp();
+
+
 /*
-	escribir_particion(3, "gola don jose", archivo_a_escribir());
-	escribir_particion(2, "gola don jose", archivo_a_escribir());
+		escribir_particion(9, 11, "gola don pepito9", particion_a_escribir(9)); // 1
+	escribir_particion(10, 15, "gola don pepito10", particion_a_escribir(10));//2
 */
 	/*NO LO BORREN LO USO PARA PRUEBAS
 	 * loggear_trace("vamos dale");
@@ -44,11 +46,19 @@ int main(int argc, char** argv) {
 
 	loggear_info("EL PRIMERO PROCESOS %s", list_get(mostrar->carpinchos, 0));
 	loggear_info("EL SEGUNDO PROCESOS %s", list_get(mostrar2->carpinchos, 1));
+		t_archivo_swamp* carp = list_get(lista_swamp, 0);
+	t_archivo_swamp* carp2 = list_get(lista_swamp, 1);
+
+	loggear_error("EL carpincho qeu se escribio es %s", list_get(carp->carpinchos, 0));
+	loggear_error("EL carpincho qeu se escribio es %s", list_get(carp->carpinchos, 1));
+	loggear_error("EL carpincho qeu se escribio es %s", list_get(carp2->carpinchos, 0));
+	loggear_error("EL carpincho qeu se escribio es %s", list_get(carp2->carpinchos, 1));
 
 */
 	debug_variables();
 
-	pthread_t ram_handshake = thread_ejecutar_funcion(enviar_handshake);
+
+/*	pthread_t ram_handshake = thread_ejecutar_funcion(enviar_handshake);
 
 
 	error = thread_join_and_free(ram_handshake);
@@ -59,7 +69,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-
+*/
 
 	cerrar_todo();
 

@@ -19,7 +19,7 @@
  *
  */
 
-int escribir_particion(uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp);
+int escribir_particion(uint32_t pid_carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp);
 
 /*
  * leer_particion
@@ -35,8 +35,9 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp);
 /*
  * archivo_a_escribir
  * Indica en que archivo se debe escribir la pagina que llega desde la RAM
+ * Tambien agrega al struct de los archivso de swamp el pid_carpincho a la lista para saber que se encuentra en este archivo.
  *
  */
-t_archivo_swamp* archivo_a_escribir();
+t_archivo_swamp* archivo_a_escribir(uint32_t pid_carpincho);
 
 #endif /* MANEJO_FILESYSTEM_MANEJO_ARCHIVOS_H_ */

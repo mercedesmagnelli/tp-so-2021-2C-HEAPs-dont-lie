@@ -1,6 +1,6 @@
 #include "manejo_archivos.h"
 
-int escribir_particion(uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
+int escribir_particion(uint32_t pid_carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
 
 	FILE* archivo;
 	char* ruta_particion = swamp->ruta_archivo;
@@ -59,7 +59,7 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp){
 	return contenido_pagina;
 }
 
-t_archivo_swamp* archivo_a_escribir(){
+t_archivo_swamp* archivo_a_escribir(uint32_t pid_carpincho){
 	int libre = 0;
 	t_archivo_swamp* archivo_a_escribir;
 	for(int i = 0; i < list_size(lista_swamp); i++){
@@ -72,6 +72,7 @@ t_archivo_swamp* archivo_a_escribir(){
 
 	loggear_trace("EL archivo a ecribir es  %s", archivo_a_escribir->ruta_archivo);
 
+	list_add(archivo_a_escribir->carpinchos, string_itoa(pid_carpincho));
 	return archivo_a_escribir;
 
 }
