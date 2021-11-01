@@ -111,7 +111,7 @@ void debug_variables() {
 	loggear_debug("TAMANIO_PAGINA: %d", get_tamanio_pagina());
 	loggear_debug("MARCOS_MAXIMOS: %d", get_marcos_maximos());
 	loggear_debug("RETARDO_SWAP: %d", get_retardo_swap());
-	loggear_debug("CANTIDAD_PAGINAS: %d", get_cantidad_paginas());
+	loggear_debug("CANTIDAD_MARCOS: %d", get_cantidad_paginas());
 	loggear_debug("CANTIDAD_ARCHIVOS: %d", get_cantidad_archivos());
 	for (int i = 0; i < get_cantidad_archivos(); ++i) {
 		loggear_debug("ARCHIVOS_SWAP[%d]: \t\t%s", i, get_archivos_swap()[i]);
