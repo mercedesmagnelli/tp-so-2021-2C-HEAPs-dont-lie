@@ -55,7 +55,7 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 		if(heap->nextAlloc==-1){
 			rta = true;
 		}else{
-			if(espacio_de_HEAP(heap)>= tam+9){
+			if(espacio_de_HEAP(heap)>= tam+9 && heap->isFree){
 				rta = true;
 			}else{
 				rta = false;
@@ -95,7 +95,7 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	//guardar_HEAP_en_memoria(PID, nuevoHeap);
 
 	//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
-	if(nuevoHeap->nextAlloc == -1){
+	if(nuevoHeap->nextAlloc != -1){
 		loggear_trace("El alloc necesita traer al sig HEAP para actualizar prevHeap");
 		heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
 		heapSig->prevAlloc = nuevoHeap->currAlloc;
@@ -128,8 +128,8 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	loggear_trace("ya cargue los valores iniciales");
 
 	loggear_trace("agrego las paginas que me dieron");
-	int cantPags = (tam + 9) / get_tamanio_pagina();
-	if((tam+9)%get_tamanio_pagina() > 0){
+	int cantPags = (tam + 18) / get_tamanio_pagina();
+	if((tam+18)%get_tamanio_pagina() > 0){
 		cantPags++;
 	}
 

@@ -14,6 +14,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 		if (existe_proceso(pid)){
 			loggear_trace("Existe el proceso %d", pid);
 			int32_t ptro = ptro_donde_entra_data(pid, size);
+			loggear_debug("el ptro es %d",ptro);
 			if (ptro >= 0) {
 				actualizar_proceso(pid,ptro,size);
 				return ptro;
