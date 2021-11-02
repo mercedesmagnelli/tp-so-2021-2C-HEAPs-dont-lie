@@ -27,6 +27,7 @@ typedef enum {
 // GETTERS
 int get_puerto();
 int get_tamanio_memoria();
+int get_tamanio_pagina();
 
 t_algoritmo_reemplazo_mmu get_algoritmo_reemplazo_mmu();
 t_tipo_asignacion get_tipo_asignacion();
@@ -37,6 +38,8 @@ int get_cantidad_entradas_tlb();
 int get_retardo_acierto_tlb();
 int get_retardo_fallo_tlb();
 
+char * get_path_dump_tlb();
+
 char * get_log_route();
 char * get_log_app_name();
 int get_log_in_console();
@@ -45,6 +48,7 @@ int get_log_level_info();
 typedef struct {
 	int puerto;
 	int tamanio_memoria;
+	int tamanio_pagina;
 
 	int algoritmo_reemplazo_mmu;
 	int tipo_asignacion;
@@ -54,6 +58,8 @@ typedef struct {
 	int cantidad_entradas_tlb;
 	int retardo_acierto_tlb;
 	int retardo_fallo_tlb;
+
+	char * path_dump_tlb;
 
 	char * log_route;
 	char * log_app_name;
