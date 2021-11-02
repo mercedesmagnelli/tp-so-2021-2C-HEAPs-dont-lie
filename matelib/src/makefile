@@ -12,7 +12,6 @@ TARGET := ../../matelib.out # Nombre del archivo al compilar
 LIBS := -lreadline -lcommons -lcspecs -lpthread # Dependencias necesarias
 CC := gcc # Compilador a utilizar
 CFLAGS := -g -Wall # Flags en la comilación (g: Debug) (Wall: Muestra todos los warnings)
-POLUS := ../../../../polus # Esto hay que eliminarlo.
 
 CONFIG_ROUTE := ../../matelib.config
 
@@ -56,5 +55,4 @@ valgrind: all
 clean: # Tarea para eliminar todos los .o y el binario
 	-find . -name "*.o" -type f -delete
 	-rm -f $(TARGET)
-	-rm -rf $(POLUS)
 	
