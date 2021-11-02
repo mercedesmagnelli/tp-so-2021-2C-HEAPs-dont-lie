@@ -9,9 +9,10 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include tests/subdir.mk
+-include src/utils/subdir.mk
 -include src/matelib_core/subdir.mk
 -include src/configuracion/subdir.mk
--include src/conexion_ram/subdir.mk
+-include src/conexiones/subdir.mk
 -include src/subdir.mk
 -include shared/tests/subdir.mk
 -include shared/subdir.mk
