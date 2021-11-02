@@ -3,11 +3,16 @@
 
 #include <pthread.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include <commons/collections/queue.h>
 #include <commons/collections/list.h>
 
+#include "../../../shared/logger.h"
+
 #include "estructuras.h"
+#include "algoritmos.h"
+#include "hilos_planificador.h"
 
 /**
  * Aca se guardaran todas las colas, listas y/o pilas que sea necesaria para mover entre hilos
@@ -31,36 +36,40 @@ int colas_destruir();
 /**
  * @NAME: colas_insertar_new
  * @DESC: Recibe un hilo nuevo y lo agrega en la cola de NEW
+ *
+ * Necesita que le pasen el numero de proceso
  * */
-t_hilo * colas_insertar_new(void * hilo);
+t_hilo * colas_insertar_new(uint32_t pid);
 
 /**
  * @NAME: colas_mover_new_ready
  * @DESC: Toma el primero en la cola de NEW y lo mueve a READY, siempre se hace en orden FIFO
  * ya que lo gestiona el planificador de LARGO PLAZO
+ *
+ * No necesita que le pasen quien se va a mover, porque funciona como FIFO
  * */
 t_hilo * colas_mover_new_ready();
 
 /**
  * @NAME: colas_mover_ready_exec
  * @DESC: Dependiendo el algoritmo, hay que recorrer la lista de hilos en READY y elegir cual mover a EXEC
+ *
+ * TODO: Se necesita una funcion de orden superior que retorne el que hay que elegir
  * */
-// TODO: Pasar como funcion de orden superior la funcion encargada de elegir que hilo mover a EXEC
 t_hilo * colas_mover_ready_exec();
 
 /**
  * @NAME: colas_mover_ready_finish
  * @DESC: Recibe un hilo y lo mueve de EXEC a FINISH
+ *
  * */
-// TODO: Ver como pasarle el hilo que termino, capaz hay que retornar el id al mover a EXEC y pasarlo como parametro a esta
-t_hilo * colas_mover_exec_finish();
+t_hilo * colas_mover_exec_finish(t_hilo * hilo);
 
 /**
  * @NAME: colas_mover_exec_blocked
  * @DESC: Recibe un hilo y lo mueve de EXEC a BLOCKED
  * */
-// TODO: Al igual que la funcion anterior, necesitamos poder sacar uno en particular si esta bloqueado por algo en especifico
-t_hilo * colas_mover_exec_block();
+t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante, char * nombre_bloqueante, uint32_t pid);
 
 /**
  * @NAME: colas_mover_block_ready
@@ -77,7 +86,7 @@ t_hilo * colas_mover_exec_block();
 // TODO: Igual que la funcion anterior, tenemos que quitar uno especifico, no siempre es en cola.
 // TODO: Quizas conviene analizar la idea de una "cola especial fantasma" a donde van los hilos bloqueados, cuando ya deben salir
 // para analizar si deben seguir bloqueados o salen.
-t_hilo * colas_mover_block_ready();
+t_hilo * colas_mover_block_ready(t_hilo * hilo_mover);
 
 /**
  * @NAME: colas_mover_block_block_susp
@@ -90,12 +99,38 @@ t_hilo * colas_mover_block_block_susp();
  * @NAME: colas_mover_block_susp_block_ready
  * @DESC: Mueve un hilo de BLOCKED SUSPENDED a BLOCKED READY.
  * */
-t_hilo * colas_mover_block_susp_block_ready();
+t_hilo * colas_mover_block_susp_block_ready(t_hilo * hilo_mover);
 
 /**
  * @NAME: colas_mover_block_ready_ready
  * @DESC: Mueve un hilo de BLOCKED READY a READY, se deberia hacer cuando el grado de multiprocesamiento lo permita.
  * */
 t_hilo * colas_mover_block_ready_ready();
+
+/**
+ * @NAME: deberia_suspenderse_procesos
+ * @DESC: Avisa el grado de multiprogramacion esta copado por procesos que no usan la CPU
+ */
+bool deberia_suspenderse_procesos();
+
+/**
+ * @NAME: hay_procesos_en_suspendido_ready
+ * @DESC: Retorna true si hay proceso en SUSPENDIDO-READY
+ */
+bool hay_procesos_en_suspendido_ready();
+
+/**
+ * @NAME: colas_desbloquear_1_hilo
+ * @DESC: Primero revisa la lista de bloqueados si hay algun hilo bloqueado para desbloquear, lo mueve a ready y retorna.
+ * SI no encuentra en bloqueados, revisa la lista de SUSPENDIDO-BLOQUEADO, lo mueve a SUSPENDIDO-LISTO y retorna;
+ * SI no encuentra ninguno, retorna NULL;
+ */
+t_hilo * colas_desbloquear_1_hilo(t_dispositivo_bloqueante dispositivo_bloqueante, char * semaforo_nombre);
+
+/**
+ * @NAME: colas_desbloquear_todos_hilos
+ * @DESC: Recorre las listas de BLOQUEADO y SUSPENDIDO-BLOQUEADO y mueve los hilos a donde corresponda
+ */
+void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloqueante, char * semaforo_nombre);
 
 #endif

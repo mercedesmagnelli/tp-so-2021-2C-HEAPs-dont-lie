@@ -1,12 +1,32 @@
 #ifndef DISPOSITIVO_IO_H_
 #define DISPOSITIVO_IO_H_
 
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+#include <commons/string.h>
+#include <commons/collections/dictionary.h>
+
+#include "colas.h"
+
+#include "../../../shared/logger.h"
+
+#include "../configuracion/configuracion_guardada.h"
+
 /**
  * Funciona muy similar a como funciona `semaforo.h` con la diferencia que:
  * 1. Al llamarse a un dispositivo, el hilo que llama siempre se bloquea
  * 2. Cada dispositivo tiene un tiempo para desbloquear el hilo
  * 3. Apenas se bloquea, se inicia un pthread aparte, con un sleep para que al terminar desbloquee el hilo
  * */
+
+typedef struct {
+	char * nombre;
+	int duracion;
+	pthread_mutex_t mutex;
+} t_io;
 
 /**
  * @NAME: dispositivo_io_estructuras_crear
@@ -23,12 +43,6 @@ int dispositivo_io_estructuras_crear();
 int dispositivo_io_estructuras_destruir();
 
 /**
- * @NAME: dispositivo_io_iniciar
- * @DESC: Agrega un dispositivo de IO al sistema para posteriormente utilizarlo 
- * */
-int dispositivo_io_iniciar(void * hilo, void * dispositivo);
-
-/**
  * @NAME: dispositivo_io_usar
  * @NOTE: Similar a semaforo_wait
  * @DESC: Avisa para bloquear el hilo que realizo la llamada al dispositivo
@@ -37,22 +51,7 @@ int dispositivo_io_iniciar(void * hilo, void * dispositivo);
  * 2. Se esta usando por [N] hilos (en espera) y se llama. Bloquea el hilo, agrega [1] al contador del dispositivo
  * para que al terminar con el proceso inicie otra vez ya que el hilo ya estaba bloqueado
  * */
-int dispositivo_io_usar(void * hilo, void * dispositivo);
+int dispositivo_io_usar(uint32_t pid, char * nombre);
 
-/**
- * @NAME: dispositivo_io_no_usar
- * @NOTE: Similar a semaforo_post
- * @DESC: No deberia llamarse desde afuera, posiblemente borre esta funcion. Pero es la que se llama para avisar que se dejo 
- * de usar un dispositivo, porque paso el tiempo de espera, asi que notifica que hay que quitar alguien de bloqueado.
- * Se reduce en 1 los hilos que usan el dispositivo, si queda mas de 1, se llama de nuevo a la funcion para notificar en X tiempo
- * */
-int dispositivo_io_no_usar(void * proceso, void * dispositivo);
-
-
-/**
- * @NAME: dispositivo_io_destruir
- * @DESC: No deberia llamarse nunca, pero destruye el dispositivo de IO y todos los asociados desbloqueandolos de ser necesario
- * */
-int dispositivo_io_destruir(void * dispositivo);
 
 #endif

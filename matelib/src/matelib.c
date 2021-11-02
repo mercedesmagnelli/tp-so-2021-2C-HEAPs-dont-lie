@@ -124,7 +124,7 @@ int mate_memread(mate_instance *lib_ref, mate_pointer origin, void *dest, int si
 
 	int error = enviar_mate_memread(read);
 
-	return error;	//TODO: que se hace con lo que se lee????
+	return error;
 }
 
 int mate_memwrite(mate_instance *lib_ref, void *origin, mate_pointer dest, int size) {

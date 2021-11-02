@@ -47,16 +47,21 @@ int cargar_archivo(char * path) {
 	error += set_variable_str(config, "IP_MEMORIA", 			&config_guardada.ip_ram);
 	error += set_variable_int(config, "PUERTO_MEMORIA", 		&config_guardada.puerto_ram);
 
+	error += set_variable_int(config, "PUERTO_ESCUCHA", 		&config_guardada.puerto_escucha);
+
 	char * algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
 	config_guardada.algoritmo = obtener_algoritmo(algoritmo_planificacion);
 	if (config_guardada.algoritmo < 0) {
 		return -1;
 	}
 
-	error += set_variable_array_str(config, "DISPOSITIVOS_IO", &config_guardada.dispositivos_io, &config_guardada.cantidad_dispositivos_io);
-	error += set_variable_array_str(config, "DURACIONES_IO", &config_guardada.duraciones_io, &config_guardada.cantidad_duraciones_io);
+	error += set_variable_int(config, "ESTIMACION_INICIAL", 	&config_guardada.estimacion_inicial);
+	error += set_variable_int(config, "ALFA", 					&config_guardada.alfa);
 
-	error += set_variable_int(config, "RETARDO_CPU", 		&config_guardada.retardo_cpu);
+	error += set_variable_array_str(config, "DISPOSITIVOS_IO", 	&config_guardada.dispositivos_io, &config_guardada.cantidad_dispositivos_io);
+	error += set_variable_array_str(config, "DURACIONES_IO", 	&config_guardada.duraciones_io, &config_guardada.cantidad_duraciones_io);
+
+	error += set_variable_int(config, "RETARDO_CPU", 			&config_guardada.retardo_cpu);
 	error += set_variable_int(config, "GRADO_MULTIPROGRAMACION", 		&config_guardada.grado_multiprogramacion);
 	error += set_variable_int(config, "GRADO_MULTIPROCESAMIENTO", 		&config_guardada.grado_multiprocesamiento);
 

@@ -1,38 +1,94 @@
 
 #include "planificadores.h"
 
-/**
- * TODOs:
- * 1. Crear todo el orquestador entre los distintos modulos del Kernel
- * 2. Crear los hilos que controlan el movimiento entre estados
- * 3. Crear los semaforos para coordinar los hilos y el movimiento entre estados
- * 4. ...
- * */
+void planificador_largo_plazo() {
+	loggear_debug("[SYSTEM] --- Se creo el planificador de largo plazo");
+
+	while (true) {
+		hilos_wait_new();
+		hilos_wait_multiprogramacion();
+
+		t_hilo * hilo;
+		if (hay_procesos_en_suspendido_ready()) {
+			hilo = colas_mover_block_ready_ready();
+			loggear_debug("[PID: %d] --- [Mediano Plazo] --- Se movió de SUSP-READY a READY", pid(hilo));
+		} else {
+			hilo = colas_mover_new_ready();
+			loggear_debug("[PID: %d] --- [Largo Plazo] --- Se movió de NEW a READY", pid(hilo));
+		}
+
+		hilos_post_ready();
+	}
+}
+
+void planificador_corto_plazo() {
+	loggear_debug("[SYSTEM] --- Se creo el planificador de corto plazo");
+
+	while (true) {
+		hilos_wait_ready();
+		hilos_wait_multitarea();
+
+		t_hilo * hilo = colas_mover_ready_exec();
+		loggear_debug("[PID: %d] --- [Corto Plazo] --- Se movió de READY a EXEC", pid(hilo));
+
+		hilos_post_ejecucion(hilo->pid); // Avisa que se encuentra en EXEC
+	}
+}
+
+void planificador_medio_plazo() {
+	loggear_debug("[SYSTEM] --- Se creo el planificador de mediano plazo");
+
+	while (true) {
+		hilos_wait_nuevo_bloqueado();
+
+		hilos_post_multitarea();
+
+		bool multiprogramacion_copada = deberia_suspenderse_procesos();
+
+		if (multiprogramacion_copada) {
+			t_hilo * hilo = colas_mover_block_block_susp();
+
+			loggear_debug("[PID: %d] --- [Mediano Plazo] --- Se movió de BLOCK a SUSP-BLOCK", pid(hilo));
+
+			hilos_post_multiprogramacion();
+
+			loggear_error("[PID: %d] --- [Mediano Plazo] --- TODO: Avisar a la RAM de la suspension", pid(hilo));
+		}
+	}
+}
 
 int planificadores_iniciar() {
-    loggear_debug("Iniciado planificador de largo plazo");
-    loggear_debug("\tSe encarga de insertar los procesos nuevos en la cola de NEW");
-    loggear_debug("\tGenerar las estructuras administrativas del proceso dentro del Kernel");
-    loggear_debug("\tNotificar a la memoria del nuevo proceso y esperar confirmacion");
-    loggear_debug("\tSi el grado de multiprogramacion lo permite, moverlo en FIFO a READY");
+	colas_iniciar();
+	hilos_planificador_iniciar();
+	semaforo_estructuras_crear();
+	dispositivo_io_estructuras_crear();
 
-    loggear_debug("Iniciado planificador de corto plazo");
-    loggear_debug("\tSe encarga de mover los proceso desde la cola de READY en EXEC");
-    loggear_debug("\t\tEsto solo se hace si el grado de multiprocesamiento lo permite");
-    loggear_debug("\t\tTambien, para realizarlo se sigue un algoritmo SJF (sin desalojo) o HRRN");
+	int error = 0;
 
-    loggear_debug("Iniciado planificador de mediano plazo");
-    loggear_debug("\tSe encarga de las transiciones de BLOCK a SUSP-BLOCK, SUSP-BLOCK a SUSP-READY y SUSP-READY a READY");
-    loggear_debug("\tSe utiliza cuando el grado de multiprocesamiento esta copado por procesos que no hacen uso del CPU");
+	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_largo_plazo, NULL);
+	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_corto_plazo, NULL);
+	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_medio_plazo, NULL);
 
-    return 0;
+    return error;
 }
 
 void planificadores_destruir() {
-
+	colas_destruir();
+	hilos_planificador_destruir();
+	semaforo_estructuras_destruir();
+	dispositivo_io_estructuras_destruir();
 }
 
-int planificadores_proceso_iniciar(void * proceso) {
+// CERRADO
+int planificadores_proceso_iniciar(uint32_t ppid) {
+	loggear_debug("[SYSTEM] --- Llego un nuevo proceso al planificador");
+
+	t_hilo * hilo = colas_insertar_new(ppid);
+	hilos_agregar_nuevo_hilo(ppid);
+	hilos_post_new();
+
+	loggear_debug("[PID: %d] --- [SYSTEM] --- Se movió a NEW", pid(hilo));
+
     return 0;
 }
 
