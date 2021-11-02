@@ -91,22 +91,23 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	nuevoHeap->nextAlloc = nextNextAlloc;
 	nuevoHeap->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeap);
-	guardar_HEAP_en_memoria(PID, nuevoHeap);
+	//guardar_HEAP_en_memoria(PID, nuevoHeap);
 
 	//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
 	if(heap->nextAlloc == -1){
 		heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
 		heapSig->prevAlloc = nuevoHeap->currAlloc;
-		guardar_HEAP_en_memoria(PID, heapSig);
+		//guardar_HEAP_en_memoria(PID, heapSig);
 	}
 }
 
 
 int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size) {
 	if(get_tipo_asignacion() == FIJA) {
-		//fijo
+		loggear_error("No se puede asignar el espacio para el proceso %d porque se alcanzo la cantidad de frames posibles para un proceso", pid);
 		return MAXIMO_MARCOS_ALCANZADO;
 	}else {
+		loggear_error("No se puede asignar el espacio para el proceso %d porque no hay mas lugar en memoria actualmente", pid);
 		return ESPACIO_EN_MEMORIA_INSUF;
 	}
 }
@@ -141,7 +142,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	nuevoHeapPrimero->nextAlloc = tam + 9;
 	nuevoHeapPrimero->isFree    = 0;
 	agregar_HEAP_a_PID(PID,nuevoHeapPrimero);
-	guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
+	//guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
 
 
 	//creamos el segundo HEAP nuevo que vamos a ingresar y actualizamos en mem
@@ -151,7 +152,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	nuevoHeapUltimo->nextAlloc = -1;
 	nuevoHeapUltimo->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeapUltimo);
-	guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
+	//guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
 
 
 	//agrego proceso a la lista
@@ -163,7 +164,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, uint32_t size) {
 	//funcion cuando un proceso pide memoria
 	//consguir socket
-	void* mensaje = serializar_pedido_memoria(pid, size);
+	/*void* mensaje = serializar_pedido_memoria(pid, size);
 
 	//semaforo_socket
 	int a = enviar_mensaje_protocolo(1,header, 8, mensaje);
@@ -177,7 +178,9 @@ int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, 
 	//loggear la respuesta
 	free(mensaje);
 
-	return respuesta_final;
+return respuesta_final;
+*/
+	return 1;
 }
 
 

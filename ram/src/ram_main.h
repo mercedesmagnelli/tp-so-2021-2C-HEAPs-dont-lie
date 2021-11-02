@@ -7,7 +7,7 @@
 #include "../../shared/logger.h"
 #include "../../shared/conexion.h"
 #include "../../shared/protocolo.h"
-
+#include "memoria/memoria.h"
 #include "conexion_planificador/conexion_planificador.h"
 
 #include <arpa/inet.h>
@@ -16,5 +16,14 @@
 #include <signal.h>
 
 #include <readline/readline.h>
+
+
+
+/*BORRAR!!!!!!!!!!!! son para testing*/
+
+
+void testeamos();
+void imprimir_hdm();
+void imprimir_procesos();
 
 #endif /* RAM_MAIN_H_ */
