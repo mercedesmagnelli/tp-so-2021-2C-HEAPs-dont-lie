@@ -16,9 +16,9 @@
 #include <string.h>
 #include <sys/param.h>
 
-t_list* listaProcesos;
-t_list* listaFrames;
-t_dictionary* cant_frames_por_proceso;
+t_list* listaProcesos;//casos: agregar_proceso, liberar_paginas
+t_list* listaFrames;//casos: traer_pagina_de_SWAP, liberar_paginas
+t_dictionary* cant_frames_por_proceso;//casos: traer_pagina_de_SWAP, liberar_paginas
 
 typedef struct{
 	//índice: frame

@@ -451,9 +451,8 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 			marco = obtener_frame_de_RAM(PID, nroPag);
 			actualizar_datos_pagina(PID, nroPag, bitModificado, 0);
 		}else{
-			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima
+			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima. Tmbn tiene que actualizar la cant de Pags en asig FIJA
 			inicializar_datos_pagina(PID, nroPag, marco, bitModificado);//podriamos poner esta funcion dentro de obtener fram asi tmbn se encarga de modificar lo administrativo dsps del cambio de pags?
-			actualizar_cantidad_frames_por_proceso_RAM(PID, 1);
 		}
 		agregar_entrada_tlb(PID, nroPag, marco);
 	}
@@ -512,6 +511,7 @@ void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModifica
 void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado){
 	t_proceso* proceso = get_proceso_PID(PID);
 	proceso->miss_proceso++;
+	proceso->hits_proceso++;
 	t_pagina* pag = list_get(proceso->tabla_paginas, nroPag);
 	pag->frame = marco;
 	pag->timestamp = obtener_timestamp_actual();
