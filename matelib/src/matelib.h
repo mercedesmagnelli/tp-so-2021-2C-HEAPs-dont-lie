@@ -6,6 +6,7 @@
 #include "utils/utils.h"
 #include "../../shared/estructura_compartida.h"
 #include "conexiones/conexiones.h"
+#include "utils/utils.h"
 
 //-------------------Type Definitions----------------------/
 typedef struct mate_instance {
@@ -20,7 +21,7 @@ typedef int32_t mate_pointer;
 
 typedef struct {
 	uint32_t pid;
-	uint32_t heap;//not so sure
+	//uint32_t heap;//not so sure
 }t_instance_metadata;
 // TODO: Docstrings
 

@@ -8,7 +8,7 @@ uint32_t generar_pid(){
 
 	if(id > 100){
 
-		id = 0;
+		id = 1;
 	}
 
 	return id;

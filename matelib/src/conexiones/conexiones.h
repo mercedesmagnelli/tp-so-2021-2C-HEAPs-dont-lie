@@ -1,6 +1,6 @@
 
-#ifndef CONEXION_RAM_H_
-#define CONEXION_RAM_H_
+#ifndef CONEXIONES_H_
+#define CONEXIONES_H_
 
 #include <pthread.h>
 #include <unistd.h>
@@ -29,6 +29,18 @@ int enviar_mate_sem_wait(t_matelib_semaforo* semaforo);
 
 int enviar_mate_sem_post(t_matelib_semaforo* semaforo);
 
+int enviar_mate_sem_destroy(t_matelib_semaforo* semaforo);
+
+int enviar_mate_call_io(t_matelib_io* entrada_salida);
+
+mate_pointer enviar_mate_memalloc(t_matelib_memoria_alloc* alloc);
+
+int enviar_mate_memfree(free);
+
+int enviar_mate_memread(t_matelib_memoria_read* read);
+
+int enviar_mate_memwrite(write);
+
 
 
 /**
@@ -43,4 +55,4 @@ void conexiones_cerrar_conexiones(bool safe_close);
  */
 int conexiones_iniciar();
 
-#endif /* CONEXION_RAM_H_ */
+#endif /* CONEXIONES_H_ */
