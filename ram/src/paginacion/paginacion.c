@@ -78,14 +78,14 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
 void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 
-	//modificamos el HEAP que vamos ocupar y actualizamos en mem
+	loggear_trace("modificamos el HEAP que vamos ocupar y actualizamos en mem");
 	heap_metadata* heap = get_HEAP(PID,ptro);
 	int nextNextAlloc = heap->nextAlloc;
 	heap->nextAlloc = ptro+tamanio;
 	heap->isFree = 0;
-	guardar_HEAP_en_memoria(PID, heap);
+	//guardar_HEAP_en_memoria(PID, heap);
 
-	//creamos el HEAP nuevo que vamos a ingresar y actualizamos en mem
+	loggear_trace("creamos el HEAP nuevo que vamos a ingresar y actualizamos en mem");
 	heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
 	nuevoHeap->currAlloc = heap->nextAlloc;
 	nuevoHeap->prevAlloc = heap->currAlloc;
@@ -95,7 +95,8 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	//guardar_HEAP_en_memoria(PID, nuevoHeap);
 
 	//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
-	if(heap->nextAlloc == -1){
+	if(nuevoHeap->nextAlloc == -1){
+		loggear_trace("El alloc necesita traer al sig HEAP para actualizar prevHeap");
 		heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
 		heapSig->prevAlloc = nuevoHeap->currAlloc;
 		//guardar_HEAP_en_memoria(PID, heapSig);

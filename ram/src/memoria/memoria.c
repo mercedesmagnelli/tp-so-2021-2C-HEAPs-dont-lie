@@ -3,7 +3,7 @@
 void* memoria_principal;
 
 
-int32_t memalloc(uint32_t pid, uint32_t size) {
+int32_t memalloc(uint32_t pid, int32_t size) {
 	loggear_trace("estoy entrando al meamalloc");
 	if (!cantidad_valida(size)) {
 		//corto la ejecucion si ya no tengo que analizar
@@ -12,13 +12,14 @@ int32_t memalloc(uint32_t pid, uint32_t size) {
 	} else {
 		loggear_trace("el tamanio es valido");
 		if (existe_proceso(pid)){
-			loggear_trace("Se pide mas espacio para el proceso %d", pid);
+			loggear_trace("Existe el proceso %d", pid);
 			int32_t ptro = ptro_donde_entra_data(pid, size);
 			if (ptro >= 0) {
 				actualizar_proceso(pid,ptro,size);
 				return ptro;
 			} else {
 				if (se_puede_almacenar_el_alloc_para_proceso(R_S_ESPACIO_PROCESO_EXISTENTE, pid, size)) {
+					loggear_trace("Se pide mas espacio para el proceso %d", pid);
 					//como hay espacio disponble, expando lo que ya tenia
 					actualizar_proceso(pid,  (-1) * ptro,  size);
 					return (-1) * ptro;
@@ -92,7 +93,7 @@ void inicializar_memoria_principal() {
 
 }
 
-bool cantidad_valida(uint32_t size) {
-	return size >=1 ? 1 : -1;
+bool cantidad_valida(int32_t size) {
+	return size >=1 ? 1 : 0;
 }
 

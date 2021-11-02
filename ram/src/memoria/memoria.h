@@ -26,7 +26,7 @@
  *   -43  No hay mas espacio de memoria del cual solicitar (Asig Global)
  **/
 
-int32_t memalloc(uint32_t pid, uint32_t size);
+int32_t memalloc(uint32_t pid, int32_t size);
 
 /**
  * @NAME: memfree
@@ -80,7 +80,7 @@ void inicializar_memoria_principal();
  **/
 
 
-bool cantidad_valida(uint32_t size);
+bool cantidad_valida(int32_t size);
 
 
 /**
