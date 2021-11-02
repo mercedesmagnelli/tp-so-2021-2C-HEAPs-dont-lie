@@ -4,13 +4,13 @@ void* memoria_principal;
 
 
 int32_t memalloc(uint32_t pid, uint32_t size) {
-
+	loggear_trace("estoy entrando al meamalloc");
 	if (!cantidad_valida(size)) {
 		//corto la ejecucion si ya no tengo que analizar
 		loggear_error("No se puede solicitad un tamanio negativo");
 		return VALOR_MEMORIA_SOLICITADO_INVALIDO;
 	} else {
-
+		loggear_trace("el tamanio es valido");
 		if (existe_proceso(pid)){
 			loggear_trace("Se pide mas espacio para el proceso %d", pid);
 			int32_t ptro = ptro_donde_entra_data(pid, size);
@@ -32,7 +32,9 @@ int32_t memalloc(uint32_t pid, uint32_t size) {
 			//si no existe, entonces tengo que crear el nuevo proceso
 			loggear_trace("Se crea un proceso nuevo de pid %d", pid);
 			if (se_puede_almacenar_el_alloc_para_proceso(R_S_ESPACIO_PROCESO_NUEVO, pid, size)) {
+				loggear_trace("pudo crear el proceso");
 				int32_t ptro_nuevo_proc = agregar_proceso(pid, size);
+				loggear_trace("lo cree y me dio este puntero %d", ptro_nuevo_proc);
 				return ptro_nuevo_proc;
 			} else {
 				return no_se_asigna_proceso(pid, size);

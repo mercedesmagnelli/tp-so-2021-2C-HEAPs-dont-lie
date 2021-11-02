@@ -7,6 +7,7 @@
 void inicializar_estructuras_administrativas() {
     listaProcesos = list_create();
     listaFrames = list_create();
+    //TODO: INICIALIZAR MEMORIA!!
     for(int i=0;i<get_tamanio_pagina();i++){
     	t_frame* frame = malloc(sizeof(t_frame));
     	frame->estado=0;
@@ -16,7 +17,7 @@ void inicializar_estructuras_administrativas() {
 
 }
 
-void destruir_estructuras_administativas() {
+void destruir_estructuras_administrativas() {
     list_destroy_and_destroy_elements(listaProcesos, destruir_proceso);
     list_destroy_and_destroy_elements(listaFrames, free);
     //TODO: ver que puede ser que tengamos que llamar a dictionary_destroy_and_destroy_elements
@@ -37,7 +38,7 @@ void destruir_proceso(void* proceso) {
 // FUNCIONES PUBLICAS
 int32_t existe_proceso(uint32_t PID){
 	t_proceso* proceso = get_proceso_PID(PID);
-	return proceso != NULL ? 0 : -1;
+	return proceso == NULL ? 0 : 1;
 
 }
 
@@ -114,38 +115,44 @@ int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size) {
 
 int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	//creo el proceso y lo inicializo
+	loggear_trace("estoy entrando a agregar proceso");
 	t_proceso* nuevoProceso = malloc(sizeof(t_proceso));
 	nuevoProceso->PID = PID;
 	nuevoProceso->tabla_paginas = list_create();
 	nuevoProceso->lista_hmd = list_create();
 	nuevoProceso->hits_proceso = 0;
 	nuevoProceso->miss_proceso = 0;
+	list_add(listaProcesos, nuevoProceso);
 
+	loggear_trace("ya cargue los valores iniciales");
 
-	//agrego las paginas que me dieron
+	loggear_trace("agrego las paginas que me dieron");
 	int cantPags = (tam + 9) / get_tamanio_pagina();
 	if((tam+9)%get_tamanio_pagina() > 0){
 		cantPags++;
 	}
+
 	t_pagina* nuevaPagina;
 	for(int i = 0;i<cantPags;i++){
-		nuevaPagina = malloc(sizeof(nuevaPagina));
+		nuevaPagina = malloc(sizeof(t_pagina));
 		nuevaPagina->bit_presencia=0;//es el unico dato que llenamos
 		list_add(nuevoProceso->tabla_paginas,nuevaPagina);
 	}
 
 
-	//creamos el primer HEAP nuevo que vamos a ingresar y actualizamos en mem
+	loggear_trace("creamos el primer HEAP nuevo que vamos a ingresar y actualizamos en mem");
 	heap_metadata* nuevoHeapPrimero = malloc(sizeof(heap_metadata));
 	nuevoHeapPrimero->currAlloc = 0;
 	nuevoHeapPrimero->prevAlloc = -1;
 	nuevoHeapPrimero->nextAlloc = tam + 9;
 	nuevoHeapPrimero->isFree    = 0;
+	loggear_trace("estoy por agregar el HEAP");
 	agregar_HEAP_a_PID(PID,nuevoHeapPrimero);
+	loggear_trace("agregue el heap a la lista");
 	//guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
 
 
-	//creamos el segundo HEAP nuevo que vamos a ingresar y actualizamos en mem
+	loggear_trace("creamos el segundo HEAP nuevo que vamos a ingresar y actualizamos en mem");
 	heap_metadata* nuevoHeapUltimo = malloc(sizeof(heap_metadata));
 	nuevoHeapUltimo->currAlloc = tam+9;
 	nuevoHeapUltimo->prevAlloc = 0;
@@ -155,8 +162,9 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	//guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
 
 
-	//agrego proceso a la lista
-	list_add(listaProcesos, nuevoProceso);
+	loggear_trace("agrego proceso a la lista");
+	//list_add(listaProcesos, nuevoProceso);
+	loggear_trace("agregue el proceso a la lista");
 
 	return nuevoHeapPrimero->currAlloc+9;//siempre el primer alloc va a ser 9 porque el primer dato se guarda al comienzo, y el metadata ocupa 9 bytes
 }
@@ -401,14 +409,16 @@ t_list* conseguir_listaHMD_mediante_PID(uint32_t PID){
 
 void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
 
+	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
+	if(list_size(listaHMD) == 0){
+		loggear_info("lista de hdm vacia pipi");
+	}
 	bool condicion(void* elementoListado, void* datoAInsertar){
 		heap_metadata* elemList = (heap_metadata*) elementoListado;
 		heap_metadata* elemInsertar = (heap_metadata*) datoAInsertar;
 
 		return elemList->currAlloc < elemInsertar->currAlloc;
 	}
-
-	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
 
 	list_add_sorted(listaHMD, (void*) heap, condicion);
 	//TODO testear que el insert se haga en la posicion correcta

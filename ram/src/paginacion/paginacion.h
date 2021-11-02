@@ -64,9 +64,6 @@ typedef struct{
 void inicializar_estructuras_administrativas_paginacion();
 
 
-
-
-
 // FUNCIONES PUBLICAS
 
 /**
@@ -157,7 +154,7 @@ void inicializar_estructuras_administrativas();
  * @NAME: destruir_estructuras_administativas
  * @DESC: libera la memoria reservada por las estructuras administrativas
  **/
-void destruir_estructuras_administativas();
+void destruir_estructuras_administrativas();
 
 /**
 * @NAME: se_puede_almacenar_el_alloc_para_proceso

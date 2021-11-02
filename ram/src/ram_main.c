@@ -6,6 +6,7 @@ void debug_configuracion();
 
 
 int main(int argc, char** argv) {
+
 	// TODO: Implementar signal de CtrlC y  tal vez CtrlZ
 	signal(SIGUSR1, signal_handler);
 	int error = iniciar_configuracion(argc, argv);
@@ -28,7 +29,9 @@ int main(int argc, char** argv) {
 		cerrar_todo();
 		return EXIT_FAILURE;
 	}
+	inicializar_estructuras_administrativas();
 	testeamos();
+	destruir_estructuras_administrativas();
 
 	cerrar_todo();
 
@@ -36,15 +39,18 @@ int main(int argc, char** argv) {
 }
 
 void testeamos() {
+
     uint32_t pid = 0;
     int32_t size;
-    while(pid!= -1){
     printf("Ingrese el numero de proceso \n");
     scanf("%d", &pid);
+    while(pid!= -1){
     printf("Ingrese el tamanio para el proceso %d \n", pid);
     scanf("%d", &size);
     memalloc(pid, size);
-
+    loggear_trace("log post-memalloc ");
+    printf("Ingrese el numero de proceso \n");
+    scanf("%d", &pid);
     }
 
     imprimir_procesos();
