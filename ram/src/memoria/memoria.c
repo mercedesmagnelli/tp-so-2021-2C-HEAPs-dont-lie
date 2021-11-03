@@ -50,7 +50,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 
 int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
 
-	if(!ptro_valido(pid, direccionLogicaALiberar) || ptro_liberado(pid, direccionLogicaALiberar)){
+	if(!existe_proceso(pid) || !ptro_valido(pid, direccionLogicaALiberar) || ptro_liberado(pid, direccionLogicaALiberar)){
 		loggear_trace("Hola soy un error, no me mates xP");
 		return -5; // MATE_FREE_FAULT
 	}else{
@@ -61,6 +61,7 @@ int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
 	}
 
 }
+
 
 int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer, void* lectura) {
 

@@ -350,4 +350,5 @@ char* calcular_hash_key_dic(uint32_t pid);
 /*COMPLETAR HEADERS*/
 uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size);
 
+
 #endif /* PAGINACION_PAGINACION_H_ */
