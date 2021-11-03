@@ -407,7 +407,16 @@ uint32_t calcular_seguidos(t_list* lista, uint32_t indice) {
 
 }
 
-// FUNCIONES PRIVADAS DE USO INTERNO
+void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
+
+	heap_metadata* heap = get_HEAP(PID, ptroHEAP);
+	int nroPag = heap->currAlloc / get_tamanio_pagina();
+	int offset = heap->currAlloc % get_tamanio_pagina();
+	void* dataLeida = leer_de_memoria_paginada(PID, nroPag, offset, tamanioALeer);
+	return dataLeida;
+}
+
+//---------------------------FUNCIONES PRIVADAS DE USO INTERNO---------------------------
 
 t_proceso* get_proceso_PID(uint32_t PID){
 
@@ -468,6 +477,28 @@ void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
 
 }
 
+void* leer_de_memoria_paginada(uint32_t PID, int nroPag, int offset, int tamDato){
+	int desplazamientoEnDato = 0;
+	uint32_t marcoPag;
+	int ptro_escritura;
+	void* data = malloc(tamDato);
+	while(tamDato>0){
+		marcoPag = obtener_marco_de_pagina_en_memoria(PID, nroPag, 0);
+		ptro_escritura = marcoPag * get_tamanio_pagina() + offset;
+		if((offset+tamDato) <= get_tamanio_pagina()){
+			leer_directamente_de_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
+			tamDato=0;
+		}else{
+			int tamDatoParcial = get_tamanio_pagina()- offset;
+			leer_directamente_de_memoria(data + desplazamientoEnDato, tamDatoParcial, ptro_escritura);
+			desplazamientoEnDato += tamDatoParcial;
+			tamDato -= tamDatoParcial;
+			offset = 0;
+		}
+	}
+	return data;
+}
+
 void guardar_HEAP_en_memoria(uint32_t PID, heap_metadata* heap){
 	int nroPag = heap->currAlloc / get_tamanio_pagina();
 	int offset = heap->currAlloc % get_tamanio_pagina();
@@ -507,9 +538,8 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 			marco = obtener_frame_de_RAM(PID, nroPag);
 			actualizar_datos_pagina(PID, nroPag, bitModificado, 0);
 		}else{
-			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima
+			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima. Tmbn tiene que actualizar la cant de Pags en asig FIJA
 			inicializar_datos_pagina(PID, nroPag, marco, bitModificado);//podriamos poner esta funcion dentro de obtener fram asi tmbn se encarga de modificar lo administrativo dsps del cambio de pags?
-			actualizar_cantidad_frames_por_proceso_RAM(PID, 1);
 		}
 		agregar_entrada_tlb(PID, nroPag, marco);
 	}
@@ -568,6 +598,7 @@ void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModifica
 void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado){
 	t_proceso* proceso = get_proceso_PID(PID);
 	proceso->miss_proceso++;
+	proceso->hits_proceso++;
 	t_pagina* pag = list_get(proceso->tabla_paginas, nroPag);
 	pag->frame = marco;
 	pag->timestamp = obtener_timestamp_actual();

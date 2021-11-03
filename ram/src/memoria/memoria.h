@@ -92,5 +92,12 @@ bool cantidad_valida(int32_t size);
 
 void escribir_directamente_en_memoria(void* valorAEscribir, int32_t tamanio, uint32_t direccionLogica);
 
+/**
+ * @NAME: leer_directamente_de_memoria
+ * @DESC: lee de la RAM el dato (ya malloqueado) teniendo en cuenta la dirLog y su tamanio
+ *
+ **/
+void leer_directamente_de_memoria(void* ptroLectura, int32_t tamanio, uint32_t direccionLogica);
+
 
 #endif /* MEMORIA_MEMORIA_C_ */

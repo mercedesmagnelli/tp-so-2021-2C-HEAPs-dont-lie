@@ -67,8 +67,7 @@ int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALee
     if(!ptro_valido(pid, direccionLogicaALeer) || ptro_liberado(direccionLogicaALeer,pid) || tamanio_de_direccion(direccionLogicaALeer, pid) < tamanioALeer){
         return -6; //MEM_READ_FAULT
     }else{
-        lectura = malloc(tamanioALeer);
-        memcpy(lectura, memoria_principal + traducir_a_dir_fisica(pid, direccionLogicaALeer, 0), tamanioALeer);
+        lectura = leer_de_memoria(direccionLogicaALeer, pid, tamanioALeer);
         return 0;
     }
 }
@@ -82,6 +81,11 @@ int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir,uint32_t
     	return 0;
 
     }
+}
+
+void leer_directamente_de_memoria(void* ptroLectura, int32_t tamanio, uint32_t direccionLogica){
+	memcpy(ptroLectura, memoria_principal + direccionLogica, tamanio);
+
 }
 
 void escribir_directamente_en_memoria(void* valorAEscribir, int32_t tamanio, uint32_t direccionLogica){

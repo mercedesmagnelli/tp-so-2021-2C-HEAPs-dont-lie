@@ -16,9 +16,9 @@
 #include <string.h>
 #include <sys/param.h>
 
-t_list* listaProcesos;
-t_list* listaFrames;
-t_dictionary* cant_frames_por_proceso;
+t_list* listaProcesos;//casos: agregar_proceso, liberar_paginas
+t_list* listaFrames;//casos: traer_pagina_de_SWAP, liberar_paginas
+t_dictionary* cant_frames_por_proceso;//casos: traer_pagina_de_SWAP, liberar_paginas
 
 typedef struct{
 	//índice: frame
@@ -188,6 +188,14 @@ uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size);
 **/
 void destruir_proceso(void* proceso);
 
+/**
+* @NAME: leer_de_memoria
+* @DESC: Devuelvo un ptro con lo leido de memoria que estaba referenciado por la dirLog a leer
+* 		Se encarga de invocar la funcion de memoria para la lectura
+**/
+void* leer_de_memoria(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer);
+
+
 
 
 // FUNCIONES PRIVADAS DE USO INTERNO
@@ -346,6 +354,14 @@ void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant);
  *
  **/
 char* calcular_hash_key_dic(uint32_t pid);
+
+/**
+* @NAME: leer_de_memoria_paginada
+* @DESC: Se encarga de devolver el msj a memoria.
+ * 		 En caso de que el dato este partido en dos o mas paginas, esta funcion se encarga de traer las pags a memoria y mandar la señal a memoria para
+ * 		 que guarde los datos.
+**/
+void* leer_de_memoria_paginada(uint32_t PID, int nroPag, int offset, int tamDato);
 
 /*COMPLETAR HEADERS*/
 uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size);
