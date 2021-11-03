@@ -16,6 +16,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 	while (seguir_esperando_mensajes) {
 		t_matelib_semaforo * semaforo;
 		t_estado_ejecucion ejecucion_semaforo;
+		t_ram_respuesta * respuesta_ram;
 
 		switch (mensaje->head) {
 		case MATELIB_INIT:
@@ -30,11 +31,29 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 
 			destruir_mensaje(mensaje);
+			desconexion(mensaje);
 
 			return 0;
 		case MATELIB_CLOSE:
 			loggear_info("[MATELIB_CLOSE], hay que cerrar el proceso");
-			loggear_error("MATELIB_CLOSE TODO hay que codear esto");
+
+			t_matelib_nuevo_proceso * muerto_proceso = deserializar_crear_proceso(mensaje->payload);
+
+			int respuesta_close = planificadores_proceso_cerrar(muerto_proceso->pid);
+
+			if (respuesta_close == 0) {
+				loggear_info("[MATELIB_CLOSE], se cerro el proceso");
+
+				respuesta_ram = ram_enviar_close(muerto_proceso);
+
+				enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, respuesta_ram->size, respuesta_ram->mensaje);
+			} else {
+				loggear_error("[MATELIB_CLOSE], no se pudo cerrar el proceso");
+				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			}
+
+			destruir_mensaje(mensaje);
+			desconexion(mensaje);
 
 			return 0;
 		case MATELIB_SEM_INIT:
@@ -147,19 +166,81 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			return 0;
 		case MATELIB_MEM_ALLOC:
-			loggear_info("[MATELIB_MEM_ALLOC], un proceso pide espacio en la RAM");
+			loggear_info("[MATELIB_MEM_ALLOC]");
+
+			t_matelib_memoria_alloc * alloc = deserializar_memoria_alloc(mensaje->payload);
+
+			loggear_info("[MATELIB_MEM_ALLOC], Enviamos mensaje a la ram");
+
+			respuesta_ram = ram_enviar_alloc(alloc);
+
+			loggear_info("[MATELIB_MEM_ALLOC], Recibimos respuesta, respondemos a la matelib");
+
+			enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, respuesta_ram->size, respuesta_ram->mensaje);
+
+			free(respuesta_ram->mensaje);
+			free(respuesta_ram);
+
+			destruir_mensaje(mensaje);
+			desconexion(mensaje);
 
 			return 0;
 		case MATELIB_MEM_FREE:
-			loggear_info("[MATELIB_MEM_FREE], un proceso libera memoria de la RAM");
+			loggear_info("[MATELIB_MEM_FREE]");
+
+			t_matelib_memoria_free * free_memoria = deserializar_memoria_free(mensaje->payload);
+
+			loggear_info("[MATELIB_MEM_FREE], Enviamos mensaje a la ram");
+
+			respuesta_ram = ram_enviar_free(free_memoria);
+
+			loggear_info("[MATELIB_MEM_FREE], Recibimos respuesta, respondemos a la matelib");
+
+			enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, respuesta_ram->size, respuesta_ram->mensaje);
+
+			free(respuesta_ram);
+
+			destruir_mensaje(mensaje);
+			desconexion(mensaje);
 
 			return 0;
 		case MATELIB_MEM_READ:
-			loggear_info("[MATELIB_MEM_READ], un proceso quiere leer algo de la RAM");
+			loggear_info("[MATELIB_MEM_READ]");
+
+			t_matelib_memoria_read * read_memoria = deserializar_memoria_read(mensaje->payload);
+
+			loggear_info("[MATELIB_MEM_READ], Enviamos mensaje a la ram");
+
+			respuesta_ram = ram_enviar_read(read_memoria);
+
+			loggear_info("[MATELIB_MEM_READ], Recibimos respuesta, respondemos a la matelib");
+
+			enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, respuesta_ram->size, respuesta_ram->mensaje);
+
+			free(respuesta_ram->mensaje);
+			free(respuesta_ram);
+
+			destruir_mensaje(mensaje);
+			desconexion(mensaje);
 
 			return 0;
 		case MATELIB_MEM_WRITE:
-			loggear_info("[MATELIB_MEM_WRITE], un proceso quiere escribir en la RAM");
+			loggear_info("[MATELIB_MEM_WRITE]");
+
+			t_matelib_memoria_alloc * write_memoria = deserializar_memoria_alloc(mensaje->payload);
+
+			loggear_info("[MATELIB_MEM_WRITE], Enviamos mensaje a la ram");
+
+			respuesta_ram = ram_enviar_alloc(write_memoria);
+
+			loggear_info("[MATELIB_MEM_WRITE], Recibimos respuesta, respondemos a la matelib");
+
+			enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, respuesta_ram->size, respuesta_ram->mensaje);
+
+			free(respuesta_ram);
+
+			destruir_mensaje(mensaje);
+			desconexion(mensaje);
 
 			return 0;
 		case DESCONEXION:

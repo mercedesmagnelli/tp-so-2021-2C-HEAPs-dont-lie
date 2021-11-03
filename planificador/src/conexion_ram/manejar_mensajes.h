@@ -20,6 +20,8 @@
  */
 int ram_recibir_mensaje(int socket_ram);
 
+t_prot_mensaje * ram_recibir(int socket);
+
 /**
  * @NAME: manejar_mensajes
  * @DESC: Se le envia un mensaje recibido y ejecuta el código acorde.

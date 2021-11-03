@@ -91,5 +91,8 @@ void hilos_wait_nuevo_bloqueado();
 void hilos_post_suspendido_ready();
 void hilos_wait_suspendido_ready();
 
+void hilos_post_finalizado();
+void hilos_wait_finalizado();
+
 
 #endif /* PLANIFICADORES_HILOS_PLANIFICADOR_H_ */
