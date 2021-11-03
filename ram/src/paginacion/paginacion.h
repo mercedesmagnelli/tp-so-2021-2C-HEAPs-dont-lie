@@ -20,6 +20,7 @@ t_list* listaProcesos;//casos: agregar_proceso, liberar_paginas
 t_list* listaFrames;//casos: traer_pagina_de_SWAP, liberar_paginas
 t_dictionary* cant_frames_por_proceso;//casos: traer_pagina_de_SWAP, liberar_paginas
 
+
 typedef struct{
 	//índice: frame
 	uint32_t estado;
@@ -62,9 +63,6 @@ typedef struct{
  * @DESC: Inicializa los diccionarios y las listas
  **/
 void inicializar_estructuras_administrativas_paginacion();
-
-
-
 
 
 // FUNCIONES PUBLICAS
@@ -157,7 +155,7 @@ void inicializar_estructuras_administrativas();
  * @NAME: destruir_estructuras_administativas
  * @DESC: libera la memoria reservada por las estructuras administrativas
  **/
-void destruir_estructuras_administativas();
+void destruir_estructuras_administrativas();
 
 /**
 * @NAME: se_puede_almacenar_el_alloc_para_proceso
@@ -191,7 +189,37 @@ uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size);
 **/
 void destruir_proceso(void* proceso);
 
+/**
+* @NAME: leer_de_memoria
+* @DESC: Devuelvo un ptro con lo leido de memoria que estaba referenciado por la dirLog a leer
+* 		Se encarga de invocar la funcion de memoria para la lectura
+**/
+void* leer_de_memoria(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer);
 
+
+/**
+ * @NAME: calcular_pagina_de_puntero_logico
+ * @DESC: devuelve la pagina a la cual corresponderia un determinado puntero logic
+ * @EXAMPLE: calcular_pagina_de_puntero_logico(100) - con paginas de 64
+ * 			 valor de retorno = 2 (pagina 2)
+ */
+uint32_t calcular_pagina_de_puntero_logico(uint32_t puntero);
+
+/**
+ * @NAME: calcular_offset_puntero_en_pagina
+ * @DESC: calcula el offset para un puntero dentro de una pagina
+ * @EXAMPLE: calcular_offset_puntero_en_pagina(100) - con paginas de 32
+ * 			 valor de retorno = 4
+ */
+
+uint32_t calcular_offset_puntero_en_pagina(uint32_t puntero);
+
+/**
+ * @NAME: escribir_en_memoria
+ * @DESC: funcion intermedia entre la funcion memwrite y la funcion que conoce la distribución de la memoria
+ */
+
+void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t puntero);
 
 // FUNCIONES PRIVADAS DE USO INTERNO
 /**
@@ -349,5 +377,28 @@ void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant);
  *
  **/
 char* calcular_hash_key_dic(uint32_t pid);
+
+/**
+* @NAME: leer_de_memoria_paginada
+* @DESC: Se encarga de devolver el msj a memoria.
+ * 		 En caso de que el dato este partido en dos o mas paginas, esta funcion se encarga de traer las pags a memoria y mandar la señal a memoria para
+ * 		 que guarde los datos.
+**/
+void* leer_de_memoria_paginada(uint32_t PID, int nroPag, int offset, int tamDato);
+
+/**
+ * @NAME: paginas_extras_para_proceso
+ * @DESC: calcula la cantidad de paginas nuevas necesarias para ampliar el espacio de direcciones de un proceso. Se fija
+ * el espacio disponible en la ultima pagina y lo tiene en cuenta para los calculos
+*/
+
+uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size);
+
+/**
+ * @NAME: calcular_paginas_para_tam
+ * @DESC: dado un determinado tamanio, calcula cuantas paginas son necesarias para almacenarlo
+*/
+
+int calcular_paginas_para_tamanio(uint32_t tam);
 
 #endif /* PAGINACION_PAGINACION_H_ */
