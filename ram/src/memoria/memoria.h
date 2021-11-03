@@ -11,6 +11,8 @@
 #include "../paginacion/paginacion.h"
 #include "../../../shared/protocolo.h"
 
+void* memoria_principal;
+
 
 /*Funciones que pide el TP obligatorias*/
 

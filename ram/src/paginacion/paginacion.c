@@ -7,7 +7,7 @@
 void inicializar_estructuras_administrativas() {
     listaProcesos = list_create();
     listaFrames = list_create();
-    //TODO: INICIALIZAR MEMORIA!!
+    memoria_principal = malloc(get_tamanio_memoria());
     for(int i=0;i<get_tamanio_pagina();i++){
     	t_frame* frame = malloc(sizeof(t_frame));
     	frame->estado=0;
@@ -346,7 +346,9 @@ void modificar_heaps(t_list* heaps, uint32_t indice, uint32_t pid, uint32_t cant
 	loggear_trace("el heap final es %d en la posicion %d", heap_final->currAlloc, MIN(indice+cantidad,list_size(heaps)-1));
 
 	if(heap_final->nextAlloc == -1){
+
 		heap_inicial->nextAlloc = -1;
+
 	}else{
 		heap_inicial->nextAlloc = heap_final->currAlloc;
 		heap_final->prevAlloc = heap_inicial->currAlloc;
@@ -407,16 +409,34 @@ uint32_t calcular_seguidos(t_list* lista, uint32_t indice) {
 
 }
 
+
 void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
 
 	heap_metadata* heap = get_HEAP(PID, ptroHEAP);
-	int nroPag = heap->currAlloc / get_tamanio_pagina();
-	int offset = heap->currAlloc % get_tamanio_pagina();
+	int nroPag = calcular_pagina_de_puntero_logico(heap->currAlloc);
+	int offset = calcular_offset_puntero_en_pagina(heap->currAlloc);
 	void* dataLeida = leer_de_memoria_paginada(PID, nroPag, offset, tamanioALeer);
 	return dataLeida;
 }
 
 //---------------------------FUNCIONES PRIVADAS DE USO INTERNO---------------------------
+
+uint32_t calcular_pagina_de_puntero_logico(uint32_t puntero){
+
+	return puntero/get_tamanio_pagina();
+}
+
+uint32_t calcular_offset_puntero_en_pagina(uint32_t puntero) {
+	return puntero%get_tamanio_pagina();
+}
+
+void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t puntero) {
+
+	uint32_t nro_pag = calcular_pagina_de_puntero_logico(puntero);
+	uint32_t offset = calcular_offset_puntero_en_pagina(puntero);
+	guardar_en_memoria_paginada(pid, nro_pag, offset, valor, size);
+
+}
 
 t_proceso* get_proceso_PID(uint32_t PID){
 

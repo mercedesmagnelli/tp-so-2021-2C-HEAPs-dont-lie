@@ -1,7 +1,5 @@
 #include "memoria.h"
 
-void* memoria_principal;
-
 
 int32_t memalloc(uint32_t pid, int32_t size) {
 	loggear_trace("estoy entrando al meamalloc");
@@ -50,7 +48,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 
 int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
 
-	if(!ptro_valido(pid, direccionLogicaALiberar) || ptro_liberado(pid, direccionLogicaALiberar)){
+	if(!existe_proceso(pid) || !ptro_valido(pid, direccionLogicaALiberar) || ptro_liberado(pid, direccionLogicaALiberar)){
 		loggear_trace("Hola soy un error, no me mates xP");
 		return -5; // MATE_FREE_FAULT
 	}else{
@@ -61,6 +59,7 @@ int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
 	}
 
 }
+
 
 int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer, void* lectura) {
 
@@ -77,7 +76,7 @@ int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir,uint32_t
     if(!ptro_valido(pid, direccionLogicaAEscribir) || ptro_liberado(direccionLogicaAEscribir,pid) || tamanio_de_direccion(direccionLogicaAEscribir, pid) < tamanioAEscribir){
             return -7; // MEM_WRITE_FAULT
     }else {
-        escribir_directamente_en_memoria(valorAEscribir, tamanioAEscribir, traducir_a_dir_fisica(pid, direccionLogicaAEscribir, 1));
+        escribir_en_memoria(pid, valorAEscribir, tamanioAEscribir, direccionLogicaAEscribir);
     	return 0;
 
     }
