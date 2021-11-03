@@ -79,11 +79,14 @@ int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir,uint32_t
     if(!ptro_valido(pid, direccionLogicaAEscribir) || ptro_liberado(direccionLogicaAEscribir,pid) || tamanio_de_direccion(direccionLogicaAEscribir, pid) < tamanioAEscribir){
             return -7; // MEM_WRITE_FAULT
     }else {
-        escribir_directamente_en_memoria(valorAEscribir, tamanioAEscribir, traducir_a_dir_fisica(pid, direccionLogicaAEscribir, 1));
+        escribir_en_memoria(pid, valorAEscribir, tamanioAEscribir, direccionLogicaAEscribir);
     	return 0;
 
     }
 }
+
+
+
 
 void escribir_directamente_en_memoria(void* valorAEscribir, int32_t tamanio, uint32_t direccionLogica){
 	memcpy(memoria_principal + direccionLogica, valorAEscribir, tamanio);

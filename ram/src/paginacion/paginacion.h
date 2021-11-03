@@ -20,6 +20,7 @@ t_list* listaProcesos;
 t_list* listaFrames;
 t_dictionary* cant_frames_por_proceso;
 
+
 typedef struct{
 	//índice: frame
 	uint32_t estado;
@@ -188,7 +189,29 @@ uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size);
 **/
 void destruir_proceso(void* proceso);
 
+/**
+ * @NAME: calcular_pagina_de_puntero_logico
+ * @DESC: devuelve la pagina a la cual corresponderia un determinado puntero logic
+ * @EXAMPLE: calcular_pagina_de_puntero_logico(100) - con paginas de 64
+ * 			 valor de retorno = 2 (pagina 2)
+ */
+uint32_t calcular_pagina_de_puntero_logico(uint32_t puntero);
 
+/**
+ * @NAME: calcular_offset_puntero_en_pagina
+ * @DESC: calcula el offset para un puntero dentro de una pagina
+ * @EXAMPLE: calcular_offset_puntero_en_pagina(100) - con paginas de 32
+ * 			 valor de retorno = 4
+ */
+
+uint32_t calcular_offset_puntero_en_pagina(uint32_t puntero);
+
+/**
+ * @NAME: escribir_en_memoria
+ * @DESC: funcion intermedia entre la funcion memwrite y la funcion que conoce la distribución de la memoria
+ */
+
+void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t puntero);
 
 // FUNCIONES PRIVADAS DE USO INTERNO
 /**
