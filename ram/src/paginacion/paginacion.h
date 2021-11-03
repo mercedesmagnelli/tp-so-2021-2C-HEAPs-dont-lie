@@ -386,8 +386,19 @@ char* calcular_hash_key_dic(uint32_t pid);
 **/
 void* leer_de_memoria_paginada(uint32_t PID, int nroPag, int offset, int tamDato);
 
-/*COMPLETAR HEADERS*/
+/**
+ * @NAME: paginas_extras_para_proceso
+ * @DESC: calcula la cantidad de paginas nuevas necesarias para ampliar el espacio de direcciones de un proceso. Se fija
+ * el espacio disponible en la ultima pagina y lo tiene en cuenta para los calculos
+*/
+
 uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size);
 
+/**
+ * @NAME: calcular_paginas_para_tam
+ * @DESC: dado un determinado tamanio, calcula cuantas paginas son necesarias para almacenarlo
+*/
+
+int calcular_paginas_para_tamanio(uint32_t tam);
 
 #endif /* PAGINACION_PAGINACION_H_ */
