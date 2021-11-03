@@ -36,4 +36,6 @@ void iniciar_swamp();
 
 void destroy_lista_carpinchos();
 
+void destroy_carpinchos_swamp(t_carpincho_swamp* carpincho);
+
 #endif /* INICIALIZAR_FILESYSTEM_INICIALIZAR_FILESYSTEM_H_ */

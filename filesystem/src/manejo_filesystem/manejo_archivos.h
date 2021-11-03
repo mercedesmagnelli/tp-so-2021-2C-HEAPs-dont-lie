@@ -9,7 +9,7 @@
 #include "../configuracion/filesystem_configuracion.h"
 #include "../../../shared/logger.h"
 #include <stdint.h>
-
+#include "../inicializar_filesystem/inicializar_filesystem.h"
 
 /*
  * escribir_particion
@@ -19,7 +19,7 @@
  *
  */
 
-int escribir_particion(uint32_t pid_carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp);
+int escribir_particion(t_carpincho_swamp* pid_carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp);
 
 /*
  * leer_particion
@@ -39,5 +39,13 @@ char* leer_particion(uint32_t marco, t_archivo_swamp* swamp);
  *
  */
 t_archivo_swamp* archivo_a_escribir(uint32_t pid_carpincho);
+
+/*
+ * crear_carpincho(uint32_t pid_carpincho)
+ * 	crea con el pid la estructura t_carpincho_swamp* para poder tener el registro de las paginas y en que marcos se encuentra.
+ *
+ */
+
+t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho);
 
 #endif /* MANEJO_FILESYSTEM_MANEJO_ARCHIVOS_H_ */

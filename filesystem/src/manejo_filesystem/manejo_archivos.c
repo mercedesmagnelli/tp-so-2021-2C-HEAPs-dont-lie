@@ -2,12 +2,17 @@
 
 uint32_t marco_libre(t_archivo_swamp* swamp);
 
-int escribir_particion(uint32_t pid_carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
+int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
 
 	FILE* archivo;
 	char* ruta_particion = swamp->ruta_archivo;
 
 	uint32_t marco = marco_libre(swamp);
+
+	if(marco < 0){
+		loggear_error("NO HAY MAS MARCOS DISPONIBLES EN LA PARTICION %s PARA GUARDAR LA PAGINA %d DEL PROCESO %d", ruta_particion, pagina, carpincho->pid_carpincho);
+		return -1;
+	}
 
 	loggear_debug("SE PROCEDE A ESCRIBIR LA PAGINA %d EN EL MARCO %d DE LA PARTICION %s", pagina, marco, ruta_particion);
 
@@ -29,6 +34,12 @@ int escribir_particion(uint32_t pid_carpincho, uint32_t pagina, char* texto_escr
 	swamp->espacio_libre = swamp->espacio_libre - 1;
 
 	bitarray_set_bit(swamp->bitmap_bitarray, marco);
+
+	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
+	dupla->marco = marco;
+	dupla->pagina = pagina;
+
+	list_add(carpincho->dupla, dupla);
 
 	loggear_debug("Se escribio con exito la pagina %d en el marco %d", pagina, marco);
 
@@ -90,7 +101,7 @@ uint32_t marco_libre(t_archivo_swamp* swamp){
 				i++;
 			}
 
-	if(i == get_cantidad_paginas()){
+	if(i == get_cantidad_marcos()){
 			loggear_error("NO HAY MARCO DISPONIBLE PARA ASIGNARLE");
 				return -1;
 			}
@@ -99,6 +110,15 @@ uint32_t marco_libre(t_archivo_swamp* swamp){
 	return i;
 }
 
+
+t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho){
+
+	t_carpincho_swamp* carpincho = malloc(sizeof(t_carpincho_swamp));
+	carpincho->pid_carpincho = pid_carpincho;
+	carpincho->dupla = list_create();
+
+	return carpincho;
+}
 /*
  * PAGINA = 10
  * BUSCO ESPACIO Y ENCUENTRO QUE TENGO LIBRE EL MARCO 1
@@ -108,7 +128,6 @@ uint32_t marco_libre(t_archivo_swamp* swamp){
  *
  *
  */
-
 
 
 

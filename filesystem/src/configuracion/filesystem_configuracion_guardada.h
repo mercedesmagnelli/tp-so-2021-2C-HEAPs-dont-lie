@@ -45,7 +45,7 @@ int get_marcos_maximos();
 int get_retardo_swap();
 int get_cantidad_archivos();
 char ** get_archivos_swap();
-int get_cantidad_paginas();
+int get_cantidad_marcos();
 
 
 /**

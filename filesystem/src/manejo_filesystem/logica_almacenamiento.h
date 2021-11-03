@@ -24,4 +24,20 @@
 
 t_archivo_swamp* particion_a_escribir(uint32_t pid_carpincho);
 
+/*
+ * esta_el_carpincho_en_lista_carpinchos(t_carpincho_swamp* carpincho)
+ * EVALUA SI EL CARPINCHO SE ENCUENTRA EN LA LISTA LISTA_CARPINCHO
+ *
+ *
+ */
+bool esta_el_carpincho_en_lista_carpinchos(t_carpincho_swamp* carpincho);
+
+/*
+ * agregar_carpincho_a_lista_carpinchos(t_carpincho_swamp* carpincho)
+ * Agrega el carpincho a la lista_carpinchos para cosas administrativas
+ *
+ *
+ */
+void agregar_carpincho_a_lista_carpinchos(t_carpincho_swamp* carpincho);
+
 #endif /* MANEJO_FILESYSTEM_LOGICA_ALMACENAMIENTO_H_ */

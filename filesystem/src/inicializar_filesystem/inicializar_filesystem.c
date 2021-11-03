@@ -48,8 +48,15 @@ int crear_particion(){
 	return 0;
 }
 
-
-void destroy_lista_carpinchos(){
-	list_destroy(lista_carpinchos);
+void destroy_carpinchos_swamp(t_carpincho_swamp* carpincho){
+	list_clean(carpincho->dupla);
+	list_destroy(carpincho->dupla);
 }
 
+void destroy_lista_carpinchos(){
+	for(int j = 0; j < list_size(lista_carpinchos); j++){
+		destroy_carpinchos_swamp(list_get(lista_carpinchos, j));
+	}
+
+	list_destroy(lista_carpinchos);
+}
