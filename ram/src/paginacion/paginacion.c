@@ -171,27 +171,59 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 }
 
 int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, uint32_t size) {
+
 	//funcion cuando un proceso pide memoria
 	//consguir socket
-	/*void* mensaje = serializar_pedido_memoria(pid, size);
+	/*uint32_t cantidad_paginas_extras = paginas_extras_para_proceso(pid, size);
+	void* mensaje = serializar_pedido_memoria(pid, cantidad_paginas_extras);
 
 	//semaforo_socket
-	int a = enviar_mensaje_protocolo(1,header, 8, mensaje);
-	if (a < 0 ) {
-		//imprimir que hubo un pronlema
-	}
+	enviar_mensaje_protocolo(1,header, 8, mensaje);
+
 	//como consigo el socket del swap?
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(1);
 	//semaforo_socket
 	uint32_t respuesta_final = *(uint32_t*)(respuesta->payload);
+	t_pagina* nueva_pagina;
+	t_proceso* proceso_obtener_proceso_mediante_PID(pid);
+	if(respuesta_final == 1) {
+		for(int i = 0;i<cantidad_paginas_extra;i++){
+			nueva_pagina= malloc(sizeof(t_pagina));
+			nueva_pagina->bit_presencia=0;//es el unico dato que llenamos
+			list_add(proceso->tabla_paginas,nueva_pagina);
+		}
+	}
 	//loggear la respuesta
 	free(mensaje);
 
-return respuesta_final;
-*/
+*/	if(header == R_S_ESPACIO_PROCESO_EXISTENTE) {
+	t_pagina* nueva_pagina;
+
+	uint32_t cantidad_paginas_extras = paginas_extras_para_proceso(pid, size);
+	t_list* tp = obtener_tabla_paginas_mediante_PID(pid);
+	for(int i = 0;i< cantidad_paginas_extras ;i++){
+				nueva_pagina = malloc(sizeof(t_pagina));
+				nueva_pagina->bit_presencia=0;//es el unico dato que llenamos
+				list_add(tp,nueva_pagina);
+	}
+}
 	return 1;
 }
 
+uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size) {
+
+	uint32_t cantidad =  (size+9) / get_tamanio_pagina();
+	uint32_t resto_ult_pag = calcular_tamanio_ultimo_HEAP(pid);
+	uint32_t excedente = (size+9) % get_tamanio_pagina();
+
+	if(resto_ult_pag < excedente) {
+		cantidad++;
+	}
+
+	loggear_info("Se van a pedir %d paginas extras a swamp", cantidad);
+
+	return cantidad;
+}
 
 
 bool ptro_valido(uint32_t PID, uint32_t ptro) {

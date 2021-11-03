@@ -62,8 +62,8 @@ void imprimir_procesos() {
 
     for (int i = 0; i < list_size(listaProcesos); i++){
         t_proceso* proc = (t_proceso*) list_get(listaProcesos,i);
-        loggear_warning("El proceso %d está ocupando %d paginas", proc->PID, list_size(proc->tabla_paginas));
-        loggear_warning("Los heaps del proceso %d son: \n", proc->PID);
+        loggear_warning("El proceso %d está ocupando %d paginas \n", proc->PID, list_size(proc->tabla_paginas));
+        loggear_warning("Los heaps del proceso %d son:", proc->PID);
         imprimir_hdm(proc->lista_hmd);
 
     }

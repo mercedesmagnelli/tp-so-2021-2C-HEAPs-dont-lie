@@ -347,4 +347,7 @@ void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant);
  **/
 char* calcular_hash_key_dic(uint32_t pid);
 
+/*COMPLETAR HEADERS*/
+uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size);
+
 #endif /* PAGINACION_PAGINACION_H_ */
