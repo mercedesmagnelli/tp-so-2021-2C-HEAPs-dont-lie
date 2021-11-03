@@ -14,6 +14,22 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		destruir_mensaje(mensaje);
 		return 0;
+
+	case EXITO_EN_LA_TAREA:
+
+		destruir_mensaje(mensaje);
+		return 0;
+
+	case FALLO_EN_LA_TAREA:
+
+		destruir_mensaje(mensaje);
+		return -1;
+
+	case FALLO_EN_LA_RAM:
+
+		destruir_mensaje(mensaje);
+		return -1;
+
 	case DESCONEXION_TOTAL:
 		loggear_error("Se cerró la conexión con ram");
 
