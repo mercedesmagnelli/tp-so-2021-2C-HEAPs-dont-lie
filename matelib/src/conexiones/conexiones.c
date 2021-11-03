@@ -219,7 +219,7 @@ int enviar_mate_call_io(t_matelib_io* entrada_salida){
 	return 0;
 }
 
-mate_pointer enviar_mate_memalloc(t_matelib_memoria_alloc* alloc){
+int32_t enviar_mate_memalloc(t_matelib_memoria_alloc* alloc){
 
 	int socket = conexiones_iniciar();
 	if (socket < 0) {
@@ -237,7 +237,7 @@ mate_pointer enviar_mate_memalloc(t_matelib_memoria_alloc* alloc){
 	}
 	free(size);
 
-	mate_pointer error = recibir_mensaje(socket);
+	int32_t error = recibir_mensaje(socket);
 	if (error != 0) {
 		loggear_info("Nos descnocimos, no podemos trabajar");
 		return error;
@@ -249,7 +249,7 @@ mate_pointer enviar_mate_memalloc(t_matelib_memoria_alloc* alloc){
 	return error;
 }
 
-int enviar_mate_memfree(free){
+int enviar_mate_memfree(t_matelib_memoria_free* liberar){
 
 	int socket = conexiones_iniciar();
 	if (socket < 0) {
@@ -257,7 +257,7 @@ int enviar_mate_memfree(free){
 	}
 
 	size_t * size = malloc(sizeof(size_t));
-	void * mensaje = serializar_memoria_free(free, size);
+	void * mensaje = serializar_memoria_free(liberar, size);
 
 	int resultado = enviar_mensaje_protocolo(socket, MATELIB_MEM_FREE, *size, mensaje);
 	if (resultado < 0) {
@@ -280,7 +280,7 @@ int enviar_mate_memfree(free){
 
 }
 
-int enviar_mate_memread(t_matelib_memoria_read* read){
+int enviar_mate_memread(t_matelib_memoria_read* leer){
 
 	int socket = conexiones_iniciar();
 	if (socket < 0) {
@@ -288,7 +288,7 @@ int enviar_mate_memread(t_matelib_memoria_read* read){
 	}
 
 	size_t * size = malloc(sizeof(size_t));
-	void * mensaje = serializar_memoria_read(read, size);
+	void * mensaje = serializar_memoria_read(leer, size);
 
 	int resultado = enviar_mensaje_protocolo(socket, MATELIB_MEM_READ, *size, mensaje);
 	if (resultado < 0) {
@@ -311,7 +311,7 @@ int enviar_mate_memread(t_matelib_memoria_read* read){
 }
 
 
-int enviar_mate_memwrite(write){
+int enviar_mate_memwrite(t_matelib_memoria_write* escribir){
 
 	int socket = conexiones_iniciar();
 	if (socket < 0) {
@@ -319,7 +319,7 @@ int enviar_mate_memwrite(write){
 	}
 
 	size_t * size = malloc(sizeof(size_t));
-	void * mensaje = serializar_memoria_read(read, size);
+	void * mensaje = serializar_memoria_write(escribir, size);
 
 	int resultado = enviar_mensaje_protocolo(socket, MATELIB_MEM_WRITE, *size, mensaje);
 	if (resultado < 0) {
