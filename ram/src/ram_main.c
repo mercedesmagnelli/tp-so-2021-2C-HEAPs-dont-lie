@@ -6,9 +6,9 @@ void debug_configuracion();
 
 
 int main(int argc, char** argv) {
+
 	// TODO: Implementar signal de CtrlC y  tal vez CtrlZ
 	signal(SIGUSR1, signal_handler);
-
 	int error = iniciar_configuracion(argc, argv);
 	if (error != STATUS_OK) {
 		puts("Error en los argumentos\n");
@@ -30,10 +30,15 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
+	inicializar_estructuras_administrativas();
+
 	cerrar_todo();
+	destruir_estructuras_administrativas();
 
 	return EXIT_SUCCESS;
 }
+
+
 
 void cerrar_todo() {
 	cerrar_conexiones(true); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga  
