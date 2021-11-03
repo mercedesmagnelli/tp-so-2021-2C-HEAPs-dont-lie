@@ -63,7 +63,13 @@ t_hilo * colas_mover_ready_exec();
  * @DESC: Recibe un hilo y lo mueve de EXEC a FINISH
  *
  * */
-t_hilo * colas_mover_exec_finish(t_hilo * hilo);
+t_hilo * colas_mover_exec_finish(uint32_t pid_mover);
+
+/**
+ * @NAME: colas_obtener_finalizado
+ * @DESC: Elimina de la cola de finalizado el primer hilo que encuentre y lo retorna
+ */
+t_hilo * colas_obtener_finalizado();
 
 /**
  * @NAME: colas_mover_exec_blocked

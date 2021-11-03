@@ -31,11 +31,29 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 
 			destruir_mensaje(mensaje);
+			desconexion(mensaje);
 
 			return 0;
 		case MATELIB_CLOSE:
 			loggear_info("[MATELIB_CLOSE], hay que cerrar el proceso");
-			loggear_error("MATELIB_CLOSE TODO hay que codear esto");
+
+			t_matelib_nuevo_proceso * muerto_proceso = deserializar_crear_proceso(mensaje->payload);
+
+			int respuesta_close = planificadores_proceso_cerrar(muerto_proceso->pid);
+
+			if (respuesta_close == 0) {
+				loggear_info("[MATELIB_CLOSE], se cerro el proceso");
+
+				respuesta_ram = ram_enviar_close(muerto_proceso);
+
+				enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, respuesta_ram->size, respuesta_ram->mensaje);
+			} else {
+				loggear_error("[MATELIB_CLOSE], no se pudo cerrar el proceso");
+				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			}
+
+			destruir_mensaje(mensaje);
+			desconexion(mensaje);
 
 			return 0;
 		case MATELIB_SEM_INIT:

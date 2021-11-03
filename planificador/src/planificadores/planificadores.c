@@ -57,6 +57,20 @@ void planificador_medio_plazo() {
 	}
 }
 
+void planificador_destruir_de_hilos() {
+	loggear_debug("[SYSTEM] --- Se creo el destructor de hilos");
+
+	while (true) {
+		hilos_wait_finalizado();
+
+		t_hilo * hilo = colas_obtener_finalizado();
+
+		loggear_debug("[PID: %d] --- [Destructor] --- Se eliminara el hilo", pid(hilo));
+
+		loggear_error("[Destructor] TODO: Codear, eliminar semaforos ocupados y recursos consumiendo (tal vez, cancelar hilo IO) ");
+	}
+}
+
 int planificadores_iniciar() {
 	colas_iniciar();
 	hilos_planificador_iniciar();
@@ -92,7 +106,15 @@ int planificadores_proceso_iniciar(uint32_t ppid) {
     return 0;
 }
 
-int planificadores_proceso_cerrar(void * proceso) {
+int planificadores_proceso_cerrar(uint32_t ppid) {
+	loggear_debug("[SYSTEM] --- Llego un proceso para cerrar en el planificador");
+
+	t_hilo * hilo = colas_mover_exec_finish(ppid);
+
+	hilos_post_finalizado();
+
+	loggear_debug("[PID: %d] --- [SYSTEM] --- Se movió a NEW", pid(hilo));
+
     return 0;
 }
 

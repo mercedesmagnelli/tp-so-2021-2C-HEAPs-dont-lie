@@ -134,8 +134,24 @@ t_ram_respuesta * ram_enviar_read(t_matelib_memoria_read * memoria_read) {
 	return respuesta;
 }
 
+t_ram_respuesta * ram_enviar_close(t_matelib_nuevo_proceso * muerto_proceso) {
+	size_t * size = malloc(sizeof(size_t));
+	void * mensaje_lib = serializiar_crear_proceso(muerto_proceso, size);
 
+	t_prot_mensaje * respuesta_ram = ram_enviar_mensaje(MATELIB_CLOSE, mensaje_lib, *size);
 
+	t_ram_respuesta * respuesta = malloc(sizeof(t_ram_respuesta));
+
+	respuesta->respuesta = respuesta_ram->head;
+	respuesta->size = 0;
+	respuesta->mensaje = NULL;
+
+	free(size);
+	free(mensaje_lib);
+	free(respuesta_ram);
+
+	return respuesta;
+}
 
 
 // Publica

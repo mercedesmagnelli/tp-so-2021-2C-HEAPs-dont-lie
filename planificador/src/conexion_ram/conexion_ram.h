@@ -39,6 +39,8 @@ t_ram_respuesta * ram_enviar_free(t_matelib_memoria_free * memoria_free);
 
 t_ram_respuesta * ram_enviar_read(t_matelib_memoria_read * memoria_read);
 
+t_ram_respuesta * ram_enviar_close(t_matelib_nuevo_proceso * muerto_proceso);
+
 /**
  * @NAME: ram_cerrar_conexiones
  * @DESC: Cierra los hilos y libera toda la memoria ocupada

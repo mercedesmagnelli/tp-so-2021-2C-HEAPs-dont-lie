@@ -137,8 +137,8 @@ t_hilo * colas_mover_ready_exec() {
     return hilo;
 }
 
-t_hilo * colas_mover_exec_finish(t_hilo * hilo_mover) {
-	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
+t_hilo * colas_mover_exec_finish(uint32_t pid_mover) {
+	bool son_iguales(void * hilo2) { return pid_mover == ((t_hilo *) hilo2)->pid; }
 	pthread_mutex_lock(&mutex_exec_list);
 	t_hilo * hilo = list_remove_by_condition(exec_list, son_iguales);
 	pthread_mutex_unlock(&mutex_exec_list);
@@ -150,6 +150,14 @@ t_hilo * colas_mover_exec_finish(t_hilo * hilo_mover) {
 	pthread_mutex_unlock(&mutex_finish_queue);
 
     return hilo;
+}
+
+t_hilo * colas_obtener_finalizado() {
+	pthread_mutex_lock(&mutex_finish_queue);
+	t_hilo * hilo = queue_pop(finish_queue);
+	pthread_mutex_unlock(&mutex_finish_queue);
+
+	return hilo;
 }
 
 t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante, char * nombre_bloqueante, uint32_t pid) {
