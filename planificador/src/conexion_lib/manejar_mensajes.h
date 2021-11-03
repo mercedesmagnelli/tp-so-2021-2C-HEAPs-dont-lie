@@ -8,6 +8,8 @@
 #include "../planificadores/semaforo.h"
 #include "../planificadores/dispositivo_io.h"
 
+#include "../conexion_ram/conexion_ram.h"
+
 #include "../../../shared/logger.h"
 #include "../../../shared/protocolo.h"
 #include "../../../shared/codigo_error.h"

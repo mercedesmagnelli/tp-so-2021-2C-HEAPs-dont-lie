@@ -7,6 +7,10 @@ int ram_recibir_mensaje(int socket_ram) {
 	return manejar_mensajes(mensaje);
 }
 
+t_prot_mensaje * ram_recibir(int socket) {
+	return recibir_mensaje_protocolo(socket);
+}
+
 int manejar_mensajes(t_prot_mensaje * mensaje) {
 	switch (mensaje->head) {
 	case HANDSHAKE_R_P:
