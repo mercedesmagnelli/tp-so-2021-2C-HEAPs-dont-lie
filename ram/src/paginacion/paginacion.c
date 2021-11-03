@@ -68,7 +68,7 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
 	ptro = heap->currAlloc + 9;
 
-	if(heap->nextAlloc==-1 && calcular_tamanio_ultimo_HEAP(PID)<tam){
+	if(heap->nextAlloc==-1 && calcular_tamanio_ultimo_HEAP(PID)<tam+9){
 		ptro = (-1)* ptro;
 	}
 
@@ -234,7 +234,6 @@ bool ptro_valido(uint32_t PID, uint32_t ptro) {
 		heap_metadata* heap_md = (heap_metadata*) heap;
 		return (heap_md->currAlloc + 9) == ptro;
 	}
-
 	return list_any_satisfy(lista_heaps,condition);
 }
 
@@ -263,6 +262,7 @@ bool ptro_liberado(uint32_t PID, uint32_t ptro){
 	}
 
 	heap_metadata* heap_encontrado = (heap_metadata*) list_find(lista_heaps, condicion);
+
 	return heap_encontrado -> isFree;
 }
 
@@ -274,24 +274,26 @@ void liberar_memoria(uint32_t PID, uint32_t ptro){
 
 void consolidar_memoria(uint32_t PID){
 
+	loggear_trace("iniciamos consolidacion de la memoria");
 	t_list* heaps = conseguir_listaHMD_mediante_PID(PID);
-
 	uint32_t indice=0;
 
 	uint32_t frees_contiguos = cantidad_de_frees_contiguos(heaps, &indice);
 
+	loggear_trace("La cantidad de frees_contiguos es %d", frees_contiguos);
 	switch(frees_contiguos) {
-
 	case 1:
 		//no hay nada para consolidar, logguear
 		loggear_info("[MEMORIA] - La memoria no tiene nada para consolidar");
 		break;
 	case 2:
 		//caso en el que modifico el heap del que parto y el siguiente del siguiente
+		loggear_info("[Memoria] - Se va a consolidar el caso LL");
 		modificar_heaps(heaps, indice, PID, 2);
 		break;
 	case 3:
 		//caso en el que puede que modifique mas de uno
+		loggear_info("[Memoria] - Se va a consolidar el caso LLL");
 		modificar_heaps(heaps, indice, PID,3);
 		break;
 
@@ -319,7 +321,7 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp) {
 
 	for(int i = 0; i < cantPagABorrar; i++){//tenemos que revisar las paginas eliminadas, si estan en RAM tenemos que actualizar la cantidad de paginas en RAM del proceso
 		list_remove_and_destroy_element(tp, cantPagNOBORRAR, free);
-	}
+	}//avisar a SWAP la eliminacion de las paginas del proceso
 
 
 }
@@ -339,20 +341,27 @@ bool el_ultimo_heap_libera_paginas(heap_metadata* ultimo_heap){
 void modificar_heaps(t_list* heaps, uint32_t indice, uint32_t pid, uint32_t cantidad){
 
 	heap_metadata* heap_inicial = (heap_metadata*) list_get(heaps, indice);
-	heap_metadata* heap_final = (heap_metadata*) list_get(heaps, indice+cantidad);
+	loggear_trace("el heap inicial en la posicion %d es %d", indice,  heap_inicial->currAlloc);
+	heap_metadata* heap_final = (heap_metadata*) list_get(heaps, MIN(indice+cantidad,list_size(heaps)-1));
+	loggear_trace("el heap final es %d en la posicion %d", heap_final->currAlloc, MIN(indice+cantidad,list_size(heaps)-1));
 
-	heap_inicial->nextAlloc = heap_final->currAlloc;
-	heap_final->prevAlloc = heap_inicial->currAlloc;
+	if(heap_final->nextAlloc == -1){
+		heap_inicial->nextAlloc = -1;
+	}else{
+		heap_inicial->nextAlloc = heap_final->currAlloc;
+		heap_final->prevAlloc = heap_inicial->currAlloc;
+	}
+	loggear_trace("ya hice el intercambio turbio");
 
-	for(int i = 0; i < cantidad - 1; i++){
+	for(int i = 0; i < cantidad -1; i++){
 
-		list_remove_and_destroy_element(heaps, indice + cantidad - i, free);
+		list_remove_and_destroy_element(heaps, indice+1, free);
 
 	}
 
 
-	guardar_HEAP_en_memoria(pid, heap_inicial);
-	guardar_HEAP_en_memoria(pid, heap_final);
+	//guardar_HEAP_en_memoria(pid, heap_inicial);
+	//guardar_HEAP_en_memoria(pid, heap_final);//verificar que  heap_inicial != -1 para hacer esto
 
 
 
@@ -366,11 +375,10 @@ uint32_t cantidad_de_frees_contiguos(t_list* lista_heaps, uint32_t* indice) {
 	while(*indice < (list_size(lista_heaps) - 1)  && no_encontrado) {
 
 		heap_metadata* heap = (heap_metadata*)list_get(lista_heaps, *indice);
-
-		if(!heap->isFree) {
+		if(heap->isFree) {
 			cantidad = calcular_seguidos(lista_heaps, *indice);
-			if(cantidad >=2) {
-				no_encontrado = false;
+				if(cantidad >=2) {
+					no_encontrado = false;
 				(*indice)--;
 			}
 		}
@@ -388,9 +396,8 @@ uint32_t calcular_seguidos(t_list* lista, uint32_t indice) {
 	int i = indice;
 	heap_metadata* obtenido = (heap_metadata*) list_get(lista, indice);
 	while(i < list_size(lista) && obtenido->isFree){
-
 		i++;
-		obtenido = (heap_metadata*) list_get(lista, i);
+		obtenido = (heap_metadata*) list_get(lista, MIN(i,list_size(lista)-1));
 		s++;
 
 	}
@@ -436,6 +443,9 @@ heap_metadata* get_HEAP(uint32_t PID, int32_t ptro){
 
 t_list* conseguir_listaHMD_mediante_PID(uint32_t PID){
     t_proceso* proceso = get_proceso_PID(PID);
+    if(proceso==NULL){
+    	loggear_trace("estoy re nulleable hoy");
+    }
     t_list* listaHMD = proceso->lista_hmd;
     return listaHMD;
 }

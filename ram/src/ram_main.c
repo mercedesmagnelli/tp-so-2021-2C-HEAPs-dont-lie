@@ -42,6 +42,8 @@ void testeamos() {
 
     uint32_t pid = 0;
     int32_t size;
+    int32_t ptro;
+
     printf("Ingrese el numero de proceso \n");
     scanf("%d", &pid);
     while(pid!= -1){
@@ -51,6 +53,17 @@ void testeamos() {
     loggear_trace("log post-memalloc ");
     printf("Ingrese el numero de proceso \n");
     scanf("%d", &pid);
+    }
+
+    printf("PASAMOS A LIBERACION \n Ingrese el numero de proceso \n");
+	scanf("%d", &pid);
+    while(pid!= -1){
+    	printf("Ingrese el ptro del proceso %d a liberar\n", pid);
+		scanf("%d", &ptro);
+		memfree(ptro, pid);
+		loggear_trace("log post-memfree ");
+		printf("Ingrese el numero de proceso \n");
+		scanf("%d", &pid);
     }
 
     imprimir_procesos();
@@ -78,7 +91,7 @@ void imprimir_hdm(t_list* lista_heaps) {
         loggear_warning("CurrAlloc     = %d", heap_actual->currAlloc);
         loggear_warning("PrevAlloc     = %d", heap_actual->prevAlloc);
         loggear_warning("NextAlloc     = %d", heap_actual ->nextAlloc);
-        loggear_warning("IsFree     = %d", heap_actual->isFree);
+        loggear_warning("IsFree	       = %d", heap_actual->isFree);
     }
 }
 

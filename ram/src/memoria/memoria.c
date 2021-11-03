@@ -50,10 +50,11 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 
 int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
 
-	if(ptro_valido(pid, direccionLogicaALiberar) || ptro_liberado(direccionLogicaALiberar,pid)){
+	if(!ptro_valido(pid, direccionLogicaALiberar) || ptro_liberado(pid, direccionLogicaALiberar)){
+		loggear_trace("Hola soy un error, no me mates xP");
 		return -5; // MATE_FREE_FAULT
 	}else{
-		//Ya aca llegue a un punto donde el puntero puede liberarse
+		loggear_trace("Liberaremos el ptro %d del proceso %d", direccionLogicaALiberar, pid);
 		liberar_memoria(pid, direccionLogicaALiberar);
 		consolidar_memoria(pid);
 		return 0; //ta to' bien
