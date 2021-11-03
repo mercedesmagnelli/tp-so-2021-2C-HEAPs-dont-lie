@@ -15,6 +15,12 @@
 
 #include "manejar_mensajes.h"
 
+typedef struct {
+	t_header respuesta;
+	size_t size;
+	void * mensaje;
+} t_ram_respuesta;
+
 /**
  * @NAME: ram_enviar_handshake
  * @DESC: Antes de empezar a trabajar con la ram, se debe llamar esta funcion y verificar que la ram nos acepta.
@@ -24,6 +30,16 @@
  * 	X Error, no nos acepta
  */
 int enviar_handshake();
+
+t_ram_respuesta * ram_enviar_alloc(t_matelib_memoria_alloc * memoria_alloc);
+
+t_ram_respuesta * ram_enviar_write(t_matelib_memoria_write * memoria_write);
+
+t_ram_respuesta * ram_enviar_free(t_matelib_memoria_free * memoria_free);
+
+t_ram_respuesta * ram_enviar_read(t_matelib_memoria_read * memoria_read);
+
+t_ram_respuesta * ram_enviar_close(t_matelib_nuevo_proceso * muerto_proceso);
 
 /**
  * @NAME: ram_cerrar_conexiones

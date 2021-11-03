@@ -65,6 +65,17 @@ typedef struct {
 	int32_t memoria_mate_pointer;
 } t_matelib_memoria_free;
 
+typedef struct {
+	size_t size;
+	void * mem_read;
+} t_ram_read;
+
+/**
+ * ALLOC: Devuelve un int32_t
+ * WRITE: Responde solo t_header EXITO o FALLO
+ * FREE: Responde solo t_header EXITO o FALLO
+ * READ: t_header de EXITO o FALLO, en caso caso de EXITO sturct { size_t, void * }
+ */
 
 t_matelib_nuevo_proceso * shared_crear_nuevo_proceso(uint32_t pid);
 void * serializiar_crear_proceso(t_matelib_nuevo_proceso * mensaje, size_t * size_final);
@@ -91,6 +102,10 @@ t_matelib_memoria_alloc * deserializar_memoria_alloc(void * puntero);
 t_matelib_memoria_read * deserializar_memoria_read(void * puntero);
 t_matelib_memoria_write * deserializar_memoria_write(void * puntero);
 t_matelib_memoria_free * deserializar_memoria_free(void * puntero);
+
+t_ram_read * shared_crear_ram_read(size_t size, void * memoria_ready);
+void * serializar_ram_read(t_ram_read * mensaje, size_t * size_final);
+t_ram_read * deserializar_ram_read(void * puntero);
 
 
 #endif /* ESTRUCTURA_COMPARTIDA_H_ */

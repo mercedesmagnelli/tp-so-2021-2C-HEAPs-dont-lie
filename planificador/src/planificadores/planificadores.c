@@ -1,23 +1,26 @@
 
 #include "planificadores.h"
 
-// CERRADO, falta apagar el hilo
 void planificador_largo_plazo() {
 	loggear_debug("[SYSTEM] --- Se creo el planificador de largo plazo");
 
-	// TODO: Cambiar while true, para que se detenga cuando corresponda
 	while (true) {
 		hilos_wait_new();
 		hilos_wait_multiprogramacion();
 
-		t_hilo * hilo = colas_mover_new_ready();
-		loggear_debug("[PID: %d] --- [Largo Plazo] --- Se movió de NEW a READY", pid(hilo));
+		t_hilo * hilo;
+		if (hay_procesos_en_suspendido_ready()) {
+			hilo = colas_mover_block_ready_ready();
+			loggear_debug("[PID: %d] --- [Mediano Plazo] --- Se movió de SUSP-READY a READY", pid(hilo));
+		} else {
+			hilo = colas_mover_new_ready();
+			loggear_debug("[PID: %d] --- [Largo Plazo] --- Se movió de NEW a READY", pid(hilo));
+		}
 
 		hilos_post_ready();
 	}
 }
 
-// CERRADO, falta modificar el archivo de colas para que pueda seleccionar bien que hilo mover de READY => EXEC
 void planificador_corto_plazo() {
 	loggear_debug("[SYSTEM] --- Se creo el planificador de corto plazo");
 
@@ -28,18 +31,57 @@ void planificador_corto_plazo() {
 		t_hilo * hilo = colas_mover_ready_exec();
 		loggear_debug("[PID: %d] --- [Corto Plazo] --- Se movió de READY a EXEC", pid(hilo));
 
-		ejecutar_hilo_iniciar_ejecucion(hilo);
+		hilos_post_ejecucion(hilo->pid); // Avisa que se encuentra en EXEC
+	}
+}
+
+void planificador_medio_plazo() {
+	loggear_debug("[SYSTEM] --- Se creo el planificador de mediano plazo");
+
+	while (true) {
+		hilos_wait_nuevo_bloqueado();
+
+		hilos_post_multitarea();
+
+		bool multiprogramacion_copada = deberia_suspenderse_procesos();
+
+		if (multiprogramacion_copada) {
+			t_hilo * hilo = colas_mover_block_block_susp();
+
+			loggear_debug("[PID: %d] --- [Mediano Plazo] --- Se movió de BLOCK a SUSP-BLOCK", pid(hilo));
+
+			hilos_post_multiprogramacion();
+
+			loggear_error("[PID: %d] --- [Mediano Plazo] --- TODO: Avisar a la RAM de la suspension", pid(hilo));
+		}
+	}
+}
+
+void planificador_destruir_de_hilos() {
+	loggear_debug("[SYSTEM] --- Se creo el destructor de hilos");
+
+	while (true) {
+		hilos_wait_finalizado();
+
+		t_hilo * hilo = colas_obtener_finalizado();
+
+		loggear_debug("[PID: %d] --- [Destructor] --- Se eliminara el hilo", pid(hilo));
+
+		loggear_error("[Destructor] TODO: Codear, eliminar semaforos ocupados y recursos consumiendo (tal vez, cancelar hilo IO) ");
 	}
 }
 
 int planificadores_iniciar() {
 	colas_iniciar();
 	hilos_planificador_iniciar();
+	semaforo_estructuras_crear();
+	dispositivo_io_estructuras_crear();
 
 	int error = 0;
 
 	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_largo_plazo, NULL);
 	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_corto_plazo, NULL);
+	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_medio_plazo, NULL);
 
     return error;
 }
@@ -47,6 +89,8 @@ int planificadores_iniciar() {
 void planificadores_destruir() {
 	colas_destruir();
 	hilos_planificador_destruir();
+	semaforo_estructuras_destruir();
+	dispositivo_io_estructuras_destruir();
 }
 
 // CERRADO
@@ -54,6 +98,7 @@ int planificadores_proceso_iniciar(uint32_t ppid) {
 	loggear_debug("[SYSTEM] --- Llego un nuevo proceso al planificador");
 
 	t_hilo * hilo = colas_insertar_new(ppid);
+	hilos_agregar_nuevo_hilo(ppid);
 	hilos_post_new();
 
 	loggear_debug("[PID: %d] --- [SYSTEM] --- Se movió a NEW", pid(hilo));
@@ -61,7 +106,15 @@ int planificadores_proceso_iniciar(uint32_t ppid) {
     return 0;
 }
 
-int planificadores_proceso_cerrar(void * proceso) {
+int planificadores_proceso_cerrar(uint32_t ppid) {
+	loggear_debug("[SYSTEM] --- Llego un proceso para cerrar en el planificador");
+
+	t_hilo * hilo = colas_mover_exec_finish(ppid);
+
+	hilos_post_finalizado();
+
+	loggear_debug("[PID: %d] --- [SYSTEM] --- Se movió a NEW", pid(hilo));
+
     return 0;
 }
 

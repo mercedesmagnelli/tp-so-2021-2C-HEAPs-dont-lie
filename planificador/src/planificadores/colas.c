@@ -8,7 +8,7 @@
  * 4. [Listo] Modificar los void * y los return donde corresponda para pasarlo por parametro o retornarlo
  * 5. [Listo] Programar la forma de comparar hilos (supongo que comparacion por .pid)
  * 6. [Listo] Recibir algoritmo de corto plazo para mover entre READY->EXEC
- * 7. Recibir algoritmo de mediano plazo para mover de BLOCK->SUSP/BLOCK
+ * 7. [Listo] Recibir algoritmo de mediano plazo para mover de BLOCK->SUSP/BLOCK
  * */
 
 t_queue * new_queue;
@@ -108,6 +108,8 @@ t_hilo * colas_mover_new_ready() {
 
 	hilo->timestamp_entrar_ready = estructuras_current_timestamp();
 	hilo->estado = ESTADO_READY;
+	hilo->bloqueante = NINGUNO;
+	hilo->nombre_bloqueante = "";
 
 	pthread_mutex_lock(&mutex_ready_list);
 	list_add(ready_list, hilo);
@@ -135,8 +137,8 @@ t_hilo * colas_mover_ready_exec() {
     return hilo;
 }
 
-t_hilo * colas_mover_exec_finish(t_hilo * hilo_mover) {
-	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
+t_hilo * colas_mover_exec_finish(uint32_t pid_mover) {
+	bool son_iguales(void * hilo2) { return pid_mover == ((t_hilo *) hilo2)->pid; }
 	pthread_mutex_lock(&mutex_exec_list);
 	t_hilo * hilo = list_remove_by_condition(exec_list, son_iguales);
 	pthread_mutex_unlock(&mutex_exec_list);
@@ -150,21 +152,31 @@ t_hilo * colas_mover_exec_finish(t_hilo * hilo_mover) {
     return hilo;
 }
 
-t_hilo * colas_mover_exec_block(t_hilo * hilo_mover) {
-	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
+t_hilo * colas_obtener_finalizado() {
+	pthread_mutex_lock(&mutex_finish_queue);
+	t_hilo * hilo = queue_pop(finish_queue);
+	pthread_mutex_unlock(&mutex_finish_queue);
+
+	return hilo;
+}
+
+t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante, char * nombre_bloqueante, uint32_t pid) {
+	bool son_iguales(void * hilo2) { return pid == ((t_hilo *) hilo2)->pid; }
 	pthread_mutex_lock(&mutex_exec_list);
 	t_hilo * hilo = list_remove_by_condition(exec_list, son_iguales);
 	pthread_mutex_unlock(&mutex_exec_list);
 
 	hilo->estado = ESTADO_BLOCK;
+	hilo->bloqueante = dispositivo_bloqueante;
+	hilo->nombre_bloqueante = nombre_bloqueante;
 	hilo->timestamp_salir_exec = estructuras_current_timestamp();
 	hilo->timestamp_tiempo_exec = estructuras_timestamp_diff(hilo->timestamp_entrar_exec, hilo->timestamp_salir_exec);
 
 	pthread_mutex_lock(&mutex_blocked_list);
-	list_add(blocked_list, 0);
+	list_add(blocked_list, hilo);
 	pthread_mutex_unlock(&mutex_blocked_list);
 
-	// TODO: Llamar funcion para consultar si hay que moverlo a bloqueado-suspendido
+	hilos_post_nuevo_bloqueado();
 
     return hilo;
 }
@@ -186,7 +198,6 @@ t_hilo * colas_mover_block_ready(t_hilo * hilo_mover) {
 }
 
 t_hilo * colas_mover_block_block_susp() {
-	// TODO: Armar criterio de busqueda
 	pthread_mutex_lock(&mutex_blocked_list);
 	int ultimo_bloqueado_pos = list_size(blocked_list);
 	t_hilo * hilo = list_remove(blocked_list, ultimo_bloqueado_pos - 1);
@@ -213,6 +224,8 @@ t_hilo * colas_mover_block_susp_block_ready(t_hilo * hilo_mover) {
 	queue_push(suspended_ready_queue, hilo);
 	pthread_mutex_unlock(&mutex_suspended_ready_queue);
 
+	hilos_post_new();
+
     return hilo;
 }
 
@@ -230,5 +243,109 @@ t_hilo * colas_mover_block_ready_ready() {
 
 	return hilo;
 }
+
+
+bool deberia_suspenderse_procesos() {
+	pthread_mutex_lock(&mutex_suspended_blocked_list);
+	bool hay_procesos_bloqueados = list_size(blocked_list) > 0;
+	pthread_mutex_unlock(&mutex_suspended_blocked_list);
+
+	if (hay_procesos_bloqueados) {
+		pthread_mutex_lock(&mutex_ready_list);
+		bool no_hay_procesos_ready = list_size(ready_list) == 0;
+		pthread_mutex_unlock(&mutex_ready_list);
+
+		if (no_hay_procesos_ready) {
+			pthread_mutex_lock(&mutex_new_queue);
+			bool hay_procesos_new = queue_size(new_queue) > 0;
+			pthread_mutex_unlock(&mutex_new_queue);
+
+			if (hay_procesos_new) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool hay_procesos_en_suspendido_ready() {
+	pthread_mutex_lock(&mutex_suspended_ready_queue);
+	bool hay_procesos = queue_size(suspended_ready_queue) > 0;
+	pthread_mutex_unlock(&mutex_suspended_ready_queue);
+
+	return hay_procesos;
+}
+
+t_hilo * colas_desbloquear_1_hilo(t_dispositivo_bloqueante dispositivo_bloqueante, char * dispositivo_nombre) {
+	bool esta_bloqueado(void * hilo2) {
+		t_hilo * hilo_comparar = (t_hilo *) hilo2;
+
+		return dispositivo_bloqueante == hilo_comparar->bloqueante && dispositivo_nombre == hilo_comparar->nombre_bloqueante;
+	}
+
+	t_hilo * hilo_retornar;
+	bool esta_en_bloqueado;
+	bool esta_en_suspendido;
+
+	pthread_mutex_lock(&mutex_blocked_list);
+	esta_en_bloqueado = list_any_satisfy(blocked_list, esta_bloqueado);
+	if (esta_en_bloqueado) {
+		hilo_retornar = list_find(blocked_list, esta_bloqueado);
+	}
+	pthread_mutex_unlock(&mutex_blocked_list);
+
+	if (esta_en_bloqueado) {
+		colas_mover_block_ready(hilo_retornar);
+
+		hilos_post_ready();
+
+		return hilo_retornar;
+	}
+
+	pthread_mutex_lock(&mutex_suspended_blocked_list);
+	esta_en_suspendido = list_any_satisfy(suspended_blocked_list, esta_bloqueado);
+	if (esta_en_suspendido) {
+		hilo_retornar = list_find(suspended_blocked_list, esta_bloqueado);
+	}
+	pthread_mutex_unlock(&mutex_suspended_blocked_list);
+
+	if (esta_en_suspendido) {
+		colas_mover_block_susp_block_ready(hilo_retornar);
+
+		return hilo_retornar;
+	}
+
+	return NULL;
+}
+
+void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloqueante, char * dispositivo_nombre) {
+	bool esta_bloqueado(void * hilo2) {
+		t_hilo * hilo_comparar = (t_hilo *) hilo2;
+
+		return dispositivo_bloqueante == hilo_comparar->bloqueante && dispositivo_nombre == hilo_comparar->nombre_bloqueante;
+	}
+
+	t_hilo * hilo_mover = NULL;
+	while (hilo_mover == NULL) {
+		pthread_mutex_lock(&mutex_blocked_list);
+		hilo_mover = list_find(blocked_list, esta_bloqueado);
+		pthread_mutex_unlock(&mutex_blocked_list);
+
+		colas_mover_block_ready(hilo_mover);
+
+		hilos_post_ready();
+	}
+
+	hilo_mover = NULL;
+	while (hilo_mover == NULL) {
+		pthread_mutex_lock(&mutex_suspended_blocked_list);
+		hilo_mover = list_find(suspended_blocked_list, esta_bloqueado);
+		pthread_mutex_unlock(&mutex_suspended_blocked_list);
+
+		colas_mover_block_susp_block_ready(hilo_mover);
+	}
+}
+
 
 

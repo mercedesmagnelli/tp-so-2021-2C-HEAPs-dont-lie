@@ -15,9 +15,10 @@ C_DEPS :=
 SUBDIRS := \
 shared \
 shared/tests \
-src/conexion_ram \
+src/conexiones \
 src/configuracion \
 src \
 src/matelib_core \
+src/utils \
 tests \
 

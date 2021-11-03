@@ -12,6 +12,7 @@
 
 #include "estructuras.h"
 #include "algoritmos.h"
+#include "hilos_planificador.h"
 
 /**
  * Aca se guardaran todas las colas, listas y/o pilas que sea necesaria para mover entre hilos
@@ -62,14 +63,19 @@ t_hilo * colas_mover_ready_exec();
  * @DESC: Recibe un hilo y lo mueve de EXEC a FINISH
  *
  * */
-t_hilo * colas_mover_exec_finish(t_hilo * hilo);
+t_hilo * colas_mover_exec_finish(uint32_t pid_mover);
+
+/**
+ * @NAME: colas_obtener_finalizado
+ * @DESC: Elimina de la cola de finalizado el primer hilo que encuentre y lo retorna
+ */
+t_hilo * colas_obtener_finalizado();
 
 /**
  * @NAME: colas_mover_exec_blocked
  * @DESC: Recibe un hilo y lo mueve de EXEC a BLOCKED
  * */
-// TODO: Llamar funcion para consultar si hay que moverlo a bloqueado-suspendido
-t_hilo * colas_mover_exec_block(t_hilo * hilo_mover);
+t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante, char * nombre_bloqueante, uint32_t pid);
 
 /**
  * @NAME: colas_mover_block_ready
@@ -107,5 +113,30 @@ t_hilo * colas_mover_block_susp_block_ready(t_hilo * hilo_mover);
  * */
 t_hilo * colas_mover_block_ready_ready();
 
+/**
+ * @NAME: deberia_suspenderse_procesos
+ * @DESC: Avisa el grado de multiprogramacion esta copado por procesos que no usan la CPU
+ */
+bool deberia_suspenderse_procesos();
+
+/**
+ * @NAME: hay_procesos_en_suspendido_ready
+ * @DESC: Retorna true si hay proceso en SUSPENDIDO-READY
+ */
+bool hay_procesos_en_suspendido_ready();
+
+/**
+ * @NAME: colas_desbloquear_1_hilo
+ * @DESC: Primero revisa la lista de bloqueados si hay algun hilo bloqueado para desbloquear, lo mueve a ready y retorna.
+ * SI no encuentra en bloqueados, revisa la lista de SUSPENDIDO-BLOQUEADO, lo mueve a SUSPENDIDO-LISTO y retorna;
+ * SI no encuentra ninguno, retorna NULL;
+ */
+t_hilo * colas_desbloquear_1_hilo(t_dispositivo_bloqueante dispositivo_bloqueante, char * semaforo_nombre);
+
+/**
+ * @NAME: colas_desbloquear_todos_hilos
+ * @DESC: Recorre las listas de BLOQUEADO y SUSPENDIDO-BLOQUEADO y mueve los hilos a donde corresponda
+ */
+void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloqueante, char * semaforo_nombre);
 
 #endif

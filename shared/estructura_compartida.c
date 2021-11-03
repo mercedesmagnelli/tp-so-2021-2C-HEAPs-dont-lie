@@ -9,6 +9,8 @@ const size_t SIZE_SEMAFORO_VALOR  = sizeof(int32_t);
 const size_t SIZE_MEMORIA_SIZE = sizeof(uint32_t);
 const size_t SIZE_MEMORIA_MATE_POINTER = sizeof(int32_t);
 
+const size_t SIZE_SIZE_MEMORIA = sizeof(size_t);
+
 t_matelib_nuevo_proceso * shared_crear_nuevo_proceso(uint32_t pid) {
 	t_matelib_nuevo_proceso * mensaje = malloc(sizeof(t_matelib_nuevo_proceso));
 	mensaje->pid = pid;
@@ -308,3 +310,46 @@ t_matelib_memoria_free * deserializar_memoria_free(void * puntero) {
 
 	return mensaje;
 }
+
+t_ram_read * shared_crear_ram_read(size_t size, void * memoria_ready) {
+	t_ram_read * mensaje = malloc(sizeof(t_ram_read));
+	mensaje->size = size;
+	mensaje->mem_read = memoria_ready;
+	return mensaje;
+}
+void * serializar_ram_read(t_ram_read * mensaje, size_t * size_final) {
+	size_t offset = 0;
+	size_t size_memoria_mensaje = SIZE_CHAR * mensaje->size;
+	size_t tamanio_buffer = SIZE_SIZE_MEMORIA + size_memoria_mensaje;
+	void * buffer = malloc(tamanio_buffer);
+
+	memcpy(buffer + offset, &mensaje->size, SIZE_SIZE_MEMORIA);
+	offset += SIZE_SIZE_MEMORIA;
+
+	memcpy(buffer + offset, mensaje->mem_read, size_memoria_mensaje);
+	offset += size_memoria_mensaje;
+
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
+
+	return buffer;
+}
+t_ram_read * deserializar_ram_read(void * puntero) {
+	size_t offset = 0;
+	t_ram_read * mensaje = malloc(sizeof(t_ram_read));
+
+	memcpy(&mensaje->size, puntero + offset, SIZE_SIZE_MEMORIA);
+	offset += SIZE_SIZE_MEMORIA;
+
+	size_t size_mensaje = SIZE_CHAR * mensaje->size;
+	mensaje->mem_read = malloc(size_mensaje);
+	memcpy(mensaje->mem_read, puntero + offset, size_mensaje);
+	offset += size_mensaje;
+
+	return mensaje;
+}
+
+
+
+

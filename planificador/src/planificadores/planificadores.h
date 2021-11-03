@@ -8,7 +8,8 @@
 #include "colas.h"
 #include "estructuras.h"
 #include "hilos_planificador.h"
-#include "ejecutar_hilo.h"
+#include "semaforo.h"
+#include "dispositivo_io.h"
 
 #include "../../../shared/logger.h"
 
@@ -46,7 +47,7 @@ int planificadores_proceso_iniciar(uint32_t pid);
  * @DESC: Elimina un proceso del sistema, moviendolo a FINISh
  * @RETURN: 0 si salio todo bien
  * */
-int planificadores_proceso_cerrar(void * proceso);
+int planificadores_proceso_cerrar(uint32_t ppid);
 
 /**
  * @NAME: planificadores_semaforos_iniciar

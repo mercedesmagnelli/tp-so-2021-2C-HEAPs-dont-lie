@@ -23,6 +23,12 @@ int main(int argc, char** argv) {
 
 	debug_variables();
 
+	error = levantar_servidor();
+	if (error != STATUS_OK) {
+		loggear_error("Ocurrio un error al levantar el servidor, ceramos");
+		cerrar_todo();
+		return EXIT_FAILURE;
+	}
 
 	error = planificadores_iniciar();
 	loggear_debug("Se creo el planificador con el estatus en %d", error);
@@ -59,7 +65,7 @@ int main(int argc, char** argv) {
 
 
 	//levantar_consola();
-	sleep(20);
+	sleep(30);
 	cerrar_todo();
 	return EXIT_SUCCESS;
 }

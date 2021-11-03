@@ -64,6 +64,13 @@ typedef enum {
 	READ_SUC_R_P,
 	WRITE_SUC_R_P,
 	WRITE_ERR_R_P,
+	SUSPENDER_PROCESO,
+
+	// Mensajes genericos
+	EXITO_EN_LA_TAREA,
+	FALLO_EN_LA_TAREA,
+	FALLO_EN_LA_RAM, // Se usa cuando tanto el Kernel como la Ram tienen que hacer algo, lo retorna la ram si falla (ejemplo: MATELIB_CLOSE de un proceso)
+
 
 	// Pruebas
 	CACHO_DE_TEXTO
