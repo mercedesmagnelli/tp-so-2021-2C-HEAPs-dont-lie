@@ -10,10 +10,10 @@ int main(int argc, char** argv) {
 	// TODO: Implementar signal de CtrlC y  tal vez CtrlZ
 	signal(SIGUSR1, signal_handler);
 	int error = iniciar_configuracion(argc, argv);
-	if (error != STATUS_OK) {
+	/*if (error != STATUS_OK) {
 		puts("Error en los argumentos\n");
 		return EXIT_FAILURE;
-	}
+	}*/
 
 	error = init_mutex_log(get_log_route(), get_log_app_name(), get_log_in_console(), get_log_level_info());
 	if (error != STATUS_OK) {

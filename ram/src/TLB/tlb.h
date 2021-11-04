@@ -62,6 +62,12 @@ uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina);
  **/
 void actualizar_datos_TLB(uint32_t PID, uint32_t nroPag);
 
+/**
+ * @NAME: destruir_tlb
+ * @DESC: elimina la tlb y sus elementos de la memoria
+ *
+ **/
+void destruir_tlb();
 
 
 
@@ -113,6 +119,12 @@ void eliminar_entrada(uint32_t indice_victima);
  */
 
 uint32_t obtener_entrada_victima();
+
+/**
+ * @NAME: destructor_de_entradas
+ * @DESC: funcion intermedia para eliminar una entrada. Se usa para eliminar entrada con las funciones de listas de las commons
+ */
+void destructor_de_entradas(void* entrada);
 
 #endif /* TLB_TLB_H_ */
 
