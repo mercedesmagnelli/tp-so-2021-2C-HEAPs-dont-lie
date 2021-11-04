@@ -11,6 +11,8 @@
 #include "../paginacion/paginacion.h"
 #include "../../../shared/protocolo.h"
 
+void* memoria_principal;
+
 
 /*Funciones que pide el TP obligatorias*/
 
@@ -26,7 +28,7 @@
  *   -43  No hay mas espacio de memoria del cual solicitar (Asig Global)
  **/
 
-int32_t memalloc(uint32_t pid, uint32_t size);
+int32_t memalloc(uint32_t pid, int32_t size);
 
 /**
  * @NAME: memfree
@@ -80,7 +82,7 @@ void inicializar_memoria_principal();
  **/
 
 
-bool cantidad_valida(uint32_t size);
+bool cantidad_valida(int32_t size);
 
 
 /**
@@ -91,6 +93,13 @@ bool cantidad_valida(uint32_t size);
 
 
 void escribir_directamente_en_memoria(void* valorAEscribir, int32_t tamanio, uint32_t direccionLogica);
+
+/**
+ * @NAME: leer_directamente_de_memoria
+ * @DESC: lee de la RAM el dato (ya malloqueado) teniendo en cuenta la dirLog y su tamanio
+ *
+ **/
+void leer_directamente_de_memoria(void* ptroLectura, int32_t tamanio, uint32_t direccionLogica);
 
 
 #endif /* MEMORIA_MEMORIA_C_ */

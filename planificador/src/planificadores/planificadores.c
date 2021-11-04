@@ -50,6 +50,11 @@ void planificador_medio_plazo() {
 
 			loggear_debug("[PID: %d] --- [Mediano Plazo] --- Se movió de BLOCK a SUSP-BLOCK", pid(hilo));
 
+			int error_ram = ram_enviar_proceso_suspendido(hilo->pid);
+			if (error_ram != 0) {
+				loggear_error("TODO: HACER ALGO ACA");
+			}
+
 			hilos_post_multiprogramacion();
 
 			loggear_error("[PID: %d] --- [Mediano Plazo] --- TODO: Avisar a la RAM de la suspension", pid(hilo));
@@ -98,10 +103,11 @@ int planificadores_proceso_iniciar(uint32_t ppid) {
 	loggear_debug("[SYSTEM] --- Llego un nuevo proceso al planificador");
 
 	t_hilo * hilo = colas_insertar_new(ppid);
-	hilos_agregar_nuevo_hilo(ppid);
-	hilos_post_new();
 
 	loggear_debug("[PID: %d] --- [SYSTEM] --- Se movió a NEW", pid(hilo));
+
+	hilos_agregar_nuevo_hilo(ppid);
+	hilos_post_new();
 
     return 0;
 }

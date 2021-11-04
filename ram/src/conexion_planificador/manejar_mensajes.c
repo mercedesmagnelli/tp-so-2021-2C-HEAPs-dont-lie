@@ -37,45 +37,71 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 		case MATELIB_INIT:
 			loggear_info("[MATELIB_INIT], hay que crear un proceso");
 
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+
 			return 0;
 		case MATELIB_CLOSE:
 			loggear_info("[MATELIB_CLOSE], hay que cerrar el proceso");
+
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_SEM_INIT:
 			loggear_info("[MATELIB_SEM_INIT], se crea un semaforo");
 
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+
 			return 0;
 		case MATELIB_SEM_WAIT:
 			loggear_info("[MATELIB_SEM_WAIT], reducir en uno el contador del semaforo y tal vez bloquear un proceso");
+
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_SEM_POST:
 			loggear_info("[MATELIB_SEM_POST], incrementar en uno el contador del semaforo y tal vez desbloquear un proceso");
 
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+
 			return 0;
 		case MATELIB_SEM_DESTROY:
 			loggear_info("[MATELIB_SEM_DESTROY], destruir un semaforo y eliminar todos los bloqueos que existan");
+
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_CALL_IO:
 			loggear_info("[MATELIB_CALL_IO], bloquear un proceso porque llama a IO");
 
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+
 			return 0;
 		case MATELIB_MEM_ALLOC:
 			loggear_info("[MATELIB_MEM_ALLOC], un proceso pide espacio en la RAM");
-			//TODO deserealizar mensaje  t_matelib_memoria_alloc*
-			uint32_t alloc_PID = 0;
-			uint32_t alloc_memoria_size = 0;
+			t_matelib_memoria_alloc* alloc = deserializar_memoria_alloc(mensaje->payload);
 
-			int32_t ptroAlloc = memalloc(alloc_PID, alloc_memoria_size);
+			int32_t ptroAlloc = memalloc(alloc->pid, alloc->memoria_size);
 
 			if(ptroAlloc>=0){
-				loggear_info("[MATELIB_MEM_ALLOC], proceso %d se le asigna espacio solicitado", alloc_PID);
-				enviar_mensaje_protocolo(mensaje->socket, 200, 4, &ptroAlloc);//TODO suplantar 200 con header de Alloc realizado correctamente
+				loggear_info("[MATELIB_MEM_ALLOC], proceso %d se le asigna espacio solicitado", alloc->pid);
+				enviar_mensaje_protocolo(mensaje->socket, ALLOC_SUC_R_P, 4, &ptroAlloc);
 			}else{
-				loggear_info("[MATELIB_MEM_ALLOC], proceso %d NO se le asigna espacio solicitado", alloc_PID);
-				enviar_mensaje_protocolo(mensaje->socket, 100, 0, NULL);//TODO suplantar 100 con header de Alloc ERROR
+				loggear_info("[MATELIB_MEM_ALLOC], proceso %d NO se le asigna espacio solicitado", alloc->pid);
+				enviar_mensaje_protocolo(mensaje->socket, ALLOC_ERR_R_P, 0, NULL);
 			}
 
 			desconexion(mensaje);
@@ -85,19 +111,18 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 		case MATELIB_MEM_FREE:
 			loggear_info("[MATELIB_MEM_FREE], un proceso libera memoria de la RAM");
 
-			//TODO deserealizar mensaje  t_matelib_memoria_free*
-			uint32_t free_PID = 0;
+			t_matelib_memoria_free* free = deserializar_memoria_free(mensaje->payload);
 			int32_t free_memoria_mate_pointer = 0;
 
-			int32_t rtaFree = memfree(free_memoria_mate_pointer, free_PID);
+			int32_t rtaFree = memfree(free_memoria_mate_pointer, free->pid);
 			uint32_t headerF;
 
 			if(rtaFree>=0){
-				loggear_info("[MATELIB_MEM_FREE], proceso %d se libero el espacio seleccionado", free_PID);
-				headerF = 400;//TODO suplantar 400 con header de Free realizado correctamente
+				loggear_info("[MATELIB_MEM_FREE], proceso %d se libero el espacio seleccionado", free->pid);
+				headerF = FREE_SUC_R_P;
 			}else{
-				loggear_info("[MATELIB_MEM_FREE], proceso %d NO se libero el espacio seleccionado", free_PID);
-				headerF = 300;//TODO suplantar 300 con header de Free ERROR
+				loggear_info("[MATELIB_MEM_FREE], proceso %d NO se libero el espacio seleccionado", free->pid);
+				headerF = FREE_ERR_R_P;
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerF, 0, NULL);
@@ -108,20 +133,18 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			return 0;
 		case MATELIB_MEM_READ:
 			loggear_info("[MATELIB_MEM_READ], un proceso quiere leer algo de la RAM");
-			//TODO deserealizar mensaje t_matelib_memoria_read*
-			uint32_t read_PID = 0;
-			uint32_t read_memoria_size = 0;
-			int32_t read_memoria_mate_pointer = 0;
+			t_matelib_memoria_read* read = deserializar_memoria_read(mensaje->payload);
+
 
 			void* ptroLectura = NULL;
-			int32_t rtaRead = memread(read_memoria_mate_pointer, read_PID, read_memoria_size, ptroLectura);
+			int32_t rtaRead = memread(read->memoria_mate_pointer, read->pid, read->memoria_size, ptroLectura);
 
 			if(rtaRead>=0){
-				loggear_info("[MATELIB_MEM_READ], proceso %d pudo leer el espacio seleccionado", read_PID);
-				enviar_mensaje_protocolo(mensaje->socket, 600, read_memoria_size, ptroLectura);//TODO suplantar 600 con header de READ realizado correctamente
+				loggear_info("[MATELIB_MEM_READ], proceso %d pudo leer el espacio seleccionado", read->pid);
+				enviar_mensaje_protocolo(mensaje->socket, READ_SUC_R_P, read->memoria_size, ptroLectura);
 			}else{
-				loggear_info("[MATELIB_MEM_READ], proceso %d NO pudo leer el espacio seleccionado", read_PID);
-				enviar_mensaje_protocolo(mensaje->socket, 500, 0, NULL);//TODO suplantar 500 con header de READ ERROR
+				loggear_info("[MATELIB_MEM_READ], proceso %d NO pudo leer el espacio seleccionado", read->pid);
+				enviar_mensaje_protocolo(mensaje->socket, READ_ERR_R_P, 0, NULL);
 			}
 
 			desconexion(mensaje);
@@ -130,20 +153,18 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			return 0;
 		case MATELIB_MEM_WRITE:
 			loggear_info("[MATELIB_MEM_WRITE], un proceso quiere escribir en la RAM");
-			//TODO deserealizar mensaje t_matelib_memoria_write*
-			uint32_t write_PID = 0;
-			uint32_t write_memoria_size = 0;
-			int32_t write_memoria_mate_pointer = 0;
+			t_matelib_memoria_read* escritura = deserializar_memoria_read(mensaje->payload);
+
 			void * write_memoria_write = NULL;
 
-			int32_t rtaWrite = memwrite(write_memoria_write, write_memoria_mate_pointer, write_PID, write_memoria_size);
+			int32_t rtaWrite = memwrite(write_memoria_write, escritura->memoria_mate_pointer, escritura->pid, escritura->memoria_size);
 			uint32_t headerW;
 			if(rtaWrite>=0){
-				loggear_info("[MATELIB_MEM_WRITE], proceso %d pudo escribir en el espacio seleccionado", write_PID);
-				headerW = 800;//TODO suplantar 800 con header de WRITE realizado correctamente
+				loggear_info("[MATELIB_MEM_WRITE], proceso %d pudo escribir en el espacio seleccionado", escritura->pid);
+				headerW = WRITE_SUC_R_P;
 			}else{
-				loggear_info("[MATELIB_MEM_WRITE], proceso %d NO pudo escribir el espacio seleccionado", write_PID);
-				headerW=700;//TODO suplantar 700 con header de WRITE realizado correctamente
+				loggear_info("[MATELIB_MEM_WRITE], proceso %d NO pudo escribir el espacio seleccionado", escritura->pid);
+				headerW=WRITE_ERR_R_P;
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerW, 0, NULL);

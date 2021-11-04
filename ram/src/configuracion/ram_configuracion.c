@@ -55,12 +55,10 @@ int cargar_archivo(char * path) {
 	error += set_variable_enum(config, "TIPO_ASIGNACION", 			&config_guardada.tipo_asignacion, obtener_tipo_asignacion);
 	error += set_variable_enum(config, "ALGORITMO_REEMPLAZO_TLB",	&config_guardada.algoritmo_reemplazo_tlb, obtener_algoritmo_reemplazo_tlb);
 
-
 	error += set_variable_int(config, "MARCOS_MAXIMOS", 		&config_guardada.marcos_maximos);
 	error += set_variable_int(config, "CANTIDAD_ENTRADAS_TLB",	&config_guardada.cantidad_entradas_tlb);
 	error += set_variable_int(config, "RETARDO_ACIERTO_TLB", 	&config_guardada.retardo_acierto_tlb);
 	error += set_variable_int(config, "RETARDO_FALLO_TLB", 		&config_guardada.retardo_fallo_tlb);
-
 	error += set_variable_str(config, "PATH_DUMP_TLB",			&config_guardada.path_dump_tlb);
 
 	// Para loggear
@@ -68,7 +66,6 @@ int cargar_archivo(char * path) {
 	error += set_variable_str(config, "LOG_APP_NAME", 			&config_guardada.log_app_name);
 	error += set_variable_int(config, "LOG_IN_CONSOLE", 		&config_guardada.log_in_console);
 	error += set_variable_int(config, "LOG_LEVEL_INFO", 		&config_guardada.log_level_info);
-
 
 	if (error != 0) {
 		return CONFIG_ERROR_EN_ARCHIVO;

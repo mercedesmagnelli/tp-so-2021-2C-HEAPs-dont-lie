@@ -21,9 +21,9 @@ int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 
 		return resultado;
 	}
-	free(size);
 
 	int error = 0;
+<<<<<<< HEAD
 	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
 	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
 		loggear_info("El proceso [PID: %zu] se creó exitosamente", nuevo_proceso->pid);
@@ -32,12 +32,10 @@ int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 		error = 1;
 	}else {
 		loggear_warning("El proceso [PID: %zu] devolvió un código extraño: %d al hacer MATE_INIT", nuevo_proceso->pid, mensaje_respuesta->head);
-		error = 2;
-	}
 
+	free(size);
 	close(socket);
 
-	pthread_exit(NULL);
 	return error;
 }
 
@@ -74,7 +72,6 @@ int enviar_mate_close(t_matelib_nuevo_proceso * nuevo_proceso) {
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return error;
 }
 
@@ -112,7 +109,6 @@ int enviar_mate_sem_init(t_matelib_semaforo* nuevo_semaforo){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return error;
 
 }
@@ -149,7 +145,6 @@ int enviar_mate_sem_wait(t_matelib_semaforo* semaforo){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return error;
 }
 
@@ -185,7 +180,6 @@ int enviar_mate_sem_post(t_matelib_semaforo* semaforo){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return error;
 }
 
@@ -221,7 +215,6 @@ int enviar_mate_sem_destroy(t_matelib_semaforo* semaforo){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return error;
 }
 
@@ -257,7 +250,6 @@ int enviar_mate_call_io(t_matelib_io* entrada_salida){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return error;
 }
 

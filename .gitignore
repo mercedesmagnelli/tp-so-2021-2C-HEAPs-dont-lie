@@ -53,6 +53,7 @@ dkms.conf
 
 *.log
 
+matelib.log
 filesystem.log
 planificador.log
 ram.log
@@ -66,10 +67,13 @@ filesystem/tests/build/*/
 ram/tests/build/
 ram/tests/build/*/
 
-planificador/tests/build/
-ram/tests/build/
+matelib/tests/build/
+matelib/tests/build/*/
+
 shared/tests/build/
+shared/tests/build/*/
 
 planificador/Debug/
 ram/Debug/
 filesystem/Debug/
+matelib/Debug/

@@ -9,13 +9,17 @@
 #include "../../src/configuracion/ram_config_guardada.h"
 #include "../../src/memoria/memoria.h"
 #include "../../src/configuracion/ram_config_guardada.h"
+#include "../../src/TLB/tlb.h"
 #include "../../../shared/logger.h"
+#include "swaping.h"
 #include <stdlib.h>
 #include <string.h>
+#include <sys/param.h>
 
-t_list* listaProcesos;
-t_list* listaFrames;
-t_dictionary* cant_frames_por_proceso;
+t_list* listaProcesos;//casos: agregar_proceso, liberar_paginas
+t_list* listaFrames;//casos: traer_pagina_de_SWAP, liberar_paginas
+t_dictionary* cant_frames_por_proceso;//casos: traer_pagina_de_SWAP, liberar_paginas
+
 
 typedef struct{
 	//índice: frame
@@ -48,7 +52,7 @@ typedef struct {
 typedef struct{
 	uint32_t bit_presencia;
 	uint32_t frame;
-	uint32_t timestamp;
+	double timestamp;
 	uint32_t bit_uso;
 	uint32_t bit_modificacion;
 }t_pagina;
@@ -59,9 +63,6 @@ typedef struct{
  * @DESC: Inicializa los diccionarios y las listas
  **/
 void inicializar_estructuras_administrativas_paginacion();
-
-
-
 
 
 // FUNCIONES PUBLICAS
@@ -154,7 +155,7 @@ void inicializar_estructuras_administrativas();
  * @NAME: destruir_estructuras_administativas
  * @DESC: libera la memoria reservada por las estructuras administrativas
  **/
-void destruir_estructuras_administativas();
+void destruir_estructuras_administrativas();
 
 /**
 * @NAME: se_puede_almacenar_el_alloc_para_proceso
@@ -188,7 +189,37 @@ uint32_t puedo_pedir_mas_memoria(uint32_t pid, uint32_t size);
 **/
 void destruir_proceso(void* proceso);
 
+/**
+* @NAME: leer_de_memoria
+* @DESC: Devuelvo un ptro con lo leido de memoria que estaba referenciado por la dirLog a leer
+* 		Se encarga de invocar la funcion de memoria para la lectura
+**/
+void* leer_de_memoria(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer);
 
+
+/**
+ * @NAME: calcular_pagina_de_puntero_logico
+ * @DESC: devuelve la pagina a la cual corresponderia un determinado puntero logic
+ * @EXAMPLE: calcular_pagina_de_puntero_logico(100) - con paginas de 64
+ * 			 valor de retorno = 2 (pagina 2)
+ */
+uint32_t calcular_pagina_de_puntero_logico(uint32_t puntero);
+
+/**
+ * @NAME: calcular_offset_puntero_en_pagina
+ * @DESC: calcula el offset para un puntero dentro de una pagina
+ * @EXAMPLE: calcular_offset_puntero_en_pagina(100) - con paginas de 32
+ * 			 valor de retorno = 4
+ */
+
+uint32_t calcular_offset_puntero_en_pagina(uint32_t puntero);
+
+/**
+ * @NAME: escribir_en_memoria
+ * @DESC: funcion intermedia entre la funcion memwrite y la funcion que conoce la distribución de la memoria
+ */
+
+void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t puntero);
 
 // FUNCIONES PRIVADAS DE USO INTERNO
 /**
@@ -199,13 +230,6 @@ void destruir_proceso(void* proceso);
 *    NULL			si no existe el proceso buscado
 **/
 t_proceso* get_proceso_PID(uint32_t PID);
-
-/*
- * @NAME: get_ptro_con_tam_min
- * @DES: busca el metadata en el cual entra el dato de tamaño solicitado
- * @RET: devuelve el metadata que puede contenerlo; caso que ninguno pueda: devuelve el ultimo HEAP
- * */
-int32_t get_ptro_con_tam_min(t_list* listaHMD, uint32_t tam);
 
 /*
  * @NAME: espacio_de_HEAP
@@ -250,7 +274,7 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
  * @DES: se fija si la pagina esta en memoria RAM (se usa TLB), en caso de no ser asi la trae del SWAP. Actualiza TLB y Pag para algoritmo de reemplazo
  * 		 Luego devuelvo la pagina en cuestion
  * */
-t_pagina* obtener_pagina_de_memoria(uint32_t PID, int pag, uint32_t bit_modificado);
+uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int pag, uint32_t bit_modificado);
 
 /*
  * @NAME: serializar_HEAP
@@ -265,8 +289,6 @@ void * serializar_HEAP(heap_metadata* nuevoHeapPrimero);
  * @DES: Informa la tabla de paginas del proceso asociado al PID
  * */
 t_list* obtener_tabla_paginas_mediante_PID(uint32_t PID);
-
-
 
 /*
  * @NAME: obtener_tabla_paginas_mediante_PID
@@ -303,12 +325,80 @@ void modificar_heaps(t_list* heaps, uint32_t indice, uint32_t pid, uint32_t cant
 */
 bool el_ultimo_heap_libera_paginas(heap_metadata* ultimo_heap);
 
-
 /**
  * @NAME: liberar_páginas
  * @DESC: libera la cantidad de paginas que estan de mas en el proceos porque
  * el último heap es mas gande que el restante dentro de una pagina
 */
 void liberar_paginas(heap_metadata* ultimo_heap, t_list* tabla_paginas);
+
+/**
+* @NAME: actualizar_datos_pagina
+* @DESC: actualiza los datos administrativos de la pagina tras su uso
+**/
+void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModificado, uint32_t bitTLB);
+
+/**
+* @NAME: inicializar_datos_pagina
+* @DESC: inicializa los datos administrativos de la pagina traido a memoria
+**/
+void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado);
+
+/**
+* @NAME: esta_en_RAM
+* @DESC: Avisa si la pagina del proceso con el PID asociado esta en la RAM
+**/
+bool esta_en_RAM(uint32_t PID, uint32_t nroPag);
+
+/**
+* @NAME: obtener_frame_de_RAM
+* @DESC: retorna el frame de la pagina del proceso con el PID asociado
+**/
+uint32_t obtener_frame_de_RAM(uint32_t PID, uint32_t nroPag);
+
+/**
+* @NAME: calcular_tamanio_ultimo_HEAP
+* @DESC: calcula el tamanio del ultimo heap del proceso asociado al PID
+**/
+uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID);
+
+/**
+* @NAME: actualizar_cantidad_frames_por_proceso_RAM
+* @DESC: se encarga de mantener actualizado el valor de paginas en RAM
+**/
+void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant);
+
+/**
+ * @NAME: calcular_hash_key
+ * @DESC: calcula un hash que va a ser usado como key del diccionario de la TLB.
+ *
+ * @EXAMPLE: calcular_hash_key(1);
+ * 			 hash = "1"
+ *
+ **/
+char* calcular_hash_key_dic(uint32_t pid);
+
+/**
+* @NAME: leer_de_memoria_paginada
+* @DESC: Se encarga de devolver el msj a memoria.
+ * 		 En caso de que el dato este partido en dos o mas paginas, esta funcion se encarga de traer las pags a memoria y mandar la señal a memoria para
+ * 		 que guarde los datos.
+**/
+void* leer_de_memoria_paginada(uint32_t PID, int nroPag, int offset, int tamDato);
+
+/**
+ * @NAME: paginas_extras_para_proceso
+ * @DESC: calcula la cantidad de paginas nuevas necesarias para ampliar el espacio de direcciones de un proceso. Se fija
+ * el espacio disponible en la ultima pagina y lo tiene en cuenta para los calculos
+*/
+
+uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size);
+
+/**
+ * @NAME: calcular_paginas_para_tam
+ * @DESC: dado un determinado tamanio, calcula cuantas paginas son necesarias para almacenarlo
+*/
+
+int calcular_paginas_para_tamanio(uint32_t tam);
 
 #endif /* PAGINACION_PAGINACION_H_ */
