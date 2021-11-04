@@ -30,7 +30,7 @@ typedef struct {
  * 	0 nos acepta
  * 	X Error, no nos acepta
  */
-int enviar_handshake();
+int ram_enviar_handshake();
 
 t_ram_respuesta * ram_enviar_alloc(t_matelib_memoria_alloc * memoria_alloc);
 
@@ -41,6 +41,8 @@ t_ram_respuesta * ram_enviar_free(t_matelib_memoria_free * memoria_free);
 t_ram_respuesta * ram_enviar_read(t_matelib_memoria_read * memoria_read);
 
 t_ram_respuesta * ram_enviar_close(t_matelib_nuevo_proceso * muerto_proceso);
+
+t_ram_respuesta * ram_enviar_init(t_matelib_nuevo_proceso * nuevo_proceso);
 
 int ram_enviar_proceso_suspendido(uint32_t pid);
 

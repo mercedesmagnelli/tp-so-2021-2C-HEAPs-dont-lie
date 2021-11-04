@@ -5,7 +5,7 @@ int conexiones_iniciar();
 void avisar_ram_desconexion();
 
 // Publica
-int enviar_handshake() {
+int ram_enviar_handshake() {
 	int socket_ram = conexiones_iniciar();
 	if (socket_ram < 0) {
 		return socket_ram;
@@ -28,7 +28,6 @@ int enviar_handshake() {
 
 	close(socket_ram);
 
-	pthread_exit(NULL);
 	return 0;
 }
 
@@ -139,6 +138,25 @@ t_ram_respuesta * ram_enviar_close(t_matelib_nuevo_proceso * muerto_proceso) {
 	void * mensaje_lib = serializiar_crear_proceso(muerto_proceso, size);
 
 	t_prot_mensaje * respuesta_ram = ram_enviar_mensaje(MATELIB_CLOSE, mensaje_lib, *size);
+
+	t_ram_respuesta * respuesta = malloc(sizeof(t_ram_respuesta));
+
+	respuesta->respuesta = respuesta_ram->head;
+	respuesta->size = 0;
+	respuesta->mensaje = NULL;
+
+	free(size);
+	free(mensaje_lib);
+	free(respuesta_ram);
+
+	return respuesta;
+}
+
+t_ram_respuesta * ram_enviar_init(t_matelib_nuevo_proceso * nuevo_proceso) {
+	size_t * size = malloc(sizeof(size_t));
+	void * mensaje_lib = serializiar_crear_proceso(nuevo_proceso, size);
+
+	t_prot_mensaje * respuesta_ram = ram_enviar_mensaje(MATELIB_INIT, mensaje_lib, *size);
 
 	t_ram_respuesta * respuesta = malloc(sizeof(t_ram_respuesta));
 

@@ -25,10 +25,17 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			planificadores_proceso_iniciar(nuevo_proceso->pid); // AVISA AL PLANIFICADOR DE LARGO PLAZO Y CREA ESTRUCTURAS
 
+			respuesta_ram = ram_enviar_init(nuevo_proceso);
+
 			hilos_wait_ejecucion(nuevo_proceso->pid); // ESPERAMOS A QUE ENTRE EN EJECUCION
 
-			loggear_info("[PID: %zu] - [Mensaje] - Se creo el proceso y ya esta en ejecucion", nuevo_proceso->pid);
-			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			if (respuesta_ram->respuesta == EXITO_EN_LA_TAREA) {
+				loggear_info("[PID: %zu] - [Mensaje] - Se creo el proceso y ya esta en ejecucion", nuevo_proceso->pid);
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			} else {
+				loggear_info("[PID: %zu] - [Mensaje] - Ocurrio un problema en la RAM al hacer MATE_INIT", nuevo_proceso->pid);
+				enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, 0, NULL);
+			}
 
 			destruir_mensaje(mensaje);
 			desconexion(mensaje);
