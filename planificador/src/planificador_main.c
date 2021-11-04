@@ -25,10 +25,18 @@ int main(int argc, char** argv) {
 
 	error = levantar_servidor();
 	if (error != STATUS_OK) {
-		loggear_error("Ocurrio un error al levantar el servidor, ceramos");
+		loggear_error("Ocurrio un error al levantar el servidor, cerramos");
 		cerrar_todo();
 		return EXIT_FAILURE;
 	}
+
+	error = ram_enviar_handshake();
+	if (error != 0) {
+		loggear_error("RAM no nos acepto, Error: %d", error);
+		cerrar_todo();
+		return EXIT_FAILURE;
+	}
+
 
 	error = planificadores_iniciar();
 	if (error != 0) {
@@ -37,13 +45,6 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 	loggear_debug("Se creo el planificador con el estatus en %d", error);
-
-	error = ram_enviar_handshake();
-	if (error != 0) {
-		loggear_error("RAM no nos acepto, Error: %d", error);
-		cerrar_todo();
-		return EXIT_FAILURE;
-	}
 
 	/*
 	planificadores_proceso_iniciar(1);
