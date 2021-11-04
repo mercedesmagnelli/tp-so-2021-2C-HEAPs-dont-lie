@@ -6,9 +6,7 @@
 #include <commons/collections/dictionary.h>
 #include "../../../shared/codigo_error.h"
 #include "../../src/conexion_swap/conexion_swap.h"
-#include "../../src/configuracion/ram_config_guardada.h"
 #include "../../src/memoria/memoria.h"
-#include "../../src/configuracion/ram_config_guardada.h"
 #include "../../src/TLB/tlb.h"
 #include "../../../shared/logger.h"
 #include "swaping.h"
@@ -49,13 +47,7 @@ typedef struct {
 	uint32_t hits_proceso;
 }t_proceso;
 
-typedef struct{
-	uint32_t bit_presencia;
-	uint32_t frame;
-	double timestamp;
-	uint32_t bit_uso;
-	uint32_t bit_modificacion;
-}t_pagina;
+
 
 
 /**
