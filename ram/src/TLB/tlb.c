@@ -16,7 +16,9 @@ void inicializar_tlb() {
 }
 
 void limpiar_tlb(){
-
+	for(int i = 0; i<list_size(TLB);i++){
+		eliminar_entrada(0);
+	}
 }
 
 void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
@@ -37,15 +39,11 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
 
 void eliminar_entrada(uint32_t indice_victima) {
-	void destructor_de_entradas(void* entrada) {
-		entrada_tlb* e_tlb = (entrada_tlb*) entrada;
-		free(e_tlb->hash_key);
-		free(e_tlb);
-	}
 
 	list_remove_and_destroy_element(TLB, indice_victima, destructor_de_entradas);
 
 }
+
 uint32_t obtener_entrada_victima() {
 	uint32_t victima;
 	if(get_algoritmo_reemplazo_tlb() == FIFO){
@@ -108,6 +106,10 @@ void actualizar_datos_TLB(uint32_t PID, uint32_t nroPag){
 
 }
 
+void destruir_tlb(){
+	list_destroy_and_destroy_elements(TLB, destructor_de_entradas);
+	loggear_debug("[RAM] - TLB destruida exitosamente");
+}
 
 
 // FUNCIONES PRIVADAS
@@ -136,5 +138,11 @@ uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina){
 	entrada_tlb* entrada_encontrada = (entrada_tlb*)list_find(TLB, buscar_key);
 	return entrada_encontrada->frame;
 	free(key);
+}
+
+void destructor_de_entradas(void* entrada) {
+	entrada_tlb* e_tlb = (entrada_tlb*) entrada;
+	free(e_tlb->hash_key);
+	free(e_tlb);
 }
 
