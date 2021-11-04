@@ -29,6 +29,8 @@ int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 	} else if (mensaje_respuesta->head == FALLO_EN_LA_TAREA) {
 		loggear_error("El proceso [PID: %zu] no se pudo crear", nuevo_proceso->pid);
 		error = 1;
+	} else if (mensaje_respuesta->head == DESCONEXION) {
+		// A VECES, llega antes la desconexion del receptor que la propia
 	} else {
 		loggear_warning("El proceso [PID: %zu] devolvio un codigo extraño: %d al hacer MATE_INIT", nuevo_proceso->pid, mensaje_respuesta->head);
 		error = 2;
