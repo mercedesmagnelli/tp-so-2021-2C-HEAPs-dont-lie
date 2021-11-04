@@ -26,6 +26,18 @@ int main(int argc, char** argv) {
 	mate_instance* lib_ref = malloc(sizeof(mate_instance));
 
 	mate_init(lib_ref, "hola");
+	sleep(5);
+	mate_sem_init(lib_ref, "sem uno", 0);
+	sleep(5);
+	mate_sem_wait(lib_ref, "sem_uno");
+	sleep(5);
+	mate_sem_post(lib_ref, "sem uno");
+	sleep(5);
+	mate_call_io(lib_ref, "Impresora", "puto");
+	sleep(5);
+	mate_sem_destroy(lib_ref, "sem uno");
+	sleep(5);
+	mate_close(lib_ref);
 
 /*
 	t_instance_metadata* metadata = malloc(sizeof(t_instance_metadata));

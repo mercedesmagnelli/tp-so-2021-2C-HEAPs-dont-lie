@@ -23,16 +23,22 @@ int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 	}
 	free(size);
 
-	int error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
+	int error = 0;
+	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
+		loggear_info("El proceso [PID: %zu] se creó exitosamente", nuevo_proceso->pid);
+	}else if(mensaje_respuesta->head == FALLO_EN_LA_TAREA){
+		loggear_info("El proceso [PID: %zu] no se pudo crear", nuevo_proceso->pid);
+		error = 1;
+	}else {
+		loggear_warning("El proceso [PID: %zu] devolvió un código extraño: %d al hacer MATE_INIT", nuevo_proceso->pid, mensaje_respuesta->head);
+		error = 2;
 	}
 
 	close(socket);
 
 	pthread_exit(NULL);
-	return 0;
+	return error;
 }
 
 int enviar_mate_close(t_matelib_nuevo_proceso * nuevo_proceso) {
@@ -54,16 +60,22 @@ int enviar_mate_close(t_matelib_nuevo_proceso * nuevo_proceso) {
 	}
 	free(size);
 
-	int error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
+	int error = 0;
+	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
+		loggear_info("El proceso [PID: %zu] terminó exitosamente", nuevo_proceso->pid);
+	}else if(mensaje_respuesta->head == FALLO_EN_LA_TAREA){
+		loggear_info("El proceso [PID: %zu] no se pudo terminar", nuevo_proceso->pid);
+		error = 1;
+	}else {
+		loggear_warning("El proceso [PID: %zu] devolvió un código extraño: %d al hacer MATE_CLOSE", nuevo_proceso->pid, mensaje_respuesta->head);
+		error = 2;
 	}
 
 	close(socket);
 
 	pthread_exit(NULL);
-	return 0;
+	return error;
 }
 
 int enviar_mate_sem_init(t_matelib_semaforo* nuevo_semaforo){
@@ -86,16 +98,22 @@ int enviar_mate_sem_init(t_matelib_semaforo* nuevo_semaforo){
 
 	loggear_trace("Enviado handshake al señor X");
 
-	int error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
+	int error = 0;
+	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
+		loggear_info("El proceso [PID: %zu] creó el semáforo %s con valor inicial %d", nuevo_semaforo->pid, nuevo_semaforo->semaforo_nombre, nuevo_semaforo->semaforo_valor);
+	}else if(mensaje_respuesta->head == FALLO_EN_LA_TAREA){
+		loggear_info("El proceso [PID: %zu] no pudo crear el semáforo %s", nuevo_semaforo->pid, nuevo_semaforo->semaforo_nombre);
+		error = 1;
+	}else {
+		loggear_warning("El proceso [PID: %zu] devolvió un código extraño: %d al hacer MATE_SEM_INIT", nuevo_semaforo->pid, mensaje_respuesta->head);
+		error = 2;
 	}
 
 	close(socket);
 
 	pthread_exit(NULL);
-	return 0;
+	return error;
 
 }
 
@@ -117,16 +135,22 @@ int enviar_mate_sem_wait(t_matelib_semaforo* semaforo){
 	}
 	free(size);
 
-	int error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
+	int error = 0;
+	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
+		loggear_info("El proceso [PID: %zu] hizo wait al semáforo %s", semaforo->pid, semaforo->semaforo_nombre);
+	}else if(mensaje_respuesta->head == FALLO_EN_LA_TAREA){
+		loggear_info("El proceso [PID: %zu] no pudo hacer wait al semáforo %s", semaforo->pid, semaforo->semaforo_nombre);
+		error = 1;
+	}else {
+		loggear_warning("El proceso [PID: %zu] devolvió un código extraño: %d al hacer MATE_SEM_WAIT", semaforo->pid, mensaje_respuesta->head);
+		error = 2;
 	}
 
 	close(socket);
 
 	pthread_exit(NULL);
-	return 0;
+	return error;
 }
 
 int enviar_mate_sem_post(t_matelib_semaforo* semaforo){
@@ -147,16 +171,22 @@ int enviar_mate_sem_post(t_matelib_semaforo* semaforo){
 	}
 	free(size);
 
-	int error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
+	int error = 0;
+	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
+		loggear_info("El proceso [PID: %zu] hizo post al semáforo %s", semaforo->pid, semaforo->semaforo_nombre);
+	}else if(mensaje_respuesta->head == FALLO_EN_LA_TAREA){
+		loggear_info("El proceso [PID: %zu] no pudo hacer post al semáforo %s", semaforo->pid, semaforo->semaforo_nombre);
+		error = 1;
+	}else {
+		loggear_warning("El proceso [PID: %zu] devolvió un código extraño: %d al hacer MATE_SEM_POST", semaforo->pid, mensaje_respuesta->head);
+		error = 2;
 	}
 
 	close(socket);
 
 	pthread_exit(NULL);
-	return 0;
+	return error;
 }
 
 int enviar_mate_sem_destroy(t_matelib_semaforo* semaforo){
@@ -177,16 +207,22 @@ int enviar_mate_sem_destroy(t_matelib_semaforo* semaforo){
 	}
 	free(size);
 
-	int error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
+	int error = 0;
+	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
+		loggear_info("El proceso [PID: %zu] hizo destroy al semáforo %s", semaforo->pid, semaforo->semaforo_nombre);
+	}else if(mensaje_respuesta->head == FALLO_EN_LA_TAREA){
+		loggear_info("El proceso [PID: %zu] no pudo hacer destroy al semáforo %s", semaforo->pid, semaforo->semaforo_nombre);
+		error = 1;
+	}else {
+		loggear_warning("El proceso [PID: %zu] devolvió un código extraño: %d al hacer MATE_SEM_DESTROY", semaforo->pid, mensaje_respuesta->head);
+		error = 2;
 	}
 
 	close(socket);
 
 	pthread_exit(NULL);
-	return 0;
+	return error;
 }
 
 int enviar_mate_call_io(t_matelib_io* entrada_salida){
@@ -207,16 +243,22 @@ int enviar_mate_call_io(t_matelib_io* entrada_salida){
 	}
 	free(size);
 
-	int error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
+	int error = 0;
+	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
+		loggear_info("El proceso [PID: %zu] llamó al recurso %s", entrada_salida->pid, entrada_salida->io_nombre);
+	}else if(mensaje_respuesta->head == FALLO_EN_LA_TAREA){
+		loggear_info("El proceso [PID: %zu] no pudo llamar al recurso %s", entrada_salida->pid, entrada_salida->io_nombre);
+		error = 1;
+	}else {
+		loggear_warning("El proceso [PID: %zu] devolvió un código extraño: %d al hacer MATE_CALL_IO", entrada_salida->pid, mensaje_respuesta->head);
+		error = 2;
 	}
 
 	close(socket);
 
 	pthread_exit(NULL);
-	return 0;
+	return error;
 }
 
 int32_t enviar_mate_memalloc(t_matelib_memoria_alloc* alloc){
