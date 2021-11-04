@@ -64,7 +64,7 @@ typedef enum {
 	READ_SUC_R_P,
 	WRITE_SUC_R_P,
 	WRITE_ERR_R_P,
-	SUSPENDER_PROCESO,
+	SUSPENDER_PROCESO_R_P,
 
 	// Mensajes genericos
 	EXITO_EN_LA_TAREA,

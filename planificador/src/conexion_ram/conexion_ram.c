@@ -153,6 +153,25 @@ t_ram_respuesta * ram_enviar_close(t_matelib_nuevo_proceso * muerto_proceso) {
 	return respuesta;
 }
 
+int ram_enviar_proceso_suspendido(uint32_t pid) {
+	loggear_info("[PID: %zu] - Se avisa a la RAM la suspension del proceso", pid);
+
+	uint32_t * pid_m = malloc(sizeof(uint32_t));
+	*pid_m = pid;
+
+	t_prot_mensaje * respuesta_ram = ram_enviar_mensaje(SUSPENDER_PROCESO_R_P, pid_m, sizeof(uint32_t));
+
+	int error = 0;
+	if (respuesta_ram->head != EXITO_EN_LA_TAREA) {
+		loggear_error("[PID: %zu] - La ram no devolvio exito en la tarea", pid);
+		error = 1;
+	}
+
+	free(pid_m);
+	free(respuesta_ram);
+
+	return error;
+}
 
 // Publica
 void conexiones_cerrar_conexiones(bool safe_close) {

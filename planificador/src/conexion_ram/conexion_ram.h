@@ -2,6 +2,7 @@
 #ifndef CONEXION_RAM_H_
 #define CONEXION_RAM_H_
 
+#include <stdint.h>
 #include <pthread.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -40,6 +41,8 @@ t_ram_respuesta * ram_enviar_free(t_matelib_memoria_free * memoria_free);
 t_ram_respuesta * ram_enviar_read(t_matelib_memoria_read * memoria_read);
 
 t_ram_respuesta * ram_enviar_close(t_matelib_nuevo_proceso * muerto_proceso);
+
+int ram_enviar_proceso_suspendido(uint32_t pid);
 
 /**
  * @NAME: ram_cerrar_conexiones
