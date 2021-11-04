@@ -11,6 +11,9 @@ int mate_init(mate_instance *lib_ref, char *config) {
 	lib_ref->group_info = metadata;
 
 	t_matelib_nuevo_proceso * nuevo_proceso = shared_crear_nuevo_proceso(metadata->pid);
+
+	loggear_debug("[PID: %zu] --- Envia al planificador", metadata->pid);
+
 	int error = enviar_mate_init(nuevo_proceso);
 
 	return error;

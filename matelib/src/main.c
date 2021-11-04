@@ -26,6 +26,10 @@ int main(int argc, char** argv) {
 	mate_instance* lib_ref = malloc(sizeof(mate_instance));
 
 	mate_init(lib_ref, "hola");
+	mate_init(lib_ref, "hola");
+	mate_init(lib_ref, "hola");
+	mate_init(lib_ref, "hola");
+	mate_init(lib_ref, "hola");
 
 /*
 	t_instance_metadata* metadata = malloc(sizeof(t_instance_metadata));

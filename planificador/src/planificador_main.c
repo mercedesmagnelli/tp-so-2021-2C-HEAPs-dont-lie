@@ -33,6 +33,7 @@ int main(int argc, char** argv) {
 	error = planificadores_iniciar();
 	loggear_debug("Se creo el planificador con el estatus en %d", error);
 
+	/*
 	planificadores_proceso_iniciar(1);
 	loggear_debug("Se creo el proceso 1");
 
@@ -47,6 +48,7 @@ int main(int argc, char** argv) {
 
 	planificadores_proceso_iniciar(5);
 	loggear_debug("Se creo el proceso 5");
+	*/
 
 
 
@@ -65,7 +67,7 @@ int main(int argc, char** argv) {
 
 
 	//levantar_consola();
-	sleep(30);
+	sleep(120);
 	cerrar_todo();
 	return EXIT_SUCCESS;
 }

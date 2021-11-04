@@ -98,10 +98,11 @@ int planificadores_proceso_iniciar(uint32_t ppid) {
 	loggear_debug("[SYSTEM] --- Llego un nuevo proceso al planificador");
 
 	t_hilo * hilo = colas_insertar_new(ppid);
-	hilos_agregar_nuevo_hilo(ppid);
-	hilos_post_new();
 
 	loggear_debug("[PID: %d] --- [SYSTEM] --- Se movió a NEW", pid(hilo));
+
+	hilos_agregar_nuevo_hilo(ppid);
+	hilos_post_new();
 
     return 0;
 }

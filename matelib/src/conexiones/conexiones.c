@@ -21,18 +21,23 @@ int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 
 		return resultado;
 	}
-	free(size);
 
-	int error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
+	int error = 0;
+	t_prot_mensaje * mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
+		loggear_info("El proceso [PID: %zu] se creo exitosamente", nuevo_proceso->pid);
+	} else if (mensaje_respuesta->head == FALLO_EN_LA_TAREA) {
+		loggear_error("El proceso [PID: %zu] no se pudo crear", nuevo_proceso->pid);
+		error = 1;
+	} else {
+		loggear_warning("El proceso [PID: %zu] devolvio un codigo extraño: %d al hacer MATE_INIT", nuevo_proceso->pid, mensaje_respuesta->head);
+		error = 2;
 	}
 
+	free(size);
 	close(socket);
 
-	pthread_exit(NULL);
-	return 0;
+	return error;
 }
 
 int enviar_mate_close(t_matelib_nuevo_proceso * nuevo_proceso) {
