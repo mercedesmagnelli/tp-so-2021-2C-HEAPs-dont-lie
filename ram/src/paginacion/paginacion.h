@@ -19,12 +19,6 @@ t_list* listaFrames;//casos: traer_pagina_de_SWAP, liberar_paginas
 t_dictionary* cant_frames_por_proceso;//casos: traer_pagina_de_SWAP, liberar_paginas
 
 
-typedef struct{
-	//índice: frame
-	uint32_t estado;
-	uint32_t proceso;
-	uint32_t pagina;
-}t_frame;
 
 typedef struct{
     uint32_t en_mp; //me sirve de flag para comprobar cuando realmente hacer el swap
@@ -38,6 +32,13 @@ typedef struct{
 	uint8_t isFree;
 }heap_metadata;
 
+typedef struct{
+	//índice: frame
+	uint32_t nroFrame;
+	uint32_t estado;
+	uint32_t proceso;
+	uint32_t pagina;
+}t_frame;
 
 typedef struct {
 	uint32_t PID;
@@ -48,8 +49,6 @@ typedef struct {
 	uint32_t miss_proceso;
 	uint32_t hits_proceso;
 }t_proceso;
-
-
 
 
 /**
