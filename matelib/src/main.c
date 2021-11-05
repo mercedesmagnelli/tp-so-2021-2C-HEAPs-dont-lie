@@ -27,9 +27,9 @@ int main(int argc, char** argv) {
 
 	mate_init(lib_ref, "hola");
 	sleep(5);
-	mate_sem_init(lib_ref, "sem uno", 0);
+	mate_sem_init(lib_ref, "sem uno", 1);
 	sleep(5);
-	mate_sem_wait(lib_ref, "sem_uno");
+	mate_sem_wait(lib_ref, "sem uno");
 	sleep(5);
 	mate_sem_post(lib_ref, "sem uno");
 	sleep(5);

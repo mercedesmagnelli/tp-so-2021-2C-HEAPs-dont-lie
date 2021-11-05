@@ -23,7 +23,6 @@ int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 	}
 
 	int error = 0;
-<<<<<<< HEAD
 	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
 	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
 		loggear_info("El proceso [PID: %zu] se creó exitosamente", nuevo_proceso->pid);
@@ -32,7 +31,8 @@ int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 		error = 1;
 	}else {
 		loggear_warning("El proceso [PID: %zu] devolvió un código extraño: %d al hacer MATE_INIT", nuevo_proceso->pid, mensaje_respuesta->head);
-
+		error =2;
+	}
 	free(size);
 	close(socket);
 
@@ -45,7 +45,6 @@ int enviar_mate_close(t_matelib_nuevo_proceso * nuevo_proceso) {
 		return socket;
 	}
 
-	// TODO: Cambiar este mensaje por un t_mensaje
 	size_t * size = malloc(sizeof(size_t));
 	void * mensaje = serializiar_crear_proceso(nuevo_proceso, size);
 
