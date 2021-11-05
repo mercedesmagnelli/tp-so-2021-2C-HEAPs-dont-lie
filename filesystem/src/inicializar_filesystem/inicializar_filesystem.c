@@ -49,8 +49,8 @@ int crear_particion(){
 }
 
 void destroy_carpinchos_swamp(t_carpincho_swamp* carpincho){
-	list_clean(carpincho->dupla);
-	list_destroy(carpincho->dupla);
+	list_destroy_and_destroy_elements(carpincho->dupla, free);
+	free(carpincho);
 }
 
 void destroy_lista_carpinchos(){

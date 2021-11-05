@@ -28,8 +28,8 @@ int main(int argc, char** argv) {
 
 	iniciar_swamp();
 
-
-
+// MI SUPER MAIN IMPORTANTE NO BORRAR, LAMENTO SUBIR ESTO IGNORALO POR EL MOMENTO ALEX, PERO ME AYUDA MUCHO A PROBAR. PROMETO BORRARLO APENAS TERMINE//
+/*
 	t_carpincho_swamp* carpincho = crear_carpincho(14);
 	t_carpincho_swamp* carpincho2 = crear_carpincho(12);
 	t_carpincho_swamp* carpincho3 = crear_carpincho(14);
@@ -62,6 +62,9 @@ int main(int argc, char** argv) {
 	t_carpincho_swamp* asdadasd = list_get(lista_carpinchos,0);
 
 	loggear_trace("LISTA TIENE %d", asdadasd->pid_carpincho);
+
+
+*/
 
 	//loggear_debug("SEGUNDO CARPINCHO %d", list_get(archivo->carpinchos, 1));
 
@@ -111,7 +114,7 @@ int main(int argc, char** argv) {
 	debug_variables();
 
 
-/*	pthread_t ram_handshake = thread_ejecutar_funcion(enviar_handshake);
+	pthread_t ram_handshake = thread_ejecutar_funcion(enviar_handshake);
 
 
 	error = thread_join_and_free(ram_handshake);
@@ -122,7 +125,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-*/
+
 
 	cerrar_todo();
 
