@@ -10,6 +10,7 @@ void inicializar_estructuras_administrativas() {
     memoria_principal = malloc(get_tamanio_memoria());
     for(int i=0;i<get_tamanio_pagina();i++){
     	t_frame* frame = malloc(sizeof(t_frame));
+    	frame->nroFrame=i;
     	frame->estado=0;
     	list_add(listaFrames, frame);
     }
