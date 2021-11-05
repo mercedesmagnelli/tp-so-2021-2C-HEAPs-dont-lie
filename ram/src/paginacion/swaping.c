@@ -9,7 +9,7 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 		info_a_guardar = pedir_a_swamp_info_pagina(PID, nroPag);
 	}else {
 		t_list* tabla_paginas = obtener_tabla_paginas_mediante_PID(PID);
-		t_list* lista_paginas_presentes = obtener_lista_paginas_en_memoria(tabla_paginas);
+		//t_list* lista_paginas_presentes = obtener_lista_paginas_en_memoria(tabla_paginas);
 		t_pagina* pagina_victima = obtener_pagina_victima(lista_paginas_presentes);
 		frame = pagina_victima->frame;
 		info_a_guardar = traer_y_controlar_consistencia_paginas(pagina_victima, nroPag, PID);
@@ -34,34 +34,44 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina, int nro_pag, uint
 }
 
 t_list* obtener_lista_frames_en_memoria(uint32_t pid) {
-	//buscar en la lista de frame todos aquellos que tengan el pid
-	//en el proceso que los ocupa
-	t_list* lista_frames_proceso = list_create();
-
+	t_list* lista_frames_proceso;
+	t_proceso* proceso = get_proceso_PID(pid);
+		if(get_tipo_asignacion() == FIJA) {
+			lista_frames_proceso = proceso->lista_frames_reservados;
+		}else {
+			lista_frames_proceso = listaFrames;
+		}
 
 	return lista_frames_proceso;
 
 }
 
-t_list* obtener_lista_paginas_en_memoria(uint32_t pid) {
-	t_list* lista_paginas = list_create();
-
-	return lista_paginas;
-}
 
 t_pagina* obtener_pagina_victima(t_list* lista_paginas) {
 
 	t_pagina* pagina_victima;
-	if(get_algoritmo_reemplazo_mmu() == LRU){
-		pagina_victima = obtener_victima_LRU(lista_paginas);
-	}else {
+	if(get_algoritmo_reemplazo_mmu() == CLOCKM){
 		pagina_victima = obtener_victima_Clock_Modificado(lista_paginas);
+	}else {
+		pagina_victima = obtener_victima_LRU(lista_paginas);
 	}
 	return pagina_victima;
 }
 
 t_pagina* obtener_victima_LRU(t_list* lista_paginas){
 	t_pagina* pagina_victima;
+	t_pagina* pagina_anterior = (t_pagina*) list_get(lista_paginas, 0);
+	for(int i = 0; i < list_size(lista_paginas); i++) {
+
+		t_pagina* pagina_actual = (t_pagina*) list_get(lista_paginas, i);
+		if(pagina_actual-> timestamp < pagina_anterior->timestamp) {
+			pagina_victima = pagina_actual;
+		}
+
+		pagina_anterior = pagina_actual;
+
+
+	}
 
 	return pagina_victima;
 }

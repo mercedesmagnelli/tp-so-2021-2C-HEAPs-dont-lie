@@ -43,6 +43,8 @@ typedef struct {
 	uint32_t PID;
 	t_list* tabla_paginas; //t_list pagina
 	t_list* lista_hmd;
+	t_list* lista_frames_reservados;
+	uint32_t puntero_frames;
 	uint32_t miss_proceso;
 	uint32_t hits_proceso;
 }t_proceso;
