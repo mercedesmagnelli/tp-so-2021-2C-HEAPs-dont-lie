@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 	sleep(5);
 	mate_sem_post(lib_ref, "sem uno");
 	sleep(5);
-	mate_call_io(lib_ref, "Impresora", "puto");
+	mate_call_io(lib_ref, "hierbitas", "puto");
 	sleep(5);
 	mate_sem_destroy(lib_ref, "sem uno");
 	sleep(5);
