@@ -1,4 +1,6 @@
 #include "matelib.h"
+#include <pthread.h>
+#include <commons/string.h>
 
 void cerrar_todo();
 
@@ -19,20 +21,43 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	mate_instance * lib_ref2 = malloc(sizeof(mate_instance));
-	mate_instance * lib_ref = malloc(sizeof(mate_instance));
 
-	mate_init(lib_ref, "hola 01");
-	mate_init(lib_ref2, "hola 02");
+	void multi_hilo1(int * n) {
+		mate_instance * lib_ref = malloc(sizeof(mate_instance));
 
-	//mate_call_io(lib_ref, "hierbitas", "asd");
-	mate_sem_init(lib_ref, "SEM_AAA", 1);
+		mate_init(lib_ref, string_from_format("Proceso %d", n));
 
-	mate_sem_wait(lib_ref2, "SEM_AAA");
-	//mate_sem_post(lib_ref, "SEM_AAA");
+		if (rand() % 10 > 5) {
+			mate_sem_wait(lib_ref, "SEM_BBB");
+		}
+		mate_sem_wait(lib_ref, "SEM_CCC");
 
-	sleep(5);
-	mate_sem_destroy(lib_ref, "SEM_AAA");
+		mate_sem_wait(lib_ref, "SEM_AAA");
+
+		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
+
+		sleep(10);
+
+		mate_sem_post(lib_ref, "SEM_AAA");
+	}
+
+	mate_instance * referencia = malloc(sizeof(mate_instance));
+
+	mate_init(referencia, "Proceso 01");
+	mate_sem_init(referencia, "SEM_AAA", 1);
+	mate_sem_init(referencia, "SEM_BBB", 10);
+	mate_sem_init(referencia, "SEM_CCC", 10);
+
+	for (int i = 1; i < 5; ++i) {
+		pthread_t thread;
+
+		pthread_create(&thread, NULL, (void *) multi_hilo1, &i);
+	}
+
+
+	loggear_debug("En 30 segundos, Se destruye el semaforo");
+	sleep(30);
+	mate_sem_destroy(referencia, "SEM_AAA");
 
 	sleep(100);
 

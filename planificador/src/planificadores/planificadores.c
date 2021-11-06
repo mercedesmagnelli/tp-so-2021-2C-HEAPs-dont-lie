@@ -81,6 +81,7 @@ int planificadores_iniciar() {
 	hilos_planificador_iniciar();
 	semaforo_estructuras_crear();
 	dispositivo_io_estructuras_crear();
+	deadlocks_iniciar();
 
 	int error = 0;
 
@@ -96,6 +97,7 @@ void planificadores_destruir() {
 	hilos_planificador_destruir();
 	semaforo_estructuras_destruir();
 	dispositivo_io_estructuras_destruir();
+	deadlocks_destruir();
 }
 
 // CERRADO
