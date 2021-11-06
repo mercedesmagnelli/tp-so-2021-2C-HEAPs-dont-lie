@@ -124,8 +124,13 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	nuevoProceso->PID = PID;
 	nuevoProceso->tabla_paginas = list_create();
 	nuevoProceso->lista_hmd = list_create();
+	nuevoProceso->lista_frames_reservados = list_create();
 	nuevoProceso->hits_proceso = 0;
 	nuevoProceso->miss_proceso = 0;
+	if(get_tipo_asignacion() == FIJA){
+		reservar_frames(nuevoProceso->lista_frames_reservados);
+		nuevoProceso->puntero_frames = 0;
+	}
 	list_add(listaProcesos, nuevoProceso);
 
 
@@ -663,3 +668,26 @@ int calcular_paginas_para_tamanio(uint32_t tam) {
 		return cantPags;
 }
 
+void reservar_frames(t_list* lista_frames_proceso){
+
+	bool frame_disponible_y_no_repetidos_en_lista(void* element){
+		return frame_disponible(element)&&frame_no_pertenece_a_lista(lista_frames_proceso, element);
+	}
+
+	for(int i=0; i<get_marcos_maximos();i++){
+		t_frame* frame = (t_frame*)list_find(listaFrames, frame_disponible_y_no_repetidos_en_lista);
+		list_add(lista_frames_proceso, frame);
+	}
+}
+
+bool frame_no_pertenece_a_lista(t_list* lista_frames, void* elementoBuscado){
+
+	t_frame* frame = (t_frame*) elementoBuscado;
+
+	bool frame_es_elemento(void* elemento){
+		t_frame* frameIterado = (t_frame*) elemento;
+		return frame->nroFrame == frameIterado->nroFrame;
+	}
+
+	return !list_any_satisfy(lista_frames, frame_es_elemento);
+}

@@ -54,8 +54,8 @@ t_list* obtener_lista_paginas_de_frames(t_list* lista_frames){
 		return list_get(proceso->tabla_paginas,frame->pagina);
 	}
 
-	t_list* aux = list_map(lista_frames, transformar_frame_a_pag);
-	return aux;
+	return list_map(lista_frames, transformar_frame_a_pag);
+
 }
 
 t_pagina* obtener_pagina_victima(t_list* lista_paginas, uint32_t pid) {
@@ -113,8 +113,7 @@ t_pagina* obtener_victima_Clock_Modificado(t_list* lista_paginas, uint32_t pid){
  		}
  	}
 
- 	actualizar_puntero(proc, indice_encontrado);
-
+ 	actualizar_puntero(proc, indice_encontrado + 1);
 
 	return pagina_victima;
 }
@@ -160,7 +159,7 @@ bool buscar_combinacion(t_list* paginas, uint32_t puntero, uint32_t uso, uint32_
 	uint32_t indice;
 	while(!encontrado && cantidad_iteraciones <= list_size(paginas)){
 		indice = calcular_indice(puntero, cantidad_iteraciones, list_size(paginas));
-		t_pagina* pagina_apuntada = (t_list*) list_get(paginas, indice);
+		t_pagina* pagina_apuntada = (t_pagina*) list_get(paginas, indice);
 
 		if(pagina_apuntada->bit_modificacion == mod && pagina_apuntada->bit_uso == uso) {
 			encontrado = true;
@@ -197,7 +196,7 @@ uint32_t obtener_frame_libre(uint32_t PID){
 	return frame_libre->nroFrame;
 }
 
-void* pedir_a_swamp_info_pagina(uint32_t PID, int nroPag){
+void* pedir_a_swamp_info_pagina(uint32_t PID, int nroPag){//tengo que poner el frame ocupado, actualizarle los datos al frame y actualizarle los datos a la pag
 	//Pedir info de la pag a SWAP, serializando y deserealizando msj
 	void* data;
 	return data;
@@ -207,3 +206,4 @@ bool frame_disponible(void* element){
 	t_frame* frame = (t_frame*) element;
 	return frame->estado==0;
 }
+
