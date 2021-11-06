@@ -161,11 +161,9 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				return 0;
 			}
 
-			loggear_info("[PID: %zu] - [Mensaje] - Se bloquea el hilo por llamada a IO", io->pid);
-
 			hilos_wait_ejecucion(io->pid);
 
-			loggear_info("[PID: %zu] - [Mensaje] - WAIT termino el bloqueo del hilo", io->pid);
+			loggear_info("[PID: %zu] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo", io->pid);
 			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 
 			destruir_mensaje(mensaje);

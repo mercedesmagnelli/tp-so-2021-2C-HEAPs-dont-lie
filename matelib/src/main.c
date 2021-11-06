@@ -19,11 +19,10 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-
-
-
-
 	mate_instance* lib_ref = malloc(sizeof(mate_instance));
+
+	mate_init(lib_ref, "hola 01");
+	mate_call_io(lib_ref, "hierbitas", "asd");
 
 	mate_init(lib_ref, "hola");
 	mate_init(lib_ref, "hola");

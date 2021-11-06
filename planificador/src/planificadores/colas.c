@@ -278,6 +278,7 @@ bool hay_procesos_en_suspendido_ready() {
 }
 
 t_hilo * colas_desbloquear_1_hilo(t_dispositivo_bloqueante dispositivo_bloqueante, char * dispositivo_nombre) {
+	loggear_error("TODO: REVISAR ESTA FUNCION, COLAS_DESBLOQUEAR_1_HILO");
 	bool esta_bloqueado(void * hilo2) {
 		t_hilo * hilo_comparar = (t_hilo *) hilo2;
 
@@ -317,6 +318,21 @@ t_hilo * colas_desbloquear_1_hilo(t_dispositivo_bloqueante dispositivo_bloqueant
 	}
 
 	return NULL;
+}
+
+t_hilo * colas_desbloquear_hilo_concreto(t_hilo * hilo_bloqueado) {
+	if (hilo_bloqueado->estado == ESTADO_BLOCK) {
+		colas_mover_block_ready(hilo_bloqueado);
+		hilos_post_ready();
+		loggear_debug("[PID: %zu] - Se desbloqueo el hilo y se envio a READY", hilo_bloqueado->pid);
+	} else if (hilo_bloqueado->estado == ESTADO_SUSPENDED_BLOCK) {
+		colas_mover_block_susp_block_ready(hilo_bloqueado);
+		loggear_debug("[PID: %zu] - Se desbloqueo el hilo y se envio a SUSPENDIDO-READY", hilo_bloqueado->pid);
+	} else {
+		loggear_error("[PID: %zu] - Se quiso desbloquear el hilo, pero no esta en estado bloqueado, esta en %d", hilo_bloqueado->pid, hilo_bloqueado->estado);
+	}
+
+	return hilo_bloqueado;
 }
 
 void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloqueante, char * dispositivo_nombre) {

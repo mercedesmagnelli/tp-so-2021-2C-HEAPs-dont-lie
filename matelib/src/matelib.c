@@ -85,9 +85,7 @@ int mate_call_io(mate_instance *lib_ref, mate_io_resource io, void *msg) {
 
 	t_instance_metadata * metadata = (t_instance_metadata*) lib_ref->group_info;
 
-	char* mensaje = (char*) msg;
-
-	t_matelib_io* entrada_salida = shared_crear_io(metadata->pid, mensaje);
+	t_matelib_io* entrada_salida = shared_crear_io(metadata->pid, io);
 
 	int error = enviar_mate_call_io(entrada_salida);
 

@@ -126,6 +126,12 @@ bool deberia_suspenderse_procesos();
 bool hay_procesos_en_suspendido_ready();
 
 /**
+ * @NAME: colas_desbloquear_hilo_concreto
+ * @DESC: Se fija en que lista esta el hilo y dependiendo de donde sea, lo mueve a READY o SUSP-READY
+ */
+t_hilo * colas_desbloquear_hilo_concreto(t_hilo * hilo_bloqueado);
+
+/**
  * @NAME: colas_desbloquear_1_hilo
  * @DESC: Primero revisa la lista de bloqueados si hay algun hilo bloqueado para desbloquear, lo mueve a ready y retorna.
  * SI no encuentra en bloqueados, revisa la lista de SUSPENDIDO-BLOQUEADO, lo mueve a SUSPENDIDO-LISTO y retorna;
