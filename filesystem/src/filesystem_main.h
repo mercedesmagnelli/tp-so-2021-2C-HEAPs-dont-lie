@@ -18,5 +18,6 @@
 
 #include "inicializar_filesystem/inicializar_filesystem.h"
 #include "manejo_filesystem/manejo_archivos.h"
+#include "manejo_filesystem/logica_almacenamiento.h"
 
 #endif /* FILESYSTEM_MAIN_H_ */

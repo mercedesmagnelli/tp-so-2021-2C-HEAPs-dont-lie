@@ -72,13 +72,16 @@ int cargar_archivo(char * path) {
 		return -2;
 	}
 
-	//para probar
+	//INICIALIZO LA LISTA CON LOS ARCHIVOS DE SWAMP.
 	lista_swamp = list_create();
 	for(int j = 0; j < config_guardada.cantidad_archivos; j ++){
 		t_archivo_swamp * archivo = malloc(sizeof(t_archivo_swamp));
 		archivo->carpinchos = list_create();
 		archivo->ruta_archivo = config_guardada.archivos_swap[j];
 		archivo->espacio_libre = config_guardada.tamanio_swap / config_guardada.tamanio_pagina;
+		archivo->puntero_a_bits = calloc((get_tamanio_swap() / get_tamanio_pagina())/8,1);
+		archivo->bitmap_bitarray = bitarray_create_with_mode(archivo->puntero_a_bits, (get_tamanio_swap() / get_tamanio_pagina())/8, LSB_FIRST);
+
 		list_add(lista_swamp, archivo);
 	}
 
@@ -149,6 +152,8 @@ void destroy_lista_swamp(){
 void destruir_archivo_swamp(t_archivo_swamp* swamp){ //TODO ver luego donde conviene moverlo.
 	list_clean_and_destroy_elements(swamp->carpinchos, destruir_string);
 	list_destroy(swamp->carpinchos);
+	free(swamp->puntero_a_bits);
+	bitarray_destroy(swamp->bitmap_bitarray);
 	free(swamp);
 }
 
