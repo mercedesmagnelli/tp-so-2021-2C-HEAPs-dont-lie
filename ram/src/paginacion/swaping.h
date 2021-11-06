@@ -85,4 +85,10 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina, int nro_pag, uint
  **/
 bool frame_disponible(void* element);
 
+/**
+ * @NAME: comunicar_eliminacion_proceso_SWAP
+ * @DESC: Avisa al modulo SWAP de la eliminacion de un proceso asociado al PID
+ **/
+void comunicar_eliminacion_proceso_SWAP(uint32_t PID);
+
 #endif /* PAGINACION_SWAPING_H_ */

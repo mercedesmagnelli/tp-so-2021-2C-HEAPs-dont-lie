@@ -5,9 +5,10 @@
 // FUNCIONES DE INICIO Y DESTRUCCION ADMINISTRATIVAS
 
 void inicializar_estructuras_administrativas() {
+	inicializar_memoria_principal();
     listaProcesos = list_create();
     listaFrames = list_create();
-    memoria_principal = malloc(get_tamanio_memoria());
+    listaFramesReservados = list_create();
     for(int i=0;i<get_tamanio_pagina();i++){
     	t_frame* frame = malloc(sizeof(t_frame));
     	frame->nroFrame=i;
@@ -30,6 +31,7 @@ void destruir_proceso(void* proceso) {
 
     list_destroy_and_destroy_elements(((t_proceso*)proceso)->tabla_paginas, free);
     list_destroy_and_destroy_elements(((t_proceso*)proceso)->lista_hmd, free);
+    list_destroy(((t_proceso*)proceso)->lista_frames_reservados);//no se eliminan los elementos porque son los mismos referenciados en listaFrames que contiene todos los frames de la RAM
     free(proceso);
 
 }
@@ -428,7 +430,34 @@ void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
 	return dataLeida;
 }
 
-//---------------------------FUNCIONES PRIVADAS DE USO INTERNO---------------------------
+void eliminar_proceso(uint32_t PID){
+	t_proceso* proceso = remover_proceso_PID_lista_procesos(PID);
+
+	liberar_frames(proceso);
+
+	if(get_tipo_asignacion()==FIJA){//esto seguramente luego lo mueva adentro de liberar_frames ya que cae en ese dominio y tmbn se hace la distincion dentro de la misma
+		eliminar_frame_reservados(proceso);
+	}
+
+	comunicar_eliminacion_proceso_SWAP(PID);
+
+	destruir_proceso(proceso);
+
+}
+
+void suspender_proceso(uint32_t PID){
+	t_proceso* proceso = get_proceso_PID(PID);
+
+	liberar_frames_ocupados_sin_modificar(proceso);
+
+	liberar_frames_ocupados_modificados(proceso);
+}
+
+
+
+
+
+//----------------------------------FUNCIONES PRIVADAS DE USO INTERNO----------------------------------
 
 uint32_t calcular_pagina_de_puntero_logico(uint32_t puntero){
 
@@ -670,12 +699,13 @@ int calcular_paginas_para_tamanio(uint32_t tam) {
 void reservar_frames(t_list* lista_frames_proceso){
 
 	bool frame_disponible_y_no_repetidos_en_lista(void* element){
-		return frame_disponible(element)&&frame_no_pertenece_a_lista(lista_frames_proceso, element);
+		return frame_disponible(element)&&frame_no_pertenece_a_lista(listaFramesReservados, element);
 	}
 
 	for(int i=0; i<get_marcos_maximos();i++){
 		t_frame* frame = (t_frame*)list_find(listaFrames, frame_disponible_y_no_repetidos_en_lista);
 		list_add(lista_frames_proceso, frame);
+		list_add(listaFramesReservados, frame);
 	}
 }
 
@@ -689,4 +719,26 @@ bool frame_no_pertenece_a_lista(t_list* lista_frames, void* elementoBuscado){
 	}
 
 	return !list_any_satisfy(lista_frames, frame_es_elemento);
+}
+
+
+void liberar_frames_ocupados_sin_modificar(t_proceso* proceso){
+
+}
+
+void liberar_frames_ocupados_modificados(t_proceso* proceso){
+
+}
+
+t_proceso* remover_proceso_PID_lista_procesos(uint32_t PID){
+	t_proceso* procesoRemovido = NULL;
+	return procesoRemovido;
+}
+
+void liberar_frames(t_proceso* proceso){
+
+}
+
+void eliminar_frame_reservados(t_proceso* proceso){
+
 }

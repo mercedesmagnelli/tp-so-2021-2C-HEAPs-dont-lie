@@ -97,3 +97,19 @@ bool cantidad_valida(int32_t size) {
 	return size >=1 ? 1 : 0;
 }
 
+int32_t close_PID(uint32_t PID){
+	if(existe_proceso(PID)){
+		eliminar_proceso(PID);
+		return 1;
+	}else
+		return 0;
+}
+
+int32_t suspender_PID(uint32_t PID){
+	if(existe_proceso(PID)){
+		suspender_proceso(PID);
+		return 1;
+	}else
+		return 0;
+}
+

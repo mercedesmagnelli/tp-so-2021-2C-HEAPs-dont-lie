@@ -117,3 +117,7 @@ bool frame_disponible(void* element){
 	t_frame* frame = (t_frame*) element;
 	return frame->estado==0;
 }
+
+void comunicar_eliminacion_proceso_SWAP(uint32_t PID){
+
+}
