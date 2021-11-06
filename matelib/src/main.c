@@ -19,16 +19,22 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	mate_instance* lib_ref = malloc(sizeof(mate_instance));
+	mate_instance * lib_ref2 = malloc(sizeof(mate_instance));
+	mate_instance * lib_ref = malloc(sizeof(mate_instance));
 
 	mate_init(lib_ref, "hola 01");
-	mate_call_io(lib_ref, "hierbitas", "asd");
+	mate_init(lib_ref2, "hola 02");
 
-	mate_init(lib_ref, "hola");
-	mate_init(lib_ref, "hola");
-	mate_init(lib_ref, "hola");
-	mate_init(lib_ref, "hola");
-	mate_init(lib_ref, "hola");
+	//mate_call_io(lib_ref, "hierbitas", "asd");
+	mate_sem_init(lib_ref, "SEM_AAA", 1);
+
+	mate_sem_wait(lib_ref2, "SEM_AAA");
+	//mate_sem_post(lib_ref, "SEM_AAA");
+
+	sleep(5);
+	mate_sem_destroy(lib_ref, "SEM_AAA");
+
+	sleep(100);
 
 /*
 	t_instance_metadata* metadata = malloc(sizeof(t_instance_metadata));

@@ -348,9 +348,13 @@ void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloquean
 		hilo_mover = list_find(blocked_list, esta_bloqueado);
 		pthread_mutex_unlock(&mutex_blocked_list);
 
-		colas_mover_block_ready(hilo_mover);
+		if (hilo_mover != NULL) {
+			t_hilo * hilo_desbloqueado = colas_mover_block_ready(hilo_mover);
 
-		hilos_post_ready();
+			loggear_debug("[PID: %zu] - Se desbloqueo", hilo_desbloqueado->pid);
+
+			hilos_post_ready();
+		}
 	}
 
 	hilo_mover = NULL;
@@ -359,7 +363,10 @@ void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloquean
 		hilo_mover = list_find(suspended_blocked_list, esta_bloqueado);
 		pthread_mutex_unlock(&mutex_suspended_blocked_list);
 
-		colas_mover_block_susp_block_ready(hilo_mover);
+		if (hilo_mover != NULL) {
+			t_hilo * hilo_desbloqueado = colas_mover_block_susp_block_ready(hilo_mover);
+			loggear_debug("[PID: %zu] - Se desbloqueo", hilo_desbloqueado->pid);
+		}
 	}
 }
 

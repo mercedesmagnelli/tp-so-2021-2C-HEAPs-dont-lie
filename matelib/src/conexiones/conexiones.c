@@ -69,7 +69,6 @@ int enviar_mate_close(t_matelib_nuevo_proceso * nuevo_proceso) {
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 }
 
@@ -91,8 +90,6 @@ int enviar_mate_sem_init(t_matelib_semaforo* nuevo_semaforo){
 	}
 	free(size);
 
-	loggear_trace("Enviado handshake al señor X");
-
 	int error = recibir_mensaje(socket);
 	if (error != 0) {
 		loggear_info("Nos descnocimos, no podemos trabajar");
@@ -101,7 +98,6 @@ int enviar_mate_sem_init(t_matelib_semaforo* nuevo_semaforo){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 
 }
@@ -132,7 +128,6 @@ int enviar_mate_sem_wait(t_matelib_semaforo* semaforo){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 }
 
@@ -162,7 +157,6 @@ int enviar_mate_sem_post(t_matelib_semaforo* semaforo){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 }
 
@@ -192,7 +186,6 @@ int enviar_mate_sem_destroy(t_matelib_semaforo* semaforo){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 }
 
@@ -222,7 +215,6 @@ int enviar_mate_call_io(t_matelib_io* entrada_salida){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 }
 
@@ -252,7 +244,6 @@ int32_t enviar_mate_memalloc(t_matelib_memoria_alloc* alloc){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return error;
 }
 
@@ -282,7 +273,6 @@ int enviar_mate_memfree(t_matelib_memoria_free* liberar){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 
 }
@@ -313,7 +303,6 @@ int enviar_mate_memread(t_matelib_memoria_read* leer){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 }
 
@@ -344,7 +333,6 @@ int enviar_mate_memwrite(t_matelib_memoria_write* escribir){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 }
 

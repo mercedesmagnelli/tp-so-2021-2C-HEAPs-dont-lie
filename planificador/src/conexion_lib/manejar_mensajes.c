@@ -82,9 +82,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			return 0;
 		case MATELIB_SEM_WAIT:
-			loggear_info("[MATELIB_SEM_WAIT], reducir en uno el contador del semaforo y tal vez bloquear un proceso");
-
-			loggear_error("CODEAR MATELIB_SEM_WAIT");
+			loggear_info("[MATELIB_SEM_WAIT], reducir en uno el contador del semaforo y bloquear cuando corresponda");
 
 			semaforo = deserializar_semaforo(mensaje->payload);
 			ejecucion_semaforo = semaforo_wait(semaforo);
