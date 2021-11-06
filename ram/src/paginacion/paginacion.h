@@ -17,7 +17,7 @@
 t_list* listaProcesos;//casos: agregar_proceso, liberar_paginas
 t_list* listaFrames;//casos: traer_pagina_de_SWAP, liberar_paginas
 t_dictionary* cant_frames_por_proceso;//casos: traer_pagina_de_SWAP, liberar_paginas
-
+uint32_t puntero_global;
 
 
 typedef struct{

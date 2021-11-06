@@ -14,6 +14,7 @@ void inicializar_estructuras_administrativas() {
     	frame->estado=0;
     	list_add(listaFrames, frame);
     }
+    puntero_global = 0;
     cant_frames_por_proceso = dictionary_create();
     inicializar_tlb();
 }
