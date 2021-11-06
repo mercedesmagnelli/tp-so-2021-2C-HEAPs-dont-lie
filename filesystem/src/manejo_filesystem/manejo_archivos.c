@@ -1,11 +1,20 @@
 #include "manejo_archivos.h"
 
-int escribir_particion(uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
+uint32_t marco_libre(t_archivo_swamp* swamp);
+
+int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
 
 	FILE* archivo;
 	char* ruta_particion = swamp->ruta_archivo;
 
-	loggear_debug("SE PROCEDE A ESCRIBIR LA PAGINA %d DE LA PARTICION %s", pagina, ruta_particion);
+	uint32_t marco = marco_libre(swamp);
+
+	if(marco < 0){
+		loggear_error("NO HAY MAS MARCOS DISPONIBLES EN LA PARTICION %s PARA GUARDAR LA PAGINA %d DEL PROCESO %d", ruta_particion, pagina, carpincho->pid_carpincho);
+		return -1;
+	}
+
+	loggear_debug("SE PROCEDE A ESCRIBIR LA PAGINA %d EN EL MARCO %d DE LA PARTICION %s", pagina, marco, ruta_particion);
 
 	archivo = fopen(ruta_particion, "r+");
 
@@ -14,7 +23,7 @@ int escribir_particion(uint32_t pagina, char* texto_escribir, t_archivo_swamp* s
 			return -1;
 		}
 
-		int posicion_escribir = pagina * get_tamanio_pagina();
+		int posicion_escribir = marco * get_tamanio_pagina();
 
 		fseek(archivo, posicion_escribir, SEEK_SET);
 
@@ -24,17 +33,25 @@ int escribir_particion(uint32_t pagina, char* texto_escribir, t_archivo_swamp* s
 
 	swamp->espacio_libre = swamp->espacio_libre - 1;
 
-	loggear_debug("Se escribio con exito la pagina %d", pagina);
+	bitarray_set_bit(swamp->bitmap_bitarray, marco);
+
+	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
+	dupla->marco = marco;
+	dupla->pagina = pagina;
+
+	list_add(carpincho->dupla, dupla);
+
+	loggear_debug("Se escribio con exito la pagina %d en el marco %d", pagina, marco);
 
 	return 0;
 }
 
 
 
-char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp){
+char* leer_particion(uint32_t marco, t_archivo_swamp* swamp){
 
 	char* ruta_particion = swamp->ruta_archivo;
-	loggear_debug("Se comienza a leer la pagina %d de la particion %s", pagina, ruta_particion);
+	loggear_debug("Se comienza a leer la pagina %d de la particion %s", marco, ruta_particion);
 
 	FILE* archivo_lectura;
 	char* contenido_pagina = malloc(get_tamanio_pagina() + 1);
@@ -46,7 +63,7 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp){
 			return "ERROR EN LECTURA IGNORAR MENSAJE"; // TODO pensar mejor esta parte para mandarle a la RAM o que control se puede hacer.
 		}
 
-	int posicion_a_leer = pagina * get_tamanio_pagina();
+	int posicion_a_leer = marco * get_tamanio_pagina();
 
 	fseek(archivo_lectura, posicion_a_leer, SEEK_SET);
 
@@ -54,12 +71,12 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp){
 
 	fclose(archivo_lectura);
 
-	loggear_debug("Se termino la lectura de la pagina %d de la particion %s", pagina, ruta_particion);
+	loggear_debug("Se termino la lectura de la pagina %d de la particion %s", marco, ruta_particion);
 
 	return contenido_pagina;
 }
 
-t_archivo_swamp* archivo_a_escribir(){
+t_archivo_swamp* archivo_a_escribir(uint32_t pid_carpincho){
 	int libre = 0;
 	t_archivo_swamp* archivo_a_escribir;
 	for(int i = 0; i < list_size(lista_swamp); i++){
@@ -70,11 +87,48 @@ t_archivo_swamp* archivo_a_escribir(){
 		}
 	}
 
-	loggear_trace("EL archivo a ecribir es  %s", archivo_a_escribir->ruta_archivo);
+	loggear_trace("EL archivo a escribir es  %s", archivo_a_escribir->ruta_archivo);
 
+	list_add(archivo_a_escribir->carpinchos, string_itoa(pid_carpincho));
 	return archivo_a_escribir;
 
 }
+
+uint32_t marco_libre(t_archivo_swamp* swamp){
+
+	int i = 0;
+	while(bitarray_test_bit(swamp->bitmap_bitarray, i)){
+				i++;
+			}
+
+	if(i == get_cantidad_marcos()){
+			loggear_error("NO HAY MARCO DISPONIBLE PARA ASIGNARLE");
+				return -1;
+			}
+
+	loggear_trace("Se asigna el marco %d", i);
+	return i;
+}
+
+
+t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho){
+
+	t_carpincho_swamp* carpincho = malloc(sizeof(t_carpincho_swamp));
+	carpincho->pid_carpincho = pid_carpincho;
+	carpincho->dupla = list_create();
+
+	return carpincho;
+}
+/*
+ * PAGINA = 10
+ * BUSCO ESPACIO Y ENCUENTRO QUE TENGO LIBRE EL MARCO 1
+ * TENGO QUE CONSIDERAR QUE CON ASIGNACION FIJA TENGO QUE RESERVAR CONTIGUOS
+ *
+ *
+ *
+ *
+ */
+
 
 
 

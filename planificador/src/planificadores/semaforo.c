@@ -87,6 +87,8 @@ t_estado_ejecucion semaforo_destruir(t_matelib_semaforo * sem) {
 
 	colas_desbloquear_todos_hilos(SEMAFORO, sem->semaforo_nombre);
 
+	loggear_info("Se desbloquearon todos los hilos");
+
 	dictionary_remove_and_destroy(semaforos, sem->semaforo_nombre, free);
 
     return SEM_OK;

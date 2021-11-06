@@ -12,7 +12,7 @@ int mate_init(mate_instance *lib_ref, char *config) {
 
 	t_matelib_nuevo_proceso * nuevo_proceso = shared_crear_nuevo_proceso(metadata->pid);
 
-	loggear_debug("[PID: %zu] --- Envia al planificador", metadata->pid);
+	loggear_debug("[PID: %zu] --- MATE_INIT ", metadata->pid);
 
 	int error = enviar_mate_init(nuevo_proceso);
 
@@ -38,6 +38,8 @@ int mate_sem_init(mate_instance *lib_ref, mate_sem_name sem, unsigned int value)
 	t_instance_metadata * metadata = (t_instance_metadata*) lib_ref->group_info;
 
 	t_matelib_semaforo* nuevo_semaforo = shared_crear_nuevo_semaforo(metadata->pid, sem, value);
+
+	loggear_debug("[PID: %zu] --- MATE_SEM_INIT ", metadata->pid);
 
 	int error = enviar_mate_sem_init(nuevo_semaforo);
 
@@ -73,6 +75,8 @@ int mate_sem_destroy(mate_instance *lib_ref, mate_sem_name sem) {
 	t_instance_metadata * metadata = (t_instance_metadata*) lib_ref->group_info;
 
 	t_matelib_semaforo* semaforo = shared_crear_usar_semaforo(metadata->pid, sem);
+
+	loggear_debug("[PID: %zu] --- MATE_SEM_DESTROY ", metadata->pid);
 
 	int error = enviar_mate_sem_destroy(semaforo);
 

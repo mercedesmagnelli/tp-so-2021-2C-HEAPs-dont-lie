@@ -36,13 +36,15 @@ int dispositivo_io_usar(uint32_t pid, char * nombre) {
 
 	t_io * io = dictionary_get(dispositivos, nombre);
 
-	colas_mover_exec_block(IO, io->nombre, pid);
+	t_hilo * hilo = colas_mover_exec_block(IO, io->nombre, pid);
 
-	pthread_mutex_lock(&io->mutex);
+	loggear_trace("[PID: %zu] se va a bloquear para usar %s durante %d milisegundos", pid, io->nombre, io->duracion);
+	pthread_mutex_lock(&(io->mutex));
 	usleep(io->duracion * 1000);
-	pthread_mutex_unlock(&io->mutex);
+	pthread_mutex_unlock(&(io->mutex));
+	loggear_trace("[PID: %zu] se desbloqueo de la llamada a %s", pid, io->nombre);
 
-	colas_desbloquear_1_hilo(IO, nombre);
+	colas_desbloquear_hilo_concreto(hilo);
 
     return 0;
 }

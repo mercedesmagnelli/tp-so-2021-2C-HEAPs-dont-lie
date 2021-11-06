@@ -4,6 +4,11 @@ void cerrar_todo();
 void manejar_signal(int n);
 void debug_variables();
 
+/*PARA ACORDARME CONTINUAR CON LO DE DUPLA AL ESCRIBIR PARA LUEGO HACER LO MISMO PARA LA LECTURA
+ *HACER EL CONTROL PARA EL CASO QUE NO HAY MAS ESPACIO
+ *
+ *
+ */
 
 int main(int argc, char** argv) {
 	signal(SIGUSR1, manejar_signal);
@@ -22,9 +27,62 @@ int main(int argc, char** argv) {
 	}
 
 	iniciar_swamp();
+
+// MI SUPER MAIN IMPORTANTE NO BORRAR, LAMENTO SUBIR ESTO IGNORALO POR EL MOMENTO ALEX, PERO ME AYUDA MUCHO A PROBAR. PROMETO BORRARLO APENAS TERMINE//
 /*
-	escribir_particion(3, "gola don jose", archivo_a_escribir());
-	escribir_particion(2, "gola don jose", archivo_a_escribir());
+	t_carpincho_swamp* carpincho = crear_carpincho(14);
+	t_carpincho_swamp* carpincho2 = crear_carpincho(12);
+	t_carpincho_swamp* carpincho3 = crear_carpincho(14);
+
+	escribir_particion(carpincho, 11, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+	escribir_particion(carpincho, 13, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+	escribir_particion(carpincho2, 14, "gola don pepito9", particion_a_escribir(carpincho2->pid_carpincho));
+	escribir_particion(carpincho3, 15, "12313 don pepito9", particion_a_escribir(carpincho3->pid_carpincho));
+
+	agregar_carpincho_a_lista_carpinchos(carpincho);
+
+
+	agregar_carpincho_a_lista_carpinchos(carpincho3);
+
+	agregar_carpincho_a_lista_carpinchos(carpincho2);
+
+	//escribir_particion(10, 13, "gola don pepito9", particion_a_escribir(10));
+	t_dupla_pagina_marco* dupla = list_get(carpincho->dupla, 0);
+	t_dupla_pagina_marco* dupla2 = list_get(carpincho->dupla, 1);
+
+	loggear_trace("DUPLA 1 marco = %d pagina = %d", dupla->marco, dupla->pagina);
+	loggear_trace("DUPLA 2 marco = %d pagina = %d", dupla2->marco, dupla2->pagina);
+
+	t_archivo_swamp* archivo = list_get(lista_swamp, 0);
+	t_archivo_swamp* archivo2 = list_get(lista_swamp, 1);
+
+	loggear_debug("PRIMER CARPINCHO %d", atoi(list_get(archivo->carpinchos, 0)));
+	loggear_debug("PRIMER CARPINCHO %d", atoi(list_get(archivo2->carpinchos, 0)));
+
+	t_carpincho_swamp* asdadasd = list_get(lista_carpinchos,0);
+
+	loggear_trace("LISTA TIENE %d", asdadasd->pid_carpincho);
+
+
+*/
+
+	//loggear_debug("SEGUNDO CARPINCHO %d", list_get(archivo->carpinchos, 1));
+
+/*
+ * SIRVE PARA MOSTRAR EL BITMAP DE LA PARTICION TENERLO POR AHORA
+	t_archivo_swamp* asd = list_get(lista_swamp, 0);
+
+	for(int w = 0; w < get_cantidad_paginas(); w++){
+		if(bitarray_test_bit(asd->bitmap_bitarray, w)){
+			loggear_trace("1");
+		}else{
+			loggear_trace("0");
+		}
+	}
+*/
+/*
+		escribir_particion(9, 11, "gola don pepito9", particion_a_escribir(9)); // 1
+	escribir_particion(10, 15, "gola don pepito10", particion_a_escribir(10));//2
 */
 	/*NO LO BORREN LO USO PARA PRUEBAS
 	 * loggear_trace("vamos dale");
@@ -44,9 +102,17 @@ int main(int argc, char** argv) {
 
 	loggear_info("EL PRIMERO PROCESOS %s", list_get(mostrar->carpinchos, 0));
 	loggear_info("EL SEGUNDO PROCESOS %s", list_get(mostrar2->carpinchos, 1));
+		t_archivo_swamp* carp = list_get(lista_swamp, 0);
+	t_archivo_swamp* carp2 = list_get(lista_swamp, 1);
+
+	loggear_error("EL carpincho qeu se escribio es %s", list_get(carp->carpinchos, 0));
+	loggear_error("EL carpincho qeu se escribio es %s", list_get(carp->carpinchos, 1));
+	loggear_error("EL carpincho qeu se escribio es %s", list_get(carp2->carpinchos, 0));
+	loggear_error("EL carpincho qeu se escribio es %s", list_get(carp2->carpinchos, 1));
 
 */
 	debug_variables();
+
 
 	pthread_t ram_handshake = thread_ejecutar_funcion(enviar_handshake);
 
@@ -70,6 +136,7 @@ void cerrar_todo() {
 	destroy_configuracion();
 	destroy_log();
 	destroy_lista_swamp();
+	destroy_lista_carpinchos();
 }
 
 
@@ -84,8 +151,26 @@ void debug_variables() {
 	loggear_debug("TAMANIO_PAGINA: %d", get_tamanio_pagina());
 	loggear_debug("MARCOS_MAXIMOS: %d", get_marcos_maximos());
 	loggear_debug("RETARDO_SWAP: %d", get_retardo_swap());
+	loggear_debug("CANTIDAD_MARCOS: %d", get_cantidad_marcos());
 	loggear_debug("CANTIDAD_ARCHIVOS: %d", get_cantidad_archivos());
 	for (int i = 0; i < get_cantidad_archivos(); ++i) {
 		loggear_debug("ARCHIVOS_SWAP[%d]: \t\t%s", i, get_archivos_swap()[i]);
 	}
 }
+
+/*
+ * NOTAS IMPORTANTES PARA ESCRIBIR CUANDO LLEGA UN PROCESO.
+ * PRIMERO EJECUTAR LA FUNCION
+ *
+ * t_carpincho_swamp* carpincho = crear_carpincho(14);
+ *
+ * LUEGO PARA ESCRIBIRLO. YA LA FUNCION PARTICION_A_ESCRIBIR DEVUELVE EN QUE PARTICION SE DEBE ESCRIBIR
+ *
+ * escribir_particion(carpincho, 11, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+ *
+ * LUEGO PARA AGREAGARLO A LA LISTA ADMISTRATIVA REALIZAR ESTO.
+ *
+ *  agregar_carpincho_a_lista_carpinchos(carpincho);
+ *
+ *
+ */

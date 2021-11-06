@@ -92,7 +92,6 @@ int enviar_mate_sem_init(t_matelib_semaforo* nuevo_semaforo){
 	}
 	free(size);
 
-	loggear_trace("Enviado handshake al señor X");
 
 	int error = 0;
 	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
@@ -278,7 +277,6 @@ int32_t enviar_mate_memalloc(t_matelib_memoria_alloc* alloc){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return error;
 }
 
@@ -308,7 +306,6 @@ int enviar_mate_memfree(t_matelib_memoria_free* liberar){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 
 }
@@ -339,7 +336,6 @@ int enviar_mate_memread(t_matelib_memoria_read* leer){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 }
 
@@ -370,7 +366,6 @@ int enviar_mate_memwrite(t_matelib_memoria_write* escribir){
 
 	close(socket);
 
-	pthread_exit(NULL);
 	return 0;
 }
 

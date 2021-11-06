@@ -82,9 +82,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			return 0;
 		case MATELIB_SEM_WAIT:
-			loggear_info("[MATELIB_SEM_WAIT], reducir en uno el contador del semaforo y tal vez bloquear un proceso");
-
-			loggear_error("CODEAR MATELIB_SEM_WAIT");
+			loggear_info("[MATELIB_SEM_WAIT], reducir en uno el contador del semaforo y bloquear cuando corresponda");
 
 			semaforo = deserializar_semaforo(mensaje->payload);
 			ejecucion_semaforo = semaforo_wait(semaforo);
@@ -161,11 +159,9 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				return 0;
 			}
 
-			loggear_info("[PID: %zu] - [Mensaje] - Se bloquea el hilo por llamada a IO", io->pid);
-
 			hilos_wait_ejecucion(io->pid);
 
-			loggear_info("[PID: %zu] - [Mensaje] - WAIT termino el bloqueo del hilo", io->pid);
+			loggear_info("[PID: %zu] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo", io->pid);
 			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 
 			destruir_mensaje(mensaje);

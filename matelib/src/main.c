@@ -19,13 +19,22 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
+	mate_instance * lib_ref2 = malloc(sizeof(mate_instance));
+	mate_instance * lib_ref = malloc(sizeof(mate_instance));
+
+	mate_init(lib_ref, "hola 01");
+	mate_init(lib_ref2, "hola 02");
+
+	//mate_call_io(lib_ref, "hierbitas", "asd");
+	mate_sem_init(lib_ref, "SEM_AAA", 1);
+
+	mate_sem_wait(lib_ref2, "SEM_AAA");
+	//mate_sem_post(lib_ref, "SEM_AAA");
+
+	sleep(5);
+	mate_sem_destroy(lib_ref, "SEM_AAA");
 
 
-
-
-	mate_instance* lib_ref = malloc(sizeof(mate_instance));
-
-	mate_init(lib_ref, "hola");
 	sleep(5);
 	mate_sem_init(lib_ref, "sem uno", 1);
 	sleep(5);
@@ -38,6 +47,9 @@ int main(int argc, char** argv) {
 	mate_sem_destroy(lib_ref, "sem uno");
 	sleep(5);
 	mate_close(lib_ref);
+
+
+	sleep(100);
 
 
 /*
