@@ -394,4 +394,16 @@ uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size);
 
 int calcular_paginas_para_tamanio(uint32_t tam);
 
+/**
+ * @NAME: reservar_frames
+ * @DESC: Toma la lista pasada por parametro y la llena con los frames reservados para el proceso dentro de la RAM
+*/
+void reservar_frames(t_list* lista_frames);
+
+/**
+ * @NAME: frame_no_pertenece_a_lista
+ * @DESC: Avisa si el frame NO pertenece a la lista de frames pasada como parametro
+*/
+bool frame_no_pertenece_a_lista(t_list* lista_frames, void* elementoBuscado);
+
 #endif /* PAGINACION_PAGINACION_H_ */

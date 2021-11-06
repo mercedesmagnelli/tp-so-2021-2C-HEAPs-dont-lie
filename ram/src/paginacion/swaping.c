@@ -22,7 +22,7 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 
 void* traer_y_controlar_consistencia_paginas(t_pagina* pagina, int nro_pag, uint32_t pid) {
 	// fijarse si esta modificado, setear en 0 el bit de presencia de la pagina victima
-	void* info_en_pagina;
+	void* info_en_pagina = NULL;
 	//primero envio lo que tengo acutualizado
 	//después recibo lo que tengoque copiar enmemoria
 	if(pagina->bit_modificacion == 1) {
@@ -89,7 +89,7 @@ t_pagina* obtener_victima_LRU(t_list* lista_paginas){
 
 t_pagina* obtener_victima_Clock_Modificado(t_list* lista_paginas){
 
- 	t_pagina* pagina_victima;
+ 	t_pagina* pagina_victima = NULL;
 
 	return pagina_victima;
 }
@@ -107,9 +107,9 @@ uint32_t obtener_frame_libre(uint32_t PID){
 	return frame_libre->nroFrame;
 }
 
-void* pedir_a_swamp_info_pagina(uint32_t PID, int nroPag){
+void* pedir_a_swamp_info_pagina(uint32_t PID, int nroPag){//tengo que poner el frame ocupado, actualizarle los datos al frame y actualizarle los datos a la pag
 	//Pedir info de la pag a SWAP, serializando y deserealizando msj
-	void* data;
+	void* data = NULL;
 	return data;
 }
 
