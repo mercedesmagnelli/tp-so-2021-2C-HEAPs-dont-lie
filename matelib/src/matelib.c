@@ -52,6 +52,8 @@ int mate_sem_wait(mate_instance *lib_ref, mate_sem_name sem) {
 
 	t_matelib_semaforo* semaforo = shared_crear_usar_semaforo(metadata->pid, sem);
 
+	loggear_debug("[PID: %zu] --- MATE_SEM_WAIT ", metadata->pid);
+
 	int error = enviar_mate_sem_wait(semaforo);
 
 	return error;

@@ -35,8 +35,6 @@ int conectar_clientes(void * socket_servidor) {
 				loggear_error("No se pueden crear mas threads, error %d", ret);
 			}
 		}
-
-		loggear_warning("Se creo el hilo [%zu] pendiente para destruir", ret);
 	}
 
 	return 0;

@@ -78,6 +78,18 @@ t_hilo * colas_obtener_finalizado();
 t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante, char * nombre_bloqueante, uint32_t pid);
 
 /**
+ * @NAME: colas_agregar_wait_semaforo
+ * @DESC: Agrega el semaforo que le pasen como un semaforo consumido por el proceso
+ */
+void colas_agregar_wait_semaforo(uint32_t pid, char * nombre_semaforo);
+
+/**
+ * @NAME: colas_hacer_post_semaforo
+ * @DESC: Elimina el semaforo de los retenidos por el hilo
+ */
+void colas_hacer_post_semaforo(uint32_t pid, char * nombre_semaforo);
+
+/**
  * @NAME: colas_mover_block_ready
  * @DESC: Mueve un hilo de block a ready cuando termina de estar bloqueado, segun la condicion que lo bloquea
  * @CASES: 
@@ -112,6 +124,25 @@ t_hilo * colas_mover_block_susp_block_ready(t_hilo * hilo_mover);
  * @DESC: Mueve un hilo de BLOCKED READY a READY, se deberia hacer cuando el grado de multiprocesamiento lo permita.
  * */
 t_hilo * colas_mover_block_ready_ready();
+
+/**
+ * @NAME: colas_bloquear_listas_bloqueados
+ * @DESC: Bloquea el mutex de la lista de BLOQUEADO y SUSPENDIDO-BLOQUEADO
+ */
+void colas_bloquear_listas_bloqueados();
+
+/**
+ * @NAME: colas_desbloquear_listas_bloqueados
+ * @DESC: Desbloquea el mutex de la lista de BLOQUEADO y SUSPENDIDO-BLOQUEADO
+ */
+void colas_desbloquear_listas_bloqueados();
+
+/**
+ * @NAME: colas_obtener_listas_bloqueados
+ * @DESC: Retorna una lista con la concatenacion de las listas de BLOQUEADO y SUSPENDIDO-BLOQUEADO,
+ * que estna bloqueados por el dispositivo que se le pase
+ */
+t_list * colas_obtener_listas_bloqueados(t_dispositivo_bloqueante dispositivo_bloqueante);
 
 /**
  * @NAME: deberia_suspenderse_procesos

@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <pthread.h>
 
+#include "deadlocks.h"
 #include "colas.h"
 #include "estructuras.h"
 #include "hilos_planificador.h"

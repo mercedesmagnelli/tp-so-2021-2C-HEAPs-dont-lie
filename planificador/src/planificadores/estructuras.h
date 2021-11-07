@@ -4,9 +4,10 @@
 
 #include <stddef.h>
 #include <stdint.h>
-
 #include <sys/time.h>
 #include <time.h>
+
+#include <commons/collections/list.h>
 
 typedef struct timespec t_timestamp;
 
@@ -45,6 +46,7 @@ typedef struct {
 
     t_dispositivo_bloqueante bloqueante;
     char * nombre_bloqueante;
+    t_list * semaforos_pedidos;
 } t_hilo;
 
 /**
