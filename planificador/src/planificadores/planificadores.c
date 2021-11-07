@@ -16,8 +16,6 @@ void planificador_largo_plazo() {
 			hilo = colas_mover_new_ready();
 			loggear_debug("[PID: %d] --- [Largo Plazo] --- Se movió de NEW a READY", pid(hilo));
 		}
-
-		hilos_post_ready();
 	}
 }
 

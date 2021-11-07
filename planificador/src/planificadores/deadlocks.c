@@ -59,7 +59,7 @@ int deadlocks_ejecutar() {
 			}
 
 			for (int j = 0; j < list_size(hilo->semaforos_pedidos); ++j) {
-				loggear_info("\t\t\t Nombre semaforo: %s", list_get(hilo->semaforos_pedidos, j));
+				loggear_info("\t\t\t Nombre semaforo: %s", ((t_semaforo *) list_get(hilo->semaforos_pedidos, j))->nombre);
 			}
 		}
 		loggear_info("----------- DEADLOCK FIN -----------");

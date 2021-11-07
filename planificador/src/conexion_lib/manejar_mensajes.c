@@ -90,17 +90,9 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			if (ejecucion_semaforo == SEM_OK) {
 				loggear_info("[PID: %zu] - [Mensaje] - WAIT se hizo WAIT del semaforo", semaforo->pid);
 
-				colas_agregar_wait_semaforo(semaforo->pid, semaforo->semaforo_nombre);
-
-				loggear_info("[PID: %zu] - [Mensaje] - Se agrego el semaforo como uno de los retenidos por el proceso", semaforo->pid);
-
 				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 			} else if (ejecucion_semaforo == SEM_BLOQUEAR) {
 				loggear_info("[PID: %zu] - [Mensaje] - WAIT hay que bloquear el hilo", semaforo->pid);
-
-				colas_mover_exec_block(SEMAFORO, semaforo->semaforo_nombre, semaforo->pid);
-
-				loggear_info("[PID: %zu] - [Mensaje] - Se agrego el semaforo como un bloqueante para el proceso");
 
 				hilos_wait_ejecucion(semaforo->pid); // ESPERAMOS A QUE ENTRE EN EJECUCION
 
@@ -123,10 +115,6 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			if (ejecucion_semaforo == SEM_OK) {
 				loggear_info("[PID: %zu] - [Mensaje] - POST se envio el desbloqueo", semaforo->pid);
-
-				colas_hacer_post_semaforo(semaforo->pid, semaforo->semaforo_nombre);
-
-				loggear_info("[PID: %zu] - [Mensaje] - Se le elimino el semaforo de los retenidos por el proceso", semaforo->pid);
 
 				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 			} else {

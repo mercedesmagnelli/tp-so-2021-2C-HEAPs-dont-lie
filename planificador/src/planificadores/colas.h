@@ -25,6 +25,38 @@
  * @RETURN: 0 si salio todo bien
  * */
 int colas_iniciar();
+void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloqueante, char * dispositivo_nombre) {
+	bool esta_bloqueado(void * hilo2) {
+		t_hilo * hilo_comparar = (t_hilo *) hilo2;
+
+		return dispositivo_bloqueante == hilo_comparar->bloqueante && dispositivo_nombre == hilo_comparar->nombre_bloqueante;
+	}
+
+	t_hilo * hilo_mover = NULL;
+	while (hilo_mover == NULL) {
+		pthread_mutex_lock(&mutex_blocked_list);
+		hilo_mover = list_find(blocked_list, esta_bloqueado);
+		pthread_mutex_unlock(&mutex_blocked_list);
+
+		if (hilo_mover != NULL) {
+			t_hilo * hilo_desbloqueado = colas_mover_block_ready(hilo_mover);
+
+			loggear_debug("[PID: %zu] - Se desbloqueo", hilo_desbloqueado->pid);
+		}
+	}
+
+	hilo_mover = NULL;
+	while (hilo_mover == NULL) {
+		pthread_mutex_lock(&mutex_suspended_blocked_list);
+		hilo_mover = list_find(suspended_blocked_list, esta_bloqueado);
+		pthread_mutex_unlock(&mutex_suspended_blocked_list);
+
+		if (hilo_mover != NULL) {
+			t_hilo * hilo_desbloqueado = colas_mover_block_susp_block_ready(hilo_mover);
+			loggear_debug("[PID: %zu] - Se desbloqueo", hilo_desbloqueado->pid);
+		}
+	}
+}
 
 /**
  * @NAME: colas_destruir
@@ -78,16 +110,16 @@ t_hilo * colas_obtener_finalizado();
 t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante, char * nombre_bloqueante, uint32_t pid);
 
 /**
+ * @NAME: colas_obtener_hilo_en_exec
+ * @DESC: Retorna el hilo en exec
+ */
+t_hilo * colas_obtener_hilo_en_exec(uint32_t pid);
+
+/**
  * @NAME: colas_agregar_wait_semaforo
  * @DESC: Agrega el semaforo que le pasen como un semaforo consumido por el proceso
  */
-void colas_agregar_wait_semaforo(uint32_t pid, char * nombre_semaforo);
-
-/**
- * @NAME: colas_hacer_post_semaforo
- * @DESC: Elimina el semaforo de los retenidos por el hilo
- */
-void colas_hacer_post_semaforo(uint32_t pid, char * nombre_semaforo);
+void colas_agregar_wait_semaforo(uint32_t pid, void * semaforo);
 
 /**
  * @NAME: colas_mover_block_ready
@@ -101,9 +133,6 @@ void colas_hacer_post_semaforo(uint32_t pid, char * nombre_semaforo);
  *      Hilo 1 se desbloquea, hilo 2 [IO-1] queda bloqueado, esperanzo que termine su rafaga.
  *      Hilo 3 queda bloqueando esperando que [IO-1] pueda ser utilizado
  * */
-// TODO: Igual que la funcion anterior, tenemos que quitar uno especifico, no siempre es en cola.
-// TODO: Quizas conviene analizar la idea de una "cola especial fantasma" a donde van los hilos bloqueados, cuando ya deben salir
-// para analizar si deben seguir bloqueados o salen.
 t_hilo * colas_mover_block_ready(t_hilo * hilo_mover);
 
 /**
@@ -161,19 +190,5 @@ bool hay_procesos_en_suspendido_ready();
  * @DESC: Se fija en que lista esta el hilo y dependiendo de donde sea, lo mueve a READY o SUSP-READY
  */
 t_hilo * colas_desbloquear_hilo_concreto(t_hilo * hilo_bloqueado);
-
-/**
- * @NAME: colas_desbloquear_1_hilo
- * @DESC: Primero revisa la lista de bloqueados si hay algun hilo bloqueado para desbloquear, lo mueve a ready y retorna.
- * SI no encuentra en bloqueados, revisa la lista de SUSPENDIDO-BLOQUEADO, lo mueve a SUSPENDIDO-LISTO y retorna;
- * SI no encuentra ninguno, retorna NULL;
- */
-t_hilo * colas_desbloquear_1_hilo(t_dispositivo_bloqueante dispositivo_bloqueante, char * semaforo_nombre);
-
-/**
- * @NAME: colas_desbloquear_todos_hilos
- * @DESC: Recorre las listas de BLOQUEADO y SUSPENDIDO-BLOQUEADO y mueve los hilos a donde corresponda
- */
-void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloqueante, char * semaforo_nombre);
 
 #endif
