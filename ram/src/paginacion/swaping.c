@@ -10,7 +10,7 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 	}else {
 		t_list* lista_frames = obtener_lista_frames_en_memoria(PID);
 		t_list* lista_paginas = obtener_lista_paginas_de_frames(lista_frames);
-		t_pagina* pagina_victima = obtener_pagina_victima(lista_paginas);
+		t_pagina* pagina_victima = obtener_pagina_victima(lista_paginas, PID);
 		frame = pagina_victima->frame;
 		info_a_guardar = traer_y_controlar_consistencia_paginas(pagina_victima, nroPag, PID);
 
@@ -54,15 +54,15 @@ t_list* obtener_lista_paginas_de_frames(t_list* lista_frames){
 		return list_get(proceso->tabla_paginas,frame->pagina);
 	}
 
-	t_list* aux = list_map(lista_frames, transformar_frame_a_pag);
-	return aux;
+	return list_map(lista_frames, transformar_frame_a_pag);
+
 }
 
-t_pagina* obtener_pagina_victima(t_list* lista_paginas) {
+t_pagina* obtener_pagina_victima(t_list* lista_paginas, uint32_t pid) {
 
 	t_pagina* pagina_victima;
 	if(get_algoritmo_reemplazo_mmu() == CLOCKM){
-		pagina_victima = obtener_victima_Clock_Modificado(lista_paginas);
+		pagina_victima = obtener_victima_Clock_Modificado(lista_paginas, pid);
 	}else {
 		pagina_victima = obtener_victima_LRU(lista_paginas);
 	}
@@ -87,11 +87,100 @@ t_pagina* obtener_victima_LRU(t_list* lista_paginas){
 	return pagina_victima;
 }
 
-t_pagina* obtener_victima_Clock_Modificado(t_list* lista_paginas){
+t_pagina* obtener_victima_Clock_Modificado(t_list* lista_paginas, uint32_t pid){
 
- 	t_pagina* pagina_victima = NULL;
+ 	t_pagina* pagina_victima;
+ 	t_proceso* proc = get_proceso_PID(pid);
+ 	uint32_t puntero = obtener_valor_puntero(proc);
+
+
+
+ 	uint32_t indice_encontrado;
+ 	//si no funciona el puntero por referencia entonces ver de hacer una funcion que se encargeu de actualizar el puntero y retornarlo
+ 	if(buscar_combinacion(lista_paginas,0,0, puntero, &indice_encontrado)){
+ 		pagina_victima = (t_pagina*) list_get(lista_paginas, indice_encontrado);
+ 	}else {
+ 		if(buscar_combinacion(lista_paginas, 0,1, puntero, &indice_encontrado)) {
+ 			pagina_victima =  (t_pagina*) list_get(lista_paginas, indice_encontrado);
+ 		}else {
+ 			modificar_bit_uso(lista_paginas);
+ 			if(buscar_combinacion(lista_paginas, 0,0, puntero, &indice_encontrado)){
+ 				pagina_victima = (t_pagina*) list_get(lista_paginas, indice_encontrado);
+ 			}else {
+ 				buscar_combinacion(lista_paginas, 0, 1, puntero, &indice_encontrado);
+ 				pagina_victima =  (t_pagina*) list_get(lista_paginas, indice_encontrado);
+ 			}
+ 		}
+ 	}
+
+ 	actualizar_puntero(proc, indice_encontrado + 1);
 
 	return pagina_victima;
+}
+
+uint32_t obtener_valor_puntero(t_proceso* proc) {
+	uint32_t puntero;
+	if (get_tipo_asignacion() == FIJA) {
+	 	 		puntero = proc->puntero_frames;
+	 	 	}else {
+	 	 		puntero = puntero_global;
+	 	 	}
+	return puntero;
+}
+
+void actualizar_puntero(t_proceso* proc, uint32_t indice_encontrado) {
+	if (get_tipo_asignacion() == FIJA) {
+	 		proc->puntero_frames = indice_encontrado;
+
+	 	 	}else {
+	 	 	 puntero_global = indice_encontrado;
+	 	 }
+
+}
+
+
+void modificar_bit_uso(t_list* lista_paginas) {
+
+	for(int i = 0; i < list_size(lista_paginas); i++) {
+		t_pagina* pag = (t_pagina*) list_get(lista_paginas, i);
+		pag->bit_uso = 0;
+
+	}
+
+}
+
+
+
+bool buscar_combinacion(t_list* paginas, uint32_t puntero, uint32_t uso, uint32_t mod, uint32_t* indice_encontrado){
+
+
+	bool encontrado = false;
+	int cantidad_iteraciones = 0;
+	uint32_t indice;
+	while(!encontrado && cantidad_iteraciones <= list_size(paginas)){
+		indice = calcular_indice(puntero, cantidad_iteraciones, list_size(paginas));
+		t_pagina* pagina_apuntada = (t_pagina*) list_get(paginas, indice);
+
+		if(pagina_apuntada->bit_modificacion == mod && pagina_apuntada->bit_uso == uso) {
+			encontrado = true;
+			(*indice_encontrado) = indice;
+		}
+
+		cantidad_iteraciones++;
+
+	}
+	return encontrado;
+
+}
+
+uint32_t calcular_indice(uint32_t puntero, uint32_t cantidad_it, uint32_t tamanio_lista) {
+
+	uint32_t indice = puntero + cantidad_it;
+
+	if(indice >= tamanio_lista){
+		indice = (puntero + cantidad_it) % tamanio_lista;
+	}
+	return indice;
 }
 
 int32_t hay_que_hacer_swap(uint32_t PID){
@@ -109,7 +198,7 @@ uint32_t obtener_frame_libre(uint32_t PID){
 
 void* pedir_a_swamp_info_pagina(uint32_t PID, int nroPag){//tengo que poner el frame ocupado, actualizarle los datos al frame y actualizarle los datos a la pag
 	//Pedir info de la pag a SWAP, serializando y deserealizando msj
-	void* data = NULL;
+	void* data=NULL;
 	return data;
 }
 
