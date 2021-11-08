@@ -91,17 +91,21 @@ t_estado_ejecucion semaforo_wait(t_matelib_semaforo * sem) {
     return SEM_OK;
 }
 
-void desbloquear_1_semaforo(t_semaforo * semaforo) {
+void desbloquear_semaforo(t_semaforo * semaforo, bool desbloquear_todos) {
 	for (int i = 0; i < list_size(semaforo->list_procesos); ++i) {
 		t_hilo * hilo_con_semaforo = list_get(semaforo->list_procesos, i);
 		if (hilo_con_semaforo->estado == ESTADO_BLOCK) {
 			colas_mover_block_ready(hilo_con_semaforo);
 			list_remove(semaforo->list_procesos, i);
-			return;
+			if (!desbloquear_todos) {
+				return;
+			}
 		} else if (hilo_con_semaforo->estado == ESTADO_SUSPENDED_BLOCK) {
 			colas_mover_block_susp_block_ready(hilo_con_semaforo);
 			list_remove(semaforo->list_procesos, i);
-			return;
+			if (!desbloquear_todos) {
+				return;
+			}
 		}
 	}
 }
@@ -121,7 +125,7 @@ t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
 	pthread_mutex_lock(&(semaforo->mutex));
 	semaforo->valor++;
 
-	desbloquear_1_semaforo(semaforo);
+	desbloquear_semaforo(semaforo, false);
 
 	t_hilo * hilo_wait = colas_obtener_hilo_en_exec(sem->pid);
 	for (int i = 0; i < list_size(hilo_wait->semaforos_pedidos); ++i) {
@@ -145,9 +149,10 @@ t_estado_ejecucion semaforo_destruir(t_matelib_semaforo * sem) {
 		loggear_error("[PID: %zu] - WAIT - No existe el semaforo: %s", sem->pid, sem->semaforo_nombre);
 		return SEM_ERROR_NO_EXISTE;
 	}
+	t_semaforo * semaforo = dictionary_get(semaforos, sem->semaforo_nombre);
 	pthread_mutex_unlock(&mutex_semaforos);
 
-	colas_desbloquear_todos_hilos(SEMAFORO, sem->semaforo_nombre);
+	desbloquear_semaforo(semaforo, true);
 
 	loggear_info("Se desbloquearon todos los hilos");
 

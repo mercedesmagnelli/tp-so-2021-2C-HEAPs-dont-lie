@@ -25,38 +25,6 @@
  * @RETURN: 0 si salio todo bien
  * */
 int colas_iniciar();
-void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloqueante, char * dispositivo_nombre) {
-	bool esta_bloqueado(void * hilo2) {
-		t_hilo * hilo_comparar = (t_hilo *) hilo2;
-
-		return dispositivo_bloqueante == hilo_comparar->bloqueante && dispositivo_nombre == hilo_comparar->nombre_bloqueante;
-	}
-
-	t_hilo * hilo_mover = NULL;
-	while (hilo_mover == NULL) {
-		pthread_mutex_lock(&mutex_blocked_list);
-		hilo_mover = list_find(blocked_list, esta_bloqueado);
-		pthread_mutex_unlock(&mutex_blocked_list);
-
-		if (hilo_mover != NULL) {
-			t_hilo * hilo_desbloqueado = colas_mover_block_ready(hilo_mover);
-
-			loggear_debug("[PID: %zu] - Se desbloqueo", hilo_desbloqueado->pid);
-		}
-	}
-
-	hilo_mover = NULL;
-	while (hilo_mover == NULL) {
-		pthread_mutex_lock(&mutex_suspended_blocked_list);
-		hilo_mover = list_find(suspended_blocked_list, esta_bloqueado);
-		pthread_mutex_unlock(&mutex_suspended_blocked_list);
-
-		if (hilo_mover != NULL) {
-			t_hilo * hilo_desbloqueado = colas_mover_block_susp_block_ready(hilo_mover);
-			loggear_debug("[PID: %zu] - Se desbloqueo", hilo_desbloqueado->pid);
-		}
-	}
-}
 
 /**
  * @NAME: colas_destruir
