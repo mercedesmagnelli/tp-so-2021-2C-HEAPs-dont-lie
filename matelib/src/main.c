@@ -58,6 +58,8 @@ int main(int argc, char** argv) {
 	loggear_debug("En 30 segundos, Se destruye el semaforo");
 	sleep(30);
 	mate_sem_destroy(referencia, "SEM_AAA");
+	mate_sem_destroy(referencia, "SEM_BBB");
+	mate_sem_destroy(referencia, "SEM_CCC");
 
 
 	sleep(5);

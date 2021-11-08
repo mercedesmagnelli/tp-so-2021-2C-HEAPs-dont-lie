@@ -3,6 +3,7 @@
 
 #include <pthread.h>
 #include <commons/collections/dictionary.h>
+#include <commons/collections/list.h>
 
 #include "colas.h"
 
@@ -13,6 +14,7 @@ typedef struct {
 	char * nombre;
 	int32_t valor;
 	pthread_mutex_t mutex;
+	t_list * list_procesos;
 } t_semaforo;
 
 typedef enum {
