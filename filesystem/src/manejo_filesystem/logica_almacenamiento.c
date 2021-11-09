@@ -50,3 +50,5 @@ void agregar_carpincho_a_lista_carpinchos(t_carpincho_swamp* carpincho){
 
 	}
 }
+
+

@@ -28,6 +28,37 @@ int main(int argc, char** argv) {
 
 	iniciar_swamp();
 
+    t_carpincho_swamp* carpincho = crear_carpincho(14);
+    t_carpincho_swamp* carpincho1 = crear_carpincho(13);
+    t_carpincho_swamp* carpincho2 = crear_carpincho(11);
+    t_carpincho_swamp* carpincho3 = crear_carpincho(10);
+    t_carpincho_swamp* carpincho4 = crear_carpincho(19);
+
+    loggear_error("----------");
+    reservar_marcos(carpincho,3, archivo_a_escribir(carpincho->pid_carpincho));
+    reservar_marcos(carpincho1,3, archivo_a_escribir(carpincho->pid_carpincho));
+    reservar_marcos(carpincho2,3, archivo_a_escribir(carpincho->pid_carpincho));
+    reservar_marcos(carpincho3,3, archivo_a_escribir(carpincho->pid_carpincho));
+    reservar_marcos(carpincho4,3, archivo_a_escribir(carpincho->pid_carpincho));
+
+
+	/*reservar_marcos(carpincho,3, archivo_a_escribir(carpincho->pid_carpincho));
+	reservar_marcos(carpincho,7, archivo_a_escribir(carpincho->pid_carpincho));
+
+	loggear_warning("marco reservado posicion %s",list_get(carpincho->marcos_reservados, 0) );
+	loggear_warning("marco reservado posicion %s",list_get(carpincho->marcos_reservados, 1) );
+	loggear_warning("marco reservado posicion %s",list_get(carpincho->marcos_reservados, 2) );
+	loggear_warning("marco reservado posicion %s",list_get(carpincho->marcos_reservados, 3) );
+	loggear_warning("marco reservado posicion %s",list_get(carpincho->marcos_reservados, 4) );
+	loggear_warning("marco reservado posicion %s",list_get(carpincho->marcos_reservados, 5) );
+	loggear_warning("marco reservado posicion %s",list_get(carpincho->marcos_reservados, 6) );
+	loggear_warning("marco reservado posicion %s",list_get(carpincho->marcos_reservados, 7) );
+	loggear_warning("marco reservado posicion %s",list_get(carpincho->marcos_reservados, 8) );
+	loggear_warning("marco reservado posicion %s",list_get(carpincho->marcos_reservados, 9) );
+
+	reservar_marcos(carpincho,1, archivo_a_escribir(carpincho->pid_carpincho));
+*/
+
 // MI SUPER MAIN IMPORTANTE NO BORRAR, LAMENTO SUBIR ESTO IGNORALO POR EL MOMENTO ALEX, PERO ME AYUDA MUCHO A PROBAR. PROMETO BORRARLO APENAS TERMINE//
 /*
 	t_carpincho_swamp* carpincho = crear_carpincho(14);
@@ -114,6 +145,7 @@ int main(int argc, char** argv) {
 	debug_variables();
 
 
+	/*
 	pthread_t ram_handshake = thread_ejecutar_funcion(enviar_handshake);
 
 
@@ -125,7 +157,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-
+*/
 
 	cerrar_todo();
 
@@ -173,4 +205,9 @@ void debug_variables() {
  *  agregar_carpincho_a_lista_carpinchos(carpincho);
  *
  *
+ *
+ *
+ *NOTAS IMPORTANTES 2.
+ * LLEGA UN PROCESO, LO PRIMERO QUE HACES ES FIJARNOS SI LA ASIGNACION ES FIJA O GLOBAL
+ * ESTA MAL EL ARCHIVO A ESCRIBIR SEGUIR VIENDO MAS TARDE
  */

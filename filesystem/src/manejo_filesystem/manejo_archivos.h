@@ -48,4 +48,7 @@ t_archivo_swamp* archivo_a_escribir(uint32_t pid_carpincho);
 
 t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho);
 
+
+int reservar_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos, t_archivo_swamp* swamp);
+
 #endif /* MANEJO_FILESYSTEM_MANEJO_ARCHIVOS_H_ */

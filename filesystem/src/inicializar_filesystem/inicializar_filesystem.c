@@ -50,6 +50,8 @@ int crear_particion(){
 
 void destroy_carpinchos_swamp(t_carpincho_swamp* carpincho){
 	list_destroy_and_destroy_elements(carpincho->dupla, free);
+	list_destroy_and_destroy_elements(carpincho->marcos_reservados, free);
+	list_destroy_and_destroy_elements(carpincho->marcos_usados, free);
 	free(carpincho);
 }
 

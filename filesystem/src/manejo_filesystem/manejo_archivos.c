@@ -1,6 +1,7 @@
 #include "manejo_archivos.h"
 
 uint32_t marco_libre(t_archivo_swamp* swamp);
+bool puedo_darle_marco(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos);
 
 int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
 
@@ -90,6 +91,7 @@ t_archivo_swamp* archivo_a_escribir(uint32_t pid_carpincho){
 	loggear_trace("EL archivo a escribir es  %s", archivo_a_escribir->ruta_archivo);
 
 	list_add(archivo_a_escribir->carpinchos, string_itoa(pid_carpincho));
+	archivo_a_escribir->espacio_libre = archivo_a_escribir->espacio_libre - 1;
 	return archivo_a_escribir;
 
 }
@@ -115,10 +117,66 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho){
 
 	t_carpincho_swamp* carpincho = malloc(sizeof(t_carpincho_swamp));
 	carpincho->pid_carpincho = pid_carpincho;
+	carpincho->marcos_reservados = list_create();
+	carpincho->marcos_usados = list_create();
 	carpincho->dupla = list_create();
+	carpincho->estado_carpincho = 0;
+
+	t_archivo_swamp* archivo = archivo_a_escribir(pid_carpincho);
+
+	loggear_error("aqui llego");
+
+	if(get_asignacion() == FIJA){
+		loggear_debug("LLEGO LA SOLICITUD DE UN CARPINCHO Y COMO LA ASIGNACION ES FIJA SE PROCEDE A RESERVAR SUS MARCOS MAXIMOS PID: %d", carpincho->pid_carpincho);
+		for(int i = 0; i < get_marcos_maximos(); i++){
+			int marco = marco_libre(archivo);
+			if(marco < 0){
+				loggear_error("NO HAY MARCOS DISPONIBLES PARA ASIGNAR, NO SE PUEDE GUARDAR EL CARPINCHO EN LA SWAP YA QUE NO ESTAN LOS MARCOS SUFICIENTES pid: %d", carpincho->pid_carpincho);
+				carpincho->estado_carpincho = 1;
+				return carpincho;
+			}
+			list_add(carpincho->marcos_reservados, string_itoa(marco));
+			bitarray_set_bit(archivo->bitmap_bitarray, marco);
+		}
+	}
 
 	return carpincho;
 }
+
+
+int reservar_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos, t_archivo_swamp* swamp){
+
+	if(get_asignacion() == FIJA){
+		if(!puedo_darle_marco(carpincho, cantidad_marcos)){
+			loggear_warning("No se le puede reservar los marcos solicitados ya que excede la asignacion para este proceso pid: %d", carpincho->pid_carpincho);
+			return -1;
+		}
+	} // ACA TESTEO SI NO SE EXCEDE DE LOS MARCOS MAXIMOS PERMITIDOS PARA EL PROCESO, SI SE EXCEDE SE RECHAZA.
+
+
+	for(int i = 0; i < cantidad_marcos; i++){
+		int marco = marco_libre(swamp);
+		if(marco < 0){
+			loggear_error("NO HAY MARCOS DISPONIBLES PARA ASIGNAR");
+			list_clean(carpincho->marcos_reservados);
+			return -1;
+		}
+		list_add(carpincho->marcos_reservados, string_itoa(marco));
+		bitarray_set_bit(swamp->bitmap_bitarray, marco);
+	}
+
+	return 0;
+}
+
+
+bool puedo_darle_marco(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos){
+	if(list_size(carpincho->marcos_reservados) + cantidad_marcos + list_size(carpincho->marcos_usados)  <= get_marcos_maximos()){
+		loggear_error("marcos reservados aqui %d", list_size(carpincho->marcos_reservados));
+		return true;
+	}
+	return false;
+}
+
 /*
  * PAGINA = 10
  * BUSCO ESPACIO Y ENCUENTRO QUE TENGO LIBRE EL MARCO 1
