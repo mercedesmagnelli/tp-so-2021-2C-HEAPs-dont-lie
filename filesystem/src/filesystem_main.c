@@ -28,18 +28,53 @@ int main(int argc, char** argv) {
 
 	iniciar_swamp();
 
-    t_carpincho_swamp* carpincho = crear_carpincho(14);
-    t_carpincho_swamp* carpincho1 = crear_carpincho(13);
-    t_carpincho_swamp* carpincho2 = crear_carpincho(11);
-    t_carpincho_swamp* carpincho3 = crear_carpincho(10);
-    t_carpincho_swamp* carpincho4 = crear_carpincho(19);
+// ULTIMAS PRUEBAS REALIZADAS
+/*   t_carpincho_swamp* carpincho = crear_carpincho(14,5); // 1 	5
+    t_carpincho_swamp* carpincho1 = crear_carpincho(13,4); // 2 4
+    t_carpincho_swamp* carpincho2 = crear_carpincho(11,12); // 2 16
+    t_carpincho_swamp* carpincho3 = crear_carpincho(10,9); // 1 13
+    t_carpincho_swamp* carpincho4 = crear_carpincho(19,5); // 1 18
 
-    loggear_error("----------");
-    reservar_marcos(carpincho,3, archivo_a_escribir(carpincho->pid_carpincho));
-    reservar_marcos(carpincho1,3, archivo_a_escribir(carpincho->pid_carpincho));
-    reservar_marcos(carpincho2,3, archivo_a_escribir(carpincho->pid_carpincho));
-    reservar_marcos(carpincho3,3, archivo_a_escribir(carpincho->pid_carpincho));
-    reservar_marcos(carpincho4,3, archivo_a_escribir(carpincho->pid_carpincho));
+    loggear_error("%d", carpincho->pid_carpincho);
+    loggear_error("%d", carpincho1->pid_carpincho);
+    loggear_error("%d", carpincho2->pid_carpincho);
+    loggear_error("%d", carpincho3->pid_carpincho);
+    loggear_error("%d", carpincho4->pid_carpincho);
+
+    reservar_marcos(carpincho,7, particion_a_escribir(carpincho->pid_carpincho));
+
+    t_archivo_swamp* archivo1 = list_get(lista_swamp, 0);
+    t_archivo_swamp* archivo2 = list_get(lista_swamp, 1);
+    char* carpincho1_str = list_get(archivo1->carpinchos, 0);
+    char* carpincho2_str = list_get(archivo1->carpinchos, 1);
+    char* carpincho3_str = list_get(archivo1->carpinchos, 2);
+
+    char* carpincho4_str = list_get(archivo2->carpinchos, 0);
+    char* carpincho5_str = list_get(archivo2->carpinchos, 1);
+
+    loggear_warning("espacio libre archivo 1 %d", archivo1->espacio_libre);
+    loggear_warning("espacio libre archivo 2 %d", archivo2->espacio_libre);
+
+    loggear_warning("carpincho 1 %s", carpincho1_str);
+    loggear_warning("carpincho 2 %s", carpincho2_str);
+    loggear_warning("carpincho 3 %s", carpincho3_str);
+    loggear_warning("carpincho 4 %s", carpincho4_str);
+    loggear_warning("carpincho 5 %s", carpincho5_str);
+
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,0));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,1));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,2));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,3));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,4));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,5));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,6));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,7));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,8));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,9));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,10));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,11));
+*/
+
 
 
 	/*reservar_marcos(carpincho,3, archivo_a_escribir(carpincho->pid_carpincho));
@@ -99,15 +134,25 @@ int main(int argc, char** argv) {
 
 	//loggear_debug("SEGUNDO CARPINCHO %d", list_get(archivo->carpinchos, 1));
 
-/*
- * SIRVE PARA MOSTRAR EL BITMAP DE LA PARTICION TENERLO POR AHORA
+//SIRVE PARA MOSTRAR EL BITMAP DEJAR POR AHORA
+ /*
 	t_archivo_swamp* asd = list_get(lista_swamp, 0);
 
-	for(int w = 0; w < get_cantidad_paginas(); w++){
+	for(int w = 0; w < get_cantidad_marcos(); w++){
 		if(bitarray_test_bit(asd->bitmap_bitarray, w)){
 			loggear_trace("1");
 		}else{
 			loggear_trace("0");
+		}
+	}
+
+	t_archivo_swamp* asd1 = list_get(lista_swamp, 1);
+
+	for(int w = 0; w < get_cantidad_marcos(); w++){
+		if(bitarray_test_bit(asd1->bitmap_bitarray, w)){
+			loggear_debug("1");
+		}else{
+			loggear_debug("0");
 		}
 	}
 */
@@ -145,7 +190,7 @@ int main(int argc, char** argv) {
 	debug_variables();
 
 
-	/*
+
 	pthread_t ram_handshake = thread_ejecutar_funcion(enviar_handshake);
 
 
@@ -157,7 +202,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-*/
+
 
 	cerrar_todo();
 
