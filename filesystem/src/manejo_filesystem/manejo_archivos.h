@@ -29,7 +29,7 @@ int escribir_particion(t_carpincho_swamp* pid_carpincho, uint32_t pagina, char* 
  *
  */
 
-char* leer_particion(uint32_t marco, t_archivo_swamp* swamp);
+char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp* carpincho);
 
 
 /*

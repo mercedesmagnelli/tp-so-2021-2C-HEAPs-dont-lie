@@ -2,18 +2,14 @@
 
 uint32_t marco_libre(t_archivo_swamp* swamp);
 bool puedo_darle_marco(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos);
+int obtener_marco_desde_pagina(uint32_t pagina, t_carpincho_swamp* carpincho);
 
 int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
 
 	FILE* archivo;
 	char* ruta_particion = swamp->ruta_archivo;
 
-	uint32_t marco = marco_libre(swamp);
-
-	if(marco < 0){
-		loggear_error("NO HAY MAS MARCOS DISPONIBLES EN LA PARTICION %s PARA GUARDAR LA PAGINA %d DEL PROCESO %d", ruta_particion, pagina, carpincho->pid_carpincho);
-		return -1;
-	}
+	uint32_t marco = atoi(list_get(carpincho->marcos_reservados, 0));
 
 	loggear_debug("SE PROCEDE A ESCRIBIR LA PAGINA %d EN EL MARCO %d DE LA PARTICION %s", pagina, marco, ruta_particion);
 
@@ -32,15 +28,14 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 	fclose(archivo);
 
-	swamp->espacio_libre = swamp->espacio_libre - 1;
-
-	bitarray_set_bit(swamp->bitmap_bitarray, marco);
-
 	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
 	dupla->marco = marco;
 	dupla->pagina = pagina;
 
 	list_add(carpincho->dupla, dupla);
+
+	list_add(carpincho->marcos_usados, list_get(carpincho->marcos_reservados, 0));
+	list_remove(carpincho->marcos_reservados, 0);
 
 	loggear_debug("Se escribio con exito la pagina %d en el marco %d", pagina, marco);
 
@@ -49,9 +44,14 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 
 
-char* leer_particion(uint32_t marco, t_archivo_swamp* swamp){
+char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp* carpincho){
 
 	char* ruta_particion = swamp->ruta_archivo;
+
+	int marco = obtener_marco_desde_pagina(pagina, carpincho);
+	if(marco < 0){
+		loggear_trace("NO EXISTE LA PAGINA %d del carpincho %d dentro de la swap", pagina, carpincho->pid_carpincho);
+	}
 	loggear_debug("Se comienza a leer la pagina %d de la particion %s", marco, ruta_particion);
 
 	FILE* archivo_lectura;
@@ -197,6 +197,18 @@ bool puedo_darle_marco(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos){
 		return true;
 	}
 	return false;
+}
+
+
+int obtener_marco_desde_pagina(uint32_t pagina, t_carpincho_swamp* carpincho){
+	for(int i = 0; i < list_size(carpincho->dupla); i++){
+		t_dupla_pagina_marco* dupla = list_get(carpincho->dupla, i);
+		if(dupla->pagina == pagina){
+			loggear_warning("el marco de la pagina %d del proceso %d es: %d", pagina, carpincho->pid_carpincho, dupla->marco);
+			return dupla->marco;
+		}
+	}
+	return -1;
 }
 
 /*
