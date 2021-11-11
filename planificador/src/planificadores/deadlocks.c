@@ -4,6 +4,92 @@ pthread_t thread_deadlock;
 int ms_tiempo_deadlock;
 bool detener_control_deadlock;
 
+t_list * list_bloqueados;
+int size_bloqueados;
+t_dictionary * dict_visitados;
+
+void iniciar_evaluacion_deadlock() {
+	colas_bloquear_listas_bloqueados();
+
+	t_list * list_bloqueados = colas_obtener_listas_bloqueados(SEMAFORO);
+
+	size_bloqueados = list_size(list_bloqueados);
+
+	dict_visitados = dictionary_create();
+
+	for (int i = 0; i < size_bloqueados; ++i) {
+		t_hilo * hilo = list_get(list_bloqueados, i);
+
+		char * key = string_from_format("%zu", pid(hilo));
+
+		bool * visitado = malloc(sizeof(bool));
+		*visitado = false;
+
+		dictionary_put(dict_visitados, key, visitado);
+	}
+
+}
+
+void destruir_evaluacion_deadlock() {
+	list_destroy(list_bloqueados);
+	size_bloqueados = 0;
+	dictionary_destroy_and_destroy_elements(dict_visitados, free);
+
+	colas_desbloquear_listas_bloqueados();
+}
+
+bool esta_bloqueado_por_semaforo(void * hilo) {
+	t_hilo * hilo_bloqueado = (t_hilo *) hilo;
+
+	return (hilo_bloqueado->estado == ESTADO_BLOCK || hilo_bloqueado->estado == ESTADO_SUSPENDED_BLOCK) && hilo_bloqueado->bloqueante == SEMAFORO;
+}
+
+t_list * dfs(t_hilo * first_hilo, t_hilo * hilo_preguntar) {
+	bool * visitado = dictionary_get(dict_visitados, string_from_format("%zu", pid(hilo_preguntar)));
+
+	if (*visitado) { return NULL; }
+	*visitado = true;
+
+	if (first_hilo == NULL) {
+		*first_hilo = hilo_preguntar;
+	} else if (pid(first_hilo) == pid(hilo_preguntar)) {
+		// Se cierra el ciclo. Encontro el deadlock
+		t_list * lista = list_create();
+		//list_add(lista, hilo_preguntar);
+
+		return lista;
+	}
+
+	// Procesos VECINOS
+	t_semaforo * semaforo_bloqueante = hilo_preguntar->bloqueante;
+	t_list * procesos_ocupan_semaforo = list_filter(semaforo_bloqueante->list_procesos_retienen, esta_bloqueado_por_semaforo);
+
+	for (int i = 0; i < list_size(procesos_ocupan_semaforo); ++i) {
+		t_hilo * hilo_ocupan = list_get(procesos_ocupan_semaforo, i); // Hilo vecino [i]
+
+		t_list * lista = dfs(first_hilo, hilo_ocupan);
+		if (lista != NULL) {
+			// Significa que de donde viene, encontro deadlock.
+			list_add(lista, hilo_ocupan);
+
+			return lista;
+		}
+	}
+
+	return NULL;
+}
+
+
+void ejemplo() {
+	iniciar_evaluacion_deadlock();
+	t_hilo * primer_hilo_bloqueado = list_get(list_bloqueados, 0);
+	t_list * hilos_deadlock = dfs(NULL, primer_hilo_bloqueado);
+	if (hilos_deadlock != NULL) {
+		loggear_warning("Hay deadlock");
+	}
+	destruir_evaluacion_deadlock();
+}
+
 int iniciar_control_deadlock();
 
 int deadlocks_iniciar() {
@@ -24,47 +110,14 @@ int deadlocks_destruir() {
 	return err;
 }
 
-/**
- * 1. Obtengo todos los procesos en la lista de BLOQUEADO o SUSPENDIDO-BLOQUEADO
- * 2. Filtro solo los que esten bloqueados por un semaforo
- * 3.
- */
+
+
 int deadlocks_ejecutar() {
 	while (true) {
 		usleep(ms_tiempo_deadlock * 1000),
 		loggear_trace("[DEADLOCK] - Pasaron %d milisegundos, controlamos deadlock", ms_tiempo_deadlock);
 
-		colas_bloquear_listas_bloqueados();
 
-		t_list * list_bloqueados = colas_obtener_listas_bloqueados(SEMAFORO);
-
-		loggear_info("----------- DEADLOCK INICIO -----------");
-		for (int i = 0; i < list_size(list_bloqueados); ++i) {
-			t_hilo * hilo = list_get(list_bloqueados, i);
-			loggear_info("\t [PID: %zu]", hilo->pid);
-
-			if (hilo->bloqueante == SEMAFORO) {
-				loggear_info("\t\t Bloqueado por SEMAFORO");
-			} else {
-				loggear_info("\t\t Bloqueado por IO");
-			}
-
-			loggear_info("\t\t Nombre bloqueante: %s", hilo->nombre_bloqueante);
-			loggear_info("\t\t Semaforos retenidos: %d", list_size(hilo->semaforos_pedidos));
-
-			if (hilo->estado == ESTADO_BLOCK) {
-				loggear_info("\t\t Estado: BLOQUEADO");
-			} else {
-				loggear_info("\t\t Estado: SUSPENDIDO-BLOQUEADO");
-			}
-
-			for (int j = 0; j < list_size(hilo->semaforos_pedidos); ++j) {
-				loggear_info("\t\t\t Nombre semaforo: %s", ((t_semaforo *) list_get(hilo->semaforos_pedidos, j))->nombre);
-			}
-		}
-		loggear_info("----------- DEADLOCK FIN -----------");
-
-		colas_desbloquear_listas_bloqueados();
 	}
 }
 

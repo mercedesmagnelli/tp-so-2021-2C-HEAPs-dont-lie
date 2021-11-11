@@ -14,7 +14,7 @@ typedef struct {
 	char * nombre;
 	int32_t valor;
 	pthread_mutex_t mutex;
-	t_list * list_procesos;
+	t_list * list_procesos_retienen;
 } t_semaforo;
 
 typedef enum {
@@ -26,12 +26,11 @@ typedef enum {
 	SEM_PROCESO_FINALIZADO
 } t_estado_ejecucion;
 
-
 /**
- * Recibe los hilos y sus peticiones hacia los semaforos
- * Analiza si hay que bloquear o no al hilo que ejecuta un WAIT a un semaforo
- * Al hacer un POST a un hilo, avisa que hay que quitar un hilo de la cola de bloqueados
- * */
+ * @NAME: semaforo_get
+ * @DESC: Retorna el semaforo
+ */
+t_semaforo * semaforo_get(char * nombre_semaforo);
 
 /**
  * @NAME: semaforo_estructuras_crear

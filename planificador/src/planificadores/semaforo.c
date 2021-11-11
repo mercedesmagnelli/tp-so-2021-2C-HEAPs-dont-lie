@@ -11,11 +11,20 @@ t_semaforo * crear_semaforo(t_matelib_semaforo * semaforo) {
 	sem->nombre = semaforo->semaforo_nombre;
 	sem->valor = semaforo->semaforo_valor;
 	pthread_mutex_init(&(sem->mutex), NULL);
-	sem->list_procesos = list_create();
+	sem->list_procesos_retienen = list_create();
 
 	return sem;
 }
 
+t_semaforo * semaforo_get(char * nombre_semaforo) {
+	t_semaforo * semaforo;
+
+	pthread_mutex_lock(&mutex_semaforos);
+	semaforo = dictionary_get(semaforos, nombre_semaforo);
+	pthread_mutex_unlock(&mutex_semaforos);
+
+	return semaforo;
+}
 
 int semaforo_estructuras_crear() {
 	loggear_debug("Se creo las estructuras para manejo de semaforos");
@@ -31,7 +40,7 @@ int semaforo_estructuras_destruir() {
 	void destruir(void * sem) {
 		t_semaforo * semaforo = (t_semaforo *) sem;
 		pthread_mutex_destroy(&(semaforo->mutex));
-		list_destroy(semaforo->list_procesos);
+		list_destroy(semaforo->list_procesos_retienen);
 		free(sem);
 	}
 
@@ -77,13 +86,15 @@ t_estado_ejecucion semaforo_wait(t_matelib_semaforo * sem) {
 	pthread_mutex_lock(&(semaforo->mutex));
 	semaforo->valor--;
 	bool bloquear = semaforo->valor < BLOQUEAR_PROCESO;
-	list_add(semaforo->list_procesos, hilo_wait);
-	pthread_mutex_unlock(&(semaforo->mutex));
 
 	if (bloquear) {
+		pthread_mutex_unlock(&(semaforo->mutex));
 		colas_mover_exec_block(SEMAFORO, semaforo->nombre, sem->pid);
 
 		return SEM_BLOQUEAR;
+	} else {
+		list_add(semaforo->list_procesos_retienen, hilo_wait);
+		pthread_mutex_unlock(&(semaforo->mutex));
 	}
 
 	colas_agregar_wait_semaforo(sem->pid, semaforo);
@@ -92,17 +103,17 @@ t_estado_ejecucion semaforo_wait(t_matelib_semaforo * sem) {
 }
 
 void desbloquear_semaforo(t_semaforo * semaforo, bool desbloquear_todos) {
-	for (int i = 0; i < list_size(semaforo->list_procesos); ++i) {
-		t_hilo * hilo_con_semaforo = list_get(semaforo->list_procesos, i);
+	for (int i = 0; i < list_size(semaforo->list_procesos_retienen); ++i) {
+		t_hilo * hilo_con_semaforo = list_get(semaforo->list_procesos_retienen, i);
 		if (hilo_con_semaforo->estado == ESTADO_BLOCK) {
 			colas_mover_block_ready(hilo_con_semaforo);
-			list_remove(semaforo->list_procesos, i);
+			list_remove(semaforo->list_procesos_retienen, i);
 			if (!desbloquear_todos) {
 				return;
 			}
 		} else if (hilo_con_semaforo->estado == ESTADO_SUSPENDED_BLOCK) {
 			colas_mover_block_susp_block_ready(hilo_con_semaforo);
-			list_remove(semaforo->list_procesos, i);
+			list_remove(semaforo->list_procesos_retienen, i);
 			if (!desbloquear_todos) {
 				return;
 			}
