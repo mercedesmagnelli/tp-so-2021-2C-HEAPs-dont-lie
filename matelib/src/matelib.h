@@ -22,12 +22,6 @@ typedef char *mate_sem_name;
 
 typedef int32_t mate_pointer;
 
-typedef struct {
-	uint32_t pid;
-	//uint32_t heap;//not so sure
-}t_instance_metadata;
-// TODO: Docstrings
-
 //------------------General Functions---------------------/
 /**
  * @NAME: mate_init

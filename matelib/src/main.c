@@ -2,30 +2,16 @@
 #include <pthread.h>
 #include <commons/string.h>
 
-void cerrar_todo();
+//void cerrar_todo();
 
 int main(int argc, char** argv) {
 
-	int error = 0;
-
-	error = iniciar_configuracion(argc, argv);
-	if (error != STATUS_OK) {
-		puts("Error en los argumentos\n");
-		return EXIT_FAILURE;
-	}
-
-	error = init_mutex_log(get_log_route(), get_log_app_name(), get_log_in_console(), LOG_LEVEL_TRACE);
-	if (error != STATUS_OK) {
-		puts("Error al crear el logger\n");
-		cerrar_todo();
-		return EXIT_FAILURE;
-	}
-
+/*
 
 	void multi_hilo1(int * n) {
 		mate_instance * lib_ref = malloc(sizeof(mate_instance));
 
-		mate_init(lib_ref, string_from_format("Proceso %d", n));
+		mate_init(lib_ref, "/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/matelib.config");
 
 		if (rand()%10>5) {
 
@@ -36,7 +22,7 @@ int main(int argc, char** argv) {
 
 		mate_sem_wait(lib_ref, "SEM_AAA");
 
-		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
+	l	loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
 		sleep(10);
 
@@ -46,7 +32,7 @@ int main(int argc, char** argv) {
 	void multi_hilo2(int * n) {
 		mate_instance * lib_ref = malloc(sizeof(mate_instance));
 
-		mate_init(lib_ref, string_from_format("Proceso %d", n));
+		mate_init(lib_ref, "/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/matelib.config");
 
 		mate_sem_wait(lib_ref, "SEM_AAA");
 
@@ -64,11 +50,11 @@ int main(int argc, char** argv) {
 
 		mate_sem_post(lib_ref, "SEM_AAA");
 	}
-
+*/
 	mate_instance * referencia = malloc(sizeof(mate_instance));
 
-	mate_init(referencia, "Proceso 01");
-	mate_sem_init(referencia, "SEM_AAA", 1);
+	mate_init(referencia, "/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/matelib.config");
+/*	mate_sem_init(referencia, "SEM_AAA", 1);
 	mate_sem_init(referencia, "SEM_BBB", 10);
 	mate_sem_init(referencia, "SEM_CCC", 10);
 
@@ -100,7 +86,7 @@ int main(int argc, char** argv) {
 	mate_sem_destroy(referencia, "SEM_CCC");
 
 	mate_close(referencia);
-
+*/
 /*
 	t_instance_metadata* metadata = malloc(sizeof(t_instance_metadata));
 	metadata->pid = generar_pid();
@@ -114,7 +100,7 @@ int main(int argc, char** argv) {
 	//cerrar_todo();
 	return EXIT_SUCCESS;
 }
-
+/*
 void cerrar_todo() {
 	conexiones_cerrar_conexiones(false);
 	loggear_info("Cerrada conexion con backend");
@@ -123,4 +109,4 @@ void cerrar_todo() {
 	destroy_log();
 	puts("Destruido logs");
 }
-
+*/

@@ -10,10 +10,8 @@
 #include <commons/config.h>
 #include <commons/string.h>
 
-#include "matelib_configuracion_guardada.h"
-
 #include "../../../shared/codigo_error.h"
-
+#include "../matelib.h"
 
 
 /**
