@@ -20,15 +20,21 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 	return frame;
 }
 
-void* traer_y_controlar_consistencia_paginas(t_pagina* pagina, int nro_pag, uint32_t pid) {
+void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_pag_a_pedir, uint32_t pid_a_pedir) {
 	// fijarse si esta modificado, setear en 0 el bit de presencia de la pagina victima
-	void* info_en_pagina;
+	void* info_para_swamp = obtener_info_en_frame(pagina_victima);
+	uint32_t pid_pag_victima;
+	uint32_t nro_pag_victima;
 	//primero envio lo que tengo acutualizado
 	//después recibo lo que tengoque copiar enmemoria
-	if(pagina->bit_modificacion == 1) {
-		//enviar la info modificada						send
-		//recibir la info de la pagina de ese pid
+	if(pagina_victima->bit_modificacion == 1) {
+		enviar_info_pagina(info_para_swamp, pid_pag_victima, nro_pag_victima);
 	}
+
+	pagina_victima->bit_presencia = 0;
+
+	void* info_en_pagina = recibir_info_en_pagina(nro_pag_a_pedir, pid_a_pedir);
+
 
 	return info_en_pagina;
 }

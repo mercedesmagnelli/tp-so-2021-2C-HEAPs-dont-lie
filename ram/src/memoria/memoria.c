@@ -7,7 +7,6 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 		//corto la ejecucion si ya no tengo que analizar
 			return VALOR_MEMORIA_SOLICITADO_INVALIDO;
 	} else {
-
 		if (existe_proceso(pid)){
 			loggear_trace("[MATELIB_MEM_ALLOC] Existe el proceso %d", pid);
 			int32_t ptro = ptro_donde_entra_data(pid, size);
@@ -24,7 +23,6 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 					loggear_error("[MATELIB_MEM_ALLOC] No se puede almacenar el alloc para el proceso %d porque no hay espacio suficiente en memoria", pid);
 					return ESPACIO_EN_MEMORIA_INSUF;
 				}
-
 			}
 		} else {
 			//si no existe, entonces tengo que crear el nuevo proceso
