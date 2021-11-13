@@ -52,14 +52,16 @@ t_list * dfs(t_hilo * first_hilo, t_hilo * hilo_preguntar, int nivel) {
 
 	if (first_hilo == NULL) {
 		first_hilo = hilo_preguntar;
+		*visitado = false;
 	} else if (pid(first_hilo) == pid(hilo_preguntar)) {
 		t_list * lista = list_create();
+
+		loggear_warning("PID: %zu - Se encontro deadlock", pid(hilo_preguntar));
 
 		return lista;
 	}
 
 	t_semaforo * semaforo_bloqueante = semaforo_get(hilo_preguntar->nombre_bloqueante);
-
 	t_list * procesos_ocupan_semaforo = list_filter(semaforo_bloqueante->list_procesos_retienen, esta_bloqueado_por_semaforo);
 
 	char * tabs = string_repeat('\t', nivel);
