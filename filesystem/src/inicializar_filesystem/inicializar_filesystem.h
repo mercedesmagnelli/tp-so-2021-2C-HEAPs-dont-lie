@@ -17,7 +17,10 @@
 
 typedef struct {
 	uint32_t pid_carpincho;
-	t_list * dupla; //en dupla esta la pagina del proceso que nos pasa la ram y el marco que esta en el swamp.
+	t_list * marcos_reservados;
+	t_list * marcos_usados;
+	t_list * dupla;//en dupla esta la pagina del proceso que nos pasa la ram y el marco que esta en el swamp.
+	int estado_carpincho; //si es 1 es que el carpincho no se pudo crear por lo tanto hay que borrarlo de la memoria.
 } t_carpincho_swamp;
 
 typedef struct {

@@ -13,6 +13,8 @@ int set_variable_array_str(t_config * config, char * param_leer, char *** param,
 
 void liberar_strings(void* elString);
 
+t_asignacion obtener_asignacion(char * asignacion);
+
 
 // Publica
 int iniciar_configuracion(int argc, char ** argv) {
@@ -71,6 +73,9 @@ int cargar_archivo(char * path) {
 	if (error != 0) {
 		return -2;
 	}
+
+	char * tipo_asignacion = config_get_string_value(config, "TIPO_ASIGNACION");
+	config_guardada.asignacion = obtener_asignacion(tipo_asignacion);
 
 	//INICIALIZO LA LISTA CON LOS ARCHIVOS DE SWAMP.
 	lista_swamp = list_create();
@@ -160,3 +165,13 @@ void destruir_archivo_swamp(t_archivo_swamp* swamp){ //TODO ver luego donde conv
 void destruir_string(void* el_String){
 	free(el_String);
 }
+
+
+t_asignacion obtener_asignacion(char * asignacion) {
+	if (strcmp(asignacion, "FIJA") == 0) {
+		return FIJA;
+	}
+
+	return GLOBAL;
+}
+

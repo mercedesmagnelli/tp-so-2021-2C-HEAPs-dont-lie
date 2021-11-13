@@ -7,9 +7,11 @@ t_archivo_swamp* particion_a_escribir(uint32_t pid_carpincho){ //TODO ver si est
 	for(int i = 0; i < get_cantidad_archivos(); i++){
 		t_archivo_swamp* archivo = list_get(lista_swamp, i);
 		if(el_carpincho_esta_en_la_lista(archivo, pid_carpincho)){
+			loggear_debug("el archivo para reservar es %s", archivo->ruta_archivo);
 			return archivo;
 		}
 	}
+	loggear_error("NUNCA DEBERÍA INGRESAR POR ACA VA A FALLAR. ESTO ES EN PARTICION_A_ESCRIBIR");
 	return archivo_a_escribir(pid_carpincho);
 }
 
@@ -50,3 +52,5 @@ void agregar_carpincho_a_lista_carpinchos(t_carpincho_swamp* carpincho){
 
 	}
 }
+
+
