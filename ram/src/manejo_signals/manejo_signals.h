@@ -1,6 +1,9 @@
 #ifndef MANEJO_SIGNALS_MANEJO_SIGNALS_H_
 #define MANEJO_SIGNALS_MANEJO_SIGNALS_H_
 
+#include "../paginacion/estructuras_paginacion.h"
+#include <stdint.h>
+#include "../../../shared/logger.h"
 /**
  * @NAME: manejar_sigint
  * @DESC: Esta funcion se desencadena tras apretar ctrl + c y lo que hace es hacer un reporte de la smetricas de hit y miss
@@ -33,6 +36,7 @@ void manejar_sigusr1();
  **/
 
 void manejar_sigusr2();
-
+void cerrar_todo();
+void imprimir_entrada_proceso(t_proceso* p);
 
 #endif /* MANEJO_SIGNALS_MANEJO_SIGNALS_H_ */

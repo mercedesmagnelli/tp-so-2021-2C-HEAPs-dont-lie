@@ -132,4 +132,11 @@ uint32_t obtener_valor_puntero(t_proceso* proc);
 
 void actualizar_puntero(t_proceso* proc, uint32_t indice_encontrado);
 
+
+/*falta poner los headers*/
+
+void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir);
+void enviar_info_pagina(void* info, uint32_t pid, uint32_t pag);
+void* obtener_info_en_frame(uint32_t pagina_victima);
+
 #endif /* PAGINACION_SWAPING_H_ */
