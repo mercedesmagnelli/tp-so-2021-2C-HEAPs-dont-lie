@@ -101,5 +101,16 @@ void escribir_directamente_en_memoria(void* valorAEscribir, int32_t tamanio, uin
  **/
 void leer_directamente_de_memoria(void* ptroLectura, int32_t tamanio, uint32_t direccionLogica);
 
+/**
+ * @NAME: close_PID
+ * @DESC: elimina el proceso si existe
+ **/
+int32_t close_PID(uint32_t PID);
+
+/**
+ * @NAME: suspender_PID
+ * @DESC: suspende el proceso si existe
+ **/
+int32_t suspender_PID(uint32_t PID_a_suspender);
 
 #endif /* MEMORIA_MEMORIA_C_ */

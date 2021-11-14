@@ -178,7 +178,22 @@ uint32_t calcular_offset_puntero_en_pagina(uint32_t puntero);
 
 void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t puntero);
 
-// FUNCIONES PRIVADAS DE USO INTERNO
+/**
+ * @NAME: eliminar_proceso
+ * @DESC: Elimina el proceso de RAM liberando los frames ocupados y las estructuras administrativas asociadas/usadas por el proceso
+ */
+void eliminar_proceso(uint32_t PID);
+
+/**
+ * @NAME: suspender_proceso
+ * @DESC: Saca al proceso de la RAM liberando los frames usados por la misma y enviando a SWAP las paginas modificadas no cargadas en SWAP
+ */
+void suspender_proceso(uint32_t PID);
+
+
+
+
+//----------------------------------------------- FUNCIONES PRIVADAS DE USO INTERNO-------------------------------------------------------------
 /**
 * @NAME: get_proceso
 * @DESC: devuelve el proceso con el PID asociado
@@ -369,5 +384,34 @@ void reservar_frames(t_list* lista_frames);
  * @DESC: Avisa si el frame NO pertenece a la lista de frames pasada como parametro
 */
 bool frame_no_pertenece_a_lista(t_list* lista_frames, void* elementoBuscado);
+
+/**
+ * @NAME: liberar_frames_ocupados_sin_modificar
+ * @DESC: Revisa la lista de paginas, liberando los frames que contengan paginas sin modificar
+*/
+void liberar_frames_ocupados_sin_modificar(t_proceso* proceso);
+
+/**
+ * @NAME: liberar_frames_ocupados_modificados
+ * @DESC: Revisa la lista de paginas, enviando a SWAP las paginas modificadas para su guardado y liberando el frame que la contenga
+*/
+void liberar_frames_ocupados_modificados(t_proceso* proceso);
+
+/**
+ * @NAME: remover_proceso_PID_lista_procesos
+ * @DESC: consigue el proceso asociado al PID y lo remueve de la lista de procesos
+*/
+t_proceso* remover_proceso_PID_lista_procesos(uint32_t PID);
+
+/**
+ * @NAME: liberar_frames
+ * @DESC: Se encarga de liberar todos lso frames usados por las paginas del proceso
+*/
+void liberar_frames(t_proceso* proceso);
+/**
+ * @NAME: eliminar_frame_reservados
+ * @DESC: Agara la lista de frames reservados por el proceso y los remueve de la lista de frames reservados por todos los procesos
+*/
+void eliminar_frame_reservados(t_proceso* proceso);
 
 #endif /* PAGINACION_PAGINACION_H_ */

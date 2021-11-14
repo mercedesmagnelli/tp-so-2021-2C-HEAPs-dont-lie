@@ -39,6 +39,21 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 	return info_en_pagina;
 }
 
+void* obtener_info_en_frame(uint32_t pagina_victima) {
+	return 0;
+}
+
+void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir) {
+
+	void* info = malloc(1);
+
+	return info;
+
+}
+void enviar_info_pagina(void* info, uint32_t pid, uint32_t pag) {
+
+}
+
 t_list* obtener_lista_frames_en_memoria(uint32_t pid) {
 	t_list* lista_frames_proceso;
 	t_proceso* proceso = get_proceso_PID(pid);
@@ -204,7 +219,7 @@ uint32_t obtener_frame_libre(uint32_t PID){
 
 void* pedir_a_swamp_info_pagina(uint32_t PID, int nroPag){//tengo que poner el frame ocupado, actualizarle los datos al frame y actualizarle los datos a la pag
 	//Pedir info de la pag a SWAP, serializando y deserealizando msj
-	void* data;
+	void* data=NULL;
 	return data;
 }
 
@@ -213,3 +228,6 @@ bool frame_disponible(void* element){
 	return frame->estado==0;
 }
 
+void comunicar_eliminacion_proceso_SWAP(uint32_t PID){
+
+}

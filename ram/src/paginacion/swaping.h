@@ -88,6 +88,12 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina, int nro_pag, uint
 bool frame_disponible(void* element);
 
 /**
+ * @NAME: comunicar_eliminacion_proceso_SWAP
+ * @DESC: Avisa al modulo SWAP de la eliminacion de un proceso asociado al PID
+ **/
+void comunicar_eliminacion_proceso_SWAP(uint32_t PID);
+
+/**
  * @NAME: modificar_bit_uso
  * @DESC: se encarga de mapear la lista de paginas y colocarle en 0 el bit de uso a todas (funcion de clock_modificado)
  **/
@@ -125,5 +131,12 @@ uint32_t obtener_valor_puntero(t_proceso* proc);
  **/
 
 void actualizar_puntero(t_proceso* proc, uint32_t indice_encontrado);
+
+
+/*falta poner los headers*/
+
+void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir);
+void enviar_info_pagina(void* info, uint32_t pid, uint32_t pag);
+void* obtener_info_en_frame(uint32_t pagina_victima);
 
 #endif /* PAGINACION_SWAPING_H_ */

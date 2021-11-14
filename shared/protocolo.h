@@ -50,12 +50,6 @@ typedef enum {
 
 	// Ram => Planificador
 	HANDSHAKE_R_P,
-
-	DESCONEXION_RAM,
-	RESPUESTA_OK_R_D,
-
-	// Planificador => Ram
-	HANDSHAKE_P_R,
 	ALLOC_SUC_R_P,
 	ALLOC_ERR_R_P,
 	FREE_SUC_R_P,
@@ -64,6 +58,16 @@ typedef enum {
 	READ_SUC_R_P,
 	WRITE_SUC_R_P,
 	WRITE_ERR_R_P,
+	CLOSE_SUC_R_P,
+	CLOSE_ERR_R_P,
+	SUSPEN_SUC_R_P,
+	SUSPEN_ERR_R_P,
+
+	DESCONEXION_RAM,
+	RESPUESTA_OK_R_D,
+
+	// Planificador => Ram
+	HANDSHAKE_P_R,
 	SUSPENDER_PROCESO,
 
 	// Mensajes genericos

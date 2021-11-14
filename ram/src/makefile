@@ -9,7 +9,7 @@ NOCOLOR :=\033[0m
 
 PROJECT_NAME := RAM
 TARGET := ../../ram.out # Nombre del archivo al compilar 
-LIBS := -lreadline -lcommons -lcspecs -lpthread -lnivel-gui -lncurses# Dependencias necesarias
+LIBS := -lreadline -lcommons -lcspecs -lpthread # Dependencias necesarias
 CC := gcc # Compilador a utilizar
 CFLAGS := -g -Wall # Flags en la comilación (g: Debug) (Wall: Muestra todos los warnings)
 
