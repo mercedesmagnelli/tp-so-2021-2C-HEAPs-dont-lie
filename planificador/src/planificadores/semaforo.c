@@ -160,8 +160,11 @@ t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
 	loggear_trace("[SEMAFORO] - PID: %zu - SEM_POST: %s", sem->pid, sem->semaforo_nombre);
 
 	t_hilo * hilo_desbloqueado = desbloquear_semaforo(semaforo, false);
-
-	loggear_trace("[SEMAFORO] - PID: %zu - Luego del SEM_POST, se desbloqueo este hilo", pid(hilo_desbloqueado));
+	if (hilo_desbloqueado != NULL) {
+		loggear_trace("[SEMAFORO] - PID: %zu - Luego del SEM_POST, se desbloqueo este hilo", pid(hilo_desbloqueado));
+	} else {
+		loggear_trace("[SEMAFORO] - EL SEM_POST a %s, no desbloqueo ningun hilo", semaforo->nombre);
+	}
 
 	t_hilo * hilo_wait = colas_obtener_hilo_en_exec(sem->pid);
 	for (int i = 0; i < list_size(hilo_wait->semaforos_pedidos); ++i) {

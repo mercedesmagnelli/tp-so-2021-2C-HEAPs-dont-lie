@@ -305,13 +305,13 @@ t_hilo * colas_mover_block_ready_ready() {
 }
 
 void colas_bloquear_listas_bloqueados() {
-	//pthread_mutex_lock(&mutex_blocked_list);
-	//pthread_mutex_lock(&mutex_suspended_blocked_list);
+	pthread_mutex_lock(&mutex_blocked_list);
+	pthread_mutex_lock(&mutex_suspended_blocked_list);
 }
 
 void colas_desbloquear_listas_bloqueados() {
-	//pthread_mutex_unlock(&mutex_blocked_list);
-	//pthread_mutex_unlock(&mutex_suspended_blocked_list);
+	pthread_mutex_unlock(&mutex_blocked_list);
+	pthread_mutex_unlock(&mutex_suspended_blocked_list);
 }
 
 t_list * colas_obtener_listas_bloqueados(t_dispositivo_bloqueante dispositivo_bloqueante) {
@@ -321,8 +321,10 @@ t_list * colas_obtener_listas_bloqueados(t_dispositivo_bloqueante dispositivo_bl
 
 	t_list * todos_los_bloqueados = list_create();
 
+	colas_bloquear_listas_bloqueados();
 	t_list * bloqueados = list_filter(blocked_list, esta_bloqueado_por);
 	t_list * suspendidos = list_filter(suspended_blocked_list, esta_bloqueado_por);
+	colas_desbloquear_listas_bloqueados();
 
 	list_add_all(todos_los_bloqueados, bloqueados);
 	list_add_all(todos_los_bloqueados, suspendidos);

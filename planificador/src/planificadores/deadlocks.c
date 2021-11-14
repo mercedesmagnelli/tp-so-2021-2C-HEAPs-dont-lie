@@ -11,8 +11,6 @@ t_dictionary * dict_visitados;
 int eliminar_proceso_deadlock(t_list * hilos_deadlock);
 
 void iniciar_evaluacion_deadlock() {
-	colas_bloquear_listas_bloqueados();
-
 	list_bloqueados = colas_obtener_listas_bloqueados(SEMAFORO);
 
 	size_bloqueados = list_size(list_bloqueados);
@@ -36,8 +34,6 @@ void destruir_evaluacion_deadlock() {
 	list_destroy(list_bloqueados);
 	size_bloqueados = 0;
 	dictionary_destroy_and_destroy_elements(dict_visitados, free);
-
-	colas_desbloquear_listas_bloqueados();
 }
 
 bool esta_bloqueado_por_semaforo(void * hilo) {
