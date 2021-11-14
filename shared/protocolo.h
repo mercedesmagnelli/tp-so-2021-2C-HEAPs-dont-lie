@@ -33,12 +33,18 @@ typedef enum {
 
 	// Ram => Filesystem
 	HANDSHAKE_R_F,
-	R_S_TRAER_PAGINA, // Mandamos pid_pedido y pag_pedida a traer a la RAM
-	R_S_ELIMINAR_PAGINA, // Mandamos pid y pag a eliminar en SWAP
-	R_S_LIBERAR_PROCESO, // Mandamos pid de proceso a eliminar
-	R_S_SWAP_PAG, //Mandamos pid y pag a guardar en SWAP y enviamos pid_pedido y pag_pedida a traer a la RAM
-	R_S_ESPACIO_PROCESO_NUEVO, //mandamos pid y size para consultar espacio para un proceso nuevo
-	R_S_ESPACIO_PROCESO_EXISTENTE, //idem arriba pero proceso ya existente
+	R_S_PROCESO_NUEVO, //Un proceso nuevo solicita espacio a la SWAP para su almacenamiento. 				pid, cant_pags
+	R_S_PROCESO_EXISTENTE, //Un proceso solicita mas espacio a la SWAP. 									pid, cant_pags
+	R_S_ESCRIBIR_EN_PAGINA, //Un proceso solicita escribir en su pagina, siempre se manda pagina completa. 	pid, nro_pag, data
+	R_S_PEDIR_PAGINA, //Un proceso solicita su pagina a SWAP												pid, nro_pag
+	R_S_ELIMINAR_PROCESO, //Un proceso es eliminado de SWAP													pid
+	R_S_LIBERAR_PAGINA, //Un proceso libera sus ultima N paginas											pid, cant_pags
+
+
+	//R_S_TRAER_PAGINA, // Mandamos pid_pedido y pag_pedida a traer a la RAM
+	//R_S_ELIMINAR_PAGINA, // Mandamos pid y pag a eliminar en SWAP
+	//R_S_LIBERAR_PROCESO, // Mandamos pid de proceso a eliminar
+	//R_S_SWAP_PAG, //Mandamos pid y pag a guardar en SWAP y enviamos pid_pedido y pag_pedida a traer a la RAM
 
 	// Filesystem => Ram
 	HANDSHAKE_F_R,
