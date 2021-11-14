@@ -386,18 +386,6 @@ void reservar_frames(t_list* lista_frames);
 bool frame_no_pertenece_a_lista(t_list* lista_frames, void* elementoBuscado);
 
 /**
- * @NAME: liberar_frames_ocupados_sin_modificar
- * @DESC: Revisa la lista de paginas, liberando los frames que contengan paginas sin modificar
-*/
-void liberar_frames_ocupados_sin_modificar(t_proceso* proceso);
-
-/**
- * @NAME: liberar_frames_ocupados_modificados
- * @DESC: Revisa la lista de paginas, enviando a SWAP las paginas modificadas para su guardado y liberando el frame que la contenga
-*/
-void liberar_frames_ocupados_modificados(t_proceso* proceso);
-
-/**
  * @NAME: remover_proceso_PID_lista_procesos
  * @DESC: consigue el proceso asociado al PID y lo remueve de la lista de procesos
 */
@@ -407,11 +395,11 @@ t_proceso* remover_proceso_PID_lista_procesos(uint32_t PID);
  * @NAME: liberar_frames
  * @DESC: Se encarga de liberar todos lso frames usados por las paginas del proceso
 */
-void liberar_frames(t_proceso* proceso);
+void liberar_frames_eliminar_proceso(t_proceso* proceso);
 /**
  * @NAME: eliminar_frame_reservados
  * @DESC: Agara la lista de frames reservados por el proceso y los remueve de la lista de frames reservados por todos los procesos
 */
-void eliminar_frame_reservados(t_proceso* proceso);
+void eliminar_frames_reservados(t_proceso* proceso);
 
 #endif /* PAGINACION_PAGINACION_H_ */

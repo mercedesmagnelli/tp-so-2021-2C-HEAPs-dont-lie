@@ -434,11 +434,7 @@ void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
 void eliminar_proceso(uint32_t PID){
 	t_proceso* proceso = remover_proceso_PID_lista_procesos(PID);
 
-	liberar_frames(proceso);
-
-	if(get_tipo_asignacion()==FIJA){//esto seguramente luego lo mueva adentro de liberar_frames ya que cae en ese dominio y tmbn se hace la distincion dentro de la misma
-		eliminar_frame_reservados(proceso);
-	}
+	liberar_frames_eliminar_proceso(proceso);
 
 	comunicar_eliminacion_proceso_SWAP(PID);
 
@@ -449,9 +445,28 @@ void eliminar_proceso(uint32_t PID){
 void suspender_proceso(uint32_t PID){
 	t_proceso* proceso = get_proceso_PID(PID);
 
-	liberar_frames_ocupados_sin_modificar(proceso);
+	t_pagina* paginaIterada;
+	t_frame* frameLiberar;
 
-	liberar_frames_ocupados_modificados(proceso);
+	for(int i=0; i<list_size(proceso->tabla_paginas); i++){
+		paginaIterada = list_get(proceso->tabla_paginas,i);
+
+		if(paginaIterada->bit_presencia){
+			frameLiberar = list_get(listaFrames, paginaIterada->frame);
+			frameLiberar->estado=0;
+			if(paginaIterada->bit_modificacion){
+				paginaIterada->bit_modificacion = 0;
+				void* data = NULL;
+				leer_directamente_de_memoria(data, get_tamanio_pagina(), paginaIterada->frame * get_tamanio_pagina());
+				//TODO:llamar funcion de swap para enviar info a SWAP
+			}
+		}
+
+	}
+
+	if (get_tipo_asignacion() == FIJA){
+		eliminar_frames_reservados(proceso);
+	}
 }
 
 
@@ -723,23 +738,49 @@ bool frame_no_pertenece_a_lista(t_list* lista_frames, void* elementoBuscado){
 }
 
 
-void liberar_frames_ocupados_sin_modificar(t_proceso* proceso){
-
-}
-
-void liberar_frames_ocupados_modificados(t_proceso* proceso){
-
-}
-
 t_proceso* remover_proceso_PID_lista_procesos(uint32_t PID){
-	t_proceso* procesoRemovido = NULL;
+	bool proceso_PID(void* element) {
+		t_proceso* proceso = (t_proceso*) element;
+		return proceso->PID == PID;
+	}
+
+	t_proceso* procesoRemovido = list_remove_by_condition(listaProcesos, proceso_PID);
 	return procesoRemovido;
 }
 
-void liberar_frames(t_proceso* proceso){
+void liberar_frames_eliminar_proceso(t_proceso* proceso){
+
+	t_pagina* paginaIterada;
+	t_frame* frameLiberar;
+
+	for(int i=0; i<list_size(proceso->tabla_paginas); i++){
+		paginaIterada = list_get(proceso->tabla_paginas,i);
+
+		if(paginaIterada->bit_presencia){
+			frameLiberar = list_get(listaFrames, paginaIterada->frame);
+			frameLiberar->estado=0;
+		}
+
+	}
+
+	if (get_tipo_asignacion() == FIJA){
+		eliminar_frames_reservados(proceso);
+	}
 
 }
 
-void eliminar_frame_reservados(t_proceso* proceso){
+void eliminar_frames_reservados(t_proceso* proceso){
 
+	t_frame* frame;
+
+	for(int i=0; i<list_size(proceso->lista_frames_reservados); i++){
+		frame = list_get(proceso->lista_frames_reservados,i);
+
+		bool frame_numero(void* element) {
+			t_frame* frameListaReservada = (t_frame*) element;
+			return frameListaReservada->nroFrame == frame->nroFrame;
+		}
+
+		list_remove_by_condition(listaFramesReservados, frame_numero);
+	}
 }
