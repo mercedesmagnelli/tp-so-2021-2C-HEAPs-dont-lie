@@ -127,7 +127,7 @@ t_ram_read * deserializar_ram_read(void * puntero);
 
 void* serializar_crear_proceso_nuevo(t_mensaje_r_s* mensaje, size_t* size_final);
 void* serializar_proceso_existente(t_mensaje_r_s* mensaje, size_t* size_final);
-void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final);
+void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final, size_t tamanio_pagina);
 void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
 void* serializar_eliminar_proceso(uint32_t pid, size_t* size_final);
 void* serilizar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
