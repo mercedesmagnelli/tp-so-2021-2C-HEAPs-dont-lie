@@ -37,7 +37,15 @@ void manejar_sigusr1();
  **/
 
 void manejar_sigusr2();
+/**
+ * @NAME: cerrrar_todo
+ * @DESC: cierra todo
+*/
 void cerrar_todo();
+/**
+ * @NAME: imprimir_entrada_proceso
+ * @DESC: funcion auxiliar que terciariza la impresión por pantalla de una línea de info en el informe de procesos
+*/
 void imprimir_entrada_proceso(t_proceso* p);
 
 #endif /* MANEJO_SIGNALS_MANEJO_SIGNALS_H_ */

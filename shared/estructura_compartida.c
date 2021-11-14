@@ -351,5 +351,72 @@ t_ram_read * deserializar_ram_read(void * puntero) {
 }
 
 
+void* serializar_crear_proceso_nuevo(t_mensaje_r_s* mensaje, size_t* size_final){
+
+}
+void* serializar_proceso_existente(t_mensaje_r_s* mensaje, size_t* size_final){
+
+}
+void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final){
+
+}
+void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final){
+
+}
+void* serializar_eliminar_proceso(uint32_t pid, size_t* size_final){
+
+}
+void* serilizar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final){
+
+}
+
+uint32_t deserializar_proceso_nuevo(void* respuesta){
+
+}
+uint32_t deserializar_proceso_existente(void* respuesta){
+
+}
+uint32_t deserializar_escritura_en_pagina(void* respuesta){
+
+}
+void* deserializar_pedir_pagina(void* respuesta){
+
+}
+uint32_t deserializar_eliminar_proceso(void* respuesta){
+
+}
+uint32_t deserializar_liberar_paginas(void* respuesta){
+
+
+
+}
+
+t_pedir_o_liberar_pagina_s* shared_crear_pedir_o_liberar(uint32_t pid, uint32_t nro_pag){
+
+	t_pedir_o_liberar_pagina_s* mensaje = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+	mensaje->pid = pid;
+	mensaje->nro_pag = nro_pag;
+	return mensaje;
+}
+t_write_s* shared_crear_write_s(uint32_t nro_pag, uint32_t pid, void* data){
+
+	t_write_s* mensaje = malloc(sizeof(t_write_s));
+	mensaje->nro_pag = nro_pag;
+	mensaje->pid = pid;
+	mensaje->data = data;
+
+	return mensaje;
+
+}
+t_mensaje_r_s* shared_crear_t_mensaje_r_s(uint32_t cant_pag, uint32_t pid){
+
+	t_mensaje_r_s* mensaje = malloc(sizeof(t_mensaje_r_s));
+	mensaje->cant_pag = cant_pag;
+	mensaje->pid = pid;
+	return mensaje;
+
+
+}
+
 
 
