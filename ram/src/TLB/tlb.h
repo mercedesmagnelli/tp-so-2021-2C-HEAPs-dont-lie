@@ -9,7 +9,8 @@
 #include "../../src/configuracion/ram_config_guardada.h"
 
 #include "../../../shared/logger.h"
-
+t_list* TLB;
+uint32_t max_entradas;
 typedef struct{
 	char* hash_key;
 	uint32_t frame;

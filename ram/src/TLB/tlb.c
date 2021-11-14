@@ -1,8 +1,7 @@
 #include "tlb.h"
 
 
-t_list* TLB;
-uint32_t max_entradas;
+
 
 
 

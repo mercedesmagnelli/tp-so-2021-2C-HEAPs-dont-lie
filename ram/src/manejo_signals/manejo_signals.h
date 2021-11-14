@@ -2,6 +2,7 @@
 #define MANEJO_SIGNALS_MANEJO_SIGNALS_H_
 
 #include "../paginacion/estructuras_paginacion.h"
+#include "../TLB/tlb.h"
 #include <stdint.h>
 #include "../../../shared/logger.h"
 /**
