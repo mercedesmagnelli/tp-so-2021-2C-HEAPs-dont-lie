@@ -12,6 +12,7 @@ t_semaforo * crear_semaforo(t_matelib_semaforo * semaforo) {
 	sem->valor = semaforo->semaforo_valor;
 	pthread_mutex_init(&(sem->mutex), NULL);
 	sem->list_procesos_retienen = list_create();
+	sem->list_procesos_bloqueados = list_create();
 
 	return sem;
 }
@@ -41,6 +42,7 @@ int semaforo_estructuras_destruir() {
 		t_semaforo * semaforo = (t_semaforo *) sem;
 		pthread_mutex_destroy(&(semaforo->mutex));
 		list_destroy(semaforo->list_procesos_retienen);
+		list_destroy(semaforo->list_procesos_bloqueados);
 		free(sem);
 	}
 
@@ -90,6 +92,7 @@ t_estado_ejecucion semaforo_wait(t_matelib_semaforo * sem) {
 	if (bloquear) {
 		pthread_mutex_unlock(&(semaforo->mutex));
 		colas_mover_exec_block(SEMAFORO, semaforo->nombre, sem->pid);
+		list_add(semaforo->list_procesos_bloqueados, hilo_wait);
 
 		return SEM_BLOQUEAR;
 	} else {
@@ -102,23 +105,41 @@ t_estado_ejecucion semaforo_wait(t_matelib_semaforo * sem) {
     return SEM_OK;
 }
 
-void desbloquear_semaforo(t_semaforo * semaforo, bool desbloquear_todos) {
-	for (int i = 0; i < list_size(semaforo->list_procesos_retienen); ++i) {
-		t_hilo * hilo_con_semaforo = list_get(semaforo->list_procesos_retienen, i);
+t_hilo * desbloquear_semaforo(t_semaforo * semaforo, bool desbloquear_todos) {
+	for (int i = 0; i < list_size(semaforo->list_procesos_bloqueados); ++i) {
+		t_hilo * hilo_con_semaforo = list_get(semaforo->list_procesos_bloqueados, i);
+		if (hilo_con_semaforo->sera_eliminado_por_deadlock) {
+			continue;
+		}
+
+		loggear_trace("[SEMAFORO] - PID: %zu va ser desbloqueado por SEM_POST en el semaforo: %s", hilo_con_semaforo->pid, semaforo->nombre);
+
+		if (hilo_con_semaforo->estado != ESTADO_BLOCK && hilo_con_semaforo->estado != ESTADO_SUSPENDED_BLOCK) {
+			loggear_error("[SEMAFORO] - El PID: %zu que se quiere desbloquear por SEM_POST no esta bloqueado, esta en: %d", pid(hilo_con_semaforo), hilo_con_semaforo->estado);
+		}
+
 		if (hilo_con_semaforo->estado == ESTADO_BLOCK) {
-			colas_mover_block_ready(hilo_con_semaforo);
-			list_remove(semaforo->list_procesos_retienen, i);
+			t_hilo * hilo = colas_mover_block_ready(hilo_con_semaforo);
+
+			loggear_trace("[SEMAFORO] - PID: %zu - Se movio de BLOCK a READY", pid(hilo));
+
+			list_remove(semaforo->list_procesos_bloqueados, i);
 			if (!desbloquear_todos) {
-				return;
+				return hilo;
 			}
 		} else if (hilo_con_semaforo->estado == ESTADO_SUSPENDED_BLOCK) {
-			colas_mover_block_susp_block_ready(hilo_con_semaforo);
-			list_remove(semaforo->list_procesos_retienen, i);
+			t_hilo * hilo = colas_mover_block_susp_block_ready(hilo_con_semaforo);
+
+			loggear_trace("[SEMAFORO] - PID: %zu - Se movio de SUSPENDED-BLOCK a READY", pid(hilo));
+
+			list_remove(semaforo->list_procesos_bloqueados, i);
 			if (!desbloquear_todos) {
-				return;
+				return hilo;
 			}
 		}
 	}
+
+	return NULL;
 }
 
 t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
@@ -136,7 +157,11 @@ t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
 	pthread_mutex_lock(&(semaforo->mutex));
 	semaforo->valor++;
 
-	desbloquear_semaforo(semaforo, false);
+	loggear_trace("[SEMAFORO] - PID: %zu - SEM_POST: %s", sem->pid, sem->semaforo_nombre);
+
+	t_hilo * hilo_desbloqueado = desbloquear_semaforo(semaforo, false);
+
+	loggear_trace("[SEMAFORO] - PID: %zu - Luego del SEM_POST, se desbloqueo este hilo", pid(hilo_desbloqueado));
 
 	t_hilo * hilo_wait = colas_obtener_hilo_en_exec(sem->pid);
 	for (int i = 0; i < list_size(hilo_wait->semaforos_pedidos); ++i) {
@@ -150,6 +175,19 @@ t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
 	pthread_mutex_unlock(&(semaforo->mutex));
 
 	return SEM_OK;
+}
+
+void semaforo_deadlock_post(t_semaforo * semaforo) {
+	pthread_mutex_lock(&(semaforo->mutex));
+	semaforo->valor++;
+
+	loggear_trace("[SEMAFORO] - SEM_POST: %s - Se va a desbloquear el primer proceso en la lista de retenidos", semaforo->nombre);
+
+	t_hilo * hilo_desbloqueado = desbloquear_semaforo(semaforo, false);
+
+	loggear_trace("[SEMAFORO] - PID: %zu - Luego del SEM_POST, se desbloqueo este hilo", pid(hilo_desbloqueado));
+
+	pthread_mutex_unlock(&(semaforo->mutex));
 }
 
 t_estado_ejecucion semaforo_destruir(t_matelib_semaforo * sem) {

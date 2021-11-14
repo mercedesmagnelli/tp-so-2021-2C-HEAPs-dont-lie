@@ -15,6 +15,7 @@ typedef struct {
 	int32_t valor;
 	pthread_mutex_t mutex;
 	t_list * list_procesos_retienen;
+	t_list * list_procesos_bloqueados;
 } t_semaforo;
 
 typedef enum {
@@ -67,6 +68,11 @@ t_estado_ejecucion semaforo_wait(t_matelib_semaforo * sem);
  * */
 t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem);
 
+/**
+ * @NAME: semaforo_deadlock_post
+ * @DESC: INcrementa en 1 el contador del semaforo, y ademas desbloquea cualquier hilo que este bloqueado esperando por el semaforo
+ */
+void semaforo_deadlock_post(t_semaforo * semaforo);
 
 /**
  * @NAME: semaforo_destruir

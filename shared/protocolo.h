@@ -70,7 +70,7 @@ typedef enum {
 	EXITO_EN_LA_TAREA,
 	FALLO_EN_LA_TAREA,
 	FALLO_EN_LA_RAM, // Se usa cuando tanto el Kernel como la Ram tienen que hacer algo, lo retorna la ram si falla (ejemplo: MATELIB_CLOSE de un proceso)
-
+	EXITO_PROCESO_ELIMINADO, // Se elimino el proceso por deadlock
 
 	// Pruebas
 	CACHO_DE_TEXTO

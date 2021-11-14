@@ -159,4 +159,11 @@ bool hay_procesos_en_suspendido_ready();
  */
 t_hilo * colas_desbloquear_hilo_concreto(t_hilo * hilo_bloqueado);
 
+/**
+ * @NAME: colas_finalizar_proceso_bloqueado
+ * @DESC: Si el proceso esta BLOQUEADO o BLOQUEADO-SUSPENDIDO lo mueve a finalizado y avisa a los semaforos
+ * Caso contrario muestra error y retorna NULL
+ */
+t_hilo * colas_finalizar_proceso_bloqueado(t_hilo * hilo_bloqueado);
+
 #endif
