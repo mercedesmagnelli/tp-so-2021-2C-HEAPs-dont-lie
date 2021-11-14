@@ -599,10 +599,10 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t bitModificado){
 	uint32_t marco;
 	if(esta_en_tlb(PID, nroPag)){
-		loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d", PID, nroPag);
 		actualizar_datos_TLB(PID, nroPag);
 		marco = obtener_frame_de_tlb(PID, nroPag);
 		actualizar_datos_pagina(PID, nroPag, bitModificado, 1);
+		loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
 	}else{
 		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
 		if(esta_en_RAM(PID, nroPag)){
@@ -611,7 +611,7 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 		}else{
 			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima. Tmbn tiene que actualizar la cant de Pags en asig FIJA
 			inicializar_datos_pagina(PID, nroPag, marco, bitModificado);//podriamos poner esta funcion dentro de obtener fram asi tmbn se encarga de modificar lo administrativo dsps del cambio de pags?
-			loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d", PID, nroPag);
+			loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
 		}
 		agregar_entrada_tlb(PID, nroPag, marco);
 	}
