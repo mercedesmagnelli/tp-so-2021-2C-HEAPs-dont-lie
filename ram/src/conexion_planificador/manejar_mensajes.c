@@ -19,19 +19,19 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 		case HANDSHAKE_P_R:
 			enviar_mensaje_protocolo(mensaje->socket, HANDSHAKE_R_P, 0, NULL);
 
-			loggear_info("Llego un handshake de la ram, devolvemos el saludo");
+			loggear_info("Llego un handshake del planificador, devolvemos el saludo");
 
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 
 			return 0;
 		case HANDSHAKE_F_R:
-			enviar_mensaje_protocolo(mensaje->socket, HANDSHAKE_R_F, 0, NULL);
+			//enviar_mensaje_protocolo(mensaje->socket, HANDSHAKE_R_F, 0, NULL);
 			//acá debería guardar el socket de la swamp??
 			socket_swap = mensaje->socket;
 			loggear_info("Llego un handshake del filesystem, devolvemos el saludo");
 
-			desconexion(mensaje);
+			//desconexion(mensaje);
 			destruir_mensaje(mensaje);
 
 			return 0;
