@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "../../../shared/codigo_error.h"
+#include "../../../shared/estructura_compartida.h"
 #include "../../src/conexion_swap/conexion_swap.h"
 #include "../../src/memoria/memoria.h"
 #include "../../src/TLB/tlb.h"

@@ -342,7 +342,7 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 
 	size_t tamanio;
 	t_pedir_o_liberar_pagina_s* mensaje = shared_crear_pedir_o_liberar(pid, cantPagABorrar);
-	void* mensaje_serializado = serilizar_liberar_pagina(mensaje, &tamanio);
+	void* mensaje_serializado = serializar_liberar_pagina(mensaje, &tamanio);
 	enviar_mensaje_protocolo(socket_swap, R_S_LIBERAR_PAGINA, tamanio, mensaje_serializado);
 	free(mensaje_serializado);
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
