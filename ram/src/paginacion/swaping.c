@@ -22,13 +22,26 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 
 void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_pag_a_pedir, uint32_t pid_a_pedir) {
 	// fijarse si esta modificado, setear en 0 el bit de presencia de la pagina victima
-	void* info_para_swamp = obtener_info_en_frame(pagina_victima);
-	uint32_t pid_pag_victima;
-	uint32_t nro_pag_victima;
-	//primero envio lo que tengo acutualizado
-	//después recibo lo que tengoque copiar enmemoria
+
+	void* info_en_frame = obtener_info_en_frame(pagina_victima->frame);
+
+	uint32_t pid_pag_victima = obtener_pid_en_frame(pagina_victima->frame);
+	uint32_t nro_pag_victima = obtener_pag_en_frame(pagina_victima->frame);
+
 	if(pagina_victima->bit_modificacion == 1) {
-		enviar_info_pagina(info_para_swamp, pid_pag_victima, nro_pag_victima);
+		size_t tamanio;
+		t_write_s* mensaje = shared_crear_write_s(nro_pag_victima, pid_pag_victima, info_en_frame);
+		void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio, get_tamanio_pagina());
+		enviar_mensaje_protocolo(socket_swap,R_S_ESCRIBIR_EN_PAGINA,tamanio,mensaje_serializado);
+		free(mensaje_serializado);
+		t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
+
+		uint32_t err = deserializar_escritura_en_pagina(rec->payload);
+
+		if(err == 0){
+			loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag_victima, pid_pag_victima);
+		}
+
 	}
 
 	pagina_victima->bit_presencia = 0;
@@ -39,14 +52,31 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 	return info_en_pagina;
 }
 
-void* obtener_info_en_frame(uint32_t pagina_victima) {
-	return 0;
+uint32_t obtener_pid_en_frame(uint32_t frame) {
+	t_frame* frame_i = (t_frame*) list_get(listaFrames, frame);
+	return frame_i->proceso;
+}
+uint32_t obtener_pag_en_frame(uint32_t frame) {
+	t_frame* frame_i = (t_frame*) list_get(listaFrames, frame);
+	return frame_i->pagina;
+}
+void* obtener_info_en_frame(uint32_t frame) {
+	uint32_t tam_memoria = get_tamanio_pagina();
+	void* info = malloc(tam_memoria);
+	leer_directamente_de_memoria(info, tam_memoria * frame, tam_memoria);
+	return info;
 }
 
 void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir) {
 
-	void* info = malloc(1);
 
+	size_t tamanio;
+	t_pedir_o_liberar_pagina_s* pedido = shared_crear_pedir_o_liberar(pid_a_pedir, pag_a_pedir);
+	void* mensaje_serializado = serializar_pedir_pagina(pedido, &tamanio);
+	enviar_mensaje_protocolo(socket_swap,R_S_PEDIR_PAGINA,tamanio,mensaje_serializado);
+	free(mensaje_serializado);
+	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
+	void* info = deserializar_pedir_pagina(rec->payload);
 	return info;
 
 }
@@ -240,7 +270,7 @@ void comunicar_eliminacion_proceso_SWAP(uint32_t PID){
 	uint32_t err = deserializar_eliminar_proceso(rec->payload);
 
 	if(err == 0){
-		loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag_victima, pid_pag_victima);
+		loggear_error("[RAM] - Hubo un problema en la eliminacion del proceso %d en swamp",PID);
 	}
 }
 
@@ -257,6 +287,6 @@ void enviar_pagina_a_SWAP(uint32_t PID, uint32_t nro_pag, void* data_pag){
 	uint32_t err = deserializar_escritura_en_pagina(rec->payload);
 
 	if(err == 0){
-		loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag_victima, pid_pag_victima);
+		loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag, PID);
 	}
 }

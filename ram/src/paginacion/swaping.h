@@ -7,8 +7,8 @@
 #include "estructuras_paginacion.h"
 #include "../../src/memoria/memoria.h"
 #include "paginacion.h"
-
-
+#include "../../../shared/estructura_compartida.h"
+uint32_t socket_swap;
 
 
 /**
@@ -132,17 +132,18 @@ uint32_t obtener_valor_puntero(t_proceso* proc);
 
 void actualizar_puntero(t_proceso* proc, uint32_t indice_encontrado);
 
-
-/*falta poner los headers*/
-
-void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir);
-void enviar_info_pagina(void* info, uint32_t pid, uint32_t pag);
-void* obtener_info_en_frame(uint32_t pagina_victima);
-
 /**
  * @NAME: enviar_pagina_a_SWAP
  * @DESC: Se le envia a SWAP para que guarde la pagina del PID asociado
  **/
 void enviar_pagina_a_SWAP(uint32_t PID, uint32_t nroPag, void* dataPag);
 
+
+/*falta poner los headers*/
+
+void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir);
+void enviar_info_pagina(void* info, uint32_t pid, uint32_t pag);
+void* obtener_info_en_frame(uint32_t pagina_victima);
+uint32_t obtener_pid_en_frame(uint32_t frame);
+uint32_t obtener_pag_en_frame(uint32_t frame);
 #endif /* PAGINACION_SWAPING_H_ */

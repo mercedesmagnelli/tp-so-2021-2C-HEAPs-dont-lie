@@ -353,26 +353,7 @@ t_ram_read * deserializar_ram_read(void * puntero) {
 }
 
 
-void* serializar_crear_proceso_nuevo(t_mensaje_r_s* mensaje, size_t* size_final){
-	size_t offset = 0;
-	size_t tamanio_buffer = SIZE_PID + SIZE_CANT_PAG;
-	void * buffer = malloc(tamanio_buffer);
-
-
-		memcpy(buffer + offset, &mensaje->cant_pag, SIZE_CANT_PAG);
-		offset += SIZE_CANT_PAG;
-
-		memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
-		offset += SIZE_PID;
-
-		if (size_final != NULL) {
-			*size_final = tamanio_buffer;
-		}
-
-		return buffer;
-
-}
-void* serializar_proceso_existente(t_mensaje_r_s* mensaje, size_t* size_final){
+void* serializar_solicitud_espacio(t_mensaje_r_s* mensaje, size_t* size_final){
 	size_t offset = 0;
 		size_t tamanio_buffer = SIZE_PID + SIZE_CANT_PAG;
 		void * buffer = malloc(tamanio_buffer);
@@ -404,7 +385,7 @@ void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final, siz
 			memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
 			offset += SIZE_PID;
 
-			memcpy(buffer+offset, mensaje->data, SIZE_PID);
+			memcpy(buffer+offset, mensaje->data, tamanio_data);
 			offset+=tamanio_data;
 			//aca creo que no sería necesario hacer otro desplazamiento porque ya es el final
 			if (size_final != NULL) {
@@ -473,18 +454,11 @@ void* serilizar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size
 	return buffer;
 }
 
-uint32_t deserializar_proceso_nuevo(void* respuesta){
+uint32_t deserializar_solicitud_espacio(void* respuesta){
 
 	uint32_t mensaje;
 	memcpy(&mensaje,respuesta,sizeof(uint32_t));
 	return mensaje;
-
-}
-
-uint32_t deserializar_proceso_existente(void* respuesta){
-	uint32_t mensaje;
-		memcpy(&mensaje,respuesta,sizeof(uint32_t));
-		return mensaje;
 
 }
 
