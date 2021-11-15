@@ -53,8 +53,8 @@ p:
 r:
 	-@echo "$(YELLOW) COMPILANDO '$(RAM_NAME)' 📝 📝 📝$(NOCOLOR)"
 	-@cd $(RAM_ROUTE) && $(MAKE) all
-	#-@echo "$(YELLOW) Building Tests '$(RAM_NAME)' 📝 📝 📝 $(NOCOLOR)"
-	#-@cd $(RAM_TEST_ROUTE) && $(MAKE) all
+	-@echo "$(YELLOW) Building Tests '$(RAM_NAME)' 📝 📝 📝 $(NOCOLOR)"
+	-@cd $(RAM_TEST_ROUTE) && $(MAKE) all
 	-@echo "$(GREEN) COMPILADO Tests '$(RAM_NAME)' ✔️✔️✔️✔️✔️✔️✔️✔️✔️✔️ $(NOCOLOR)"
 
 f:

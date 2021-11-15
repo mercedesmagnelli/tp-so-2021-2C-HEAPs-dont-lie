@@ -40,12 +40,6 @@ typedef enum {
 	R_S_ELIMINAR_PROCESO, //Un proceso es eliminado de SWAP													pid
 	R_S_LIBERAR_PAGINA, //Un proceso libera sus ultima N paginas											pid, cant_pags
 
-
-	//R_S_TRAER_PAGINA, // Mandamos pid_pedido y pag_pedida a traer a la RAM
-	//R_S_ELIMINAR_PAGINA, // Mandamos pid y pag a eliminar en SWAP
-	//R_S_LIBERAR_PROCESO, // Mandamos pid de proceso a eliminar
-	//R_S_SWAP_PAG, //Mandamos pid y pag a guardar en SWAP y enviamos pid_pedido y pag_pedida a traer a la RAM
-
 	// Filesystem => Ram
 	HANDSHAKE_F_R,
 	S_R_MEMORIA_CONCEDIDA, // cant pag = 0(no concede) | 1 (concede) segun corresponda

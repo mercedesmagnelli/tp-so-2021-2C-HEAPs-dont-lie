@@ -14,5 +14,5 @@ int get_marcos_maximos(){ return config_guardada.marcos_maximos; }
 int get_retardo_swap(){ return config_guardada.retardo_swap; }
 int get_cantidad_archivos() { return config_guardada.cantidad_archivos; }
 char ** get_archivos_swap() { return config_guardada.archivos_swap; }
-
-
+int get_cantidad_marcos(){ return config_guardada.tamanio_swap / config_guardada.tamanio_pagina; }
+t_asignacion get_asignacion() { return config_guardada.asignacion;}

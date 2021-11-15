@@ -25,10 +25,17 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			planificadores_proceso_iniciar(nuevo_proceso->pid); // AVISA AL PLANIFICADOR DE LARGO PLAZO Y CREA ESTRUCTURAS
 
+			respuesta_ram = ram_enviar_init(nuevo_proceso);
+
 			hilos_wait_ejecucion(nuevo_proceso->pid); // ESPERAMOS A QUE ENTRE EN EJECUCION
 
-			loggear_info("[PID: %zu] - [Mensaje] - Se creo el proceso y ya esta en ejecucion", nuevo_proceso->pid);
-			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			if (respuesta_ram->respuesta == EXITO_EN_LA_TAREA) {
+				loggear_info("[PID: %zu] - [Mensaje] - Se creo el proceso y ya esta en ejecucion", nuevo_proceso->pid);
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			} else {
+				loggear_info("[PID: %zu] - [Mensaje] - Ocurrio un problema en la RAM al hacer MATE_INIT", nuevo_proceso->pid);
+				enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, 0, NULL);
+			}
 
 			destruir_mensaje(mensaje);
 			desconexion(mensaje);
@@ -75,20 +82,17 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			return 0;
 		case MATELIB_SEM_WAIT:
-			loggear_info("[MATELIB_SEM_WAIT], reducir en uno el contador del semaforo y tal vez bloquear un proceso");
-
-			loggear_error("CODEAR MATELIB_SEM_WAIT");
+			loggear_info("[MATELIB_SEM_WAIT], reducir en uno el contador del semaforo y bloquear cuando corresponda");
 
 			semaforo = deserializar_semaforo(mensaje->payload);
 			ejecucion_semaforo = semaforo_wait(semaforo);
 
 			if (ejecucion_semaforo == SEM_OK) {
 				loggear_info("[PID: %zu] - [Mensaje] - WAIT se hizo WAIT del semaforo", semaforo->pid);
+
 				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 			} else if (ejecucion_semaforo == SEM_BLOQUEAR) {
 				loggear_info("[PID: %zu] - [Mensaje] - WAIT hay que bloquear el hilo", semaforo->pid);
-
-				colas_mover_exec_block(SEMAFORO, semaforo->semaforo_nombre, semaforo->pid);
 
 				hilos_wait_ejecucion(semaforo->pid); // ESPERAMOS A QUE ENTRE EN EJECUCION
 
@@ -111,6 +115,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			if (ejecucion_semaforo == SEM_OK) {
 				loggear_info("[PID: %zu] - [Mensaje] - POST se envio el desbloqueo", semaforo->pid);
+
 				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 			} else {
 				loggear_error("[PID: %zu] - [Mensaje] - POST no se pudo ejeuctar", semaforo->pid);
@@ -154,11 +159,9 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				return 0;
 			}
 
-			loggear_info("[PID: %zu] - [Mensaje] - Se bloquea el hilo por llamada a IO", io->pid);
-
 			hilos_wait_ejecucion(io->pid);
 
-			loggear_info("[PID: %zu] - [Mensaje] - WAIT termino el bloqueo del hilo", io->pid);
+			loggear_info("[PID: %zu] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo", io->pid);
 			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 
 			destruir_mensaje(mensaje);
@@ -278,8 +281,6 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 
 void desconexion(t_prot_mensaje * mensaje) {
-	loggear_debug("Se cierra el socket");
-
 	close(mensaje->socket);
 }
 

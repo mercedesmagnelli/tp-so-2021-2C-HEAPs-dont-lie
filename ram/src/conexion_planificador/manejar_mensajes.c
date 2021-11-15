@@ -38,6 +38,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 		case MATELIB_INIT:
 			loggear_info("[MATELIB_INIT], hay que crear un proceso");
 
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+
 			return 0;
 		case MATELIB_CLOSE:
 			loggear_info("[MATELIB_CLOSE], hay que cerrar el proceso");
@@ -64,21 +68,41 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 		case MATELIB_SEM_INIT:
 			loggear_info("[MATELIB_SEM_INIT], se crea un semaforo");
 
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+
 			return 0;
 		case MATELIB_SEM_WAIT:
 			loggear_info("[MATELIB_SEM_WAIT], reducir en uno el contador del semaforo y tal vez bloquear un proceso");
+
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_SEM_POST:
 			loggear_info("[MATELIB_SEM_POST], incrementar en uno el contador del semaforo y tal vez desbloquear un proceso");
 
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+
 			return 0;
 		case MATELIB_SEM_DESTROY:
 			loggear_info("[MATELIB_SEM_DESTROY], destruir un semaforo y eliminar todos los bloqueos que existan");
 
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+
 			return 0;
 		case MATELIB_CALL_IO:
 			loggear_info("[MATELIB_CALL_IO], bloquear un proceso porque llama a IO");
+
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_MEM_ALLOC:

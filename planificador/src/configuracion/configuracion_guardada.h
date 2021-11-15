@@ -27,6 +27,8 @@ int get_retardo_cpu();
 int get_grado_multiprogramacion();
 int get_grado_multiprocesamiento();
 
+int get_tiempo_deadlock();
+
 char * get_log_route();
 char * get_log_app_name();
 int get_log_in_console();
@@ -53,6 +55,8 @@ typedef struct {
 
 	int grado_multiprogramacion;
 	int grado_multiprocesamiento;
+
+	int tiempo_deadlock;
 
 	// Loggin
 	char * log_route;

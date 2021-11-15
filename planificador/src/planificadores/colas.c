@@ -1,16 +1,5 @@
 #include "colas.h"
 
-/**
- * TODOs
- * 1. [Listo] Crear todas las colas y listas
- * 2. [Listo] Crear la destruccion de las colas y listas
- * 3. [Listo] Pensar en que estructuras se van a pasar entre estados, todos t_hilo excepto en NEW
- * 4. [Listo] Modificar los void * y los return donde corresponda para pasarlo por parametro o retornarlo
- * 5. [Listo] Programar la forma de comparar hilos (supongo que comparacion por .pid)
- * 6. [Listo] Recibir algoritmo de corto plazo para mover entre READY->EXEC
- * 7. [Listo] Recibir algoritmo de mediano plazo para mover de BLOCK->SUSP/BLOCK
- * */
-
 t_queue * new_queue;
 pthread_mutex_t mutex_new_queue;
 
@@ -93,6 +82,9 @@ t_hilo * colas_insertar_new(uint32_t pid) {
 	hilo->estado = ESTADO_NEW;
 	hilo->estimacion_anterior = get_estimacion_inicial();
 	hilo->timestamp_tiempo_exec = 0.0;
+	//hilo->bloqueante = NINGUNO;
+	//hilo->nombre_bloqueante = "";
+	hilo->semaforos_pedidos = list_create();
 
 	pthread_mutex_lock(&mutex_new_queue);
 	queue_push(new_queue, hilo);
@@ -114,6 +106,8 @@ t_hilo * colas_mover_new_ready() {
 	pthread_mutex_lock(&mutex_ready_list);
 	list_add(ready_list, hilo);
 	pthread_mutex_unlock(&mutex_ready_list);
+
+	hilos_post_ready();
 
     return hilo;
 }
@@ -167,10 +161,11 @@ t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante,
 	pthread_mutex_unlock(&mutex_exec_list);
 
 	hilo->estado = ESTADO_BLOCK;
-	hilo->bloqueante = dispositivo_bloqueante;
-	hilo->nombre_bloqueante = nombre_bloqueante;
 	hilo->timestamp_salir_exec = estructuras_current_timestamp();
 	hilo->timestamp_tiempo_exec = estructuras_timestamp_diff(hilo->timestamp_entrar_exec, hilo->timestamp_salir_exec);
+
+	hilo->bloqueante = dispositivo_bloqueante;
+	hilo->nombre_bloqueante = nombre_bloqueante;
 
 	pthread_mutex_lock(&mutex_blocked_list);
 	list_add(blocked_list, hilo);
@@ -181,6 +176,25 @@ t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante,
     return hilo;
 }
 
+t_hilo * colas_obtener_hilo_en_exec(uint32_t pid) {
+	bool son_iguales(void * hilo2) { return pid == ((t_hilo *) hilo2)->pid; }
+
+	pthread_mutex_lock(&mutex_exec_list);
+	t_hilo * hilo = list_find(exec_list, son_iguales);
+	pthread_mutex_unlock(&mutex_exec_list);
+
+	return hilo;
+}
+
+void colas_agregar_wait_semaforo(uint32_t pid, void * semaforo) {
+	bool son_iguales(void * hilo) { return pid == ((t_hilo *) hilo)->pid; }
+
+	pthread_mutex_lock(&mutex_exec_list);
+	t_hilo * hilo = list_find(exec_list, son_iguales);
+	list_add(hilo->semaforos_pedidos, semaforo);
+	pthread_mutex_unlock(&mutex_exec_list);
+}
+
 t_hilo * colas_mover_block_ready(t_hilo * hilo_mover) {
 	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
 	pthread_mutex_lock(&mutex_blocked_list);
@@ -189,10 +203,14 @@ t_hilo * colas_mover_block_ready(t_hilo * hilo_mover) {
 
 	hilo->estado = ESTADO_READY;
 	hilo->timestamp_entrar_ready = estructuras_current_timestamp();
+	hilo->bloqueante = NINGUNO;
+	hilo->nombre_bloqueante = "";
 
 	pthread_mutex_lock(&mutex_ready_list);
 	list_add_in_index(ready_list, 0, hilo);
 	pthread_mutex_unlock(&mutex_ready_list);
+
+	hilos_post_ready();
 
     return hilo;
 }
@@ -219,6 +237,8 @@ t_hilo * colas_mover_block_susp_block_ready(t_hilo * hilo_mover) {
 	pthread_mutex_unlock(&mutex_suspended_blocked_list);
 
 	hilo->estado = ESTADO_SUSPENDED_READY;
+	hilo->bloqueante = NINGUNO;
+	hilo->nombre_bloqueante = "";
 
 	pthread_mutex_lock(&mutex_suspended_ready_queue);
 	queue_push(suspended_ready_queue, hilo);
@@ -241,9 +261,39 @@ t_hilo * colas_mover_block_ready_ready() {
 	list_add_in_index(ready_list, 0, hilo);
 	pthread_mutex_unlock(&mutex_ready_list);
 
+	hilos_post_ready();
+
 	return hilo;
 }
 
+void colas_bloquear_listas_bloqueados() {
+	pthread_mutex_lock(&mutex_blocked_list);
+	pthread_mutex_lock(&mutex_suspended_blocked_list);
+}
+
+void colas_desbloquear_listas_bloqueados() {
+	pthread_mutex_unlock(&mutex_blocked_list);
+	pthread_mutex_unlock(&mutex_suspended_blocked_list);
+}
+
+t_list * colas_obtener_listas_bloqueados(t_dispositivo_bloqueante dispositivo_bloqueante) {
+	bool esta_bloqueado_por(void * hilo) {
+		return ((t_hilo *) hilo)->bloqueante == dispositivo_bloqueante;
+	}
+
+	t_list * todos_los_bloqueados = list_create();
+
+	t_list * bloqueados = list_filter(blocked_list, esta_bloqueado_por);
+	t_list * suspendidos = list_filter(suspended_blocked_list, esta_bloqueado_por);
+
+	list_add_all(todos_los_bloqueados, bloqueados);
+	list_add_all(todos_los_bloqueados, suspendidos);
+
+	list_destroy(bloqueados);
+	list_destroy(suspendidos);
+
+	return todos_los_bloqueados;
+}
 
 bool deberia_suspenderse_procesos() {
 	pthread_mutex_lock(&mutex_suspended_blocked_list);
@@ -277,75 +327,18 @@ bool hay_procesos_en_suspendido_ready() {
 	return hay_procesos;
 }
 
-t_hilo * colas_desbloquear_1_hilo(t_dispositivo_bloqueante dispositivo_bloqueante, char * dispositivo_nombre) {
-	bool esta_bloqueado(void * hilo2) {
-		t_hilo * hilo_comparar = (t_hilo *) hilo2;
-
-		return dispositivo_bloqueante == hilo_comparar->bloqueante && dispositivo_nombre == hilo_comparar->nombre_bloqueante;
+t_hilo * colas_desbloquear_hilo_concreto(t_hilo * hilo_bloqueado) {
+	if (hilo_bloqueado->estado == ESTADO_BLOCK) {
+		colas_mover_block_ready(hilo_bloqueado);
+		loggear_debug("[PID: %zu] - Se desbloqueo el hilo y se envio a READY", hilo_bloqueado->pid);
+	} else if (hilo_bloqueado->estado == ESTADO_SUSPENDED_BLOCK) {
+		colas_mover_block_susp_block_ready(hilo_bloqueado);
+		loggear_debug("[PID: %zu] - Se desbloqueo el hilo y se envio a SUSPENDIDO-READY", hilo_bloqueado->pid);
+	} else {
+		loggear_error("[PID: %zu] - Se quiso desbloquear el hilo, pero no esta en estado bloqueado, esta en %d", hilo_bloqueado->pid, hilo_bloqueado->estado);
 	}
 
-	t_hilo * hilo_retornar;
-	bool esta_en_bloqueado;
-	bool esta_en_suspendido;
-
-	pthread_mutex_lock(&mutex_blocked_list);
-	esta_en_bloqueado = list_any_satisfy(blocked_list, esta_bloqueado);
-	if (esta_en_bloqueado) {
-		hilo_retornar = list_find(blocked_list, esta_bloqueado);
-	}
-	pthread_mutex_unlock(&mutex_blocked_list);
-
-	if (esta_en_bloqueado) {
-		colas_mover_block_ready(hilo_retornar);
-
-		hilos_post_ready();
-
-		return hilo_retornar;
-	}
-
-	pthread_mutex_lock(&mutex_suspended_blocked_list);
-	esta_en_suspendido = list_any_satisfy(suspended_blocked_list, esta_bloqueado);
-	if (esta_en_suspendido) {
-		hilo_retornar = list_find(suspended_blocked_list, esta_bloqueado);
-	}
-	pthread_mutex_unlock(&mutex_suspended_blocked_list);
-
-	if (esta_en_suspendido) {
-		colas_mover_block_susp_block_ready(hilo_retornar);
-
-		return hilo_retornar;
-	}
-
-	return NULL;
+	return hilo_bloqueado;
 }
-
-void colas_desbloquear_todos_hilos(t_dispositivo_bloqueante dispositivo_bloqueante, char * dispositivo_nombre) {
-	bool esta_bloqueado(void * hilo2) {
-		t_hilo * hilo_comparar = (t_hilo *) hilo2;
-
-		return dispositivo_bloqueante == hilo_comparar->bloqueante && dispositivo_nombre == hilo_comparar->nombre_bloqueante;
-	}
-
-	t_hilo * hilo_mover = NULL;
-	while (hilo_mover == NULL) {
-		pthread_mutex_lock(&mutex_blocked_list);
-		hilo_mover = list_find(blocked_list, esta_bloqueado);
-		pthread_mutex_unlock(&mutex_blocked_list);
-
-		colas_mover_block_ready(hilo_mover);
-
-		hilos_post_ready();
-	}
-
-	hilo_mover = NULL;
-	while (hilo_mover == NULL) {
-		pthread_mutex_lock(&mutex_suspended_blocked_list);
-		hilo_mover = list_find(suspended_blocked_list, esta_bloqueado);
-		pthread_mutex_unlock(&mutex_suspended_blocked_list);
-
-		colas_mover_block_susp_block_ready(hilo_mover);
-	}
-}
-
 
 

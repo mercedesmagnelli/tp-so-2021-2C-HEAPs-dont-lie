@@ -8,6 +8,11 @@ void iniciar_swamp(){
 
 	crear_particion();
 
+	//INICIALIZO UNA LISTA PARA TENER TODOS LOS CARPINCHOS QUE VAN APARECIENDO
+
+	lista_carpinchos = list_create();
+
+
 	loggear_info("SE INICIO EL SWAMP");
 
 }
@@ -43,3 +48,17 @@ int crear_particion(){
 	return 0;
 }
 
+void destroy_carpinchos_swamp(t_carpincho_swamp* carpincho){
+	list_destroy_and_destroy_elements(carpincho->dupla, free);
+	list_destroy_and_destroy_elements(carpincho->marcos_reservados, free);
+	list_destroy_and_destroy_elements(carpincho->marcos_usados, free);
+	free(carpincho);
+}
+
+void destroy_lista_carpinchos(){
+	for(int j = 0; j < list_size(lista_carpinchos); j++){
+		destroy_carpinchos_swamp(list_get(lista_carpinchos, j));
+	}
+
+	list_destroy(lista_carpinchos);
+}

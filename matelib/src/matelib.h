@@ -3,10 +3,13 @@
 #define MATELIB_H_INCLUDED
 
 #include <stdint.h>
+
 #include "utils/utils.h"
-#include "../../shared/estructura_compartida.h"
 #include "conexiones/conexiones.h"
-#include "utils/utils.h"
+
+#include "configuracion/matelib_configuracion.h"
+
+#include "../../shared/estructura_compartida.h"
 
 //-------------------Type Definitions----------------------/
 typedef struct mate_instance {

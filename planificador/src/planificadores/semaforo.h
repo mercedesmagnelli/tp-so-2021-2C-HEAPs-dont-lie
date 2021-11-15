@@ -1,7 +1,9 @@
 #ifndef SEMAFORO_H_
 #define SEMAFORO_H_
 
+#include <pthread.h>
 #include <commons/collections/dictionary.h>
+#include <commons/collections/list.h>
 
 #include "colas.h"
 
@@ -11,6 +13,8 @@
 typedef struct {
 	char * nombre;
 	int32_t valor;
+	pthread_mutex_t mutex;
+	t_list * list_procesos;
 } t_semaforo;
 
 typedef enum {
@@ -18,7 +22,8 @@ typedef enum {
 	SEM_BLOQUEAR,
 	SEM_ERROR_YA_EXISTIA,
 	SEM_ERROR_NO_EXISTE,
-	SEM_ERROR_MENOR_CERO
+	SEM_ERROR_MENOR_CERO,
+	SEM_PROCESO_FINALIZADO
 } t_estado_ejecucion;
 
 

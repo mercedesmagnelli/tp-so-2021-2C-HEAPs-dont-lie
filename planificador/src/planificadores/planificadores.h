@@ -5,11 +5,13 @@
 #include <stddef.h>
 #include <pthread.h>
 
+#include "deadlocks.h"
 #include "colas.h"
 #include "estructuras.h"
 #include "hilos_planificador.h"
 #include "semaforo.h"
 #include "dispositivo_io.h"
+#include "../conexion_ram/conexion_ram.h"
 
 #include "../../../shared/logger.h"
 

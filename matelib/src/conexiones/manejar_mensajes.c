@@ -14,26 +14,42 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		destruir_mensaje(mensaje);
 		return 0;
+
+	case EXITO_EN_LA_TAREA:
+
+		destruir_mensaje(mensaje);
+		return 0;
+
+	case FALLO_EN_LA_TAREA:
+
+		destruir_mensaje(mensaje);
+		return -1;
+
+	case FALLO_EN_LA_RAM:
+
+		destruir_mensaje(mensaje);
+		return -1;
+
 	case DESCONEXION_TOTAL:
-		loggear_error("Se cerró la conexión con ram");
+		loggear_error("Se cerró la conexión con backend");
 
 		return ERROR_DESCONEXION_RAM;
 	case DESCONEXION:
-		loggear_warning("Se cerró la conexión con ram");
+		loggear_warning("Se cerró la conexión con backend");
 
 		destruir_mensaje(mensaje);
 
 		return 0;
 	break;
 	case FALLO_AL_RECIBIR:
-		loggear_error("Ocurrió un error al recibir el mensaje de ram");
+		loggear_error("Ocurrió un error al recibir el mensaje de backend");
 
 		destruir_mensaje(mensaje);
 
 		return ERROR_AL_RECIBIR_MENSAJE;
 	break;
 	default:
-		loggear_error("Mensaje desconocido desde ram, Código: %d", mensaje->head);
+		loggear_error("Mensaje desconocido desde backend, Código: %d", mensaje->head);
 
 		destruir_mensaje(mensaje);
 

@@ -15,10 +15,14 @@
 #include "../../../shared/codigo_error.h"
 #include "../../../shared/logger.h"
 
+#include <commons/bitarray.h>
+
 typedef struct {
 	char* ruta_archivo;
 	t_list * carpinchos;
 	int espacio_libre;
+	void* puntero_a_bits;
+	t_bitarray* bitmap_bitarray;
 } t_archivo_swamp;
 
 

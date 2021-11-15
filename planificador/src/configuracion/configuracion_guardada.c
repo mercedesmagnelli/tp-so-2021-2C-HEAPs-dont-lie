@@ -22,6 +22,7 @@ int get_retardo_cpu() { return config_guardada.retardo_cpu; }
 int get_grado_multiprogramacion() { return config_guardada.grado_multiprogramacion; }
 int get_grado_multiprocesamiento() { return config_guardada.grado_multiprocesamiento; }
 
+int get_tiempo_deadlock() { return config_guardada.tiempo_deadlock; }
 
 char * get_log_route() { return config_guardada.log_route; }
 char * get_log_app_name() { return config_guardada.log_app_name; }

@@ -16,8 +16,6 @@ void planificador_largo_plazo() {
 			hilo = colas_mover_new_ready();
 			loggear_debug("[PID: %d] --- [Largo Plazo] --- Se movió de NEW a READY", pid(hilo));
 		}
-
-		hilos_post_ready();
 	}
 }
 
@@ -50,6 +48,11 @@ void planificador_medio_plazo() {
 
 			loggear_debug("[PID: %d] --- [Mediano Plazo] --- Se movió de BLOCK a SUSP-BLOCK", pid(hilo));
 
+			int error_ram = ram_enviar_proceso_suspendido(hilo->pid);
+			if (error_ram != 0) {
+				loggear_error("TODO: HACER ALGO ACA");
+			}
+
 			hilos_post_multiprogramacion();
 
 			loggear_error("[PID: %d] --- [Mediano Plazo] --- TODO: Avisar a la RAM de la suspension", pid(hilo));
@@ -76,6 +79,7 @@ int planificadores_iniciar() {
 	hilos_planificador_iniciar();
 	semaforo_estructuras_crear();
 	dispositivo_io_estructuras_crear();
+	deadlocks_iniciar();
 
 	int error = 0;
 
@@ -91,6 +95,7 @@ void planificadores_destruir() {
 	hilos_planificador_destruir();
 	semaforo_estructuras_destruir();
 	dispositivo_io_estructuras_destruir();
+	deadlocks_destruir();
 }
 
 // CERRADO
@@ -98,10 +103,11 @@ int planificadores_proceso_iniciar(uint32_t ppid) {
 	loggear_debug("[SYSTEM] --- Llego un nuevo proceso al planificador");
 
 	t_hilo * hilo = colas_insertar_new(ppid);
-	hilos_agregar_nuevo_hilo(ppid);
-	hilos_post_new();
 
 	loggear_debug("[PID: %d] --- [SYSTEM] --- Se movió a NEW", pid(hilo));
+
+	hilos_agregar_nuevo_hilo(ppid);
+	hilos_post_new();
 
     return 0;
 }

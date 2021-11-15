@@ -9,6 +9,12 @@ typedef struct{
 	int pos_y;
 }t_posicion;
 
+
+typedef enum {
+	FIJA,
+	GLOBAL
+} t_asignacion;
+
 typedef struct {
 	char * ip;
 	int puerto;
@@ -20,6 +26,7 @@ typedef struct {
 
 	int cantidad_archivos;
 	char ** archivos_swap;
+	t_asignacion asignacion;
 
 	// Loggin
 	char * log_route;
@@ -27,6 +34,8 @@ typedef struct {
 	int log_in_console;
 	int log_level_info;
 
+	//utiles
+	int cantidad_paginas;
 } t_info_config;
 
 
@@ -43,7 +52,8 @@ int get_marcos_maximos();
 int get_retardo_swap();
 int get_cantidad_archivos();
 char ** get_archivos_swap();
-
+int get_cantidad_marcos();
+t_asignacion get_asignacion();
 
 /**
  * @NAME: config_guardada
