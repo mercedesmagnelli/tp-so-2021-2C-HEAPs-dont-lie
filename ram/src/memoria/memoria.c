@@ -14,7 +14,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 				actualizar_proceso(pid,ptro,size);
 				return ptro;
 			} else {
-				if (se_puede_almacenar_el_alloc_para_proceso(R_S_ESPACIO_PROCESO_EXISTENTE, pid, size)) {
+				if (se_puede_almacenar_el_alloc_para_proceso(R_S_PROCESO_EXISTENTE, pid, size)) {
 					loggear_trace("[MATELIB_MEM_ALLOC] Se pide mas espacio para el proceso %d", pid);
 					//como hay espacio disponble, expando lo que ya tenia
 					actualizar_proceso(pid,  (-1) * ptro,  size);
@@ -26,7 +26,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 			}
 		} else {
 			//si no existe, entonces tengo que crear el nuevo proceso
-			if (se_puede_almacenar_el_alloc_para_proceso(R_S_ESPACIO_PROCESO_NUEVO, pid, size)) {
+			if (se_puede_almacenar_el_alloc_para_proceso(R_S_PROCESO_NUEVO, pid, size)) {
 				loggear_trace("[MATELIB_MEM_ALLOC] Se crea un proceso nuevo de pid %d", pid);
 				int32_t ptro_nuevo_proc = agregar_proceso(pid, size);
 				return ptro_nuevo_proc;

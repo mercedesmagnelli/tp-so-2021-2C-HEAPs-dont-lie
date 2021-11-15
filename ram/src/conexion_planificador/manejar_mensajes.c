@@ -134,10 +134,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			if(rtaRead>=0){
 				t_ram_read* estructuraRead = shared_crear_ram_read(rtaRead, ptroLectura);
-				int tamanioBuffer;
-				void* readSerializado = serializar_ram_read(estructuraRead, &tamanioBuffer);
+				size_t* tamanioBuffer = malloc(sizeof(size_t));
+				void* readSerializado = serializar_ram_read(estructuraRead, tamanioBuffer);
 				loggear_info("[MATELIB_MEM_READ], proceso %d pudo leer el espacio seleccionado", read->pid);
-				enviar_mensaje_protocolo(mensaje->socket, READ_SUC_R_P, tamanioBuffer, readSerializado);
+				enviar_mensaje_protocolo(mensaje->socket, READ_SUC_R_P, *tamanioBuffer, readSerializado);
 				free(readSerializado);
 			}else{
 				loggear_info("[MATELIB_MEM_READ], proceso %d NO pudo leer el espacio seleccionado", read->pid);
