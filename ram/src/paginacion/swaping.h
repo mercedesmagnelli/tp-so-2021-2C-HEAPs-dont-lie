@@ -139,4 +139,10 @@ void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir);
 void enviar_info_pagina(void* info, uint32_t pid, uint32_t pag);
 void* obtener_info_en_frame(uint32_t pagina_victima);
 
+/**
+ * @NAME: enviar_pagina_a_SWAP
+ * @DESC: Se le envia a SWAP para que guarde la pagina del PID asociado
+ **/
+void enviar_pagina_a_SWAP(uint32_t PID, uint32_t nroPag, void* dataPag);
+
 #endif /* PAGINACION_SWAPING_H_ */

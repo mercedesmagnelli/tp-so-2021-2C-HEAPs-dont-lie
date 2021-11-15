@@ -447,6 +447,7 @@ void suspender_proceso(uint32_t PID){
 
 	t_pagina* paginaIterada;
 	t_frame* frameLiberar;
+	void* data;
 
 	for(int i=0; i<list_size(proceso->tabla_paginas); i++){
 		paginaIterada = list_get(proceso->tabla_paginas,i);
@@ -455,10 +456,10 @@ void suspender_proceso(uint32_t PID){
 			frameLiberar = list_get(listaFrames, paginaIterada->frame);
 			frameLiberar->estado=0;
 			if(paginaIterada->bit_modificacion){
-				paginaIterada->bit_modificacion = 0;
-				void* data = NULL;
+				data = malloc(get_tamanio_pagina());
 				leer_directamente_de_memoria(data, get_tamanio_pagina(), paginaIterada->frame * get_tamanio_pagina());
-				//TODO:llamar funcion de swap para enviar info a SWAP
+				enviar_pagina_a_SWAP(PID, i, data);
+				free(data);
 			}
 		}
 
