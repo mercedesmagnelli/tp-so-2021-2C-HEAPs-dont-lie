@@ -132,6 +132,12 @@ uint32_t obtener_valor_puntero(t_proceso* proc);
 
 void actualizar_puntero(t_proceso* proc, uint32_t indice_encontrado);
 
+/**
+ * @NAME: enviar_pagina_a_SWAP
+ * @DESC: Se le envia a SWAP para que guarde la pagina del PID asociado
+ **/
+void enviar_pagina_a_SWAP(uint32_t PID, uint32_t nroPag, void* dataPag);
+
 
 /*falta poner los headers*/
 
