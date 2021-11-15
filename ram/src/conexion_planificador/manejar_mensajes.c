@@ -27,7 +27,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			return 0;
 		case HANDSHAKE_F_R:
 			enviar_mensaje_protocolo(mensaje->socket, HANDSHAKE_R_F, 0, NULL);
-
+			//acá debería guardar el socket de la swamp??
+			socket_swap = mensaje->socket;
 			loggear_info("Llego un handshake del filesystem, devolvemos el saludo");
 
 			desconexion(mensaje);
