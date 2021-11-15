@@ -84,7 +84,7 @@ typedef struct{
 
 typedef struct{
 	uint32_t pid;
-	uint32_t nro_pag;
+	uint32_t nro_pag; //tmb puede ser la cantidad de paginas a liberar - dsp ver de poner un mejor nombre
 }t_pedir_o_liberar_pagina_s;
 
 /**
@@ -125,15 +125,13 @@ void * serializar_ram_read(t_ram_read * mensaje, size_t * size_final);
 t_ram_read * deserializar_ram_read(void * puntero);
 
 
-void* serializar_crear_proceso_nuevo(t_mensaje_r_s* mensaje, size_t* size_final);
-void* serializar_proceso_existente(t_mensaje_r_s* mensaje, size_t* size_final);
+void* serializar_solicitud_espacio(t_mensaje_r_s* mensaje, size_t* size_final);
 void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final, size_t tamanio_pagina);
 void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
 void* serializar_eliminar_proceso(uint32_t pid, size_t* size_final);
-void* serilizar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
+void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
 
-uint32_t deserializar_proceso_nuevo(void* respuesta);
-uint32_t deserializar_proceso_existente(void* respuesta);
+uint32_t deserializar_solicitud_espacio(void* respuesta);
 uint32_t deserializar_escritura_en_pagina(void* respuesta);
 void* deserializar_pedir_pagina(void* respuesta);
 uint32_t deserializar_eliminar_proceso(void* respuesta);

@@ -32,7 +32,6 @@ int main(int argc, char** argv) {
 	}
 
 	inicializar_estructuras_administrativas();
-
 	cerrar_todo();
 	destruir_estructuras_administrativas();
 

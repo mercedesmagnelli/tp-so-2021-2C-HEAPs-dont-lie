@@ -22,6 +22,13 @@
 void inicializar_estructuras_administrativas_paginacion();
 
 
+/**
+ * @NAME: obtener_socket
+ * @DESC: obtiene el socket de comunicacion con el swamp
+*/
+
+uint32_t obtener_socket();
+
 // FUNCIONES PUBLICAS
 
 /**
@@ -302,7 +309,7 @@ bool el_ultimo_heap_libera_paginas(heap_metadata* ultimo_heap);
  * @DESC: libera la cantidad de paginas que estan de mas en el proceos porque
  * el último heap es mas gande que el restante dentro de una pagina
 */
-void liberar_paginas(heap_metadata* ultimo_heap, t_list* tabla_paginas);
+void liberar_paginas(heap_metadata* ultimo_heap, t_list* tabla_paginas, uint32_t pid);
 
 /**
 * @NAME: actualizar_datos_pagina
