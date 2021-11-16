@@ -26,44 +26,56 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			return 0;
 		case HANDSHAKE_F_R:
-			//enviar_mensaje_protocolo(mensaje->socket, HANDSHAKE_R_F, 0, NULL);
-			//acá debería guardar el socket de la swamp??
+
 			socket_swap = mensaje->socket;
 			loggear_info("Llego un handshake del filesystem, devolvemos el saludo");
 
-			//desconexion(mensaje);
 			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_INIT:
 			loggear_info("[MATELIB_INIT], hay que crear un proceso");
+			t_matelib_nuevo_proceso* PID_proceso_nuevo = deserializar_crear_proceso(mensaje->payload);
 
-			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			int rtaInit = inicializar_proceso(PID_proceso_nuevo->pid);
+			uint32_t headerI;
+
+			if(rtaInit){
+				loggear_info("[MATELIB_INIT], proceso %d fue inicializado en la memoria", PID_proceso_nuevo->pid);
+				headerI = EXITO_EN_LA_TAREA;
+			}else{
+				loggear_info("[MATELIB_INIT], proceso %d NO fue inicializado en la memoria", PID_proceso_nuevo->pid);
+				headerI = FALLO_EN_LA_TAREA;
+			}
+
+			enviar_mensaje_protocolo(mensaje->socket, headerI, 0, NULL);
+
+			free(PID_proceso_nuevo);
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_CLOSE:
 			loggear_info("[MATELIB_CLOSE], hay que cerrar el proceso");
-			//Nos mandan un uint32_t PID para eliminar el proceso
+			t_matelib_nuevo_proceso* PID_proceso_eliminar = deserializar_crear_proceso(mensaje->payload);
 
-			uint32_t PID_a_liberar=0;
-
-			int32_t rtaClose = close_PID(PID_a_liberar);
+			int32_t rtaClose = close_PID(PID_proceso_eliminar->pid);
 			uint32_t headerC;
 
 			if(rtaClose){
-				loggear_info("[MATELIB_CLOSE], proceso %d fue eliminado de memoria", PID_a_liberar);
-				headerC = CLOSE_SUC_R_P;
+				loggear_info("[MATELIB_CLOSE], proceso %d fue eliminado de memoria", PID_proceso_eliminar->pid);
+				headerC = EXITO_EN_LA_TAREA;
 			}else{
-				loggear_info("[MATELIB_CLOSE], proceso %d NO fue eliminado de memoria", PID_a_liberar);
-				headerC = CLOSE_ERR_R_P;
+				loggear_info("[MATELIB_CLOSE], proceso %d NO fue eliminado de memoria", PID_proceso_eliminar->pid);
+				headerC = FALLO_EN_LA_TAREA;
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerC, 0, NULL);
 
+			free(PID_proceso_eliminar);
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
+
 			return 0;
 		case MATELIB_SEM_INIT:
 			loggear_info("[MATELIB_SEM_INIT], se crea un semaforo");
@@ -113,14 +125,13 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			if(ptroAlloc>=0){
 				loggear_info("[MATELIB_MEM_ALLOC], proceso %d se le asigna espacio solicitado", alloc->pid);
-				enviar_mensaje_protocolo(mensaje->socket, ALLOC_SUC_R_P, 4, &ptroAlloc);
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 4, &ptroAlloc);
 			}else{
 				loggear_info("[MATELIB_MEM_ALLOC], proceso %d NO se le asigna espacio solicitado", alloc->pid);
-				enviar_mensaje_protocolo(mensaje->socket, ALLOC_ERR_R_P, 0, NULL);
+				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
 			free(alloc);
-
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 
@@ -135,16 +146,15 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			if(rtaFree>=0){
 				loggear_info("[MATELIB_MEM_FREE], proceso %d se libero el espacio seleccionado", free1->pid);
-				headerF = FREE_SUC_R_P;
+				headerF = EXITO_EN_LA_TAREA;
 			}else{
 				loggear_info("[MATELIB_MEM_FREE], proceso %d NO se libero el espacio seleccionado", free1->pid);
-				headerF = FREE_ERR_R_P;
+				headerF = FALLO_EN_LA_TAREA;
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerF, 0, NULL);
 
 			free(free1);
-
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 
@@ -162,15 +172,14 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				size_t* tamanioBuffer = malloc(sizeof(size_t));
 				void* readSerializado = serializar_ram_read(estructuraRead, tamanioBuffer);
 				loggear_info("[MATELIB_MEM_READ], proceso %d pudo leer el espacio seleccionado", read->pid);
-				enviar_mensaje_protocolo(mensaje->socket, READ_SUC_R_P, *tamanioBuffer, readSerializado);
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, *tamanioBuffer, readSerializado);
 				free(readSerializado);
 			}else{
 				loggear_info("[MATELIB_MEM_READ], proceso %d NO pudo leer el espacio seleccionado", read->pid);
-				enviar_mensaje_protocolo(mensaje->socket, READ_ERR_R_P, 0, NULL);
+				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
 			free(ptroLectura);
-
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 
@@ -186,38 +195,36 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			if(rtaWrite>=0){
 				loggear_info("[MATELIB_MEM_WRITE], proceso %d pudo escribir en el espacio seleccionado", escritura->pid);
-				headerW = WRITE_SUC_R_P;
+				headerW = EXITO_EN_LA_TAREA;
 			}else{
 				loggear_info("[MATELIB_MEM_WRITE], proceso %d NO pudo escribir el espacio seleccionado", escritura->pid);
-				headerW=WRITE_ERR_R_P;
+				headerW=FALLO_EN_LA_TAREA;
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerW, 0, NULL);
 
 			free(escritura);
-
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 			return 0;
 		case SUSPENDER_PROCESO:
 			loggear_info("[MATELIB_CLOSE], hay que cerrar el proceso");
-			//Nos mandan un uint32_t PID para eliminar el proceso
+			t_matelib_nuevo_proceso* PID_proceso_suspender = deserializar_crear_proceso(mensaje->payload);
 
-			uint32_t PID_a_suspender=0;
-
-			int32_t rtaSuspender = suspender_PID(PID_a_suspender);
+			int32_t rtaSuspender = suspender_PID(PID_proceso_suspender->pid);
 			uint32_t headerS;
 
 			if(rtaSuspender){
-				loggear_info("[SUSPENDER_PROCESO], proceso %d fue suspendido", PID_a_suspender);
-				headerS = SUSPEN_SUC_R_P;
+				loggear_info("[SUSPENDER_PROCESO], proceso %d fue suspendido", PID_proceso_suspender->pid);
+				headerS = EXITO_EN_LA_TAREA;
 			}else{
-				loggear_info("[SUSPENDER_PROCESO], proceso %d NO fue suspendido", PID_a_suspender);
-				headerS = SUSPEN_ERR_R_P;
+				loggear_info("[SUSPENDER_PROCESO], proceso %d NO fue suspendido", PID_proceso_suspender->pid);
+				headerS = FALLO_EN_LA_TAREA;
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerS, 0, NULL);
 
+			free(PID_proceso_suspender);
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 			return 0;

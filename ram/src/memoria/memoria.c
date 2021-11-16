@@ -1,5 +1,8 @@
 #include "memoria.h"
 
+int inicializar_proceso(uint32_t PID){
+
+}
 
 int32_t memalloc(uint32_t pid, int32_t size) {
 	loggear_trace("[MATELIB_MEM_ALLOC] estoy entrando al meamalloc");
