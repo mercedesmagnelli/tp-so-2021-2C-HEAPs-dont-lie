@@ -1,19 +1,20 @@
 #include "ram_main.h"
 
-void cerrar_todo();
-void signal_handler(int n);
 void debug_configuracion();
 
 
 int main(int argc, char** argv) {
 
 	// TODO: Implementar signal de CtrlC y  tal vez CtrlZ
-	signal(SIGUSR1, signal_handler);
+	signal(SIGINT, manejar_sigint);
+	signal(SIGUSR1, manejar_sigusr1);
+	signal(SIGUSR1, manejar_sigusr2);
+
 	int error = iniciar_configuracion(argc, argv);
-	if (error != STATUS_OK) {
+	/*if (error != STATUS_OK) {
 		puts("Error en los argumentos\n");
 		return EXIT_FAILURE;
-	}
+	}*/
 
 	error = init_mutex_log(get_log_route(), get_log_app_name(), get_log_in_console(), get_log_level_info());
 	if (error != STATUS_OK) {
@@ -31,7 +32,6 @@ int main(int argc, char** argv) {
 	}
 
 	inicializar_estructuras_administrativas();
-
 	cerrar_todo();
 	destruir_estructuras_administrativas();
 
@@ -40,15 +40,6 @@ int main(int argc, char** argv) {
 
 
 
-void cerrar_todo() {
-	cerrar_conexiones(true); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga  
-	destroy_configuracion();
-	destroy_log();
-}
-
-void signal_handler(int n){
-	loggear_warning("Llego un SIGNAL, n: %d", n);
-}
 
 void debug_configuracion() {
 	loggear_debug("---Variables en archivo de configuración---");
