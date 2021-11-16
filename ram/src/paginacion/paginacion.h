@@ -22,14 +22,6 @@
  **/
 void inicializar_estructuras_administrativas_paginacion();
 
-
-/**
- * @NAME: obtener_socket
- * @DESC: obtiene el socket de comunicacion con el swamp
-*/
-
-uint32_t obtener_socket();
-
 // FUNCIONES PUBLICAS
 
 /**

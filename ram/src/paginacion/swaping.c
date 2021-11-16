@@ -6,7 +6,7 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 	void* info_a_guardar;
 	if(!hay_que_hacer_swap(PID)) {
 		frame = obtener_frame_libre(PID);
-		info_a_guardar = pedir_a_swamp_info_pagina(PID, nroPag);
+		info_a_guardar =  recibir_info_en_pagina(PID, nroPag);
 	}else {
 		t_list* lista_frames = obtener_lista_frames_en_memoria(PID);
 		t_list* lista_paginas = obtener_lista_paginas_de_frames(lista_frames);
@@ -80,9 +80,7 @@ void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir) {
 	return info;
 
 }
-void enviar_info_pagina(void* info, uint32_t pid, uint32_t pag) {
 
-}
 
 t_list* obtener_lista_frames_en_memoria(uint32_t pid) {
 	t_list* lista_frames_proceso;
@@ -261,14 +259,14 @@ bool frame_disponible(void* element){
 void comunicar_eliminacion_proceso_SWAP(uint32_t PID){
 
 	size_t tamanio;
-	void* mensaje_serializado = serializar_eliminar_proceso(PID, &tamanio);
+	t_matelib_nuevo_proceso* pid = shared_crear_nuevo_proceso(PID);
+	void* mensaje_serializado = serializiar_crear_proceso(pid, &tamanio);
 	enviar_mensaje_protocolo(socket_swap,R_S_ELIMINAR_PROCESO,tamanio,mensaje_serializado);
 	free(mensaje_serializado);
+ 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
+	t_matelib_nuevo_proceso* err = deserializar_crear_proceso(rec->payload);
 
-	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
-	uint32_t err = deserializar_eliminar_proceso(rec->payload);
-
-	if(err == 0){
+	if(err->pid == 0){
 		loggear_error("[RAM] - Hubo un problema en la eliminacion del proceso %d en swamp",PID);
 	}
 }

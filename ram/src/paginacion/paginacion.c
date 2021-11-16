@@ -5,7 +5,7 @@
 // FUNCIONES DE INICIO Y DESTRUCCION ADMINISTRATIVAS
 
 void inicializar_estructuras_administrativas() {
-	socket_swap = obtener_socket();
+
 	inicializar_memoria_principal();
     listaProcesos = list_create();
     listaFrames = list_create();
@@ -20,9 +20,7 @@ void inicializar_estructuras_administrativas() {
     cant_frames_por_proceso = dictionary_create();
     inicializar_tlb();
 }
-uint32_t obtener_socket() {
-	return 1;
-}
+
 void destruir_estructuras_administrativas() {
     list_destroy_and_destroy_elements(listaProcesos, destruir_proceso);
     list_destroy_and_destroy_elements(listaFrames, free);

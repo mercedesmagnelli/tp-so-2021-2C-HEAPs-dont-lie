@@ -418,21 +418,6 @@ void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_
 	return buffer;
 }
 
-void* serializar_eliminar_proceso(uint32_t pid, size_t* size_final){
-	size_t offset = 0;
-	size_t tamanio_buffer = SIZE_PID;
-	void * buffer = malloc(tamanio_buffer);
-
-	memcpy(buffer + offset, &pid, SIZE_PID);
-	offset += SIZE_PID;
-
-	if (size_final != NULL) {
-		*size_final = tamanio_buffer;
-	}
-
-	return buffer;
-}
-
 void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final){
 	size_t offset = 0;
 	size_t tamanio_buffer = SIZE_PID + SIZE_NRO_PAG;
