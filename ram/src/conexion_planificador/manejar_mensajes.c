@@ -54,10 +54,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			if(rtaClose){
 				loggear_info("[MATELIB_CLOSE], proceso %d fue eliminado de memoria", PID_a_liberar);
-				headerC = CLOSE_SUC_R_P;
+				headerC = EXITO_EN_LA_TAREA;
 			}else{
 				loggear_info("[MATELIB_CLOSE], proceso %d NO fue eliminado de memoria", PID_a_liberar);
-				headerC = CLOSE_ERR_R_P;
+				headerC = FALLO_EN_LA_TAREA;
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerC, 0, NULL);
@@ -113,10 +113,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			if(ptroAlloc>=0){
 				loggear_info("[MATELIB_MEM_ALLOC], proceso %d se le asigna espacio solicitado", alloc->pid);
-				enviar_mensaje_protocolo(mensaje->socket, ALLOC_SUC_R_P, 4, &ptroAlloc);
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 4, &ptroAlloc);
 			}else{
 				loggear_info("[MATELIB_MEM_ALLOC], proceso %d NO se le asigna espacio solicitado", alloc->pid);
-				enviar_mensaje_protocolo(mensaje->socket, ALLOC_ERR_R_P, 0, NULL);
+				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
 			free(alloc);
@@ -135,10 +135,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			if(rtaFree>=0){
 				loggear_info("[MATELIB_MEM_FREE], proceso %d se libero el espacio seleccionado", free1->pid);
-				headerF = FREE_SUC_R_P;
+				headerF = EXITO_EN_LA_TAREA;
 			}else{
 				loggear_info("[MATELIB_MEM_FREE], proceso %d NO se libero el espacio seleccionado", free1->pid);
-				headerF = FREE_ERR_R_P;
+				headerF = FALLO_EN_LA_TAREA;
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerF, 0, NULL);
@@ -162,11 +162,11 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				size_t* tamanioBuffer = malloc(sizeof(size_t));
 				void* readSerializado = serializar_ram_read(estructuraRead, tamanioBuffer);
 				loggear_info("[MATELIB_MEM_READ], proceso %d pudo leer el espacio seleccionado", read->pid);
-				enviar_mensaje_protocolo(mensaje->socket, READ_SUC_R_P, *tamanioBuffer, readSerializado);
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, *tamanioBuffer, readSerializado);
 				free(readSerializado);
 			}else{
 				loggear_info("[MATELIB_MEM_READ], proceso %d NO pudo leer el espacio seleccionado", read->pid);
-				enviar_mensaje_protocolo(mensaje->socket, READ_ERR_R_P, 0, NULL);
+				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
 			free(ptroLectura);
@@ -186,10 +186,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			if(rtaWrite>=0){
 				loggear_info("[MATELIB_MEM_WRITE], proceso %d pudo escribir en el espacio seleccionado", escritura->pid);
-				headerW = WRITE_SUC_R_P;
+				headerW = EXITO_EN_LA_TAREA;
 			}else{
 				loggear_info("[MATELIB_MEM_WRITE], proceso %d NO pudo escribir el espacio seleccionado", escritura->pid);
-				headerW=WRITE_ERR_R_P;
+				headerW = FALLO_EN_LA_TAREA;
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerW, 0, NULL);
@@ -200,23 +200,31 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			destruir_mensaje(mensaje);
 			return 0;
 		case SUSPENDER_PROCESO:
-			loggear_info("[MATELIB_CLOSE], hay que cerrar el proceso");
+			loggear_info("[SUSPENDER_PROCESO], hay que cerrar el proceso");
 			//Nos mandan un uint32_t PID para eliminar el proceso
 
 			uint32_t PID_a_suspender=0;
 
 			int32_t rtaSuspender = suspender_PID(PID_a_suspender);
-			uint32_t headerS;
+			uint32_t header;
 
 			if(rtaSuspender){
 				loggear_info("[SUSPENDER_PROCESO], proceso %d fue suspendido", PID_a_suspender);
-				headerS = SUSPEN_SUC_R_P;
+				header = EXITO_EN_LA_TAREA;
 			}else{
 				loggear_info("[SUSPENDER_PROCESO], proceso %d NO fue suspendido", PID_a_suspender);
-				headerS = SUSPEN_ERR_R_P;
+				header = FALLO_EN_LA_TAREA;
 			}
 
-			enviar_mensaje_protocolo(mensaje->socket, headerS, 0, NULL);
+			enviar_mensaje_protocolo(mensaje->socket, header, 0, NULL);
+
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+			return 0;
+		case PROCESO_EN_READY:
+			loggear_error("[PROCESO_EN_READY] - ''''TODO: CODE THIS'''' Se movio a ready un proceso");
+
+
 
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);

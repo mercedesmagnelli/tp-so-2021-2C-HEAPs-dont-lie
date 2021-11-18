@@ -69,6 +69,7 @@ typedef enum {
 	// Planificador => Ram
 	HANDSHAKE_P_R,
 	SUSPENDER_PROCESO,
+	PROCESO_EN_READY,
 
 	// Mensajes genericos
 	EXITO_EN_LA_TAREA,
