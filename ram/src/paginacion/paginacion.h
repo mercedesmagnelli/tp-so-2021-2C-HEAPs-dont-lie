@@ -2,60 +2,18 @@
 #define PAGINACION_PAGINACION_H_
 
 #include <stdint.h>
-#include <commons/collections/list.h>
-#include <commons/collections/dictionary.h>
+
 #include "../../../shared/codigo_error.h"
+#include "../../../shared/estructura_compartida.h"
 #include "../../src/conexion_swap/conexion_swap.h"
-#include "../../src/configuracion/ram_config_guardada.h"
 #include "../../src/memoria/memoria.h"
-#include "../../src/configuracion/ram_config_guardada.h"
 #include "../../src/TLB/tlb.h"
 #include "../../../shared/logger.h"
 #include "swaping.h"
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
-
-t_list* listaProcesos;//casos: agregar_proceso, liberar_paginas
-t_list* listaFrames;//casos: traer_pagina_de_SWAP, liberar_paginas
-t_dictionary* cant_frames_por_proceso;//casos: traer_pagina_de_SWAP, liberar_paginas
-
-
-typedef struct{
-	//índice: frame
-	uint32_t estado;
-	uint32_t proceso;
-	uint32_t pagina;
-}t_frame;
-
-typedef struct{
-    uint32_t en_mp; //me sirve de flag para comprobar cuando realmente hacer el swap
-    uint32_t en_mv; // me sirve para tener el control de la cant maxima por proceso
-}asignacion_marcos_fijos;
-
-typedef struct{
-	uint32_t currAlloc;
-	int32_t prevAlloc;
-	int32_t nextAlloc;
-	uint8_t isFree;
-}heap_metadata;
-
-
-typedef struct {
-	uint32_t PID;
-	t_list* tabla_paginas; //t_list pagina
-	t_list* lista_hmd;
-	uint32_t miss_proceso;
-	uint32_t hits_proceso;
-}t_proceso;
-
-typedef struct{
-	uint32_t bit_presencia;
-	uint32_t frame;
-	double timestamp;
-	uint32_t bit_uso;
-	uint32_t bit_modificacion;
-}t_pagina;
+#include "estructuras_paginacion.h"
 
 
 /**
@@ -64,6 +22,13 @@ typedef struct{
  **/
 void inicializar_estructuras_administrativas_paginacion();
 
+
+/**
+ * @NAME: obtener_socket
+ * @DESC: obtiene el socket de comunicacion con el swamp
+*/
+
+uint32_t obtener_socket();
 
 // FUNCIONES PUBLICAS
 
@@ -221,7 +186,22 @@ uint32_t calcular_offset_puntero_en_pagina(uint32_t puntero);
 
 void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t puntero);
 
-// FUNCIONES PRIVADAS DE USO INTERNO
+/**
+ * @NAME: eliminar_proceso
+ * @DESC: Elimina el proceso de RAM liberando los frames ocupados y las estructuras administrativas asociadas/usadas por el proceso
+ */
+void eliminar_proceso(uint32_t PID);
+
+/**
+ * @NAME: suspender_proceso
+ * @DESC: Saca al proceso de la RAM liberando los frames usados por la misma y enviando a SWAP las paginas modificadas no cargadas en SWAP
+ */
+void suspender_proceso(uint32_t PID);
+
+
+
+
+//----------------------------------------------- FUNCIONES PRIVADAS DE USO INTERNO-------------------------------------------------------------
 /**
 * @NAME: get_proceso
 * @DESC: devuelve el proceso con el PID asociado
@@ -330,7 +310,7 @@ bool el_ultimo_heap_libera_paginas(heap_metadata* ultimo_heap);
  * @DESC: libera la cantidad de paginas que estan de mas en el proceos porque
  * el último heap es mas gande que el restante dentro de una pagina
 */
-void liberar_paginas(heap_metadata* ultimo_heap, t_list* tabla_paginas);
+void liberar_paginas(heap_metadata* ultimo_heap, t_list* tabla_paginas, uint32_t pid);
 
 /**
 * @NAME: actualizar_datos_pagina
@@ -400,5 +380,34 @@ uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size);
 */
 
 int calcular_paginas_para_tamanio(uint32_t tam);
+
+/**
+ * @NAME: reservar_frames
+ * @DESC: Toma la lista pasada por parametro y la llena con los frames reservados para el proceso dentro de la RAM
+*/
+void reservar_frames(t_list* lista_frames);
+
+/**
+ * @NAME: frame_no_pertenece_a_lista
+ * @DESC: Avisa si el frame NO pertenece a la lista de frames pasada como parametro
+*/
+bool frame_no_pertenece_a_lista(t_list* lista_frames, void* elementoBuscado);
+
+/**
+ * @NAME: remover_proceso_PID_lista_procesos
+ * @DESC: consigue el proceso asociado al PID y lo remueve de la lista de procesos
+*/
+t_proceso* remover_proceso_PID_lista_procesos(uint32_t PID);
+
+/**
+ * @NAME: liberar_frames
+ * @DESC: Se encarga de liberar todos lso frames usados por las paginas del proceso
+*/
+void liberar_frames_eliminar_proceso(t_proceso* proceso);
+/**
+ * @NAME: eliminar_frame_reservados
+ * @DESC: Agara la lista de frames reservados por el proceso y los remueve de la lista de frames reservados por todos los procesos
+*/
+void eliminar_frames_reservados(t_proceso* proceso);
 
 #endif /* PAGINACION_PAGINACION_H_ */

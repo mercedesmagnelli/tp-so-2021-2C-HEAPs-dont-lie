@@ -7,7 +7,6 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 		//corto la ejecucion si ya no tengo que analizar
 			return VALOR_MEMORIA_SOLICITADO_INVALIDO;
 	} else {
-
 		if (existe_proceso(pid)){
 			loggear_trace("[MATELIB_MEM_ALLOC] Existe el proceso %d", pid);
 			int32_t ptro = ptro_donde_entra_data(pid, size);
@@ -15,7 +14,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 				actualizar_proceso(pid,ptro,size);
 				return ptro;
 			} else {
-				if (se_puede_almacenar_el_alloc_para_proceso(R_S_ESPACIO_PROCESO_EXISTENTE, pid, size)) {
+				if (se_puede_almacenar_el_alloc_para_proceso(R_S_PROCESO_EXISTENTE, pid, size)) {
 					loggear_trace("[MATELIB_MEM_ALLOC] Se pide mas espacio para el proceso %d", pid);
 					//como hay espacio disponble, expando lo que ya tenia
 					actualizar_proceso(pid,  (-1) * ptro,  size);
@@ -24,11 +23,10 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 					loggear_error("[MATELIB_MEM_ALLOC] No se puede almacenar el alloc para el proceso %d porque no hay espacio suficiente en memoria", pid);
 					return ESPACIO_EN_MEMORIA_INSUF;
 				}
-
 			}
 		} else {
 			//si no existe, entonces tengo que crear el nuevo proceso
-			if (se_puede_almacenar_el_alloc_para_proceso(R_S_ESPACIO_PROCESO_NUEVO, pid, size)) {
+			if (se_puede_almacenar_el_alloc_para_proceso(R_S_PROCESO_NUEVO, pid, size)) {
 				loggear_trace("[MATELIB_MEM_ALLOC] Se crea un proceso nuevo de pid %d", pid);
 				int32_t ptro_nuevo_proc = agregar_proceso(pid, size);
 				return ptro_nuevo_proc;
@@ -95,5 +93,21 @@ void inicializar_memoria_principal() {
 
 bool cantidad_valida(int32_t size) {
 	return size >=1 ? 1 : 0;
+}
+
+int32_t close_PID(uint32_t PID){
+	if(existe_proceso(PID)){
+		eliminar_proceso(PID);
+		return 1;
+	}else
+		return 0;
+}
+
+int32_t suspender_PID(uint32_t PID){
+	if(existe_proceso(PID)){
+		suspender_proceso(PID);
+		return 1;
+	}else
+		return 0;
 }
 

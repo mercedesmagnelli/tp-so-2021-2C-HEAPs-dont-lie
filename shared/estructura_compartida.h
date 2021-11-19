@@ -7,7 +7,7 @@
 #include <string.h>
 
 #include <commons/string.h>
-
+#include <stdint.h>
 #include "logger.h"
 
 /// NUEVO
@@ -70,6 +70,23 @@ typedef struct {
 	void * mem_read;
 } t_ram_read;
 
+
+typedef struct{
+uint32_t cant_pag;
+uint32_t pid;
+}t_mensaje_r_s;
+
+typedef struct{
+	uint32_t nro_pag;
+	uint32_t pid;
+	void* data;
+}t_write_s;
+
+typedef struct{
+	uint32_t pid;
+	uint32_t nro_pag; //tmb puede ser la cantidad de paginas a liberar - dsp ver de poner un mejor nombre
+}t_pedir_o_liberar_pagina_s;
+
 /**
  * ALLOC: Devuelve un int32_t
  * WRITE: Responde solo t_header EXITO o FALLO
@@ -106,6 +123,23 @@ t_matelib_memoria_free * deserializar_memoria_free(void * puntero);
 t_ram_read * shared_crear_ram_read(size_t size, void * memoria_ready);
 void * serializar_ram_read(t_ram_read * mensaje, size_t * size_final);
 t_ram_read * deserializar_ram_read(void * puntero);
+
+
+void* serializar_solicitud_espacio(t_mensaje_r_s* mensaje, size_t* size_final);
+void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final, size_t tamanio_pagina);
+void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
+void* serializar_eliminar_proceso(uint32_t pid, size_t* size_final);
+void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
+
+uint32_t deserializar_solicitud_espacio(void* respuesta);
+uint32_t deserializar_escritura_en_pagina(void* respuesta);
+void* deserializar_pedir_pagina(void* respuesta);
+uint32_t deserializar_eliminar_proceso(void* respuesta);
+uint32_t deserializar_liberar_paginas(void* respuesta);
+
+t_pedir_o_liberar_pagina_s* shared_crear_pedir_o_liberar(uint32_t pid, uint32_t nro_pag);
+t_write_s* shared_crear_write_s(uint32_t nro_pag, uint32_t pid, void* data);
+t_mensaje_r_s* shared_crear_t_mensaje_r_s(uint32_t cant_pag, uint32_t pid);
 
 
 #endif /* ESTRUCTURA_COMPARTIDA_H_ */

@@ -3,8 +3,10 @@
 
 const size_t SIZE_PID = sizeof(int32_t);
 const size_t SIZE_CHAR = sizeof(char);
-
-const size_t SIZE_SEMAFORO_VALOR  = sizeof(int32_t);
+const size_t SIZE_CANT_PAG = sizeof(uint32_t);
+const size_t SIZE_NRO_PAG = sizeof(uint32_t);
+const size_t SIZE_RESPUESTA = sizeof(uint32_t);
+const size_t SIZE_SEMAFORO_VALOR  = sizeof(uint32_t);
 
 const size_t SIZE_MEMORIA_SIZE = sizeof(uint32_t);
 const size_t SIZE_MEMORIA_MATE_POINTER = sizeof(int32_t);
@@ -350,6 +352,169 @@ t_ram_read * deserializar_ram_read(void * puntero) {
 	return mensaje;
 }
 
+
+void* serializar_solicitud_espacio(t_mensaje_r_s* mensaje, size_t* size_final){
+	size_t offset = 0;
+		size_t tamanio_buffer = SIZE_PID + SIZE_CANT_PAG;
+		void * buffer = malloc(tamanio_buffer);
+
+
+			memcpy(buffer + offset, &mensaje->cant_pag, SIZE_CANT_PAG);
+			offset += SIZE_CANT_PAG;
+
+			memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
+			offset += SIZE_PID;
+
+			if (size_final != NULL) {
+				*size_final = tamanio_buffer;
+			}
+
+			return buffer;
+
+
+}
+void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final, size_t tamanio_data){
+	size_t offset = 0;
+		size_t tamanio_buffer = SIZE_PID+ SIZE_NRO_PAG + tamanio_data;
+		void * buffer = malloc(tamanio_buffer);
+
+
+			memcpy(buffer + offset, &mensaje->nro_pag, SIZE_NRO_PAG);
+			offset += SIZE_NRO_PAG;
+
+			memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
+			offset += SIZE_PID;
+
+			memcpy(buffer+offset, mensaje->data, tamanio_data);
+			offset+=tamanio_data;
+			//aca creo que no sería necesario hacer otro desplazamiento porque ya es el final
+			if (size_final != NULL) {
+				*size_final = tamanio_buffer;
+			}
+
+			return buffer;
+
+
+
+}
+void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final){
+	size_t offset = 0;
+	size_t tamanio_buffer = SIZE_PID + SIZE_NRO_PAG;
+	void * buffer = malloc(tamanio_buffer);
+
+
+	memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
+	offset += SIZE_PID;
+
+	memcpy(buffer + offset, &mensaje->nro_pag, SIZE_NRO_PAG);
+	offset += SIZE_NRO_PAG;
+
+
+	//aca creo que no sería necesario hacer otro desplazamiento porque ya es el final
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
+
+	return buffer;
+}
+
+void* serializar_eliminar_proceso(uint32_t pid, size_t* size_final){
+	size_t offset = 0;
+	size_t tamanio_buffer = SIZE_PID;
+	void * buffer = malloc(tamanio_buffer);
+
+	memcpy(buffer + offset, &pid, SIZE_PID);
+	offset += SIZE_PID;
+
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
+
+	return buffer;
+}
+
+void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final){
+	size_t offset = 0;
+	size_t tamanio_buffer = SIZE_PID + SIZE_NRO_PAG;
+	void * buffer = malloc(tamanio_buffer);
+
+
+	memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
+	offset += SIZE_PID;
+
+	memcpy(buffer + offset, &mensaje->nro_pag, SIZE_NRO_PAG);
+	offset += SIZE_NRO_PAG;
+
+
+	//aca creo que no sería necesario hacer otro desplazamiento porque ya es el final
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
+
+	return buffer;
+}
+
+uint32_t deserializar_solicitud_espacio(void* respuesta){
+
+	uint32_t mensaje;
+	memcpy(&mensaje,respuesta,sizeof(uint32_t));
+	return mensaje;
+
+}
+
+uint32_t deserializar_escritura_en_pagina(void* respuesta){
+	uint32_t mensaje;
+		memcpy(&mensaje,respuesta,sizeof(uint32_t));
+		return mensaje;
+
+}
+
+void* deserializar_pedir_pagina(void* respuesta){
+	return respuesta;
+
+}
+
+uint32_t deserializar_eliminar_proceso(void* respuesta){
+	uint32_t mensaje;
+	memcpy(&mensaje,respuesta,sizeof(uint32_t));
+	return mensaje;
+
+}
+
+uint32_t deserializar_liberar_paginas(void* respuesta){
+	uint32_t mensaje;
+	memcpy(&mensaje,respuesta,sizeof(uint32_t));
+	return mensaje;
+
+}
+
+t_pedir_o_liberar_pagina_s* shared_crear_pedir_o_liberar(uint32_t pid, uint32_t nro_pag){
+
+	t_pedir_o_liberar_pagina_s* mensaje = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+	mensaje->pid = pid;
+	mensaje->nro_pag = nro_pag;
+	return mensaje;
+}
+
+t_write_s* shared_crear_write_s(uint32_t nro_pag, uint32_t pid, void* data){
+
+	t_write_s* mensaje = malloc(sizeof(t_write_s));
+	mensaje->nro_pag = nro_pag;
+	mensaje->pid = pid;
+	mensaje->data = data;
+
+	return mensaje;
+
+}
+
+t_mensaje_r_s* shared_crear_t_mensaje_r_s(uint32_t cant_pag, uint32_t pid){
+
+	t_mensaje_r_s* mensaje = malloc(sizeof(t_mensaje_r_s));
+	mensaje->cant_pag = cant_pag;
+	mensaje->pid = pid;
+	return mensaje;
+
+}
 
 
 

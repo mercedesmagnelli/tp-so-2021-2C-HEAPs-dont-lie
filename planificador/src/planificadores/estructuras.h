@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <sys/time.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include <commons/collections/list.h>
 
@@ -37,6 +38,8 @@ typedef struct {
     float estimacion_anterior; // Viene de la LIB
     float estimacion_actual_sjf;
     float estimacion_actual_hrrn;
+
+    bool sera_eliminado_por_deadlock;
 
     t_timestamp timestamp_entrar_exec;
     t_timestamp timestamp_salir_exec;

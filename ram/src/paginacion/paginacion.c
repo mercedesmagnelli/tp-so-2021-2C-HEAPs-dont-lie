@@ -5,29 +5,37 @@
 // FUNCIONES DE INICIO Y DESTRUCCION ADMINISTRATIVAS
 
 void inicializar_estructuras_administrativas() {
+	socket_swap = obtener_socket();
+	inicializar_memoria_principal();
     listaProcesos = list_create();
     listaFrames = list_create();
-    memoria_principal = malloc(get_tamanio_memoria());
+    listaFramesReservados = list_create();
     for(int i=0;i<get_tamanio_pagina();i++){
     	t_frame* frame = malloc(sizeof(t_frame));
+    	frame->nroFrame=i;
     	frame->estado=0;
     	list_add(listaFrames, frame);
     }
+    puntero_global = 0;
     cant_frames_por_proceso = dictionary_create();
-
+    inicializar_tlb();
 }
-
+uint32_t obtener_socket() {
+	return 1;
+}
 void destruir_estructuras_administrativas() {
     list_destroy_and_destroy_elements(listaProcesos, destruir_proceso);
     list_destroy_and_destroy_elements(listaFrames, free);
+    free(memoria_principal);
     //TODO: ver que puede ser que tengamos que llamar a dictionary_destroy_and_destroy_elements
     dictionary_destroy(cant_frames_por_proceso);
-
+    destruir_tlb();
 }
 void destruir_proceso(void* proceso) {
 
     list_destroy_and_destroy_elements(((t_proceso*)proceso)->tabla_paginas, free);
     list_destroy_and_destroy_elements(((t_proceso*)proceso)->lista_hmd, free);
+    list_destroy(((t_proceso*)proceso)->lista_frames_reservados);//no se eliminan los elementos porque son los mismos referenciados en listaFrames que contiene todos los frames de la RAM
     free(proceso);
 
 }
@@ -121,8 +129,13 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	nuevoProceso->PID = PID;
 	nuevoProceso->tabla_paginas = list_create();
 	nuevoProceso->lista_hmd = list_create();
+	nuevoProceso->lista_frames_reservados = list_create();
 	nuevoProceso->hits_proceso = 0;
 	nuevoProceso->miss_proceso = 0;
+	if(get_tipo_asignacion() == FIJA){
+		reservar_frames(nuevoProceso->lista_frames_reservados);
+		nuevoProceso->puntero_frames = 0;
+	}
 	list_add(listaProcesos, nuevoProceso);
 
 
@@ -165,20 +178,22 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, uint32_t size) {
 
 
-	//TODO: Consegui el socket de la conexion SWAMP - RAM
-	uint32_t socket_swamp = 8000;
-
 	uint32_t cantidad_paginas_extras = paginas_extras_para_proceso(pid, size);
-	//TODO: Hay que modificar el tema de serializar en una estructura
-	void* mensaje = serializar_pedido_memoria(pid, cantidad_paginas_extras);
+
+
+	t_mensaje_r_s* mensaje = shared_crear_t_mensaje_r_s(cantidad_paginas_extras, pid);
+
+	size_t tamanio;
+
+	void* mensaje_serializado = serializar_solicitud_espacio(mensaje, &tamanio);
 
 	//semaforo_socket
-	enviar_mensaje_protocolo(socket_swamp,header, 8, mensaje);
+	enviar_mensaje_protocolo(socket_swap,header, tamanio, mensaje_serializado);
 
-	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swamp);
+	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
 	//semaforo_socket
 
-	uint32_t respuesta_final = *(uint32_t*)(respuesta->payload);
+	uint32_t respuesta_final = deserializar_solicitud_espacio(respuesta->payload);
 	t_pagina* nueva_pagina;
 
 	t_proceso* proceso = get_proceso_PID(pid);
@@ -191,7 +206,7 @@ int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, 
 	}
 
 	free(mensaje);
-	return 1;
+	return respuesta_final;
 
 
 
@@ -303,12 +318,12 @@ void consolidar_memoria(uint32_t PID){
 	t_list* tabla_paginas = obtener_tabla_paginas_mediante_PID(PID);
 
 	if(el_ultimo_heap_libera_paginas(ultimo_heap)){
-		liberar_paginas(ultimo_heap, tabla_paginas);
+		liberar_paginas(ultimo_heap, tabla_paginas, PID);
 	}
 
 }
 
-void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp) {
+void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 
 
 	uint32_t cantPagNOBORRAR = ultimo_heap->currAlloc/get_tamanio_pagina();
@@ -324,9 +339,18 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp) {
 	//TODO: tenemos que revisar las paginas eliminadas, si estan en RAM tenemos que actualizar la cantidad de paginas en RAM del proceso
 		list_remove_and_destroy_element(tp, cantPagNOBORRAR, free);
 	}
-	//TODO: avisar a SWAP la eliminacion de las paginas del proceso
 
+	size_t tamanio;
+	t_pedir_o_liberar_pagina_s* mensaje = shared_crear_pedir_o_liberar(pid, cantPagABorrar);
+	void* mensaje_serializado = serializar_liberar_pagina(mensaje, &tamanio);
+	enviar_mensaje_protocolo(socket_swap, R_S_LIBERAR_PAGINA, tamanio, mensaje_serializado);
+	free(mensaje_serializado);
+	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
+	uint32_t err = deserializar_liberar_paginas(respuesta->payload);
 
+    if(err == 0){
+        loggear_error("[RAM] - Hubo un problema en la liberacion de la paginas del proceos %d en swamp", pid);
+    }
 }
 
 t_list* obtener_tabla_paginas_mediante_PID(uint32_t PID){
@@ -421,7 +445,50 @@ void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
 	return dataLeida;
 }
 
-//---------------------------FUNCIONES PRIVADAS DE USO INTERNO---------------------------
+void eliminar_proceso(uint32_t PID){
+	t_proceso* proceso = remover_proceso_PID_lista_procesos(PID);
+
+	liberar_frames_eliminar_proceso(proceso);
+
+	comunicar_eliminacion_proceso_SWAP(PID);
+
+	destruir_proceso(proceso);
+
+}
+
+void suspender_proceso(uint32_t PID){
+	t_proceso* proceso = get_proceso_PID(PID);
+
+	t_pagina* paginaIterada;
+	t_frame* frameLiberar;
+	void* data;
+
+	for(int i=0; i<list_size(proceso->tabla_paginas); i++){
+		paginaIterada = list_get(proceso->tabla_paginas,i);
+
+		if(paginaIterada->bit_presencia){
+			frameLiberar = list_get(listaFrames, paginaIterada->frame);
+			frameLiberar->estado=0;
+			if(paginaIterada->bit_modificacion){
+				data = malloc(get_tamanio_pagina());
+				leer_directamente_de_memoria(data, get_tamanio_pagina(), paginaIterada->frame * get_tamanio_pagina());
+				enviar_pagina_a_SWAP(PID, i, data);
+				free(data);
+			}
+		}
+
+	}
+
+	if (get_tipo_asignacion() == FIJA){
+		eliminar_frames_reservados(proceso);
+	}
+}
+
+
+
+
+
+//----------------------------------FUNCIONES PRIVADAS DE USO INTERNO----------------------------------
 
 uint32_t calcular_pagina_de_puntero_logico(uint32_t puntero){
 
@@ -550,13 +617,16 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 		actualizar_datos_TLB(PID, nroPag);
 		marco = obtener_frame_de_tlb(PID, nroPag);
 		actualizar_datos_pagina(PID, nroPag, bitModificado, 1);
+		loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
 	}else{
+		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
 		if(esta_en_RAM(PID, nroPag)){
 			marco = obtener_frame_de_RAM(PID, nroPag);
 			actualizar_datos_pagina(PID, nroPag, bitModificado, 0);
 		}else{
 			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima. Tmbn tiene que actualizar la cant de Pags en asig FIJA
 			inicializar_datos_pagina(PID, nroPag, marco, bitModificado);//podriamos poner esta funcion dentro de obtener fram asi tmbn se encarga de modificar lo administrativo dsps del cambio de pags?
+			loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
 		}
 		agregar_entrada_tlb(PID, nroPag, marco);
 	}
@@ -657,3 +727,75 @@ int calcular_paginas_para_tamanio(uint32_t tam) {
 		return cantPags;
 }
 
+void reservar_frames(t_list* lista_frames_proceso){
+
+	bool frame_disponible_y_no_repetidos_en_lista(void* element){
+		return frame_disponible(element)&&frame_no_pertenece_a_lista(listaFramesReservados, element);
+	}
+
+	for(int i=0; i<get_marcos_maximos();i++){
+		t_frame* frame = (t_frame*)list_find(listaFrames, frame_disponible_y_no_repetidos_en_lista);
+		list_add(lista_frames_proceso, frame);
+		list_add(listaFramesReservados, frame);
+	}
+}
+
+bool frame_no_pertenece_a_lista(t_list* lista_frames, void* elementoBuscado){
+
+	t_frame* frame = (t_frame*) elementoBuscado;
+
+	bool frame_es_elemento(void* elemento){
+		t_frame* frameIterado = (t_frame*) elemento;
+		return frame->nroFrame == frameIterado->nroFrame;
+	}
+
+	return !list_any_satisfy(lista_frames, frame_es_elemento);
+}
+
+
+t_proceso* remover_proceso_PID_lista_procesos(uint32_t PID){
+	bool proceso_PID(void* element) {
+		t_proceso* proceso = (t_proceso*) element;
+		return proceso->PID == PID;
+	}
+
+	t_proceso* procesoRemovido = list_remove_by_condition(listaProcesos, proceso_PID);
+	return procesoRemovido;
+}
+
+void liberar_frames_eliminar_proceso(t_proceso* proceso){
+
+	t_pagina* paginaIterada;
+	t_frame* frameLiberar;
+
+	for(int i=0; i<list_size(proceso->tabla_paginas); i++){
+		paginaIterada = list_get(proceso->tabla_paginas,i);
+
+		if(paginaIterada->bit_presencia){
+			frameLiberar = list_get(listaFrames, paginaIterada->frame);
+			frameLiberar->estado=0;
+		}
+
+	}
+
+	if (get_tipo_asignacion() == FIJA){
+		eliminar_frames_reservados(proceso);
+	}
+
+}
+
+void eliminar_frames_reservados(t_proceso* proceso){
+
+	t_frame* frame;
+
+	for(int i=0; i<list_size(proceso->lista_frames_reservados); i++){
+		frame = list_get(proceso->lista_frames_reservados,i);
+
+		bool frame_numero(void* element) {
+			t_frame* frameListaReservada = (t_frame*) element;
+			return frameListaReservada->nroFrame == frame->nroFrame;
+		}
+
+		list_remove_by_condition(listaFramesReservados, frame_numero);
+	}
+}

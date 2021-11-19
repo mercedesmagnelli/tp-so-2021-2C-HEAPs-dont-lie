@@ -12,12 +12,6 @@ int mate_init(mate_instance *lib_ref, char *config) {
 	if(error != 0){//hubo un error al leer el archivo
 		return -2;
 	}
-	printf("IP: %s \n", metadata->ip);
-	printf("PORT: %d \n", metadata->port);
-	printf("LOG_ROUTE: %s \n", metadata->log_route);
-	printf("LOG_APP_NAME: %s \n", metadata->log_app_name);
-	printf("LOG_IN_CONSOLE: %d \n", metadata->log_in_console);
-	printf("LO_LEVEL_INFO: %d \n", metadata->log_level_info);
 
 	lib_ref->group_info = metadata;
 

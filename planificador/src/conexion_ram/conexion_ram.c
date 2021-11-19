@@ -171,17 +171,16 @@ t_ram_respuesta * ram_enviar_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 	return respuesta;
 }
 
-int ram_enviar_proceso_suspendido(uint32_t pid) {
-	loggear_info("[PID: %zu] - Se avisa a la RAM la suspension del proceso", pid);
 
+int ram_enviar_cambio_estado_proceso(uint32_t pid, t_header estado) {
 	uint32_t * pid_m = malloc(sizeof(uint32_t));
 	*pid_m = pid;
 
-	t_prot_mensaje * respuesta_ram = ram_enviar_mensaje(SUSPENDER_PROCESO_R_P, pid_m, sizeof(uint32_t));
+	t_prot_mensaje * respuesta_ram = ram_enviar_mensaje(estado, pid_m, sizeof(uint32_t));
 
 	int error = 0;
 	if (respuesta_ram->head != EXITO_EN_LA_TAREA) {
-		loggear_error("[PID: %zu] - La ram no devolvio exito en la tarea", pid);
+		loggear_error("[PID: %zu] - La ram no devolvio exito en el cambio de estado", pid);
 		error = 1;
 	}
 
@@ -189,6 +188,18 @@ int ram_enviar_proceso_suspendido(uint32_t pid) {
 	free(respuesta_ram);
 
 	return error;
+}
+
+int ram_enviar_proceso_suspendido(uint32_t pid) {
+	loggear_info("[PID: %zu] - Se avisa a la RAM la suspension del proceso", pid);
+
+	return ram_enviar_cambio_estado_proceso(pid, SUSPENDER_PROCESO);
+}
+
+int ram_enviar_proceso_ready(uint32_t pid) {
+	loggear_info("[PID: %zu] - Se avisa a la RAM que el proceso se movio a ready", pid);
+
+	return ram_enviar_cambio_estado_proceso(pid, PROCESO_EN_READY);
 }
 
 // Publica

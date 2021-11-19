@@ -33,12 +33,12 @@ typedef enum {
 
 	// Ram => Filesystem
 	HANDSHAKE_R_F,
-	R_S_TRAER_PAGINA, // Mandamos pid_pedido y pag_pedida a traer a la RAM
-	R_S_ELIMINAR_PAGINA, // Mandamos pid y pag a eliminar en SWAP
-	R_S_LIBERAR_PROCESO, // Mandamos pid de proceso a eliminar
-	R_S_SWAP_PAG, //Mandamos pid y pag a guardar en SWAP y enviamos pid_pedido y pag_pedida a traer a la RAM
-	R_S_ESPACIO_PROCESO_NUEVO, //mandamos pid y size para consultar espacio para un proceso nuevo
-	R_S_ESPACIO_PROCESO_EXISTENTE, //idem arriba pero proceso ya existente
+	R_S_PROCESO_NUEVO, //Un proceso nuevo solicita espacio a la SWAP para su almacenamiento. 				pid, cant_pags
+	R_S_PROCESO_EXISTENTE, //Un proceso solicita mas espacio a la SWAP. 									pid, cant_pags
+	R_S_ESCRIBIR_EN_PAGINA, //Un proceso solicita escribir en su pagina, siempre se manda pagina completa. 	pid, nro_pag, data
+	R_S_PEDIR_PAGINA, //Un proceso solicita su pagina a SWAP												pid, nro_pag
+	R_S_ELIMINAR_PROCESO, //Un proceso es eliminado de SWAP													pid
+	R_S_LIBERAR_PAGINA, //Un proceso libera sus ultima N paginas											pid, cant_pags
 
 	// Filesystem => Ram
 	HANDSHAKE_F_R,
@@ -50,12 +50,6 @@ typedef enum {
 
 	// Ram => Planificador
 	HANDSHAKE_R_P,
-
-	DESCONEXION_RAM,
-	RESPUESTA_OK_R_D,
-
-	// Planificador => Ram
-	HANDSHAKE_P_R,
 	ALLOC_SUC_R_P,
 	ALLOC_ERR_R_P,
 	FREE_SUC_R_P,
@@ -64,13 +58,24 @@ typedef enum {
 	READ_SUC_R_P,
 	WRITE_SUC_R_P,
 	WRITE_ERR_R_P,
-	SUSPENDER_PROCESO_R_P,
+	CLOSE_SUC_R_P,
+	CLOSE_ERR_R_P,
+	SUSPEN_SUC_R_P,
+	SUSPEN_ERR_R_P,
+
+	DESCONEXION_RAM,
+	RESPUESTA_OK_R_D,
+
+	// Planificador => Ram
+	HANDSHAKE_P_R,
+	SUSPENDER_PROCESO,
+	PROCESO_EN_READY,
 
 	// Mensajes genericos
 	EXITO_EN_LA_TAREA,
 	FALLO_EN_LA_TAREA,
 	FALLO_EN_LA_RAM, // Se usa cuando tanto el Kernel como la Ram tienen que hacer algo, lo retorna la ram si falla (ejemplo: MATELIB_CLOSE de un proceso)
-
+	EXITO_PROCESO_ELIMINADO, // Se elimino el proceso por deadlock
 
 	// Pruebas
 	CACHO_DE_TEXTO

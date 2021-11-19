@@ -16,7 +16,7 @@ typedef enum {
 } t_tipo_asignacion;
 
 typedef enum {
-	CLOCKM
+	CLOCKM,
 } t_algoritmo_reemplazo_mmu;
 
 typedef enum {

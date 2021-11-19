@@ -19,18 +19,19 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 		case HANDSHAKE_P_R:
 			enviar_mensaje_protocolo(mensaje->socket, HANDSHAKE_R_P, 0, NULL);
 
-			loggear_info("Llego un handshake de la ram, devolvemos el saludo");
+			loggear_info("Llego un handshake del planificador, devolvemos el saludo");
 
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 
 			return 0;
 		case HANDSHAKE_F_R:
-			enviar_mensaje_protocolo(mensaje->socket, HANDSHAKE_R_F, 0, NULL);
-
+			//enviar_mensaje_protocolo(mensaje->socket, HANDSHAKE_R_F, 0, NULL);
+			//acá debería guardar el socket de la swamp??
+			socket_swap = mensaje->socket;
 			loggear_info("Llego un handshake del filesystem, devolvemos el saludo");
 
-			desconexion(mensaje);
+			//desconexion(mensaje);
 			destruir_mensaje(mensaje);
 
 			return 0;
@@ -44,11 +45,25 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			return 0;
 		case MATELIB_CLOSE:
 			loggear_info("[MATELIB_CLOSE], hay que cerrar el proceso");
+			//Nos mandan un uint32_t PID para eliminar el proceso
 
-			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			uint32_t PID_a_liberar=0;
+
+			int32_t rtaClose = close_PID(PID_a_liberar);
+			uint32_t headerC;
+
+			if(rtaClose){
+				loggear_info("[MATELIB_CLOSE], proceso %d fue eliminado de memoria", PID_a_liberar);
+				headerC = EXITO_EN_LA_TAREA;
+			}else{
+				loggear_info("[MATELIB_CLOSE], proceso %d NO fue eliminado de memoria", PID_a_liberar);
+				headerC = FALLO_EN_LA_TAREA;
+			}
+
+			enviar_mensaje_protocolo(mensaje->socket, headerC, 0, NULL);
+
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
-
 			return 0;
 		case MATELIB_SEM_INIT:
 			loggear_info("[MATELIB_SEM_INIT], se crea un semaforo");
@@ -98,11 +113,13 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			if(ptroAlloc>=0){
 				loggear_info("[MATELIB_MEM_ALLOC], proceso %d se le asigna espacio solicitado", alloc->pid);
-				enviar_mensaje_protocolo(mensaje->socket, ALLOC_SUC_R_P, 4, &ptroAlloc);
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 4, &ptroAlloc);
 			}else{
 				loggear_info("[MATELIB_MEM_ALLOC], proceso %d NO se le asigna espacio solicitado", alloc->pid);
-				enviar_mensaje_protocolo(mensaje->socket, ALLOC_ERR_R_P, 0, NULL);
+				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
+
+			free(alloc);
 
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
@@ -111,21 +128,22 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 		case MATELIB_MEM_FREE:
 			loggear_info("[MATELIB_MEM_FREE], un proceso libera memoria de la RAM");
 
-			t_matelib_memoria_free* free = deserializar_memoria_free(mensaje->payload);
-			int32_t free_memoria_mate_pointer = 0;
+			t_matelib_memoria_free* free1 = deserializar_memoria_free(mensaje->payload);
 
-			int32_t rtaFree = memfree(free_memoria_mate_pointer, free->pid);
+			int32_t rtaFree = memfree(free1->memoria_mate_pointer, free1->pid);
 			uint32_t headerF;
 
 			if(rtaFree>=0){
-				loggear_info("[MATELIB_MEM_FREE], proceso %d se libero el espacio seleccionado", free->pid);
-				headerF = FREE_SUC_R_P;
+				loggear_info("[MATELIB_MEM_FREE], proceso %d se libero el espacio seleccionado", free1->pid);
+				headerF = EXITO_EN_LA_TAREA;
 			}else{
-				loggear_info("[MATELIB_MEM_FREE], proceso %d NO se libero el espacio seleccionado", free->pid);
-				headerF = FREE_ERR_R_P;
+				loggear_info("[MATELIB_MEM_FREE], proceso %d NO se libero el espacio seleccionado", free1->pid);
+				headerF = FALLO_EN_LA_TAREA;
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerF, 0, NULL);
+
+			free(free1);
 
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
@@ -140,12 +158,18 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			int32_t rtaRead = memread(read->memoria_mate_pointer, read->pid, read->memoria_size, ptroLectura);
 
 			if(rtaRead>=0){
+				t_ram_read* estructuraRead = shared_crear_ram_read(rtaRead, ptroLectura);
+				size_t* tamanioBuffer = malloc(sizeof(size_t));
+				void* readSerializado = serializar_ram_read(estructuraRead, tamanioBuffer);
 				loggear_info("[MATELIB_MEM_READ], proceso %d pudo leer el espacio seleccionado", read->pid);
-				enviar_mensaje_protocolo(mensaje->socket, READ_SUC_R_P, read->memoria_size, ptroLectura);
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, *tamanioBuffer, readSerializado);
+				free(readSerializado);
 			}else{
 				loggear_info("[MATELIB_MEM_READ], proceso %d NO pudo leer el espacio seleccionado", read->pid);
-				enviar_mensaje_protocolo(mensaje->socket, READ_ERR_R_P, 0, NULL);
+				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
+
+			free(ptroLectura);
 
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
@@ -159,15 +183,48 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			int32_t rtaWrite = memwrite(write_memoria_write, escritura->memoria_mate_pointer, escritura->pid, escritura->memoria_size);
 			uint32_t headerW;
+
 			if(rtaWrite>=0){
 				loggear_info("[MATELIB_MEM_WRITE], proceso %d pudo escribir en el espacio seleccionado", escritura->pid);
-				headerW = WRITE_SUC_R_P;
+				headerW = EXITO_EN_LA_TAREA;
 			}else{
 				loggear_info("[MATELIB_MEM_WRITE], proceso %d NO pudo escribir el espacio seleccionado", escritura->pid);
-				headerW=WRITE_ERR_R_P;
+				headerW = FALLO_EN_LA_TAREA;
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerW, 0, NULL);
+
+			free(escritura);
+
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+			return 0;
+		case SUSPENDER_PROCESO:
+			loggear_info("[SUSPENDER_PROCESO], hay que cerrar el proceso");
+			//Nos mandan un uint32_t PID para eliminar el proceso
+
+			uint32_t PID_a_suspender=0;
+
+			int32_t rtaSuspender = suspender_PID(PID_a_suspender);
+			uint32_t header;
+
+			if(rtaSuspender){
+				loggear_info("[SUSPENDER_PROCESO], proceso %d fue suspendido", PID_a_suspender);
+				header = EXITO_EN_LA_TAREA;
+			}else{
+				loggear_info("[SUSPENDER_PROCESO], proceso %d NO fue suspendido", PID_a_suspender);
+				header = FALLO_EN_LA_TAREA;
+			}
+
+			enviar_mensaje_protocolo(mensaje->socket, header, 0, NULL);
+
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+			return 0;
+		case PROCESO_EN_READY:
+			loggear_error("[PROCESO_EN_READY] - ''''TODO: CODE THIS'''' Se movio a ready un proceso");
+
+
 
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);

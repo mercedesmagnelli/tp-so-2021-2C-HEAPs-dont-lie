@@ -9,7 +9,7 @@
 #include "../../shared/protocolo.h"
 #include "memoria/memoria.h"
 #include "conexion_planificador/conexion_planificador.h"
-
+#include "manejo_signals/manejo_signals.h"
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <string.h>

@@ -46,6 +46,8 @@ t_ram_respuesta * ram_enviar_init(t_matelib_nuevo_proceso * nuevo_proceso);
 
 int ram_enviar_proceso_suspendido(uint32_t pid);
 
+int ram_enviar_proceso_ready(uint32_t pid);
+
 /**
  * @NAME: ram_cerrar_conexiones
  * @DESC: Cierra los hilos y libera toda la memoria ocupada
