@@ -127,12 +127,13 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
 void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 
+	//FIXME: puede que acá haya que traer a memoria???
 
 	heap_metadata* heap = get_HEAP(PID,ptro);
 	int nextNextAlloc = heap->nextAlloc;
 	heap->nextAlloc = ptro+tamanio;
 	heap->isFree = 0;
-	//guardar_HEAP_en_memoria(PID, heap);
+	guardar_HEAP_en_memoria(PID, heap);
 
 
 	heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
@@ -141,14 +142,14 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	nuevoHeap->nextAlloc = nextNextAlloc;
 	nuevoHeap->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeap);
-	//guardar_HEAP_en_memoria(PID, nuevoHeap);
+	guardar_HEAP_en_memoria(PID, nuevoHeap);
 
 	//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
 	if(nuevoHeap->nextAlloc != -1){
 
 		heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
 		heapSig->prevAlloc = nuevoHeap->currAlloc;
-		//guardar_HEAP_en_memoria(PID, heapSig);
+		guardar_HEAP_en_memoria(PID, heapSig);
 	}
 }
 
@@ -199,7 +200,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 
 	agregar_HEAP_a_PID(PID,nuevoHeapPrimero);
 
-	//guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
+	guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
 
 
 
@@ -209,7 +210,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	nuevoHeapUltimo->nextAlloc = -1;
 	nuevoHeapUltimo->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeapUltimo);
-	//guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
+	guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
 
 
 
@@ -281,6 +282,7 @@ bool ptro_valido(uint32_t PID, uint32_t ptro) {
 
 	bool condition(void* heap) {
 		heap_metadata* heap_md = (heap_metadata*) heap;
+		leer_heap(heap, PID);
 		return (heap_md->currAlloc + 9) == ptro;
 	}
 	return list_any_satisfy(lista_heaps,condition);
@@ -288,6 +290,7 @@ bool ptro_valido(uint32_t PID, uint32_t ptro) {
 
 uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t PID){
 	heap_metadata* heap = get_HEAP(PID, direccionLogicaALeer);
+	leer_heap(heap, PID);
     return espacio_de_HEAP(heap);
 }
 
@@ -307,6 +310,7 @@ bool ptro_liberado(uint32_t PID, uint32_t ptro){
 
 	bool condicion(void* heap_i) {
 		heap_metadata* heap = (heap_metadata*) heap_i;
+		leer_heap(heap, PID);
 		return (heap->currAlloc + 9) == ptro;
 	}
 
@@ -423,8 +427,13 @@ void modificar_heaps(t_list* heaps, uint32_t indice, uint32_t pid, uint32_t cant
 	}
 
 
-	//guardar_HEAP_en_memoria(pid, heap_inicial);
-	//guardar_HEAP_en_memoria(pid, heap_final);//verificar que  heap_inicial != -1 para hacer esto
+	guardar_HEAP_en_memoria(pid, heap_inicial);
+
+	//TODO: esto esta bien??
+	if(heap_final->nextAlloc == -1) {
+		guardar_HEAP_en_memoria(pid, heap_final);//verificar que  heap_inicial != -1 para hacer esto
+	}
+
 
 
 
