@@ -730,6 +730,7 @@ uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
 
 void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant){
 	char* keyProceso = calcular_hash_key_dic(PID);
+	pthread_mutex_lock(&mutex_acceso_diccionario);
 	asignacion_marcos_fijos* asigFija = (asignacion_marcos_fijos*) dictionary_get(cant_frames_por_proceso , keyProceso);
 	if(modCant>0){
 		if(MIN(asigFija->en_mp, get_marcos_maximos())<get_marcos_maximos()){
@@ -738,6 +739,7 @@ void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant){
 	}else{
 		asigFija->en_mp=-1;
 	}
+	pthread_mutex_unlock(&mutex_acceso_diccionario);
 }
 
 char* calcular_hash_key_dic(uint32_t proceso) {
