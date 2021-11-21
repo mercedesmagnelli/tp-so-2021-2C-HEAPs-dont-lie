@@ -28,6 +28,8 @@ void inicializar_semafotos() {
 	pthread_mutex_init(&mutex_acceso_lista_frames, NULL);
 	pthread_mutex_init(&mutex_enviar_mensaje_swap, NULL);
 	pthread_mutex_init(&mutex_acceso_memoria, NULL);
+	pthread_mutex_init(&mutex_acceso_lista_frames_r, NULL);
+	pthread_mutex_init(&mutex_acceso_diccionario, NULL);
 }
 
 void destruir_estructuras_administrativas() {
@@ -43,6 +45,8 @@ void destruir_semaforos() {
 		pthread_mutex_destroy(&mutex_acceso_lista_frames);
 		pthread_mutex_destroy(&mutex_enviar_mensaje_swap);
 		pthread_mutex_destroy(&mutex_acceso_memoria);
+		pthread_mutex_destroy(&mutex_acceso_lista_frames_r);
+		pthread_mutex_destroy(&mutex_acceso_diccionario);
 }
 void destruir_proceso(void* proceso) {
 
@@ -753,17 +757,20 @@ int calcular_paginas_para_tamanio(uint32_t tam) {
 void reservar_frames(t_list* lista_frames_proceso){
 
 	bool frame_disponible_y_no_repetidos_en_lista(void* element){
-		return frame_disponible(element)&&frame_no_pertenece_a_lista(listaFramesReservados, element);
+
+		return frame_disponible(element) && frame_no_pertenece_a_lista(listaFramesReservados, element);
 	}
 
 	for(int i=0; i<get_marcos_maximos();i++){
+		pthread_mutex_lock(&mutex_acceso_lista_frames_r);
 		pthread_mutex_lock(&mutex_acceso_lista_frames);
 		t_frame* frame = (t_frame*)list_find(listaFrames, frame_disponible_y_no_repetidos_en_lista);
 		pthread_mutex_unlock(&mutex_acceso_lista_frames);
+
 		list_add(lista_frames_proceso, frame);
-		//TODO: falta sincronizar
 		list_add(listaFramesReservados, frame);
 
+		pthread_mutex_unlock(&mutex_acceso_lista_frames_r);
 	}
 }
 
@@ -824,7 +831,8 @@ void eliminar_frames_reservados(t_proceso* proceso){
 			t_frame* frameListaReservada = (t_frame*) element;
 			return frameListaReservada->nroFrame == frame->nroFrame;
 		}
-
+		pthread_mutex_lock(&mutex_acceso_lista_frames_r);
 		list_remove_by_condition(listaFramesReservados, frame_numero);
+		pthread_mutex_unlock(&mutex_acceso_lista_frames_r);
 	}
 }

@@ -83,12 +83,18 @@ int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir,uint32_t
 }
 
 void leer_directamente_de_memoria(void* ptroLectura, int32_t tamanio, uint32_t direccionLogica){
+	//TODO: CREO QUE NO VA
+	//pthread_mutex_lock(&mutex_acceso_memoria);
 	memcpy(ptroLectura, memoria_principal + direccionLogica, tamanio);
+	//pthread_mutex_unlock(&mutex_acceso_memoria);
 
 }
 
 void escribir_directamente_en_memoria(void* valorAEscribir, int32_t tamanio, uint32_t direccionLogica){
+	//TODO: CREO QUE NO VA
+	//pthread_mutex_lock(&mutex_acceso_memoria);
 	memcpy(memoria_principal + direccionLogica, valorAEscribir, tamanio);
+	//pthread_mutex_unlock(&mutex_acceso_memoria);
 
 }
 

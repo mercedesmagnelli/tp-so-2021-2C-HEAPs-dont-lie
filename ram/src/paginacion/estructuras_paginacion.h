@@ -13,6 +13,8 @@ uint32_t puntero_global;
 
 pthread_mutex_t mutex_acceso_memoria;
 pthread_mutex_t mutex_acceso_lista_frames;
+pthread_mutex_t mutex_acceso_lista_frames_r;
+pthread_mutex_t mutex_acceso_diccionario;
 pthread_mutex_t mutex_enviar_mensaje_swap;
 
 typedef struct{
