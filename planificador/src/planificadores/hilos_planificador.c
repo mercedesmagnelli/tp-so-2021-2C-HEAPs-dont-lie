@@ -46,7 +46,6 @@ void hilos_planificador_destruir() {
 		t_hilos_semaforo * hilo = (t_hilos_semaforo *) sem;
 
 		sem_destroy(&hilo->sem_ejecutar);
-		sem_destroy(&hilo->sem_finalizo);
 		if (hilo->mensaje != NULL) {
 			free(hilo->mensaje);
 		}
@@ -88,8 +87,8 @@ void hilos_agregar_nuevo_hilo(uint32_t pid) {
 	t_hilos_semaforo * hilo_semaforo = malloc(sizeof(t_hilos_semaforo));
 
 	sem_init(&hilo_semaforo->sem_ejecutar, 0, 0);
-	sem_init(&hilo_semaforo->sem_finalizo, 0, 0);
 	hilo_semaforo->mensaje = NULL;
+	hilo_semaforo->finalizo = false;
 
 	dictionary_put(dict_hilos, hilos_get_key(pid), hilo_semaforo);
 }
@@ -100,10 +99,26 @@ void hilos_post_ejecucion(uint32_t pid) {
 	sem_post(&hilo_semaforo->sem_ejecutar);
 }
 
+void hilos_se_movio_finalizado(uint32_t pid) {
+	t_hilos_semaforo * hilo_semaforo = dictionary_get(dict_hilos, hilos_get_key(pid));
+
+	hilo_semaforo->finalizo = true;
+
+	sem_post(&hilo_semaforo->sem_ejecutar);
+}
+
 void hilos_wait_ejecucion(uint32_t pid) {
 	t_hilos_semaforo * hilo_semaforo = dictionary_get(dict_hilos, hilos_get_key(pid));
 
 	sem_wait(&hilo_semaforo->sem_ejecutar);
+}
+
+bool hilos_check_finalizo_proceso(uint32_t pid) {
+	t_hilos_semaforo * hilo_semaforo = dictionary_get(dict_hilos, hilos_get_key(pid));
+
+	sem_wait(&hilo_semaforo->sem_ejecutar);
+
+	return hilo_semaforo->finalizo;
 }
 
 void hilos_destruir_hilo_actual() {

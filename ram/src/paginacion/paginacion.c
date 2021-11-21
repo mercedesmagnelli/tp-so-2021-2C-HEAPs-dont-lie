@@ -79,11 +79,17 @@ void iniciar_proceso_RAM(uint32_t PID){
 	nuevoProceso->lista_frames_reservados = list_create();
 	nuevoProceso->hits_proceso = 0;
 	nuevoProceso->miss_proceso = 0;
-	/*if(get_tipo_asignacion() == FIJA){
-		reservar_frames(nuevoProceso->lista_frames_reservados);
-		nuevoProceso->puntero_frames = 0;
-	}*/
 	list_add(listaProcesos, nuevoProceso);
+}
+
+void alistar_proceso(uint32_t PID){
+
+	t_proceso* proceso = get_proceso_PID(PID);
+
+	if(get_tipo_asignacion() == FIJA){
+		reservar_frames(proceso->lista_frames_reservados);
+		proceso->puntero_frames = 0;
+	}
 }
 
 

@@ -27,6 +27,12 @@ void* memoria_principal;
 uint32_t inicializar_proceso(uint32_t PID);
 
 /**
+ * @NAME: PID_listo
+ * @DESC: El proceso reserva frames en caso de estar en asig FIJA
+ **/
+uint32_t PID_listo(uint32_t PID);
+
+/**
  * @NAME: memalloc
  * @DESC: Asigna un espacio dentro de la memoria principal. Si tiene que generar un espacio, lo hace al final de la
  * lista de direcciones. Si usa un espacio entre lugares ocupados y sobra, genera dos divisiones: la ocupada y la del espacio estante.

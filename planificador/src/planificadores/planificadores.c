@@ -16,6 +16,8 @@ void planificador_largo_plazo() {
 			hilo = colas_mover_new_ready();
 			loggear_debug("[PID: %d] --- [Largo Plazo] --- Se movió de NEW a READY", pid(hilo));
 		}
+
+		 ram_enviar_proceso_ready(pid(hilo));
 	}
 }
 
@@ -68,6 +70,9 @@ void planificador_destruir_de_hilos() {
 
 		t_hilo * hilo = colas_obtener_finalizado();
 
+		hilos_se_movio_finalizado(hilo->pid); // TODO: La estructura para manejar esto hay que borrarla luego de responder
+		// TODO: Podria haber un WAIT a que se enviara el mensaje
+
 		loggear_debug("[PID: %d] --- [Destructor] --- Se eliminara el hilo", pid(hilo));
 
 		loggear_error("[Destructor] TODO: Codear, eliminar semaforos ocupados y recursos consumiendo (tal vez, cancelar hilo IO) ");
@@ -117,9 +122,7 @@ int planificadores_proceso_cerrar(uint32_t ppid) {
 
 	t_hilo * hilo = colas_mover_exec_finish(ppid);
 
-	hilos_post_finalizado();
-
-	loggear_debug("[PID: %d] --- [SYSTEM] --- Se movió a NEW", pid(hilo));
+	loggear_debug("[PID: %d] --- [SYSTEM] --- Se movió a FINISH", pid(hilo));
 
     return 0;
 }

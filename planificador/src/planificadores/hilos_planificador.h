@@ -7,6 +7,7 @@
 #include <semaphore.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include <commons/string.h>
 #include <commons/collections/dictionary.h>
@@ -16,7 +17,7 @@
 
 typedef struct {
 	sem_t sem_ejecutar;
-	sem_t sem_finalizo;
+	bool finalizo;
 
 	void * mensaje;
 } t_hilos_semaforo;
@@ -54,10 +55,22 @@ void hilos_agregar_nuevo_hilo(uint32_t pid);
 void hilos_post_ejecucion(uint32_t pid);
 
 /**
+ * @NAME: hilos_se_movio_finalizado
+ * @DESC: Marca el hilo como que esta finalizado por DEADLOCK y hace el post para avisar que puede continuar ejecucion
+ */
+void hilos_se_movio_finalizado(uint32_t pid);
+
+/**
  * @NAME: hilos_wait_ejecucion
  * @DESC: HAce un wait en el semaforo del hilo para esperar que entre en ejecucion
  */
 void hilos_wait_ejecucion(uint32_t pid);
+
+/**
+ * @NAME: hilos_check_finalizo_proceso
+ * @DESC: Hace un wait en el semaforo del hilo para esperar a que se pueda ejecutar y retorna si finalizo o no
+ */
+bool hilos_check_finalizo_proceso(uint32_t pid);
 
 /**
  * @NAME: hilos_destruir_hilo_actual

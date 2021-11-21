@@ -37,8 +37,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, 0, NULL);
 			}
 
-			destruir_mensaje(mensaje);
 			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_CLOSE:
@@ -59,8 +59,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
-			destruir_mensaje(mensaje);
 			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_SEM_INIT:
@@ -77,8 +77,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
-			destruir_mensaje(mensaje);
 			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_SEM_WAIT:
@@ -94,17 +94,20 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			} else if (ejecucion_semaforo == SEM_BLOQUEAR) {
 				loggear_info("[PID: %zu] - [Mensaje] - WAIT hay que bloquear el hilo", semaforo->pid);
 
-				hilos_wait_ejecucion(semaforo->pid); // ESPERAMOS A QUE ENTRE EN EJECUCION
-
-				loggear_info("[PID: %zu] - [Mensaje] - WAIT termino el bloqueo del hilo", semaforo->pid);
-				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+				if (hilos_check_finalizo_proceso(semaforo->pid)) {
+					loggear_info("[PID: %zu] - [Mensaje] - WAIT se elimino el hilo por deadlock", semaforo->pid);
+					enviar_mensaje_protocolo(mensaje->socket, EXITO_PROCESO_ELIMINADO, 0, NULL);
+				} else {
+					loggear_info("[PID: %zu] - [Mensaje] - WAIT termino el bloqueo del hilo", semaforo->pid);
+					enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+				}
 			} else {
 				loggear_error("[PID: %zu] - [Mensaje] - No se pudo crear el semaforo", semaforo->pid);
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
-			destruir_mensaje(mensaje);
 			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_SEM_POST:
@@ -122,8 +125,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
-			destruir_mensaje(mensaje);
 			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_SEM_DESTROY:
@@ -140,8 +143,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
-			destruir_mensaje(mensaje);
 			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_CALL_IO:
@@ -164,8 +167,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			loggear_info("[PID: %zu] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo", io->pid);
 			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 
-			destruir_mensaje(mensaje);
 			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_MEM_ALLOC:
@@ -184,8 +187,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			free(respuesta_ram->mensaje);
 			free(respuesta_ram);
 
-			destruir_mensaje(mensaje);
 			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_MEM_FREE:
@@ -203,8 +206,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			free(respuesta_ram);
 
-			destruir_mensaje(mensaje);
 			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_MEM_READ:
@@ -223,8 +226,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			free(respuesta_ram->mensaje);
 			free(respuesta_ram);
 
-			destruir_mensaje(mensaje);
 			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case MATELIB_MEM_WRITE:
@@ -242,8 +245,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			free(respuesta_ram);
 
-			destruir_mensaje(mensaje);
 			desconexion(mensaje);
+			destruir_mensaje(mensaje);
 
 			return 0;
 		case DESCONEXION:
