@@ -24,7 +24,7 @@ void* memoria_principal;
  *   -43    espacio en SWAP insuficiente
  *   -47	el proceso ya existia
  */
-int inicializar_proceso(uint32_t PID);
+uint32_t inicializar_proceso(uint32_t PID);
 
 /**
  * @NAME: memalloc

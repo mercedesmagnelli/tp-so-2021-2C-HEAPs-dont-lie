@@ -418,21 +418,6 @@ void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_
 	return buffer;
 }
 
-void* serializar_eliminar_proceso(uint32_t pid, size_t* size_final){
-	size_t offset = 0;
-	size_t tamanio_buffer = SIZE_PID;
-	void * buffer = malloc(tamanio_buffer);
-
-	memcpy(buffer + offset, &pid, SIZE_PID);
-	offset += SIZE_PID;
-
-	if (size_final != NULL) {
-		*size_final = tamanio_buffer;
-	}
-
-	return buffer;
-}
-
 void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final){
 	size_t offset = 0;
 	size_t tamanio_buffer = SIZE_PID + SIZE_NRO_PAG;
@@ -454,39 +439,17 @@ void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* siz
 	return buffer;
 }
 
-uint32_t deserializar_solicitud_espacio(void* respuesta){
 
-	uint32_t mensaje;
-	memcpy(&mensaje,respuesta,sizeof(uint32_t));
-	return mensaje;
 
-}
 
-uint32_t deserializar_escritura_en_pagina(void* respuesta){
-	uint32_t mensaje;
-		memcpy(&mensaje,respuesta,sizeof(uint32_t));
-		return mensaje;
 
-}
 
 void* deserializar_pedir_pagina(void* respuesta){
 	return respuesta;
 
 }
 
-uint32_t deserializar_eliminar_proceso(void* respuesta){
-	uint32_t mensaje;
-	memcpy(&mensaje,respuesta,sizeof(uint32_t));
-	return mensaje;
 
-}
-
-uint32_t deserializar_liberar_paginas(void* respuesta){
-	uint32_t mensaje;
-	memcpy(&mensaje,respuesta,sizeof(uint32_t));
-	return mensaje;
-
-}
 
 t_pedir_o_liberar_pagina_s* shared_crear_pedir_o_liberar(uint32_t pid, uint32_t nro_pag){
 

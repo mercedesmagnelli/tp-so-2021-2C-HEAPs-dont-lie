@@ -5,6 +5,8 @@
 #include "../TLB/tlb.h"
 #include <stdint.h>
 #include "../../../shared/logger.h"
+#include "../conexion_planificador/conexion_planificador.h"
+
 /**
  * @NAME: manejar_sigint
  * @DESC: Esta funcion se desencadena tras apretar ctrl + c y lo que hace es hacer un reporte de la smetricas de hit y miss
