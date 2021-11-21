@@ -232,7 +232,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			loggear_info("[PROCESO_EN_READY], Se movio a ready un proceso");
 			t_matelib_nuevo_proceso* PID_proceso_ready = deserializar_crear_proceso(mensaje->payload);
 
-			int32_t rtaReady = 0;//PID_listo(PID_proceso_ready->pid);
+			int32_t rtaReady = PID_listo(PID_proceso_ready->pid);
 			uint32_t headerR;
 
 			if(rtaReady){

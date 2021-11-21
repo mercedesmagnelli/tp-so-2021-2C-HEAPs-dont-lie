@@ -49,6 +49,12 @@ uint32_t iniciar_proceso_SWAP(uint32_t PID);
 void iniciar_proceso_RAM(uint32_t PID);
 
 /**
+ * @NAME: alistar_proceso
+ * @DESC: se encarga de reservar los frames en caso de estar en asignacion FIJA
+*/
+void alistar_proceso(uint32_t PID);
+
+/**
  * @NAME: ptro_donde_entra_data
  * @DESC: Dado un proceso(ya allocado) y el tamaño de la data te devuelve el alloc donde puede entrar, sin pedir memoria a la RAM
  * @RET:

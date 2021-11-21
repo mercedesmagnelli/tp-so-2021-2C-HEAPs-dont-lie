@@ -60,11 +60,17 @@ void iniciar_proceso_RAM(uint32_t PID){
 	nuevoProceso->lista_frames_reservados = list_create();
 	nuevoProceso->hits_proceso = 0;
 	nuevoProceso->miss_proceso = 0;
-	/*if(get_tipo_asignacion() == FIJA){
-		reservar_frames(nuevoProceso->lista_frames_reservados);
-		nuevoProceso->puntero_frames = 0;
-	}*/
 	list_add(listaProcesos, nuevoProceso);
+}
+
+void alistar_proceso(uint32_t PID){
+
+	t_proceso* proceso = get_proceso_PID(PID);
+
+	if(get_tipo_asignacion() == FIJA){
+		reservar_frames(proceso->lista_frames_reservados);
+		proceso->puntero_frames = 0;
+	}
 }
 
 
@@ -113,7 +119,7 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	int nextNextAlloc = heap->nextAlloc;
 	heap->nextAlloc = ptro+tamanio;
 	heap->isFree = 0;
-	//guardar_HEAP_en_memoria(PID, heap);
+	guardar_HEAP_en_memoria(PID, heap);
 
 
 	heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
@@ -122,14 +128,14 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	nuevoHeap->nextAlloc = nextNextAlloc;
 	nuevoHeap->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeap);
-	//guardar_HEAP_en_memoria(PID, nuevoHeap);
+	guardar_HEAP_en_memoria(PID, nuevoHeap);
 
 	//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
 	if(nuevoHeap->nextAlloc != -1){
 
 		heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
 		heapSig->prevAlloc = nuevoHeap->currAlloc;
-		//guardar_HEAP_en_memoria(PID, heapSig);
+		guardar_HEAP_en_memoria(PID, heapSig);
 	}
 }
 

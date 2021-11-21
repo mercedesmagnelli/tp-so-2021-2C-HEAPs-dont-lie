@@ -11,13 +11,19 @@ uint32_t inicializar_proceso(uint32_t PID){
 			loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
 			return ESPACIO_EN_MEMORIA_INSUF;
 		}
-		return 1;
 	}else{
 		loggear_trace("[MATELIB_INIT] el proceso ya existia en memoria");
 		return PROCESO_EXISTENTE;
 	}
 }
 
+uint32_t PID_listo(uint32_t PID){
+	if(existe_proceso(PID)){
+		alistar_proceso(PID);
+		return 1;
+	}else
+		return 0;
+}
 
 int32_t memalloc(uint32_t pid, int32_t size) {
 	loggear_trace("[MATELIB_MEM_ALLOC] estoy entrando al meamalloc");
