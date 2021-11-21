@@ -10,6 +10,9 @@ t_list* listaFramesReservados;//lista de frames reservados por todos los proceso
 t_dictionary* cant_frames_por_proceso;//casos: traer_pagina_de_SWAP, liberar_paginas
 uint32_t puntero_global;
 
+pthread_mutex_t mutex_acceso_memoria;
+pthread_mutex_t mutex_acceso_lista_frames;
+pthread_mutex_t mutex_enviar_mensaje_swap;
 
 typedef struct{
     uint32_t en_mp; //me sirve de flag para comprobar cuando realmente hacer el swap
