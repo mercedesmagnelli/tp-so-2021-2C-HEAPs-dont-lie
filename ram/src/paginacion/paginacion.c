@@ -48,6 +48,25 @@ int32_t existe_proceso(uint32_t PID){
 
 }
 
+uint32_t iniciar_proceso_SWAP(uint32_t PID){
+	return crear_proceso_SWAP(PID);
+}
+
+void iniciar_proceso_RAM(uint32_t PID){
+	t_proceso* nuevoProceso = malloc(sizeof(t_proceso));
+	nuevoProceso->PID = PID;
+	nuevoProceso->tabla_paginas = list_create();
+	nuevoProceso->lista_hmd = list_create();
+	nuevoProceso->lista_frames_reservados = list_create();
+	nuevoProceso->hits_proceso = 0;
+	nuevoProceso->miss_proceso = 0;
+	/*if(get_tipo_asignacion() == FIJA){
+		reservar_frames(nuevoProceso->lista_frames_reservados);
+		nuevoProceso->puntero_frames = 0;
+	}*/
+	list_add(listaProcesos, nuevoProceso);
+}
+
 
 int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 

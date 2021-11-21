@@ -1,5 +1,30 @@
 #include "swaping.h"
 
+uint32_t crear_proceso_SWAP(uint32_t PID){
+
+	uint32_t respuesta_final = 0;
+
+	t_matelib_nuevo_proceso* mensaje = shared_crear_nuevo_proceso(PID);
+
+	size_t tamanio;
+
+	void* mensaje_serializado = serializiar_crear_proceso(mensaje, &tamanio);
+
+	//semaforo_socket
+	enviar_mensaje_protocolo(socket_swap,R_S_PROCESO_NUEVO, tamanio, mensaje_serializado);
+
+	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
+	//semaforo_socket
+
+	if(respuesta->head==EXITO_EN_LA_TAREA){
+		respuesta_final = 1;
+	}
+
+	free(mensaje);
+	return respuesta_final;
+
+}
+
 uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 
 	uint32_t frame;

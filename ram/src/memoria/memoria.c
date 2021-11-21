@@ -1,38 +1,49 @@
 #include "memoria.h"
 
-int inicializar_proceso(uint32_t PID){
-
+uint32_t inicializar_proceso(uint32_t PID){
+	if(!existe_proceso(PID)){
+		loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
+		if (iniciar_proceso_SWAP(PID)) {
+			loggear_trace("[MATELIB_INIT] Se crea un proceso nuevo de pid %d", PID);
+			iniciar_proceso_RAM(PID);
+			return 0;
+		} else {
+			loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
+			return ESPACIO_EN_MEMORIA_INSUF;
+		}
+		return 1;
+	}else{
+		loggear_trace("[MATELIB_INIT] el proceso ya existia en memoria");
+		return PROCESO_EXISTENTE;
+	}
 }
 
 
 int32_t memalloc(uint32_t pid, int32_t size) {
 	loggear_trace("[MATELIB_MEM_ALLOC] estoy entrando al meamalloc");
-		if (!cantidad_valida(size)) {
-			//corto la ejecucion si ya no tengo que analizar
-				return VALOR_MEMORIA_SOLICITADO_INVALIDO;
-		} else {
-			loggear_trace("[MATELIB_MEM_ALLOC] - Se puede asignar el espacio solicitado para el proceso %d", pid);
-			int32_t ptro = ptro_donde_entra_data(pid, size);
+	if (!cantidad_valida(size)) {
+		//corto la ejecucion si ya no tengo que analizar
+			return VALOR_MEMORIA_SOLICITADO_INVALIDO;
+	} else {
+		loggear_trace("[MATELIB_MEM_ALLOC] - Se puede asignar el espacio solicitado para el proceso %d", pid);
+		int32_t ptro = ptro_donde_entra_data(pid, size);
 
-			if(ptro>=0) {
-				//puedo asignar en algo que ya estaba
-				actualizar_proceso(pid,ptro,size);
-				return ptro;
+		if(ptro>=0) {
+			//puedo asignar en algo que ya estaba
+			actualizar_proceso(pid,ptro,size);
+			return ptro;
+		}else {
+			if(memoria_suficiente_en_swap(pid,size)) {
+				loggear_trace("[MATELIB_MEM_ALLOC] Se pide mas espacio para el proceso %d", pid);
+				//como hay espacio disponble, expando lo que ya tenia
+				actualizar_proceso(pid,  (-1) * ptro,  size);
+				return (-1) * ptro;
 			}else {
-				if(memoria_suficiente_en_swap(pid,size)) {
-					loggear_trace("[MATELIB_MEM_ALLOC] Se pide mas espacio para el proceso %d", pid);
-					//como hay espacio disponble, expando lo que ya tenia
-					actualizar_proceso(pid,  (-1) * ptro,  size);
-					return (-1) * ptro;
-				}else {
-					loggear_warning("[MATELIB_MEM_ALLOC] - No se puede pedir mas memoria para el proceso %d", pid);
-					return no_se_asigna_proceso(pid, size);
-				}
+				loggear_warning("[MATELIB_MEM_ALLOC] - No se puede pedir mas memoria para el proceso %d", pid);
+				return no_se_asigna_proceso(pid, size);
 			}
-
-
-
 		}
+	}
 }
 
 
