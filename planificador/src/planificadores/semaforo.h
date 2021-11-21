@@ -14,7 +14,8 @@ typedef struct {
 	char * nombre;
 	int32_t valor;
 	pthread_mutex_t mutex;
-	t_list * list_procesos;
+	t_list * list_procesos_retienen;
+	t_list * list_procesos_bloqueados;
 } t_semaforo;
 
 typedef enum {
@@ -26,12 +27,11 @@ typedef enum {
 	SEM_PROCESO_FINALIZADO
 } t_estado_ejecucion;
 
-
 /**
- * Recibe los hilos y sus peticiones hacia los semaforos
- * Analiza si hay que bloquear o no al hilo que ejecuta un WAIT a un semaforo
- * Al hacer un POST a un hilo, avisa que hay que quitar un hilo de la cola de bloqueados
- * */
+ * @NAME: semaforo_get
+ * @DESC: Retorna el semaforo
+ */
+t_semaforo * semaforo_get(char * nombre_semaforo);
 
 /**
  * @NAME: semaforo_estructuras_crear
@@ -68,6 +68,11 @@ t_estado_ejecucion semaforo_wait(t_matelib_semaforo * sem);
  * */
 t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem);
 
+/**
+ * @NAME: semaforo_deadlock_post
+ * @DESC: INcrementa en 1 el contador del semaforo, y ademas desbloquea cualquier hilo que este bloqueado esperando por el semaforo
+ */
+void semaforo_deadlock_post(t_semaforo * semaforo);
 
 /**
  * @NAME: semaforo_destruir

@@ -1,5 +1,30 @@
 #include "swaping.h"
 
+uint32_t crear_proceso_SWAP(uint32_t PID){
+
+	uint32_t respuesta_final = 0;
+
+	t_matelib_nuevo_proceso* mensaje = shared_crear_nuevo_proceso(PID);
+
+	size_t tamanio;
+
+	void* mensaje_serializado = serializiar_crear_proceso(mensaje, &tamanio);
+
+
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
+	enviar_mensaje_protocolo(socket_swap,R_S_PROCESO_NUEVO, tamanio, mensaje_serializado);
+	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
+	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
+
+	if(respuesta->head == EXITO_EN_LA_TAREA){
+		respuesta_final = 1;
+	}
+
+	free(mensaje);
+	return respuesta_final;
+
+}
+
 uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 
 	uint32_t frame;
@@ -32,13 +57,14 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 		size_t tamanio;
 		t_write_s* mensaje = shared_crear_write_s(nro_pag_victima, pid_pag_victima, info_en_frame);
 		void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio, get_tamanio_pagina());
+
+		pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 		enviar_mensaje_protocolo(socket_swap,R_S_ESCRIBIR_EN_PAGINA,tamanio,mensaje_serializado);
-		free(mensaje_serializado);
 		t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
+		pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
 
-		uint32_t err = deserializar_escritura_en_pagina(rec->payload);
-
-		if(err == 0){
+		free(mensaje_serializado);
+		if(rec->head== FALLO_EN_LA_TAREA){
 			loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag_victima, pid_pag_victima);
 		}
 
@@ -53,12 +79,16 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 }
 
 uint32_t obtener_pid_en_frame(uint32_t frame) {
+	pthread_mutex_lock(&mutex_acceso_lista_frames);
 	t_frame* frame_i = (t_frame*) list_get(listaFrames, frame);
 	return frame_i->proceso;
+	pthread_mutex_unlock(&mutex_acceso_lista_frames);
 }
 uint32_t obtener_pag_en_frame(uint32_t frame) {
+	pthread_mutex_lock(&mutex_acceso_lista_frames);
 	t_frame* frame_i = (t_frame*) list_get(listaFrames, frame);
 	return frame_i->pagina;
+	pthread_mutex_unlock(&mutex_acceso_lista_frames);
 }
 void* obtener_info_en_frame(uint32_t frame) {
 	uint32_t tam_memoria = get_tamanio_pagina();
@@ -73,9 +103,17 @@ void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir) {
 	size_t tamanio;
 	t_pedir_o_liberar_pagina_s* pedido = shared_crear_pedir_o_liberar(pid_a_pedir, pag_a_pedir);
 	void* mensaje_serializado = serializar_pedir_pagina(pedido, &tamanio);
+
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 	enviar_mensaje_protocolo(socket_swap,R_S_PEDIR_PAGINA,tamanio,mensaje_serializado);
-	free(mensaje_serializado);
 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
+	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
+
+	free(mensaje_serializado);
+	if(rec->head == FALLO_EN_LA_TAREA){
+				loggear_error("[RAM] - Hubo un problema en la recepcion de la info de la pagina %d del proceso %d en swamp", pag_a_pedir, pid_a_pedir);
+	}
+
 	void* info = deserializar_pedir_pagina(rec->payload);
 	return info;
 
@@ -261,12 +299,14 @@ void comunicar_eliminacion_proceso_SWAP(uint32_t PID){
 	size_t tamanio;
 	t_matelib_nuevo_proceso* pid = shared_crear_nuevo_proceso(PID);
 	void* mensaje_serializado = serializiar_crear_proceso(pid, &tamanio);
-	enviar_mensaje_protocolo(socket_swap,R_S_ELIMINAR_PROCESO,tamanio,mensaje_serializado);
-	free(mensaje_serializado);
- 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
-	t_matelib_nuevo_proceso* err = deserializar_crear_proceso(rec->payload);
 
-	if(err->pid == 0){
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
+	enviar_mensaje_protocolo(socket_swap,R_S_ELIMINAR_PROCESO,tamanio,mensaje_serializado);
+ 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
+ 	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
+
+ 	free(mensaje_serializado);
+	if(rec->head == FALLO_EN_LA_TAREA){
 		loggear_error("[RAM] - Hubo un problema en la eliminacion del proceso %d en swamp",PID);
 	}
 }
@@ -276,13 +316,14 @@ void enviar_pagina_a_SWAP(uint32_t PID, uint32_t nro_pag, void* data_pag){
 	size_t tamanio;
 	t_write_s* mensaje = shared_crear_write_s(nro_pag, PID, data_pag);
 	void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio, get_tamanio_pagina());
+
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 	enviar_mensaje_protocolo(socket_swap,R_S_ESCRIBIR_EN_PAGINA,tamanio,mensaje_serializado);
-	free(mensaje_serializado);
-
 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
-	uint32_t err = deserializar_escritura_en_pagina(rec->payload);
+	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
 
-	if(err == 0){
+	free(mensaje_serializado);
+	if(rec->head == FALLO_EN_LA_TAREA){
 		loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag, PID);
 	}
 }

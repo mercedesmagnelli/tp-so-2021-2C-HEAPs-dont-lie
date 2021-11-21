@@ -10,7 +10,8 @@ void inicializar_estructuras_administrativas() {
     listaProcesos = list_create();
     listaFrames = list_create();
     listaFramesReservados = list_create();
-    for(int i=0;i<get_tamanio_pagina();i++){
+    uint32_t cant_frames = get_tamanio_memoria() / get_tamanio_pagina();
+    for(int i=0;i<cant_frames;i++){
     	t_frame* frame = malloc(sizeof(t_frame));
     	frame->nroFrame=i;
     	frame->estado=0;
@@ -19,6 +20,16 @@ void inicializar_estructuras_administrativas() {
     puntero_global = 0;
     cant_frames_por_proceso = dictionary_create();
     inicializar_tlb();
+    inicializar_semaforos();
+
+}
+
+void inicializar_semaforos() {
+	pthread_mutex_init(&mutex_acceso_lista_frames, NULL);
+	pthread_mutex_init(&mutex_enviar_mensaje_swap, NULL);
+	pthread_mutex_init(&mutex_acceso_memoria, NULL);
+	pthread_mutex_init(&mutex_acceso_lista_frames_r, NULL);
+	pthread_mutex_init(&mutex_acceso_diccionario, NULL);
 }
 
 void destruir_estructuras_administrativas() {
@@ -28,6 +39,14 @@ void destruir_estructuras_administrativas() {
     //TODO: ver que puede ser que tengamos que llamar a dictionary_destroy_and_destroy_elements
     dictionary_destroy(cant_frames_por_proceso);
     destruir_tlb();
+    destruir_semaforos();
+}
+void destruir_semaforos() {
+		pthread_mutex_destroy(&mutex_acceso_lista_frames);
+		pthread_mutex_destroy(&mutex_enviar_mensaje_swap);
+		pthread_mutex_destroy(&mutex_acceso_memoria);
+		pthread_mutex_destroy(&mutex_acceso_lista_frames_r);
+		pthread_mutex_destroy(&mutex_acceso_diccionario);
 }
 void destruir_proceso(void* proceso) {
 
@@ -46,6 +65,31 @@ int32_t existe_proceso(uint32_t PID){
 	t_proceso* proceso = get_proceso_PID(PID);
 	return proceso == NULL ? 0 : 1;
 
+}
+
+uint32_t iniciar_proceso_SWAP(uint32_t PID){
+	return crear_proceso_SWAP(PID);
+}
+
+void iniciar_proceso_RAM(uint32_t PID){
+	t_proceso* nuevoProceso = malloc(sizeof(t_proceso));
+	nuevoProceso->PID = PID;
+	nuevoProceso->tabla_paginas = list_create();
+	nuevoProceso->lista_hmd = list_create();
+	nuevoProceso->lista_frames_reservados = list_create();
+	nuevoProceso->hits_proceso = 0;
+	nuevoProceso->miss_proceso = 0;
+	list_add(listaProcesos, nuevoProceso);
+}
+
+void alistar_proceso(uint32_t PID){
+
+	t_proceso* proceso = get_proceso_PID(PID);
+
+	if(get_tipo_asignacion() == FIJA){
+		reservar_frames(proceso->lista_frames_reservados);
+		proceso->puntero_frames = 0;
+	}
 }
 
 
@@ -89,12 +133,13 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
 void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 
+	//FIXME: puede que acá haya que traer a memoria???
 
 	heap_metadata* heap = get_HEAP(PID,ptro);
 	int nextNextAlloc = heap->nextAlloc;
 	heap->nextAlloc = ptro+tamanio;
 	heap->isFree = 0;
-	//guardar_HEAP_en_memoria(PID, heap);
+	guardar_HEAP_en_memoria(PID, heap);
 
 
 	heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
@@ -103,14 +148,14 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	nuevoHeap->nextAlloc = nextNextAlloc;
 	nuevoHeap->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeap);
-	//guardar_HEAP_en_memoria(PID, nuevoHeap);
+	guardar_HEAP_en_memoria(PID, nuevoHeap);
 
 	//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
 	if(nuevoHeap->nextAlloc != -1){
 
 		heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
 		heapSig->prevAlloc = nuevoHeap->currAlloc;
-		//guardar_HEAP_en_memoria(PID, heapSig);
+		guardar_HEAP_en_memoria(PID, heapSig);
 	}
 }
 
@@ -161,7 +206,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 
 	agregar_HEAP_a_PID(PID,nuevoHeapPrimero);
 
-	//guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
+	guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
 
 
 
@@ -171,7 +216,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	nuevoHeapUltimo->nextAlloc = -1;
 	nuevoHeapUltimo->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeapUltimo);
-	//guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
+	guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
 
 
 
@@ -190,13 +235,21 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 
 	void* mensaje_serializado = serializar_solicitud_espacio(mensaje, &tamanio);
 
-	//semaforo_socket
+
+
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 	enviar_mensaje_protocolo(socket_swap, R_S_SOLICITUD_ESPACIO, tamanio, mensaje_serializado);
-
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
-	//semaforo_socket
+	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
 
-	uint32_t respuesta_final = deserializar_solicitud_espacio(respuesta->payload);
+	free(mensaje_serializado);
+
+	uint32_t respuesta_final = 1;
+
+	if(respuesta->head == FALLO_EN_LA_TAREA) {
+		respuesta_final = 0;
+	}
+
 	t_pagina* nueva_pagina;
 
 	t_proceso* proceso = get_proceso_PID(pid);
@@ -235,6 +288,7 @@ bool ptro_valido(uint32_t PID, uint32_t ptro) {
 
 	bool condition(void* heap) {
 		heap_metadata* heap_md = (heap_metadata*) heap;
+		leer_heap(heap, PID);
 		return (heap_md->currAlloc + 9) == ptro;
 	}
 	return list_any_satisfy(lista_heaps,condition);
@@ -242,6 +296,7 @@ bool ptro_valido(uint32_t PID, uint32_t ptro) {
 
 uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t PID){
 	heap_metadata* heap = get_HEAP(PID, direccionLogicaALeer);
+	leer_heap(heap, PID);
     return espacio_de_HEAP(heap);
 }
 
@@ -261,6 +316,7 @@ bool ptro_liberado(uint32_t PID, uint32_t ptro){
 
 	bool condicion(void* heap_i) {
 		heap_metadata* heap = (heap_metadata*) heap_i;
+		leer_heap(heap, PID);
 		return (heap->currAlloc + 9) == ptro;
 	}
 
@@ -330,12 +386,14 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 	size_t tamanio;
 	t_pedir_o_liberar_pagina_s* mensaje = shared_crear_pedir_o_liberar(pid, cantPagABorrar);
 	void* mensaje_serializado = serializar_liberar_pagina(mensaje, &tamanio);
-	enviar_mensaje_protocolo(socket_swap, R_S_LIBERAR_PAGINA, tamanio, mensaje_serializado);
-	free(mensaje_serializado);
-	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
-	uint32_t err = deserializar_liberar_paginas(respuesta->payload);
 
-    if(err == 0){
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
+	enviar_mensaje_protocolo(socket_swap, R_S_LIBERAR_PAGINA, tamanio, mensaje_serializado);
+	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
+	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
+
+	free(mensaje_serializado);
+    if(respuesta->head == FALLO_EN_LA_TAREA){
         loggear_error("[RAM] - Hubo un problema en la liberacion de la paginas del proceos %d en swamp", pid);
     }
 }
@@ -375,8 +433,13 @@ void modificar_heaps(t_list* heaps, uint32_t indice, uint32_t pid, uint32_t cant
 	}
 
 
-	//guardar_HEAP_en_memoria(pid, heap_inicial);
-	//guardar_HEAP_en_memoria(pid, heap_final);//verificar que  heap_inicial != -1 para hacer esto
+	guardar_HEAP_en_memoria(pid, heap_inicial);
+
+	//TODO: esto esta bien??
+	if(heap_final->nextAlloc == -1) {
+		guardar_HEAP_en_memoria(pid, heap_final);//verificar que  heap_inicial != -1 para hacer esto
+	}
+
 
 
 
@@ -461,8 +524,10 @@ void suspender_proceso(uint32_t PID){
 		paginaIterada = list_get(proceso->tabla_paginas,i);
 
 		if(paginaIterada->bit_presencia){
+			pthread_mutex_lock(&mutex_acceso_lista_frames);
 			frameLiberar = list_get(listaFrames, paginaIterada->frame);
 			frameLiberar->estado=0;
+			 pthread_mutex_unlock(&mutex_acceso_lista_frames);
 			if(paginaIterada->bit_modificacion){
 				data = malloc(get_tamanio_pagina());
 				leer_directamente_de_memoria(data, get_tamanio_pagina(), paginaIterada->frame * get_tamanio_pagina());
@@ -637,28 +702,16 @@ void* serializar_HEAP(heap_metadata* heap){//TODO revisar serializacion
 
 bool esta_en_RAM(uint32_t PID, uint32_t nroPag){
 
-	bool frame_contiene_pagina(void* element){
-		t_frame* frame = (t_frame*) element;
-		return frame->estado==1 && frame->proceso==PID && frame->pagina==nroPag;
-	}
-
-	return list_any_satisfy(listaFrames, frame_contiene_pagina);
+	t_list* tabla_paginas = obtener_tabla_paginas_mediante_PID(PID);
+	t_pagina* pag = (t_pagina*) list_get(tabla_paginas, nroPag);
+	return pag->bit_presencia == 1 ? true : false;
 }
 
 uint32_t obtener_frame_de_RAM(uint32_t PID, uint32_t nroPag){
 
-	int contadorPosicion = 0;
-	int* ptroContador = &contadorPosicion;
-
-	bool frame_contiene_pagina(void* element){
-		t_frame* frame = (t_frame*) element;
-		(*ptroContador)++;
-		return frame->estado==1 && frame->proceso==PID && frame->pagina==nroPag;
-	}
-
-	list_find(listaFrames, frame_contiene_pagina);
-
-	return contadorPosicion;
+	t_list* tabla_paginas = obtener_tabla_paginas_mediante_PID(PID);
+	t_pagina* pag = (t_pagina*) list_get(tabla_paginas, nroPag);
+	return pag->frame;
 }
 
 void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModificado, uint32_t bitTLB){
@@ -697,6 +750,7 @@ uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
 
 void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant){
 	char* keyProceso = calcular_hash_key_dic(PID);
+	pthread_mutex_lock(&mutex_acceso_diccionario);
 	asignacion_marcos_fijos* asigFija = (asignacion_marcos_fijos*) dictionary_get(cant_frames_por_proceso , keyProceso);
 	if(modCant>0){
 		if(MIN(asigFija->en_mp, get_marcos_maximos())<get_marcos_maximos()){
@@ -705,6 +759,7 @@ void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant){
 	}else{
 		asigFija->en_mp=-1;
 	}
+	pthread_mutex_unlock(&mutex_acceso_diccionario);
 }
 
 char* calcular_hash_key_dic(uint32_t proceso) {
@@ -724,13 +779,20 @@ int calcular_paginas_para_tamanio(uint32_t tam) {
 void reservar_frames(t_list* lista_frames_proceso){
 
 	bool frame_disponible_y_no_repetidos_en_lista(void* element){
-		return frame_disponible(element)&&frame_no_pertenece_a_lista(listaFramesReservados, element);
+
+		return frame_disponible(element) && frame_no_pertenece_a_lista(listaFramesReservados, element);
 	}
 
 	for(int i=0; i<get_marcos_maximos();i++){
+		pthread_mutex_lock(&mutex_acceso_lista_frames_r);
+		pthread_mutex_lock(&mutex_acceso_lista_frames);
 		t_frame* frame = (t_frame*)list_find(listaFrames, frame_disponible_y_no_repetidos_en_lista);
+		pthread_mutex_unlock(&mutex_acceso_lista_frames);
+
 		list_add(lista_frames_proceso, frame);
 		list_add(listaFramesReservados, frame);
+
+		pthread_mutex_unlock(&mutex_acceso_lista_frames_r);
 	}
 }
 
@@ -766,8 +828,10 @@ void liberar_frames_eliminar_proceso(t_proceso* proceso){
 		paginaIterada = list_get(proceso->tabla_paginas,i);
 
 		if(paginaIterada->bit_presencia){
+			pthread_mutex_lock(&mutex_acceso_lista_frames);
 			frameLiberar = list_get(listaFrames, paginaIterada->frame);
 			frameLiberar->estado=0;
+			pthread_mutex_unlock(&mutex_acceso_lista_frames);
 		}
 
 	}
@@ -789,7 +853,8 @@ void eliminar_frames_reservados(t_proceso* proceso){
 			t_frame* frameListaReservada = (t_frame*) element;
 			return frameListaReservada->nroFrame == frame->nroFrame;
 		}
-
+		pthread_mutex_lock(&mutex_acceso_lista_frames_r);
 		list_remove_by_condition(listaFramesReservados, frame_numero);
+		pthread_mutex_unlock(&mutex_acceso_lista_frames_r);
 	}
 }

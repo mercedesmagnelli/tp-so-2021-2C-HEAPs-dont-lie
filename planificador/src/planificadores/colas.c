@@ -82,6 +82,7 @@ t_hilo * colas_insertar_new(uint32_t pid) {
 	hilo->estado = ESTADO_NEW;
 	hilo->estimacion_anterior = get_estimacion_inicial();
 	hilo->timestamp_tiempo_exec = 0.0;
+	hilo->sera_eliminado_por_deadlock = false;
 	//hilo->bloqueante = NINGUNO;
 	//hilo->nombre_bloqueante = "";
 	hilo->semaforos_pedidos = list_create();
@@ -143,8 +144,45 @@ t_hilo * colas_mover_exec_finish(uint32_t pid_mover) {
 	queue_push(finish_queue, hilo);
 	pthread_mutex_unlock(&mutex_finish_queue);
 
+	hilos_post_finalizado();
+
     return hilo;
 }
+
+t_hilo * colas_mover_block_finish(t_hilo * hilo_mover) {
+	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
+	pthread_mutex_lock(&mutex_blocked_list);
+	t_hilo * hilo = list_remove_by_condition(blocked_list, son_iguales);
+	pthread_mutex_unlock(&mutex_blocked_list);
+
+	hilo->estado = ESTADO_FINISH;
+
+	pthread_mutex_lock(&mutex_finish_queue);
+	queue_push(finish_queue, hilo);
+	pthread_mutex_unlock(&mutex_finish_queue);
+
+	hilos_post_finalizado();
+
+    return hilo;
+}
+
+t_hilo * colas_mover_susp_block_finish(t_hilo * hilo_mover) {
+	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
+	pthread_mutex_lock(&mutex_suspended_blocked_list);
+	t_hilo * hilo = list_remove_by_condition(suspended_blocked_list, son_iguales);
+	pthread_mutex_unlock(&mutex_suspended_blocked_list);
+
+	hilo->estado = ESTADO_FINISH;
+
+	pthread_mutex_lock(&mutex_finish_queue);
+	queue_push(finish_queue, hilo);
+	pthread_mutex_unlock(&mutex_finish_queue);
+
+	hilos_post_finalizado();
+
+    return hilo;
+}
+
 
 t_hilo * colas_obtener_finalizado() {
 	pthread_mutex_lock(&mutex_finish_queue);
@@ -196,7 +234,7 @@ void colas_agregar_wait_semaforo(uint32_t pid, void * semaforo) {
 }
 
 t_hilo * colas_mover_block_ready(t_hilo * hilo_mover) {
-	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
+	bool son_iguales(void * hilo2) { return pid(hilo_mover) == pid(hilo2); }
 	pthread_mutex_lock(&mutex_blocked_list);
 	t_hilo * hilo = list_remove_by_condition(blocked_list, son_iguales);
 	pthread_mutex_unlock(&mutex_blocked_list);
@@ -283,8 +321,10 @@ t_list * colas_obtener_listas_bloqueados(t_dispositivo_bloqueante dispositivo_bl
 
 	t_list * todos_los_bloqueados = list_create();
 
+	colas_bloquear_listas_bloqueados();
 	t_list * bloqueados = list_filter(blocked_list, esta_bloqueado_por);
 	t_list * suspendidos = list_filter(suspended_blocked_list, esta_bloqueado_por);
+	colas_desbloquear_listas_bloqueados();
 
 	list_add_all(todos_los_bloqueados, bloqueados);
 	list_add_all(todos_los_bloqueados, suspendidos);
@@ -336,6 +376,21 @@ t_hilo * colas_desbloquear_hilo_concreto(t_hilo * hilo_bloqueado) {
 		loggear_debug("[PID: %zu] - Se desbloqueo el hilo y se envio a SUSPENDIDO-READY", hilo_bloqueado->pid);
 	} else {
 		loggear_error("[PID: %zu] - Se quiso desbloquear el hilo, pero no esta en estado bloqueado, esta en %d", hilo_bloqueado->pid, hilo_bloqueado->estado);
+	}
+
+	return hilo_bloqueado;
+}
+
+t_hilo * colas_finalizar_proceso_bloqueado(t_hilo * hilo_bloqueado) {
+	if (hilo_bloqueado->estado == ESTADO_BLOCK) {
+		colas_mover_block_finish(hilo_bloqueado);
+	} else if (hilo_bloqueado->estado == ESTADO_SUSPENDED_BLOCK) {
+		colas_mover_susp_block_finish(hilo_bloqueado);
+	} else {
+		loggear_error("[COLAS] - El hilo a finalikzar no esta bloqueado");
+		loggear_error("[COLAS] - Si entro acá significa que al eliminar un hilo del deadlock, se le liberaron los recursos y eso hizo que este hilo se desbloqueara");
+		loggear_error("[COLAS] - Arreglar funcion deadlock.eliminar_proceso_deadlock para que controle esto");
+		return NULL;
 	}
 
 	return hilo_bloqueado;

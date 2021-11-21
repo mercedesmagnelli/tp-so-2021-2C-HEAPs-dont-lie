@@ -33,6 +33,7 @@ typedef enum {
 
 	// Ram => Filesystem
 	HANDSHAKE_R_F,
+	R_S_PROCESO_NUEVO,
 	R_S_SOLICITUD_ESPACIO,
 	R_S_ESCRIBIR_EN_PAGINA, //Un proceso solicita escribir en su pagina, siempre se manda pagina completa. 	pid, nro_pag, data
 	R_S_PEDIR_PAGINA, //Un proceso solicita su pagina a SWAP												pid, nro_pag
@@ -68,12 +69,13 @@ typedef enum {
 	// Planificador => Ram
 	HANDSHAKE_P_R,
 	SUSPENDER_PROCESO,
+	PROCESO_EN_READY,
 
 	// Mensajes genericos
 	EXITO_EN_LA_TAREA,
 	FALLO_EN_LA_TAREA,
 	FALLO_EN_LA_RAM, // Se usa cuando tanto el Kernel como la Ram tienen que hacer algo, lo retorna la ram si falla (ejemplo: MATELIB_CLOSE de un proceso)
-
+	EXITO_PROCESO_ELIMINADO, // Se elimino el proceso por deadlock
 
 	// Pruebas
 	CACHO_DE_TEXTO

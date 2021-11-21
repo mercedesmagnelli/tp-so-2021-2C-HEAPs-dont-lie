@@ -18,12 +18,4 @@
 #include <readline/readline.h>
 
 
-
-/*BORRAR!!!!!!!!!!!! son para testing*/
-
-
-void testeamos();
-void imprimir_hdm();
-void imprimir_procesos();
-
 #endif /* RAM_MAIN_H_ */
