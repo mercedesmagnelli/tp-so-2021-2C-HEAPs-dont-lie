@@ -24,7 +24,7 @@ void inicializar_estructuras_administrativas() {
 
 }
 
-void inicializar_semafotos() {
+void inicializar_semaforos() {
 	pthread_mutex_init(&mutex_acceso_lista_frames, NULL);
 	pthread_mutex_init(&mutex_enviar_mensaje_swap, NULL);
 	pthread_mutex_init(&mutex_acceso_memoria, NULL);

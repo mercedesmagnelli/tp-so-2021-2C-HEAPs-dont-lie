@@ -422,5 +422,21 @@ void liberar_frames_eliminar_proceso(t_proceso* proceso);
  * @DESC: Agara la lista de frames reservados por el proceso y los remueve de la lista de frames reservados por todos los procesos
 */
 void eliminar_frames_reservados(t_proceso* proceso);
+/**
+ * @NAME: inicializar_semaforos
+ * @DESC: inicializa todos los semaforos de la ram
+
+*/
+
+void  inicializar_semaforos();
+
+/**
+ * @NAME: destruir_semaforos
+ * @DESC: elimina los semaforos
+
+*/
+
+void destruir_semaforos();
+
 
 #endif /* PAGINACION_PAGINACION_H_ */
