@@ -198,7 +198,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				headerW = EXITO_EN_LA_TAREA;
 			}else{
 				loggear_info("[MATELIB_MEM_WRITE], proceso %d NO pudo escribir el espacio seleccionado", escritura->pid);
-				headerW=FALLO_EN_LA_TAREA;
+				headerW = FALLO_EN_LA_TAREA;
+
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerW, 0, NULL);
@@ -208,7 +209,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			destruir_mensaje(mensaje);
 			return 0;
 		case SUSPENDER_PROCESO:
-			loggear_info("[MATELIB_CLOSE], hay que cerrar el proceso");
+			loggear_info("[SUSPENDER_PROCESO], hay que cerrar el proceso");
 			t_matelib_nuevo_proceso* PID_proceso_suspender = deserializar_crear_proceso(mensaje->payload);
 
 			int32_t rtaSuspender = suspender_PID(PID_proceso_suspender->pid);
@@ -224,7 +225,26 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			enviar_mensaje_protocolo(mensaje->socket, headerS, 0, NULL);
 
-			free(PID_proceso_suspender);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+			return 0;
+		case PROCESO_EN_READY:
+			loggear_info("[PROCESO_EN_READY], Se movio a ready un proceso");
+			t_matelib_nuevo_proceso* PID_proceso_ready = deserializar_crear_proceso(mensaje->payload);
+
+			int32_t rtaReady = 0;//PID_listo(PID_proceso_ready->pid);
+			uint32_t headerR;
+
+			if(rtaReady){
+				loggear_info("[SUSPENDER_PROCESO], proceso %d fue suspendido", PID_proceso_ready->pid);
+				headerR = EXITO_EN_LA_TAREA;
+			}else{
+				loggear_info("[SUSPENDER_PROCESO], proceso %d NO fue suspendido", PID_proceso_ready->pid);
+				headerR = FALLO_EN_LA_TAREA;
+			}
+
+			enviar_mensaje_protocolo(mensaje->socket, headerR, 0, NULL);
+
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 			return 0;

@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 
+#include <commons/string.h>
 #include <commons/collections/list.h>
 
 #include "semaforo.h"
