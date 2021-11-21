@@ -4,43 +4,36 @@ int inicializar_proceso(uint32_t PID){
 
 }
 
+
 int32_t memalloc(uint32_t pid, int32_t size) {
 	loggear_trace("[MATELIB_MEM_ALLOC] estoy entrando al meamalloc");
-	if (!cantidad_valida(size)) {
-		//corto la ejecucion si ya no tengo que analizar
-			return VALOR_MEMORIA_SOLICITADO_INVALIDO;
-	} else {
-		if (existe_proceso(pid)){
-			loggear_trace("[MATELIB_MEM_ALLOC] Existe el proceso %d", pid);
+		if (!cantidad_valida(size)) {
+			//corto la ejecucion si ya no tengo que analizar
+				return VALOR_MEMORIA_SOLICITADO_INVALIDO;
+		} else {
+			loggear_trace("[MATELIB_MEM_ALLOC] - Se puede asignar el espacio solicitado para el proceso %d", pid);
 			int32_t ptro = ptro_donde_entra_data(pid, size);
-			if (ptro >= 0) {
+
+			if(ptro>=0) {
+				//puedo asignar en algo que ya estaba
 				actualizar_proceso(pid,ptro,size);
 				return ptro;
-			} else {
-				if (se_puede_almacenar_el_alloc_para_proceso(R_S_PROCESO_EXISTENTE, pid, size)) {
+			}else {
+				if(memoria_suficiente_en_swap(pid,size)) {
 					loggear_trace("[MATELIB_MEM_ALLOC] Se pide mas espacio para el proceso %d", pid);
 					//como hay espacio disponble, expando lo que ya tenia
 					actualizar_proceso(pid,  (-1) * ptro,  size);
 					return (-1) * ptro;
-				} else {
-					loggear_error("[MATELIB_MEM_ALLOC] No se puede almacenar el alloc para el proceso %d porque no hay espacio suficiente en memoria", pid);
-					return ESPACIO_EN_MEMORIA_INSUF;
+				}else {
+					loggear_warning("[MATELIB_MEM_ALLOC] - No se puede pedir mas memoria para el proceso %d", pid);
+					return no_se_asigna_proceso(pid, size);
 				}
 			}
-		} else {
-			//si no existe, entonces tengo que crear el nuevo proceso
-			if (se_puede_almacenar_el_alloc_para_proceso(R_S_PROCESO_NUEVO, pid, size)) {
-				loggear_trace("[MATELIB_MEM_ALLOC] Se crea un proceso nuevo de pid %d", pid);
-				int32_t ptro_nuevo_proc = agregar_proceso(pid, size);
-				return ptro_nuevo_proc;
-			} else {
-				return no_se_asigna_proceso(pid, size);
-			}
+
+
+
 		}
-
-	}
 }
-
 
 
 int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {

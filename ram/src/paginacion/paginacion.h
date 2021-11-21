@@ -115,13 +115,13 @@ void inicializar_estructuras_administrativas();
 void destruir_estructuras_administrativas();
 
 /**
-* @NAME: se_puede_almacenar_el_alloc_para_proceso
-* @DESC: Dado un proceso  (nuevo o existente) y un tamanio, se establece si puede ser guardado en memoria. Se usa para preguntarle a
+* @NAME: memoria_suficiente_en_swap
+* @DESC:Dado un proceso, se establece si puede ser guardado en memoria. Se usa para preguntarle a
 * 		la swap si tiene espacion para guardarlo.
 * @RET: 0 si no puede
 * 		1 si puede
 **/
-int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, uint32_t size);
+int32_t memoria_suficiente_en_swap( uint32_t pid, uint32_t size);
 
 /**
 * @NAME: no_se_asigna_proceso
@@ -153,6 +153,12 @@ void destruir_proceso(void* proceso);
 **/
 void* leer_de_memoria(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer);
 
+/**
+* @NAME: leer_heap
+* @DESC: lee el heap de memoria
+**/
+
+void* leer_heap(heap_metadata* heap, uint32_t PID);
 
 /**
  * @NAME: calcular_pagina_de_puntero_logico

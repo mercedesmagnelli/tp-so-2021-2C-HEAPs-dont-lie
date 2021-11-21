@@ -53,29 +53,34 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
 	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
 
-	int32_t ptro;
+	int32_t ptro = -9;
 
-	bool heap_tam_min(void* element){
-		bool rta;
-		heap_metadata* heap = (heap_metadata*) element;
-		if(heap->nextAlloc==-1){
-			rta = true;
-		}else{
-			if(espacio_de_HEAP(heap)>= tam+9 && heap->isFree){
+	if(!list_is_empty(listaHMD)){
+
+		bool heap_tam_min(void* element){
+			bool rta;
+			heap_metadata* heap = (heap_metadata*) element;
+			leer_heap(heap, PID);
+			if(heap->nextAlloc==-1){
 				rta = true;
 			}else{
-				rta = false;
+				if(espacio_de_HEAP(heap)>= tam+9 && heap->isFree){
+					rta = true;
+				}else{
+					rta = false;
+				}
 			}
+			return rta;
 		}
-		return rta;
-	}
 
-	heap_metadata* heap = list_find(listaHMD,heap_tam_min);
+		heap_metadata* heap = list_find(listaHMD,heap_tam_min);
 
-	ptro = heap->currAlloc + 9;
+		ptro = heap->currAlloc + 9;
 
-	if(heap->nextAlloc==-1 && calcular_tamanio_ultimo_HEAP(PID)<tam+9){
-		ptro = (-1)* ptro;
+		if(heap->nextAlloc==-1 && calcular_tamanio_ultimo_HEAP(PID)<tam+9){
+			ptro = (-1)* ptro;
+		}
+
 	}
 
 	return ptro;
@@ -173,7 +178,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 	return nuevoHeapPrimero->currAlloc+9;//siempre el primer alloc va a ser 9 porque el primer dato se guarda al comienzo, y el metadata ocupa 9 bytes
 }
 
-int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, uint32_t size) {
+int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 
 
 	uint32_t cantidad_paginas_extras = paginas_extras_para_proceso(pid, size);
@@ -186,7 +191,7 @@ int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, 
 	void* mensaje_serializado = serializar_solicitud_espacio(mensaje, &tamanio);
 
 	//semaforo_socket
-	enviar_mensaje_protocolo(socket_swap,header, tamanio, mensaje_serializado);
+	enviar_mensaje_protocolo(socket_swap, R_S_SOLICITUD_ESPACIO, tamanio, mensaje_serializado);
 
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
 	//semaforo_socket
@@ -205,22 +210,6 @@ int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, 
 
 	free(mensaje);
 	return respuesta_final;
-
-
-
-	/* VERSION PARA TESTEAR
-	if(header == R_S_ESPACIO_PROCESO_EXISTENTE) {
-
-	t_pagina* nueva_pagina;
-
-	uint32_t cantidad_paginas_extras = paginas_extras_para_proceso(pid, size);
-	t_list* tp = obtener_tabla_paginas_mediante_PID(pid);
-	for(int i = 0;i< cantidad_paginas_extras ;i++){
-				nueva_pagina = malloc(sizeof(t_pagina));
-				nueva_pagina->bit_presencia=0;//es el unico dato que llenamos
-				list_add(tp,nueva_pagina);
-	}*/
-
 
 }
 
@@ -431,6 +420,13 @@ uint32_t calcular_seguidos(t_list* lista, uint32_t indice) {
 
 	return s;
 
+}
+void* leer_heap(heap_metadata* heap, uint32_t PID){
+
+	int nroPag = calcular_pagina_de_puntero_logico(heap->currAlloc);
+	int offset = calcular_offset_puntero_en_pagina(heap->currAlloc);
+	void* dataLeida = leer_de_memoria_paginada(PID, nroPag, offset, 9);
+	return dataLeida;
 }
 
 
