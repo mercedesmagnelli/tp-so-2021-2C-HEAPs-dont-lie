@@ -1,7 +1,21 @@
 #include "memoria.h"
 
-int inicializar_proceso(uint32_t PID){
-
+int32_t* inicializar_proceso(uint32_t PID){
+	if(!existe_proceso(PID)){
+		loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
+		if (iniciar_proceso_SWAP(PID)) {
+			loggear_trace("[MATELIB_INIT] Se crea un proceso nuevo de pid %d", PID);
+			iniciar_proceso_RAM(PID);
+			return 0;
+		} else {
+			loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
+			return ESPACIO_EN_MEMORIA_INSUF;
+		}
+		return 1;
+	}else{
+		loggear_trace("[MATELIB_INIT] el proceso ya existia en memoria");
+		return PROCESO_EXISTENTE;
+	}
 }
 
 int32_t memalloc(uint32_t pid, int32_t size) {
@@ -28,14 +42,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 				}
 			}
 		} else {
-			//si no existe, entonces tengo que crear el nuevo proceso
-			if (se_puede_almacenar_el_alloc_para_proceso(R_S_PROCESO_NUEVO, pid, size)) {
-				loggear_trace("[MATELIB_MEM_ALLOC] Se crea un proceso nuevo de pid %d", pid);
-				int32_t ptro_nuevo_proc = agregar_proceso(pid, size);
-				return ptro_nuevo_proc;
-			} else {
-				return no_se_asigna_proceso(pid, size);
-			}
+			return no_se_asigna_proceso(pid, size);
 		}
 
 	}

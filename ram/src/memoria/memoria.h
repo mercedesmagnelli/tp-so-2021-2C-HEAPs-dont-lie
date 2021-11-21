@@ -20,8 +20,9 @@ void* memoria_principal;
  * @NAME: inicializar_proceso
  * @DESC: Le avisa a SWAP de la creacion de un proceso, y si se puede almacenar en SWAP, inicializa el proceso y sus estructuras administrativas en RAM
   * @RET:
- *   0		no se pudo crear el proceso
- *   !=0	se pudo crear el proceso
+ *   0		se pudo crear el proceso
+ *   -43    espacio en SWAP insuficiente
+ *   -47	el proceso ya existia
  */
 int inicializar_proceso(uint32_t PID);
 

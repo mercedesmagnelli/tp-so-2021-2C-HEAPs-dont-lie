@@ -10,6 +10,14 @@
 #include "../../../shared/estructura_compartida.h"
 uint32_t socket_swap;
 
+/**
+ * @NAME: crear_proceso_SWAP
+ * @DESC: solicitamos la creacion del proceso en SWAP
+ * @RET:
+ * 		1 Se pudo inicializar el proceso en SWAP
+ * 		0 No se pudo inicializar el proceso en SWAP
+*/
+uint32_t crear_proceso_SWAP(uint32_t PID);
 
 /**
  * @NAME: traer_pagina_de_SWAP

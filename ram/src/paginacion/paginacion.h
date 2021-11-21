@@ -42,6 +42,21 @@ uint32_t obtener_socket();
 int32_t existe_proceso(uint32_t PID);
 
 /**
+ * @NAME: iniciar_proceso_SWAP
+ * @DESC: pasamanos para SWAP de inicializacion de proceso
+ * @RET:
+ * 		1 Se pudo inicializar el proceso en SWAP
+ * 		0 No se pudo inicializar el proceso en SWAP
+*/
+uint32_t iniciar_proceso_SWAP(uint32_t PID);
+
+/**
+ * @NAME: iniciar_proceso_RAM
+ * @DESC: se encarga de inicializar las estructuras administrativas del proceso los proceso
+*/
+void iniciar_proceso_RAM(uint32_t PID);
+
+/**
  * @NAME: ptro_donde_entra_data
  * @DESC: Dado un proceso(ya allocado) y el tamaño de la data te devuelve el alloc donde puede entrar, sin pedir memoria a la RAM
  * @RET:
