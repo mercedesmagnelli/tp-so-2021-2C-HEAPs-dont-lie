@@ -11,10 +11,6 @@ int main(int argc, char** argv) {
 	signal(SIGUSR1, manejar_sigusr2);
 
 	int error = iniciar_configuracion(argc, argv);
-	/*if (error != STATUS_OK) {
-		puts("Error en los argumentos\n");
-		return EXIT_FAILURE;
-	}*/
 
 	error = init_mutex_log(get_log_route(), get_log_app_name(), get_log_in_console(), get_log_level_info());
 	if (error != STATUS_OK) {

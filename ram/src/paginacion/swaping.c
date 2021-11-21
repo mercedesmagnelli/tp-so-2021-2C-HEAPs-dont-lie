@@ -77,12 +77,16 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 }
 
 uint32_t obtener_pid_en_frame(uint32_t frame) {
+	pthread_mutex_lock(&mutex_acceso_lista_frames);
 	t_frame* frame_i = (t_frame*) list_get(listaFrames, frame);
 	return frame_i->proceso;
+	pthread_mutex_unlock(&mutex_acceso_lista_frames);
 }
 uint32_t obtener_pag_en_frame(uint32_t frame) {
+	pthread_mutex_lock(&mutex_acceso_lista_frames);
 	t_frame* frame_i = (t_frame*) list_get(listaFrames, frame);
 	return frame_i->pagina;
+	pthread_mutex_unlock(&mutex_acceso_lista_frames);
 }
 void* obtener_info_en_frame(uint32_t frame) {
 	uint32_t tam_memoria = get_tamanio_pagina();

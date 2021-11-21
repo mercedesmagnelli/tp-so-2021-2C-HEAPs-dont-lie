@@ -4,6 +4,7 @@
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
 #include <stdint.h>
+#include <pthread.h>
 t_list* listaProcesos;//casos: agregar_proceso, liberar_paginas
 t_list* listaFrames;//casos: traer_pagina_de_SWAP, liberar_paginas
 t_list* listaFramesReservados;//lista de frames reservados por todos los procesos
