@@ -502,4 +502,50 @@ t_mensaje_r_s* shared_crear_t_mensaje_r_s(uint32_t cant_pag, uint32_t pid){
 }
 
 
+t_mensaje_r_s * deserializar_mensaje_solicitud_r_s(void * puntero) {
+	size_t offset = 0;
+	t_mensaje_r_s * mensaje = malloc(sizeof(t_mensaje_r_s));
+
+	memcpy(&mensaje->cant_pag, puntero + offset, SIZE_PID);
+	offset += SIZE_PID;
+
+	memcpy(&mensaje->pid, puntero + offset, SIZE_PID);
+	offset += SIZE_PID;
+
+	return mensaje;
+}
+
+
+
+t_write_s * deserializar_mensaje_write_s(void* puntero){
+	size_t offset = 0;
+	t_write_s * mensaje = malloc(sizeof(t_write_s));
+
+	memcpy(&mensaje->nro_pag, puntero + offset, SIZE_PID);
+		offset += SIZE_PID;
+
+	memcpy(&mensaje->pid, puntero + offset, SIZE_PID);
+		offset += SIZE_PID;
+
+		mensaje->data = string_new();
+		string_append(&mensaje->data, puntero + offset);
+		offset += string_length(mensaje->data) + 1;
+
+	return mensaje;
+}
+
+
+t_pedir_o_liberar_pagina_s* deserializar_mensaje_peticion_liberacion_pagina(void* puntero){
+	size_t offset = 0;
+	t_pedir_o_liberar_pagina_s * mensaje = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+
+	memcpy(&mensaje->pid, puntero + offset, SIZE_PID);
+		offset += SIZE_PID;
+
+	memcpy(&mensaje->nro_pag, puntero + offset, SIZE_PID);
+		offset += SIZE_PID;
+
+	return mensaje;
+}
+
 

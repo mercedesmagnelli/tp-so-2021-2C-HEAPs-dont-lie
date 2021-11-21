@@ -11,6 +11,9 @@
 #include "../../../shared/codigo_error.h"
 #include "../../../shared/estructura_compartida.h"
 #include "conexion_ram.h"
+#include "../manejo_filesystem/manejo_archivos.h"
+#include "../manejo_filesystem/logica_almacenamiento.h"
+
 
 /**
  * @NAME: recibir_mensaje
