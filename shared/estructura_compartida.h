@@ -130,10 +130,9 @@ void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final, siz
 void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
 void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
 
-uint32_t deserializar_solicitud_espacio(void* respuesta);
-uint32_t deserializar_escritura_en_pagina(void* respuesta);
+
 void* deserializar_pedir_pagina(void* respuesta);
-uint32_t deserializar_liberar_paginas(void* respuesta);
+
 
 t_pedir_o_liberar_pagina_s* shared_crear_pedir_o_liberar(uint32_t pid, uint32_t nro_pag);
 t_write_s* shared_crear_write_s(uint32_t nro_pag, uint32_t pid, void* data);

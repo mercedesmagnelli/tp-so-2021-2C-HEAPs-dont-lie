@@ -36,9 +36,8 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 		free(mensaje_serializado);
 		t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
 
-		uint32_t err = deserializar_escritura_en_pagina(rec->payload);
 
-		if(err == 0){
+		if(rec->head== FALLO_EN_LA_TAREA){
 			loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag_victima, pid_pag_victima);
 		}
 
@@ -76,6 +75,10 @@ void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir) {
 	enviar_mensaje_protocolo(socket_swap,R_S_PEDIR_PAGINA,tamanio,mensaje_serializado);
 	free(mensaje_serializado);
 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
+	if(rec->head == FALLO_EN_LA_TAREA){
+				loggear_error("[RAM] - Hubo un problema en la recepcion de la info de la pagina %d del proceso %d en swamp", pag_a_pedir, pid_a_pedir);
+	}
+
 	void* info = deserializar_pedir_pagina(rec->payload);
 	return info;
 
@@ -264,9 +267,8 @@ void comunicar_eliminacion_proceso_SWAP(uint32_t PID){
 	enviar_mensaje_protocolo(socket_swap,R_S_ELIMINAR_PROCESO,tamanio,mensaje_serializado);
 	free(mensaje_serializado);
  	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
-	t_matelib_nuevo_proceso* err = deserializar_crear_proceso(rec->payload);
 
-	if(err->pid == 0){
+	if(rec->head == FALLO_EN_LA_TAREA){
 		loggear_error("[RAM] - Hubo un problema en la eliminacion del proceso %d en swamp",PID);
 	}
 }
@@ -280,9 +282,9 @@ void enviar_pagina_a_SWAP(uint32_t PID, uint32_t nro_pag, void* data_pag){
 	free(mensaje_serializado);
 
 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
-	uint32_t err = deserializar_escritura_en_pagina(rec->payload);
 
-	if(err == 0){
+
+	if(rec->head == FALLO_EN_LA_TAREA){
 		loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag, PID);
 	}
 }

@@ -196,7 +196,12 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
 	//semaforo_socket
 
-	uint32_t respuesta_final = deserializar_solicitud_espacio(respuesta->payload);
+	uint32_t respuesta_final = 1;
+
+	if(respuesta->head == FALLO_EN_LA_TAREA) {
+		respuesta_final = 0;
+	}
+
 	t_pagina* nueva_pagina;
 
 	t_proceso* proceso = get_proceso_PID(pid);
@@ -333,9 +338,9 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 	enviar_mensaje_protocolo(socket_swap, R_S_LIBERAR_PAGINA, tamanio, mensaje_serializado);
 	free(mensaje_serializado);
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
-	uint32_t err = deserializar_liberar_paginas(respuesta->payload);
 
-    if(err == 0){
+
+    if(respuesta->head == 0){
         loggear_error("[RAM] - Hubo un problema en la liberacion de la paginas del proceos %d en swamp", pid);
     }
 }
