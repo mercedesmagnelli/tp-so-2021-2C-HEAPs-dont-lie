@@ -228,11 +228,14 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 
 	void* mensaje_serializado = serializar_solicitud_espacio(mensaje, &tamanio);
 
-	//semaforo_socket
-	enviar_mensaje_protocolo(socket_swap, R_S_SOLICITUD_ESPACIO, tamanio, mensaje_serializado);
 
+
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
+	enviar_mensaje_protocolo(socket_swap, R_S_SOLICITUD_ESPACIO, tamanio, mensaje_serializado);
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
-	//semaforo_socket
+	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
+
+	free(mensaje_serializado);
 
 	uint32_t respuesta_final = 1;
 
@@ -373,12 +376,14 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 	size_t tamanio;
 	t_pedir_o_liberar_pagina_s* mensaje = shared_crear_pedir_o_liberar(pid, cantPagABorrar);
 	void* mensaje_serializado = serializar_liberar_pagina(mensaje, &tamanio);
+
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 	enviar_mensaje_protocolo(socket_swap, R_S_LIBERAR_PAGINA, tamanio, mensaje_serializado);
-	free(mensaje_serializado);
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
+	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
 
-
-    if(respuesta->head == 0){
+	free(mensaje_serializado);
+    if(respuesta->head == FALLO_EN_LA_TAREA){
         loggear_error("[RAM] - Hubo un problema en la liberacion de la paginas del proceos %d en swamp", pid);
     }
 }

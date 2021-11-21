@@ -10,13 +10,13 @@ uint32_t crear_proceso_SWAP(uint32_t PID){
 
 	void* mensaje_serializado = serializiar_crear_proceso(mensaje, &tamanio);
 
-	//semaforo_socket
+
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 	enviar_mensaje_protocolo(socket_swap,R_S_PROCESO_NUEVO, tamanio, mensaje_serializado);
-
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
-	//semaforo_socket
+	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
 
-	if(respuesta->head==EXITO_EN_LA_TAREA){
+	if(respuesta->head == EXITO_EN_LA_TAREA){
 		respuesta_final = 1;
 	}
 
@@ -57,11 +57,13 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 		size_t tamanio;
 		t_write_s* mensaje = shared_crear_write_s(nro_pag_victima, pid_pag_victima, info_en_frame);
 		void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio, get_tamanio_pagina());
+
+		pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 		enviar_mensaje_protocolo(socket_swap,R_S_ESCRIBIR_EN_PAGINA,tamanio,mensaje_serializado);
-		free(mensaje_serializado);
 		t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
+		pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
 
-
+		free(mensaje_serializado);
 		if(rec->head== FALLO_EN_LA_TAREA){
 			loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag_victima, pid_pag_victima);
 		}
@@ -101,9 +103,13 @@ void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir) {
 	size_t tamanio;
 	t_pedir_o_liberar_pagina_s* pedido = shared_crear_pedir_o_liberar(pid_a_pedir, pag_a_pedir);
 	void* mensaje_serializado = serializar_pedir_pagina(pedido, &tamanio);
+
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 	enviar_mensaje_protocolo(socket_swap,R_S_PEDIR_PAGINA,tamanio,mensaje_serializado);
-	free(mensaje_serializado);
 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
+	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
+
+	free(mensaje_serializado);
 	if(rec->head == FALLO_EN_LA_TAREA){
 				loggear_error("[RAM] - Hubo un problema en la recepcion de la info de la pagina %d del proceso %d en swamp", pag_a_pedir, pid_a_pedir);
 	}
@@ -293,10 +299,13 @@ void comunicar_eliminacion_proceso_SWAP(uint32_t PID){
 	size_t tamanio;
 	t_matelib_nuevo_proceso* pid = shared_crear_nuevo_proceso(PID);
 	void* mensaje_serializado = serializiar_crear_proceso(pid, &tamanio);
-	enviar_mensaje_protocolo(socket_swap,R_S_ELIMINAR_PROCESO,tamanio,mensaje_serializado);
-	free(mensaje_serializado);
- 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
 
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
+	enviar_mensaje_protocolo(socket_swap,R_S_ELIMINAR_PROCESO,tamanio,mensaje_serializado);
+ 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
+ 	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
+
+ 	free(mensaje_serializado);
 	if(rec->head == FALLO_EN_LA_TAREA){
 		loggear_error("[RAM] - Hubo un problema en la eliminacion del proceso %d en swamp",PID);
 	}
@@ -307,12 +316,13 @@ void enviar_pagina_a_SWAP(uint32_t PID, uint32_t nro_pag, void* data_pag){
 	size_t tamanio;
 	t_write_s* mensaje = shared_crear_write_s(nro_pag, PID, data_pag);
 	void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio, get_tamanio_pagina());
+
+	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 	enviar_mensaje_protocolo(socket_swap,R_S_ESCRIBIR_EN_PAGINA,tamanio,mensaje_serializado);
-	free(mensaje_serializado);
-
 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
+	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
 
-
+	free(mensaje_serializado);
 	if(rec->head == FALLO_EN_LA_TAREA){
 		loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag, PID);
 	}
