@@ -27,17 +27,27 @@ uint32_t crear_proceso_SWAP(uint32_t PID){
 
 uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 
+
 	uint32_t frame;
 	void* info_a_guardar;
-	if(!hay_que_hacer_swap(PID)) {
+	if(hay_que_hacer_swap(PID)) {
+		loggear_warning("pase el if1");
 		frame = obtener_frame_libre(PID);
+		loggear_warning("pase el if2");
 		info_a_guardar =  recibir_info_en_pagina(PID, nroPag);
+		loggear_warning("pase el if3");
 	}else {
+		loggear_warning("pase el else1");
 		t_list* lista_frames = obtener_lista_frames_en_memoria(PID);
+		loggear_warning("pase el else12");
 		t_list* lista_paginas = obtener_lista_paginas_de_frames(lista_frames);
+		loggear_warning("pase el else13");
 		t_pagina* pagina_victima = obtener_pagina_victima(lista_paginas, PID);
+		loggear_warning("pase el else14");
 		frame = pagina_victima->frame;
+		loggear_warning("pase el else15");
 		info_a_guardar = traer_y_controlar_consistencia_paginas(pagina_victima, nroPag, PID);
+		loggear_warning("pase el else16");
 
 	}
 	escribir_directamente_en_memoria(info_a_guardar, get_tamanio_pagina(), frame * get_tamanio_pagina());
