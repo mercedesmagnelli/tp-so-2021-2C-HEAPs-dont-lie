@@ -20,15 +20,46 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		destruir_mensaje(mensaje);
 		return 0;
+	case R_S_PROCESO_NUEVO:
+
+		loggear_error("ENTRO AQUI");
+		mensaje_serializado = malloc(sizeof(t_mensaje_r_s));
+		loggear_error("ENTRO AQUIx2");
+			memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
+			loggear_error("ENTRO AQUIx3");
+
+			t_mensaje_r_s* mensaje_deserializado_nuevo = malloc(sizeof(t_mensaje_r_s));
+			loggear_error("ENTRO AQUIx4");
+
+			if(get_asignacion() == FIJA){
+				carpincho = crear_carpincho(mensaje_deserializado_nuevo->pid,mensaje_deserializado_nuevo->cant_pag);
+				if(carpincho->estado_carpincho > 0){
+						destroy_carpinchos_swamp(carpincho);
+						loggear_debug("NO HAY MAS ESPACIO POR LO QUE SE ENVIA A LA RAM EL MENSAJE DE ERROR AL GUARDAR");
+						enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL); //TODO esto no se si es así revisar bien.
+					}
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			}else{
+				loggear_error("ENTRO AQUIx5");
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			}
+
+		free(mensaje_serializado);
+		free(mensaje_deserializado_nuevo);
+		loggear_error("ENTRO AQUIx6");
+		destruir_mensaje(mensaje);
+		return 0;
 	case R_S_SOLICITUD_ESPACIO:
 
+		loggear_error("ENTRO AQUIx7");
 		mensaje_serializado = malloc(sizeof(t_mensaje_r_s));
 		memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
-
+		loggear_error("ENTRO AQUIx8");
 		t_mensaje_r_s* mensaje_deserializado = malloc(sizeof(t_mensaje_r_s));
 
 		mensaje_deserializado = deserializar_mensaje_solicitud_r_s(mensaje_serializado);
 
+		loggear_error("ENTRO AQUIx9");
 		carpincho = crear_carpincho(mensaje_deserializado->pid,mensaje_deserializado->cant_pag);
 
 		if(carpincho->estado_carpincho > 0){
@@ -36,9 +67,15 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 			loggear_debug("NO HAY MAS ESPACIO POR LO QUE SE ENVIA A LA RAM EL MENSAJE DE ERROR AL GUARDAR");
 			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL); //TODO esto no se si es así revisar bien.
 		}
+
+		loggear_error("ENTRO AQUIx10");
 		reservar_marcos(carpincho,mensaje_deserializado->cant_pag, particion_a_escribir(carpincho->pid_carpincho));
 
 		enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+
+		loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,0));
+		loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,1));
+
 
 		free(mensaje_serializado);
 		free(mensaje_deserializado);

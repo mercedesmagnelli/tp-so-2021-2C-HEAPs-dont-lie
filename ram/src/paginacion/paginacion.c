@@ -225,22 +225,27 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 
 int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 
-
+	loggear_warning("entre aqui");
 	uint32_t cantidad_paginas_extras = paginas_extras_para_proceso(pid, size);
-
+	loggear_warning("entre aqui2");
 
 	t_mensaje_r_s* mensaje = shared_crear_t_mensaje_r_s(cantidad_paginas_extras, pid);
-
+	loggear_warning("entre aqui3");
 	size_t tamanio;
-
+	loggear_warning("entre aqui4");
 	void* mensaje_serializado = serializar_solicitud_espacio(mensaje, &tamanio);
-
+	loggear_warning("entre aqui5");
 
 
 	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
+	loggear_error("tamanio %d", tamanio);
+	loggear_debug("socket: %d", socket_swap);
 	enviar_mensaje_protocolo(socket_swap, R_S_SOLICITUD_ESPACIO, tamanio, mensaje_serializado);
+	loggear_warning("entre aqui6");
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
+	loggear_warning("entre aqui7");
 	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
+	loggear_warning("entre aqui8");
 
 	free(mensaje_serializado);
 
@@ -267,9 +272,11 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 }
 
 uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size) {
-
+	loggear_debug("entre aqui 2");
 	uint32_t cantidad =  (size+9) / get_tamanio_pagina();
+	loggear_debug("entre aqui 2  x2");
 	uint32_t resto_ult_pag = calcular_tamanio_ultimo_HEAP(pid);
+	loggear_debug("entre aqui 2 x3");
 	uint32_t excedente = (size+9) % get_tamanio_pagina();
 
 	if(resto_ult_pag < excedente) {
@@ -368,7 +375,6 @@ void consolidar_memoria(uint32_t PID){
 
 void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 
-
 	uint32_t cantPagNOBORRAR = ultimo_heap->currAlloc/get_tamanio_pagina();
 
 	if(((ultimo_heap->currAlloc)%get_tamanio_pagina()) > 0){
@@ -378,10 +384,16 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 	uint32_t paginasUsadas = list_size(tp);
 	uint32_t cantPagABorrar = paginasUsadas - cantPagNOBORRAR;
 
+	t_pagina* paginaEliminar;
+
 	for(int i = 0; i < cantPagABorrar; i++){
-	//TODO: tenemos que revisar las paginas eliminadas, si estan en RAM tenemos que actualizar la cantidad de paginas en RAM del proceso
-		list_remove_and_destroy_element(tp, cantPagNOBORRAR, free);
-	}
+	        paginaEliminar = list_get(tp, cantPagNOBORRAR);
+	        if(paginaEliminar->bit_presencia==1){
+	            t_frame* frameLiberado = list_get(listaFrames, paginaEliminar);
+	            frameLiberado->estado=0;
+	        }
+	        list_remove_and_destroy_element(tp, cantPagNOBORRAR, free);
+	    }
 
 	size_t tamanio;
 	t_pedir_o_liberar_pagina_s* mensaje = shared_crear_pedir_o_liberar(pid, cantPagABorrar);
@@ -741,11 +753,29 @@ void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uin
 }
 
 uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
-	t_proceso* proceso = get_proceso_PID(PID);
-	int tamanioProceso = list_size(proceso->tabla_paginas) * get_tamanio_pagina();
-	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
-	heap_metadata* ultimoHeap = list_get(listaHMD, list_size(listaHMD)-1);
-	return tamanioProceso - ultimoHeap->currAlloc;
+    t_proceso* proceso = get_proceso_PID(PID);
+    uint32_t extra;
+    int tamanioProceso = list_size(proceso->tabla_paginas) * get_tamanio_pagina();
+    t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
+    loggear_trace("casi llego");
+    if(listaHMD == NULL){
+        loggear_info("la lista es nula");
+    }
+    heap_metadata* ultimoHeap;
+    loggear_trace("casi llegox2");
+    int tamanio_lista = list_size(listaHMD);
+    loggear_trace("casi llegox3 %d", tamanio_lista);
+    if(tamanio_lista == 0){
+    extra = 0;
+    loggear_trace("casi llegox4 %d", tamanio_lista);
+    }else{
+    ultimoHeap = list_get(listaHMD, list_size(listaHMD)-1);
+extra = ultimoHeap->currAlloc;
+    loggear_trace("casi llegox5 %d", tamanio_lista);
+    }
+    loggear_trace("no llgue");
+
+    return tamanioProceso - extra;
 }
 
 void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant){
