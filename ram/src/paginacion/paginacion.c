@@ -134,12 +134,14 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 
 	//FIXME: puede que acá haya que traer a memoria???
-
+	loggear_warning("rompo aqui");
 	heap_metadata* heap = get_HEAP(PID,ptro);
 	int nextNextAlloc = heap->nextAlloc;
 	heap->nextAlloc = ptro+tamanio;
 	heap->isFree = 0;
+	loggear_warning("rompo aquix2");
 	guardar_HEAP_en_memoria(PID, heap);
+	loggear_warning("rompo aquix3");
 
 
 	heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
@@ -149,7 +151,7 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	nuevoHeap->isFree    = 1;
 	agregar_HEAP_a_PID(PID,nuevoHeap);
 	guardar_HEAP_en_memoria(PID, nuevoHeap);
-
+	loggear_warning("ya no rompo aqui");
 	//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
 	if(nuevoHeap->nextAlloc != -1){
 
