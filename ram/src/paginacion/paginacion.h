@@ -74,7 +74,7 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio);
  * @DESC: Agrega el proceso a la lista de procesos y crea los 2 HEAPs necesarios
  * @RET: devuelve el puntero en el cual entra el tamaño solicitado
  **/
-int32_t agregar_proceso(uint32_t PID, uint32_t tam);
+void agregar_proceso(uint32_t PID, uint32_t tam);
 
 /**
 * @NAME: se_puede_almacenar_el_alloc_para_proceso

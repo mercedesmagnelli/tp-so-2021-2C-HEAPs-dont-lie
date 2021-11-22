@@ -134,29 +134,37 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 
 	//FIXME: puede que acá haya que traer a memoria???
+	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
+	if(list_is_empty(listaHMD)) {
+		agregar_proceso(PID, tamanio);
+	}else {
+		heap_metadata* heap = get_HEAP(PID,ptro);
+		int nextNextAlloc = heap->nextAlloc;
+			heap->nextAlloc = ptro+tamanio;
+			heap->isFree = 0;
+			guardar_HEAP_en_memoria(PID, heap);
 
-	heap_metadata* heap = get_HEAP(PID,ptro);
-	int nextNextAlloc = heap->nextAlloc;
-	heap->nextAlloc = ptro+tamanio;
-	heap->isFree = 0;
-	guardar_HEAP_en_memoria(PID, heap);
 
+			heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
+			nuevoHeap->currAlloc = heap->nextAlloc;
+			nuevoHeap->prevAlloc = heap->currAlloc;
+			nuevoHeap->nextAlloc = nextNextAlloc;
+			nuevoHeap->isFree    = 1;
+			agregar_HEAP_a_PID(PID,nuevoHeap);
+			guardar_HEAP_en_memoria(PID, nuevoHeap);
 
-	heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
-	nuevoHeap->currAlloc = heap->nextAlloc;
-	nuevoHeap->prevAlloc = heap->currAlloc;
-	nuevoHeap->nextAlloc = nextNextAlloc;
-	nuevoHeap->isFree    = 1;
-	agregar_HEAP_a_PID(PID,nuevoHeap);
-	guardar_HEAP_en_memoria(PID, nuevoHeap);
+			//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
+			if(nuevoHeap->nextAlloc != -1){
 
-	//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
-	if(nuevoHeap->nextAlloc != -1){
+				heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
+				heapSig->prevAlloc = nuevoHeap->currAlloc;
+				guardar_HEAP_en_memoria(PID, heapSig);
+			}
 
-		heap_metadata* heapSig = get_HEAP(PID,nuevoHeap->nextAlloc);
-		heapSig->prevAlloc = nuevoHeap->currAlloc;
-		guardar_HEAP_en_memoria(PID, heapSig);
 	}
+
+
+
 }
 
 
@@ -170,22 +178,10 @@ int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size) {
 	}
 }
 
-int32_t agregar_proceso(uint32_t PID, uint32_t tam){
+void agregar_proceso(uint32_t PID, uint32_t tam){
 	//creo el proceso y lo inicializo
 
-	t_proceso* nuevoProceso = malloc(sizeof(t_proceso));
-	nuevoProceso->PID = PID;
-	nuevoProceso->tabla_paginas = list_create();
-	nuevoProceso->lista_hmd = list_create();
-	nuevoProceso->lista_frames_reservados = list_create();
-	nuevoProceso->hits_proceso = 0;
-	nuevoProceso->miss_proceso = 0;
-	if(get_tipo_asignacion() == FIJA){
-		reservar_frames(nuevoProceso->lista_frames_reservados);
-		nuevoProceso->puntero_frames = 0;
-	}
-	list_add(listaProcesos, nuevoProceso);
-
+	t_proceso* nuevoProceso = get_proceso_PID(PID);
 
 	int cantPags = calcular_paginas_para_tamanio(tam);
 
@@ -220,7 +216,7 @@ int32_t agregar_proceso(uint32_t PID, uint32_t tam){
 
 
 
-	return nuevoHeapPrimero->currAlloc+9;//siempre el primer alloc va a ser 9 porque el primer dato se guarda al comienzo, y el metadata ocupa 9 bytes
+	//return nuevoHeapPrimero->currAlloc+9;//siempre el primer alloc va a ser 9 porque el primer dato se guarda al comienzo, y el metadata ocupa 9 bytes
 }
 
 int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
