@@ -99,7 +99,10 @@ void leer_directamente_de_memoria(void* ptroLectura, int32_t tamanio, uint32_t d
 void escribir_directamente_en_memoria(void* valorAEscribir, int32_t tamanio, uint32_t direccionLogica){
 	//TODO: CREO QUE NO VA
 	//pthread_mutex_lock(&mutex_acceso_memoria);
+	loggear_trace("ESTOY POR COPIAR EN MEMORIA PRINCIAL EN LA DIRECCION: %d, DE TAMANIO %d",memoria_principal + direccionLogica,tamanio);
 	memcpy(memoria_principal + direccionLogica, valorAEscribir, tamanio);
+	loggear_trace("DESPUES DE COPIAR EN MEMORIA PRINCIAL EN LA DIRECCION: %d, DE TAMANIO %d",memoria_principal + direccionLogica,tamanio);
+
 	//pthread_mutex_unlock(&mutex_acceso_memoria);
 
 }
