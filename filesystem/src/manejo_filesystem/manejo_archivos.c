@@ -51,6 +51,7 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 	int marco = obtener_marco_desde_pagina(pagina, carpincho);
 	if(marco < 0){
 		loggear_trace("NO EXISTE LA PAGINA %d del carpincho %d dentro de la swap", pagina, carpincho->pid_carpincho);
+		return "basura";
 	}
 	loggear_debug("Se comienza a leer la pagina %d de la particion %s", marco, ruta_particion);
 
@@ -185,7 +186,7 @@ int reservar_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos, t_ar
 	list_add_all(carpincho->marcos_reservados, marcos_lista);
 	swamp->espacio_libre = swamp->espacio_libre - cantidad_marcos;
 
-
+	loggear_warning("aca voy bien");
 	list_destroy(marcos_lista);
 	return 0;
 }

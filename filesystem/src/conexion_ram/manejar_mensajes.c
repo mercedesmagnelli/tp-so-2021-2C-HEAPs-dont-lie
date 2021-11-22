@@ -73,15 +73,17 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 
-		loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,0));
-		loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,1));
+		loggear_error("marco reservado %s", list_get(carpincho->marcos_reservados,0));
+		loggear_error("marco reservado %s", list_get(carpincho->marcos_reservados,1));
 
 
 		free(mensaje_serializado);
 		free(mensaje_deserializado);
-
+		destruir_mensaje(mensaje);
+		loggear_warning("aca voy re bien");
 		return 0;
 	case R_S_ESCRIBIR_EN_PAGINA:
+		loggear_info("llega una solicitud de escritura desde la RAM");
 		 mensaje_serializado = malloc(sizeof(t_write_s));
 
 		 t_write_s* write_deserializado = malloc(sizeof(t_write_s));
@@ -98,14 +100,17 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		free(write_deserializado->data);
 		free(write_deserializado);
-
+		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_PEDIR_PAGINA:
+		loggear_info("llego una peticion de pagina de la ram");
 		mensaje_serializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
-
+		memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
 		t_pedir_o_liberar_pagina_s* pedir_deserializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
 
 		pedir_deserializado = deserializar_mensaje_peticion_liberacion_pagina(mensaje_serializado);
+
+		loggear_warning("me pide la pagina %zu", pedir_deserializado->nro_pag); //TODO xq me llega cualquier verdura aca.
 
 		carpincho  = buscar_carpincho_en_lista(pedir_deserializado->pid);
 
@@ -121,6 +126,9 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 					}
 
 		free(pagina_info);
+		free(mensaje_serializado);
+		free(pedir_deserializado);
+		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_ELIMINAR_PROCESO:
 
