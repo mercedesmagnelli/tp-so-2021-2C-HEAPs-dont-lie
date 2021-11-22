@@ -381,9 +381,9 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 	t_pagina* paginaEliminar;
 
 	for(int i = 0; i < cantPagABorrar; i++){
-	        paginaEliminar = list_get(tp, cantPagNOBORRAR);
+	        paginaEliminar = (t_pagina*)list_get(tp, cantPagNOBORRAR);
 	        if(paginaEliminar->bit_presencia==1){
-	            t_frame* frameLiberado = list_get(listaFrames, paginaEliminar);
+	            t_frame* frameLiberado = list_get(listaFrames, paginaEliminar->frame);
 	            frameLiberado->estado=0;
 	        }
 	        list_remove_and_destroy_element(tp, cantPagNOBORRAR, free);
@@ -686,11 +686,17 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 	}else{
 		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
 		if(esta_en_RAM(PID, nroPag)){
+			loggear_debug("rompo");
 			marco = obtener_frame_de_RAM(PID, nroPag);
+			loggear_debug("rompo2");
 			actualizar_datos_pagina(PID, nroPag, bitModificado, 0);
+			loggear_debug("rompo3");
 		}else{
+			loggear_warning("else 1");
 			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima. Tmbn tiene que actualizar la cant de Pags en asig FIJA
+			loggear_warning("else 2");
 			inicializar_datos_pagina(PID, nroPag, marco, bitModificado);//podriamos poner esta funcion dentro de obtener fram asi tmbn se encarga de modificar lo administrativo dsps del cambio de pags?
+			loggear_warning("else 3");
 			loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
 		}
 		agregar_entrada_tlb(PID, nroPag, marco);
@@ -709,7 +715,10 @@ void* serializar_HEAP(heap_metadata* heap){//TODO revisar serializacion
 bool esta_en_RAM(uint32_t PID, uint32_t nroPag){
 
 	t_list* tabla_paginas = obtener_tabla_paginas_mediante_PID(PID);
+	loggear_debug("rompo!!");
 	t_pagina* pag = (t_pagina*) list_get(tabla_paginas, nroPag);
+	loggear_debug("rompo!!2");
+	loggear_debug("el bit de presencia es: %d",pag->bit_presencia);
 	return pag->bit_presencia == 1 ? true : false;
 }
 
