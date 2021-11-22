@@ -64,12 +64,11 @@ void testeamos() {
     uint32_t pid = 0;
     int32_t size;
     while(pid!= -1){
-    printf("Ingrese el numero de proceso y el tamanio");
+		printf("Ingrese el numero de proceso y el tamanio");
 
-    scanf("%d %d", &pid, &size);
-    inicializar_proceso(pid);
-    memalloc(pid, size);
-
+		scanf("%d %d", &pid, &size);
+		inicializar_proceso(pid);
+		memalloc(pid, size);
     }
 
     imprimir_procesos();

@@ -25,6 +25,7 @@ int enviar_handshake() {
 		loggear_info("La RAM nos desconoce, no podemos trabajar");
 		return error;
 	}
+
 	}
 	//pthread_exit(NULL);
 	return 0;
