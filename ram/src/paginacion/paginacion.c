@@ -577,7 +577,7 @@ t_proceso* get_proceso_PID(uint32_t PID){
 	bool proceso_PID(void* element) {
 			t_proceso* proceso = (t_proceso*) element;
 			return proceso->PID == PID;
-		}
+	}
 
 	t_proceso* proceso = list_find(listaProcesos, proceso_PID);
 	return proceso;
@@ -694,7 +694,7 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 		}else{
 			loggear_warning("else 1");
 			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima. Tmbn tiene que actualizar la cant de Pags en asig FIJA
-			loggear_warning("else 2");
+			loggear_info("[RAM] - El marco que voy a usar es: %d", marco);
 			inicializar_datos_pagina(PID, nroPag, marco, bitModificado);//podriamos poner esta funcion dentro de obtener fram asi tmbn se encarga de modificar lo administrativo dsps del cambio de pags?
 			loggear_warning("else 3");
 			loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);

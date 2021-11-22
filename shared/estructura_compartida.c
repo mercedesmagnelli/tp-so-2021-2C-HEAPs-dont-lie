@@ -446,6 +446,8 @@ void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* siz
 
 
 void* deserializar_pedir_pagina(void* respuesta){
+	void* rta = malloc(32);
+	memcpy(rta, respuesta, 32);
 	return respuesta;
 
 }
@@ -520,10 +522,12 @@ t_pedir_o_liberar_pagina_s* deserializar_mensaje_peticion_liberacion_pagina(void
 
 	memcpy(&mensaje->pid, puntero + offset, SIZE_NRO_PAG);
 		offset += SIZE_PID;
-	loggear_trace("el pid en swamp es %d", mensaje->pid);
+
 	memcpy(&mensaje->nro_pag, puntero + offset, SIZE_NRO_PAG);
 		offset += SIZE_NRO_PAG;
-		loggear_trace("el nro_pagina en swamp es %d", mensaje->nro_pag);
+
+
+
 	return mensaje;
 }
 
