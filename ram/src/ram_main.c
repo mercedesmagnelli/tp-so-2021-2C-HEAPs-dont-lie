@@ -7,9 +7,9 @@ void testeamos();
 int main(int argc, char** argv) {
 
 	// TODO: Implementar signal de CtrlC y  tal vez CtrlZ
-	signal(SIGINT, manejar_sigint);
-	signal(SIGUSR1, manejar_sigusr1);
-	signal(SIGUSR1, manejar_sigusr2);
+	//signal(SIGINT, manejar_sigint);
+	//signal(SIGUSR1, manejar_sigusr1);
+	//signal(SIGUSR1, manejar_sigusr2);
 
 	int error = iniciar_configuracion(argc, argv);
 

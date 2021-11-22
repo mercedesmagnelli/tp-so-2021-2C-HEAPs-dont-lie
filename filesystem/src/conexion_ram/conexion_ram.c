@@ -19,27 +19,27 @@ int enviar_handshake() {
 	}
 
 	loggear_trace("Enviado handshake a la ram");
-
+	while(1){
 	int error = recibir_mensaje(socket_ram);
 	if (error != 0) {
 		loggear_info("La RAM nos desconoce, no podemos trabajar");
 		return error;
 	}
 
-	pthread_exit(NULL);
+	}
+	//pthread_exit(NULL);
 	return 0;
 }
 
 // Publica
 void conexiones_cerrar_conexiones(bool safe_close) {
 	avisar_ram_desconexion();
-
 	loggear_trace("Cerrado los threads y sockets");
 }
 
 void avisar_ram_desconexion() {
 	int socket_avisar = conexiones_iniciar();
-
+	loggear_error("paso por desconectar");
 	enviar_mensaje_protocolo(socket_avisar, DESCONEXION_TOTAL, 0, NULL);
 
 	close(socket_avisar);

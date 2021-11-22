@@ -163,8 +163,6 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 
 	}
 
-
-
 }
 
 
