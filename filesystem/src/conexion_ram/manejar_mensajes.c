@@ -117,6 +117,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		char* pagina_info = malloc(get_tamanio_pagina() + 1);
 
 		pagina_info = leer_particion(pedir_deserializado->nro_pag, particion_a_escribir(carpincho->pid_carpincho), carpincho); //TODO resta bien hacer lo del error en esto
+		loggear_warning("info pag %s", pagina_info);
 		int codigo_mensaje = enviar_mensaje_protocolo(mensaje->socket, R_S_PEDIR_PAGINA, string_length(pagina_info) + 1, pagina_info);
 
 					if (codigo_mensaje < 0) {

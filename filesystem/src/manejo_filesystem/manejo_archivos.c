@@ -51,7 +51,7 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 	int marco = obtener_marco_desde_pagina(pagina, carpincho);
 	if(marco < 0){
 		loggear_trace("NO EXISTE LA PAGINA %d del carpincho %d dentro de la swap", pagina, carpincho->pid_carpincho);
-		return "basura";
+		return string_repeat('b', get_tamanio_pagina());
 	}
 	loggear_debug("Se comienza a leer la pagina %d de la particion %s", marco, ruta_particion);
 
