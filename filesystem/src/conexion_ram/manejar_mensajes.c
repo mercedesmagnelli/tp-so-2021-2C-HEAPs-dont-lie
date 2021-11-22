@@ -125,9 +125,9 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 						loggear_info("Se mando a la RAM la pagina solicitada");
 					}
 
-		free(pagina_info);
 		free(mensaje_serializado);
 		free(pedir_deserializado);
+		//free(pagina_info); TODO porque no me deja hacer este free???
 		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_ELIMINAR_PROCESO:
