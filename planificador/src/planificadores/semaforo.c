@@ -27,9 +27,11 @@ void semaforo_imprimir_status() {
 		lista_hilos(semaforo->list_procesos_bloqueados),
 		lista_hilos(semaforo->list_procesos_retienen));
 	}
+	pthread_mutex_lock(&mutex_semaforos);
 	loggear_warning("--------------INICIO SEMAFOROS--------------");
 	dictionary_iterator(semaforos, imprimir);
 	loggear_warning("--------------FIN SEMAFOROS--------------");
+	pthread_mutex_unlock(&mutex_semaforos);
 }
 
 t_semaforo * crear_semaforo(t_matelib_semaforo * semaforo) {
@@ -121,9 +123,9 @@ t_estado_ejecucion semaforo_wait(t_matelib_semaforo * sem) {
 	bool bloquear = semaforo->valor < BLOQUEAR_PROCESO;
 
 	if (bloquear) {
-		pthread_mutex_unlock(&(semaforo->mutex));
 		colas_mover_exec_block(SEMAFORO, semaforo->nombre, sem->pid);
 		list_add(semaforo->list_procesos_bloqueados, hilo_wait);
+		pthread_mutex_unlock(&(semaforo->mutex));
 
 		semaforo_imprimir_status();
 
@@ -160,6 +162,7 @@ t_hilo * desbloquear_semaforo(t_semaforo * semaforo, bool desbloquear_todos) {
 
 			list_remove(semaforo->list_procesos_bloqueados, i);
 			list_add(semaforo->list_procesos_retienen, hilo);
+			list_add(hilo->semaforos_pedidos, semaforo);
 			if (!desbloquear_todos) {
 				semaforo_imprimir_status();
 
@@ -172,6 +175,7 @@ t_hilo * desbloquear_semaforo(t_semaforo * semaforo, bool desbloquear_todos) {
 
 			list_remove(semaforo->list_procesos_bloqueados, i);
 			list_add(semaforo->list_procesos_retienen, hilo);
+			list_add(hilo->semaforos_pedidos, semaforo);
 			if (!desbloquear_todos) {
 				semaforo_imprimir_status();
 
@@ -222,9 +226,9 @@ t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
 		}
 	}
 
-	pthread_mutex_unlock(&(semaforo->mutex));
-
 	semaforo_imprimir_status();
+
+	pthread_mutex_unlock(&(semaforo->mutex));
 
 	return SEM_OK;
 }
@@ -237,11 +241,15 @@ void semaforo_deadlock_post(t_semaforo * semaforo) {
 
 	t_hilo * hilo_desbloqueado = desbloquear_semaforo(semaforo, false);
 
-	pthread_mutex_unlock(&(semaforo->mutex));
-
-	loggear_trace("[SEMAFORO] - PID: %zu - Luego del SEM_POST, se desbloqueo este hilo", pid(hilo_desbloqueado));
+	if (hilo_desbloqueado != NULL) {
+		loggear_trace("[SEMAFORO] - PID: %zu - Luego del SEM_POST, se desbloqueo este hilo", pid(hilo_desbloqueado));
+	} else {
+		loggear_trace("[SEMAFORO] - Luego del SEM_POST, no se desbloqueo ningun hilo");
+	}
 
 	semaforo_imprimir_status();
+
+	pthread_mutex_unlock(&(semaforo->mutex));
 }
 
 t_estado_ejecucion semaforo_destruir(t_matelib_semaforo * sem) {
@@ -281,7 +289,7 @@ void semaforo_eliminar_proceso(t_hilo * hilo) {
 		semaforo_bloqueante->valor++;
 		pthread_mutex_unlock(&(semaforo_bloqueante->mutex));
 
-		list_remove_by_condition(semaforo_bloqueante->list_procesos_bloqueados, es_hilo);
+		list_remove_and_destroy_by_condition(semaforo_bloqueante->list_procesos_bloqueados, es_hilo, identity);
 
 		loggear_info("[SEMAFORO] -- Se le incremeto un contador al semaforo: %s", semaforo_bloqueante->nombre);
 	}
@@ -289,8 +297,8 @@ void semaforo_eliminar_proceso(t_hilo * hilo) {
 	if (hilo->semaforos_pedidos != NULL) {
 		void avisar_semaforo_post(void * sem) {
 			t_semaforo * semaforo = (t_semaforo *) sem;
-			semaforo_deadlock_post(semaforo);
 			list_remove_and_destroy_by_condition(semaforo->list_procesos_retienen, es_hilo, identity);
+			semaforo_deadlock_post(semaforo);
 		}
 		list_destroy_and_destroy_elements(hilo->semaforos_pedidos, avisar_semaforo_post);
 		hilo->semaforos_pedidos = NULL;

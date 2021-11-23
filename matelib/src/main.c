@@ -28,13 +28,10 @@ int main(int argc, char** argv) {
 		mate_init(lib_ref, string_from_format("Proceso %d", n));
 
 		mate_sem_wait(lib_ref, "SEM_CCC");
-		sleep(5);
 		mate_sem_wait(lib_ref, "SEM_BBB");
 		mate_sem_wait(lib_ref, "SEM_AAA");
 
 		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
-
-		sleep(7);
 
 		loggear_trace("[PID: %zu] - SEM_POST A SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
@@ -47,13 +44,10 @@ int main(int argc, char** argv) {
 		mate_init(lib_ref, string_from_format("Proceso %d", n));
 
 		mate_sem_wait(lib_ref, "SEM_AAA");
-		sleep(5);
 		mate_sem_wait(lib_ref, "SEM_CCC");
 		mate_sem_wait(lib_ref, "SEM_BBB");
 
 		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
-
-		sleep(7);
 
 		loggear_trace("[PID: %zu] - SEM_POST a SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
@@ -66,13 +60,10 @@ int main(int argc, char** argv) {
 		mate_init(lib_ref, string_from_format("Proceso %d", n));
 
 		mate_sem_wait(lib_ref, "SEM_BBB");
-		sleep(5);
 		mate_sem_wait(lib_ref, "SEM_AAA");
 		mate_sem_wait(lib_ref, "SEM_CCC");
 
 		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
-
-		sleep(7);
 
 		loggear_trace("[PID: %zu] - SEM_POST A SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
