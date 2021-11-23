@@ -10,6 +10,7 @@
 #include "../../../shared/logger.h"
 #include <stdint.h>
 #include "../inicializar_filesystem/inicializar_filesystem.h"
+#include "logica_almacenamiento.h"
 
 /*
  * escribir_particion
@@ -52,5 +53,9 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 int reservar_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos, t_archivo_swamp* swamp);
 
 int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_paginas);
+
+int vaciar_marco_del_archivo(uint32_t marco, char* ruta_archivo);
+
+int eliminar_proceso(t_carpincho_swamp* carpincho);
 
 #endif /* MANEJO_FILESYSTEM_MANEJO_ARCHIVOS_H_ */

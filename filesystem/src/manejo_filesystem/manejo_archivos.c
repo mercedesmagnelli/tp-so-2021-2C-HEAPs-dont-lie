@@ -245,13 +245,71 @@ int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_
 			list_remove(carpincho->marcos_usados, j - i - 1); //ver si hace falta un remove.
 		}
 	}else{
+		t_archivo_swamp* archivo = particion_a_escribir(carpincho->pid_carpincho);
 		for(int i = 0; i < cantidad_paginas; i++){
+			char* marco = list_get(carpincho->marcos_usados, j - i - 1);
+			int aux = atoi(marco);
+			loggear_debug("se libera el marco %d por peticion de la RAM ya que se borro informacion del proceso %d del archivo %s", aux, carpincho->pid_carpincho, archivo->ruta_archivo);
 			list_remove_and_destroy_element(carpincho->marcos_usados, j - i - 1, free); // ver si hace falta un remove.
+			bitarray_clean_bit(archivo->bitmap_bitarray, aux);
+			vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
 		}
 	}
 
 	return 0;
 }
 
+int vaciar_marco_del_archivo(uint32_t marco, char* ruta_archivo){
+
+	FILE* archivo;
+	archivo = fopen(ruta_archivo, "r+");
+
+	if(archivo == NULL){
+		loggear_error("Ocurrio un error al abrir el archivo %s, puede deberse a que no esta creado o no es la ruta correcta", ruta_archivo);
+		return -1;
+	}
+
+	int posicion_escribir = marco * get_tamanio_pagina();
+
+	fseek(archivo, posicion_escribir, SEEK_SET);
+	char* texto_escribir = string_repeat('?', get_tamanio_pagina());
+
+	fputs(texto_escribir, archivo);
+
+	fclose(archivo);
+
+	free(texto_escribir);
+	return 0;
+}
+
+int eliminar_proceso(t_carpincho_swamp* carpincho){
+	t_archivo_swamp* archivo = particion_a_escribir(carpincho->pid_carpincho);
+	for(int i = 0; i < list_size(carpincho->marcos_usados); i++){
+		char* marco = list_get(carpincho->marcos_usados, i);
+		int aux = atoi(marco);
+		bitarray_clean_bit(archivo->bitmap_bitarray, aux);
+		vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
+	}
+	for(int j = 0; j < list_size(carpincho->marcos_reservados); j++){
+		char* marco = list_get(carpincho->marcos_reservados, j);
+		int aux = atoi(marco);
+		bitarray_clean_bit(archivo->bitmap_bitarray, aux);
+	}
+
+	for(int w = 0; w < list_size(lista_carpinchos); w++){
+		t_carpincho_swamp* carpi = list_get(lista_carpinchos, w);
+		if(carpi->pid_carpincho == carpincho->pid_carpincho){
+			loggear_info("la posicion es %d", w);
+			list_remove(lista_carpinchos, w);
+		}
+	}
+
+	destroy_carpinchos_swamp(carpincho);
+
+
+
+
+	return 0;
+}
 
 
