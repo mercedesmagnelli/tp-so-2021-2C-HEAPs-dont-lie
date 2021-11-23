@@ -56,6 +56,11 @@ int mate_sem_wait(mate_instance *lib_ref, mate_sem_name sem) {
 
 	int error = enviar_mate_sem_wait(semaforo);
 
+	if (error == EXITO_PROCESO_ELIMINADO) {
+		loggear_warning("Destruimos el hilo actual");
+		pthread_exit(NULL);
+	}
+
 	return error;
 
 }

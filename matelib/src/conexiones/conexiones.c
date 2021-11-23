@@ -133,10 +133,15 @@ int enviar_mate_sem_wait(t_matelib_semaforo* semaforo){
 	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
 	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
 		loggear_info("El proceso [PID: %zu] hizo wait al semáforo %s", semaforo->pid, semaforo->semaforo_nombre);
-	}else if(mensaje_respuesta->head == FALLO_EN_LA_TAREA){
+	} else if(mensaje_respuesta->head == FALLO_EN_LA_TAREA){
 		loggear_info("El proceso [PID: %zu] no pudo hacer wait al semáforo %s", semaforo->pid, semaforo->semaforo_nombre);
 		error = 1;
-	}else {
+	} else if (mensaje_respuesta->head == EXITO_PROCESO_ELIMINADO) {
+		loggear_info("El proceso [PID: %zu] fue desalojado por un deadlock", semaforo->pid);
+		error = EXITO_PROCESO_ELIMINADO;
+	} else if (mensaje_respuesta->head == DESCONEXION) {
+		loggear_debug("Desconeccion [PID: %zu]", semaforo->pid);
+	} else {
 		loggear_warning("El proceso [PID: %zu] devolvió un código extraño: %d al hacer MATE_SEM_WAIT", semaforo->pid, mensaje_respuesta->head);
 		error = 2;
 	}
@@ -370,7 +375,7 @@ int enviar_mate_memwrite(t_matelib_memoria_write* escribir){
 }
 
 // Publica
-void conexiones_cerrar_conexiones(bool safe_close) {
+void conexiones_cerrar_conexiones() {
 	avisar_desconexion();
 
 	loggear_trace("Cerrado los threads y sockets");

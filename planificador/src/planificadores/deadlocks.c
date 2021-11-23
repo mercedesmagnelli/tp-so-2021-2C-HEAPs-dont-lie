@@ -157,7 +157,7 @@ int iniciar_control_deadlock() {
 }
 
 void * get_maximo_pid(void * hilo_void_1, void * hilo_void_2) {
-	if (((t_hilo *) hilo_void_1)->pid > ((t_hilo *) hilo_void_2)->pid) {
+	if (pid(hilo_void_1) >= pid(hilo_void_2)) {
 		return hilo_void_1;
 	}
 	return hilo_void_2;
@@ -211,20 +211,7 @@ int eliminar_proceso_deadlock(t_list * hilos_deadlock) {
 
 	loggear_warning("[DEADLOCK] -- Se va a eliminar el carpincho de PID MAYOR: %zu", pid(hilo_mayor_pid));
 
-	t_semaforo * semaforo_bloqueante = semaforo_get(hilo_mayor_pid->nombre_bloqueante);
-
-	loggear_warning("[DEADLOCK] -- El PID: %zu, esta bloqueado por el semaforo: %s", pid(hilo_mayor_pid), semaforo_bloqueante->nombre);
-
-	pthread_mutex_lock(&(semaforo_bloqueante->mutex));
-	semaforo_bloqueante->valor++;
-	pthread_mutex_unlock(&(semaforo_bloqueante->mutex));
-
-	loggear_warning("[DEADLOCK] -- Se le incremeto un contador al semaforo: %s", semaforo_bloqueante->nombre);
-
-	void avisar_semaforo_post(void * sem) { semaforo_deadlock_post((t_semaforo *) sem); }
-	list_iterate(hilo_mayor_pid->semaforos_pedidos, avisar_semaforo_post);
-
-	loggear_warning("[DEADLOCK] -- Se hizo POST de todos los semaforos ocuados por el PID: %zu", pid(hilo_mayor_pid));
+	semaforo_eliminar_proceso(hilo_mayor_pid);
 
 	t_hilo * hilo_movido = colas_finalizar_proceso_bloqueado(hilo_mayor_pid);
 	if (hilo_movido == NULL) {

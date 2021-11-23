@@ -37,6 +37,10 @@ int dispositivo_io_usar(uint32_t pid, char * nombre) {
 	t_io * io = dictionary_get(dispositivos, nombre);
 
 	t_hilo * hilo = colas_mover_exec_block(IO, io->nombre, pid);
+	if (hilo == NULL) {
+		loggear_error("No existe el hilo");
+		return 0;
+	}
 
 	loggear_trace("[PID: %zu] se va a bloquear para usar %s durante %d milisegundos", pid, io->nombre, io->duracion);
 	pthread_mutex_lock(&(io->mutex));
