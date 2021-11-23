@@ -1,7 +1,7 @@
 #include "matelib_configuracion.h"
 
 // Declaracion de funciones privadas
-int cargar_archivo(t_instance_metadata * lib_ref, char * path); // carga en config guardada la info que se adquire del .config
+ // carga en config guardada la info que se adquire del .config
 
 int set_variable_str(t_config * config, char * param_leer, char ** param); // Se usa para setear un string leyendo del archivo config
 

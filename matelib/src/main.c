@@ -6,8 +6,7 @@
 
 int main(int argc, char** argv) {
 
-/*
- *
+
 	void multi_hilo1(int * n) {
 		mate_instance * lib_ref = malloc(sizeof(mate_instance));
 
@@ -18,7 +17,7 @@ int main(int argc, char** argv) {
 		mate_sem_wait(lib_ref, "SEM_BBB");
 		mate_sem_wait(lib_ref, "SEM_AAA");
 
-	l	loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
+		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
 		sleep(10);
 
@@ -58,19 +57,14 @@ int main(int argc, char** argv) {
 
 		mate_sem_post(lib_ref, "SEM_AAA");
 	}
-*/
+
 	mate_instance * referencia = malloc(sizeof(mate_instance));
 
 
 	mate_init(referencia, "/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/matelib.config");
-/*	mate_sem_init(referencia, "SEM_AAA", 1);
+	mate_sem_init(referencia, "SEM_AAA", 1);
 	mate_sem_init(referencia, "SEM_BBB", 10);
 	mate_sem_init(referencia, "SEM_CCC", 10);
-
-	mate_init(referencia, "Proceso 01");
-	mate_sem_init(referencia, "SEM_AAA", 1);
-	mate_sem_init(referencia, "SEM_BBB", 1);
-	mate_sem_init(referencia, "SEM_CCC", 1);
 
 
 	pthread_t thread_uno;
@@ -96,15 +90,16 @@ int main(int argc, char** argv) {
 	pthread_join(thread_uno, NULL);
 	pthread_join(thread_dos, NULL);
 	pthread_join(thread_tres, NULL);
-	pthread_join(thread_cuatro, NULL);
+//	pthread_join(thread_cuatro, NULL);
 
 	mate_sem_destroy(referencia, "SEM_AAA");
 	mate_sem_destroy(referencia, "SEM_BBB");
 	mate_sem_destroy(referencia, "SEM_CCC");
 
 	mate_close(referencia);
-*/
-/*
+
+
+	/*
 	t_instance_metadata* metadata = malloc(sizeof(t_instance_metadata));
 	metadata->pid = generar_pid();
 

@@ -11,6 +11,8 @@
 
 #include "../../shared/estructura_compartida.h"
 
+#include "../../shared/logger.h"
+
 //-------------------Type Definitions----------------------/
 typedef struct mate_instance {
     void *group_info;

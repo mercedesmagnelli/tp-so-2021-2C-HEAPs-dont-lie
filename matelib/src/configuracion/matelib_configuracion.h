@@ -31,6 +31,9 @@ bool son_validos_los_parametros(int argc, char ** argv);
  */
 int iniciar_configuracion(int argc, char ** argv);
 
+int cargar_archivo(t_instance_metadata * lib_ref, char * path);
+
+
 /**
  * @NAME: destroy_configuracion
  * @DESC: Libera la memoria de todos los punteros de la variable "global" config_guardada

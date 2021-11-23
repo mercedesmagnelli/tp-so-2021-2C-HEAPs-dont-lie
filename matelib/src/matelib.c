@@ -5,12 +5,16 @@ int mate_init(mate_instance *lib_ref, char *config) {
 
 	int error = 0;
 
+	init_mutex_log("./matelib.log", "Matelib", 1, LOG_LEVEL_TRACE);
+
+
 	t_instance_metadata* metadata = malloc(sizeof(t_instance_metadata));
 	metadata->pid = generar_pid();
 	error = cargar_archivo(metadata, config);
 
-	if(error != 0){//hubo un error al leer el archivo
-		return -2;
+	if(error != STATUS_OK){
+		loggear_error("Hubo un error al leer el archivo");
+		return EXIT_FAILURE;
 	}
 
 	lib_ref->group_info = metadata;
@@ -21,11 +25,12 @@ int mate_init(mate_instance *lib_ref, char *config) {
 
 	error = enviar_mate_init(metadata, nuevo_proceso);
 
-	if(error !=0){//hubo un error al enviar el mensaje
-		return -1;
+	if(error !=STATUS_OK){
+		loggear_error("Hubo un error al enviar el mensaje");
+		return EXIT_FAILURE;
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int mate_close(mate_instance *lib_ref) {
