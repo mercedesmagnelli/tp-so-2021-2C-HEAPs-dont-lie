@@ -74,8 +74,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 
-		loggear_error("marco reservado %s", list_get(carpincho->marcos_reservados,0));
-		loggear_error("marco reservado %s", list_get(carpincho->marcos_reservados,1));
+
 
 
 		free(mensaje_serializado);

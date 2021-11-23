@@ -121,9 +121,15 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
 		ptro = heap->currAlloc + 9;
 
+		loggear_warning("[MATELIB_MEM_ALLOC] el ptro conseguido es %d", ptro);
+
+		loggear_warning("[MATELIB_MEM_ALLOC] el next alloc es %d y su tamanio es %d", heap->nextAlloc, calcular_tamanio_ultimo_HEAP(PID));
+
 		if(heap->nextAlloc==-1 && calcular_tamanio_ultimo_HEAP(PID)<tam+9){
 			ptro = (-1)* ptro;
 		}
+
+		loggear_warning("[MATELIB_MEM_ALLOC] el ptro posta real 100 no fake conseguido es %d", ptro);
 
 	}
 
