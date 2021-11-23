@@ -31,14 +31,16 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 		//corto la ejecucion si ya no tengo que analizar
 			return VALOR_MEMORIA_SOLICITADO_INVALIDO;
 	} else {
-		loggear_trace("[MATELIB_MEM_ALLOC] - Se puede asignar el espacio solicitado para el proceso %d", pid);
 		int32_t ptro = ptro_donde_entra_data(pid, size);
+		loggear_error("El valor del puntero es %d", ptro);
 
 		if(ptro>=0) {
+			loggear_trace("[MATELIB_MEM_ALLOC] - Se puede asignar el espacio solicitado para el proceso %d", pid);
 			//puedo asignar en algo que ya estaba
 			actualizar_proceso(pid,ptro,size);
 			return ptro;
 		}else {
+			loggear_trace("[MATELIB_MEM_ALLOC] Se verifica memoria en SWAP");
 			if(memoria_suficiente_en_swap(pid,size)) {
 				loggear_trace("[MATELIB_MEM_ALLOC] Se pide mas espacio para el proceso %d", pid);
 				//como hay espacio disponble, expando lo que ya tenia
@@ -100,6 +102,7 @@ void escribir_directamente_en_memoria(void* valorAEscribir, int32_t tamanio, uin
 	//TODO: CREO QUE NO VA
 	//pthread_mutex_lock(&mutex_acceso_memoria);
 	memcpy(memoria_principal + direccionLogica, valorAEscribir, tamanio);
+
 	//pthread_mutex_unlock(&mutex_acceso_memoria);
 
 }
