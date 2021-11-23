@@ -99,6 +99,7 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
 	int32_t ptro = -9;
 
+	loggear_trace("TAMANIO DE LISTA: %d", list_size(listaHMD));
 	if(!list_is_empty(listaHMD)){
 
 		bool heap_tam_min(void* element){
@@ -106,11 +107,14 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 			heap_metadata* heap = (heap_metadata*) element;
 			leer_heap(heap, PID);
 			if(heap->nextAlloc==-1){
+				loggear_trace("te voy a asignar le primer heap");
 				rta = true;
 			}else{
 				if(espacio_de_HEAP(heap)>= tam+9 && heap->isFree){
+					loggear_trace("te voy a asignar el heap de tamanio : %d", espacio_de_HEAP(heap));
 					rta = true;
 				}else{
+					loggear_trace("este heap no es");
 					rta = false;
 				}
 			}
@@ -131,6 +135,8 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
 		loggear_warning("[MATELIB_MEM_ALLOC] el ptro posta real 100 no fake conseguido es %d", ptro);
 
+	}else {
+		loggear_trace("estoy con el primer heap");
 	}
 
 	return ptro;
@@ -142,10 +148,9 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	//FIXME: puede que acá haya que traer a memoria???
 	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
 	if(list_is_empty(listaHMD)) {
-		loggear_trace("antes de agregar peoceso");
 		agregar_proceso(PID, tamanio);
-		loggear_trace("dsp de agregar proceso");
 	}else {
+		loggear_debug("Se va a actualizar algo que ya tenia un alloc previo");
 		heap_metadata* heap = get_HEAP(PID,ptro);
 		int nextNextAlloc = heap->nextAlloc;
 			heap->nextAlloc = ptro+tamanio;
@@ -192,8 +197,9 @@ void agregar_proceso(uint32_t PID, uint32_t tam){
 
 	t_proceso* nuevoProceso = get_proceso_PID(PID);
 
-	int cantPags = calcular_paginas_para_tamanio(tam);
 
+	int cantPags = calcular_paginas_para_tamanio(tam);
+	loggear_trace("----VOY A AGREGAR %d PAGINAS AL PROCESO %d:",cantPags, PID);
 	t_pagina* nuevaPagina;
 	for(int i = 0;i<cantPags;i++){
 		nuevaPagina = malloc(sizeof(t_pagina));
@@ -213,7 +219,6 @@ void agregar_proceso(uint32_t PID, uint32_t tam){
 
 	guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
 
-	loggear_debug("SEGUNDO HEAP");
 
 	heap_metadata* nuevoHeapUltimo = malloc(sizeof(heap_metadata));
 	nuevoHeapUltimo->currAlloc = tam+9;
@@ -224,7 +229,6 @@ void agregar_proceso(uint32_t PID, uint32_t tam){
 	agregar_HEAP_a_PID(PID,nuevoHeapUltimo);
 	guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
 
-	loggear_trace("SEGUNDO HEAP");
 
 
 
@@ -233,27 +237,24 @@ void agregar_proceso(uint32_t PID, uint32_t tam){
 
 int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 
-	loggear_warning("entre aqui");
 	uint32_t cantidad_paginas_extras = paginas_extras_para_proceso(pid, size);
-	loggear_warning("entre aqui2");
 
 	t_mensaje_r_s* mensaje = shared_crear_t_mensaje_r_s(cantidad_paginas_extras, pid);
-	loggear_warning("entre aqui3");
+
 	size_t tamanio;
-	loggear_warning("entre aqui4");
+
 	void* mensaje_serializado = serializar_solicitud_espacio(mensaje, &tamanio);
-	loggear_warning("entre aqui5");
+
 
 
 	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
-	loggear_error("tamanio %d", tamanio);
-	loggear_debug("socket: %d", socket_swap);
+
+
 	enviar_mensaje_protocolo(socket_swap, R_S_SOLICITUD_ESPACIO, tamanio, mensaje_serializado);
-	loggear_warning("entre aqui6");
+
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
-	loggear_warning("entre aqui7");
+
 	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
-	loggear_warning("entre aqui8");
 
 	free(mensaje_serializado);
 
@@ -280,11 +281,11 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 }
 
 uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size) {
-	loggear_debug("entre aqui 2");
+
 	uint32_t cantidad =  (size+9) / get_tamanio_pagina();
-	loggear_debug("entre aqui 2  x2");
+
 	uint32_t resto_ult_pag = calcular_tamanio_ultimo_HEAP(pid);
-	loggear_debug("entre aqui 2 x3");
+
 	uint32_t excedente = (size+9) % get_tamanio_pagina();
 
 	if(resto_ult_pag < excedente) {
@@ -699,9 +700,7 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 
 uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t bitModificado){
 	uint32_t marco;
-	loggear_trace("antes del if");
 	if(esta_en_tlb(PID, nroPag)){
-		loggear_trace("si, estoy en la tlb");
 		actualizar_datos_TLB(PID, nroPag);
 		marco = obtener_frame_de_tlb(PID, nroPag);
 		actualizar_datos_pagina(PID, nroPag, bitModificado, 1);
@@ -774,9 +773,11 @@ void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uin
 }
 
 uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
-    t_proceso* proceso = get_proceso_PID(PID);
+	loggear_trace("Estoy entrando al calculo del tamanio del ultimo heap");
+	t_proceso* proceso = get_proceso_PID(PID);
     uint32_t extra;
     int tamanioProceso = list_size(proceso->tabla_paginas) * get_tamanio_pagina();
+    loggear_trace("tamanio del proceso %d:%d y tamanio de la lista: %d",proceso->PID ,tamanioProceso,list_size(proceso->tabla_paginas) );
     t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
 
 
@@ -787,12 +788,18 @@ uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
     if(tamanio_lista == 0){
     extra = 0;
     }else{
-    ultimoHeap = list_get(listaHMD, list_size(listaHMD)-1);
+    	ultimoHeap = list_get(listaHMD, list_size(listaHMD)-1);
+    	loggear_trace("el curr_alloc del ultimo heap es: %d", ultimoHeap->currAlloc);
     	extra = ultimoHeap->currAlloc;
+    	loggear_trace("Lo que tengo que restarle al proceso es: %d", extra);
     }
 
 
-    return tamanioProceso - extra;
+    int tam = tamanioProceso - extra;
+
+    loggear_trace("tamanio disponible en el proceso en una pagina es :%d", tam);
+
+    return tam;
 }
 
 void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant){
