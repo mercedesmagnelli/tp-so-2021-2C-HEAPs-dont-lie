@@ -12,6 +12,7 @@ int recibir_mensaje(int socket_ram) {
 
 int manejar_mensajes(t_prot_mensaje * mensaje) {
 
+	int error;
 	void* mensaje_serializado;
 	t_carpincho_swamp* carpincho;
 	switch (mensaje->head) {
@@ -91,7 +92,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		 write_deserializado = deserializar_mensaje_write_s(mensaje_serializado);
 		 carpincho = buscar_carpincho_en_lista(write_deserializado->pid); //TODO HACER FUNCION
 
-		int error = escribir_particion(carpincho, write_deserializado->nro_pag, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+		error = escribir_particion(carpincho, write_deserializado->nro_pag, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
 		if(error < 0){
 			loggear_debug("OCURRIO UN ERROR INESPERADO AL QUERER ESCRIBIR EL ARCHIVO DE SWAP NO SE GUARDO CORRECTAMENTE");
 			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
@@ -132,10 +133,28 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_ELIMINAR_PROCESO:
+		loggear_info("llego una peticion para eliminar un proceso"); //TODO necesito saber cual es el struct
 
 		return 0;
 	case R_S_LIBERAR_PAGINA:
+		loggear_info("llego una peticion liberar paginas");
+		mensaje_serializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+		memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
+		t_pedir_o_liberar_pagina_s* liberar_deserializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
 
+		liberar_deserializado = deserializar_mensaje_peticion_liberacion_pagina(mensaje_serializado);
+		loggear_warning("la cantidad de paginas a liberar es %zu", liberar_deserializado->nro_pag);
+		carpincho  = buscar_carpincho_en_lista(liberar_deserializado->pid);
+		error = borrar_x_cantidad_de_marcos(carpincho,  liberar_deserializado->nro_pag);
+		if(error < 0){
+			loggear_debug("OCURRIO UN ERROR INESPERADO AL QUERER LIBERAR LAS PAGINAS SOLICITIDAS PARA EL PROCESO %zu", liberar_deserializado->pid);
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+		}
+
+		enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+		free(mensaje_serializado);
+		free(liberar_deserializado);
+		destruir_mensaje(mensaje);
 		return 0;;
 	case DESCONEXION_TOTAL:
 		loggear_error("Se cerró la conexión con ram");
