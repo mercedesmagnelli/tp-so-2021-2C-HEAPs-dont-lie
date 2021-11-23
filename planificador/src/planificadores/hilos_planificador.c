@@ -36,19 +36,16 @@ int hilos_planificador_iniciar() {
 	return 0;
 }
 
+void limpiar_semaforo(void * sem) {
+	t_hilos_semaforo * hilo = (t_hilos_semaforo *) sem;
+
+	sem_destroy(&hilo->sem_ejecutar);
+	free(hilo);
+}
+
 void hilos_planificador_destruir() {
 	void limpiar_hilo(void * hilo) {
 		pthread_cancel(*(pthread_t *) hilo);
-		free(hilo);
-	}
-
-	void limpiar_semaforo(void * sem) {
-		t_hilos_semaforo * hilo = (t_hilos_semaforo *) sem;
-
-		sem_destroy(&hilo->sem_ejecutar);
-		if (hilo->mensaje != NULL) {
-			free(hilo->mensaje);
-		}
 		free(hilo);
 	}
 
@@ -87,10 +84,16 @@ void hilos_agregar_nuevo_hilo(uint32_t pid) {
 	t_hilos_semaforo * hilo_semaforo = malloc(sizeof(t_hilos_semaforo));
 
 	sem_init(&hilo_semaforo->sem_ejecutar, 0, 0);
-	hilo_semaforo->mensaje = NULL;
+
 	hilo_semaforo->finalizo = false;
 
 	dictionary_put(dict_hilos, hilos_get_key(pid), hilo_semaforo);
+}
+
+void hilos_destruir_hilo_finish(uint32_t pid) {
+	t_hilos_semaforo * hilo_semaforo = dictionary_remove(dict_hilos, hilos_get_key(pid));
+
+	limpiar_semaforo(hilo_semaforo);
 }
 
 void hilos_post_ejecucion(uint32_t pid) {

@@ -203,7 +203,7 @@ int ram_enviar_proceso_ready(uint32_t pid) {
 }
 
 // Publica
-void conexiones_cerrar_conexiones(bool safe_close) {
+void ram_cerrar_conexiones() {
 	avisar_ram_desconexion();
 
 	loggear_trace("Cerrado los threads y sockets");

@@ -13,13 +13,12 @@ int main(int argc, char** argv) {
 		mate_init(lib_ref, "/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/matelib.config");
 
 		mate_sem_wait(lib_ref, "SEM_CCC");
-		sleep(5);
 		mate_sem_wait(lib_ref, "SEM_BBB");
 		mate_sem_wait(lib_ref, "SEM_AAA");
 
 		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
-		sleep(10);
+		loggear_trace("[PID: %zu] - SEM_POST A SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
 		mate_sem_post(lib_ref, "SEM_AAA");
 	}
@@ -30,13 +29,12 @@ int main(int argc, char** argv) {
 		mate_init(lib_ref, "/home/utnso/workspace/tp-2021-2c-HEAPs-dont-lie/matelib.config");
 
 		mate_sem_wait(lib_ref, "SEM_AAA");
-		sleep(5);
 		mate_sem_wait(lib_ref, "SEM_CCC");
 		mate_sem_wait(lib_ref, "SEM_BBB");
 
 		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
-		sleep(10);
+		loggear_trace("[PID: %zu] - SEM_POST a SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
 		mate_sem_post(lib_ref, "SEM_AAA");
 	}
@@ -47,13 +45,12 @@ int main(int argc, char** argv) {
 		mate_init(lib_ref, string_from_format("Proceso %d", n));
 
 		mate_sem_wait(lib_ref, "SEM_BBB");
-		sleep(5);
 		mate_sem_wait(lib_ref, "SEM_AAA");
 		mate_sem_wait(lib_ref, "SEM_CCC");
 
 		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
-		sleep(10);
+		loggear_trace("[PID: %zu] - SEM_POST A SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
 		mate_sem_post(lib_ref, "SEM_AAA");
 	}
@@ -70,27 +67,22 @@ int main(int argc, char** argv) {
 	pthread_t thread_uno;
 	pthread_t thread_dos;
 	pthread_t thread_tres;
-	pthread_t thread_cuatro;
 
-	int uno = 1;
-	int dos = 2;
-	int tres = 3;
-	int cuatro = 4;
+	int uno = 10;
+	int dos = 20;
+	int tres = 30;
 
 	pthread_create(&thread_uno, NULL, (void *) multi_hilo1, &uno);
-	pthread_create(&thread_tres, NULL, (void *) multi_hilo2, &dos);
+	pthread_create(&thread_dos, NULL, (void *) multi_hilo2, &dos);
 	pthread_create(&thread_tres, NULL, (void *) multi_hilo3, &tres);
-	//pthread_create(&thread_dos, NULL, (void *) multi_hilo1, &dos);
 
-	//pthread_create(&thread_cuatro, NULL, (void *) multi_hilo2, &cuatro);
-
-
-	loggear_debug("Esperamos a que finalicen todos");
-
+	loggear_debug("Esperamos a que finalice 1");
 	pthread_join(thread_uno, NULL);
+	loggear_debug("Esperamos a que finalice 2");
 	pthread_join(thread_dos, NULL);
+	loggear_debug("Esperamos a que finalice 3");
 	pthread_join(thread_tres, NULL);
-//	pthread_join(thread_cuatro, NULL);
+
 
 	mate_sem_destroy(referencia, "SEM_AAA");
 	mate_sem_destroy(referencia, "SEM_BBB");
@@ -111,11 +103,17 @@ int main(int argc, char** argv) {
 
 */
 	//cerrar_todo();
+
+	loggear_warning("ESperamos 60 segundos para cerrar todo");
+	sleep(60);
+	loggear_warning("PAsaron 60 segundos");
+
+
 	return EXIT_SUCCESS;
 }
 /*
 void cerrar_todo() {
-	conexiones_cerrar_conexiones(false);
+	conexiones_cerrar_conexiones();
 	loggear_info("Cerrada conexion con backend");
 	destroy_configuracion();
 	puts("Destruido configuraciones");

@@ -156,12 +156,15 @@ t_hilo * colas_mover_block_finish(t_hilo * hilo_mover) {
 	pthread_mutex_unlock(&mutex_blocked_list);
 
 	hilo->estado = ESTADO_FINISH;
+	hilo->bloqueante = NINGUNO;
+	hilo->nombre_bloqueante = "";
 
 	pthread_mutex_lock(&mutex_finish_queue);
 	queue_push(finish_queue, hilo);
 	pthread_mutex_unlock(&mutex_finish_queue);
 
 	hilos_post_finalizado();
+	hilos_post_multitarea();
 
     return hilo;
 }
@@ -173,6 +176,8 @@ t_hilo * colas_mover_susp_block_finish(t_hilo * hilo_mover) {
 	pthread_mutex_unlock(&mutex_suspended_blocked_list);
 
 	hilo->estado = ESTADO_FINISH;
+	hilo->bloqueante = NINGUNO;
+	hilo->nombre_bloqueante = "";
 
 	pthread_mutex_lock(&mutex_finish_queue);
 	queue_push(finish_queue, hilo);
@@ -197,6 +202,12 @@ t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante,
 	pthread_mutex_lock(&mutex_exec_list);
 	t_hilo * hilo = list_remove_by_condition(exec_list, son_iguales);
 	pthread_mutex_unlock(&mutex_exec_list);
+
+	if (hilo == NULL) {
+		loggear_error("TODO: Ver que pasa aca, no se puede mover exec a bloqueado un hilo que no existe");
+		loggear_error("PID: %zu, Dispositivo: %d, NOmbre: %s", pid, dispositivo_bloqueante, nombre_bloqueante);
+		return hilo;
+	}
 
 	hilo->estado = ESTADO_BLOCK;
 	hilo->timestamp_salir_exec = estructuras_current_timestamp();
@@ -387,7 +398,7 @@ t_hilo * colas_finalizar_proceso_bloqueado(t_hilo * hilo_bloqueado) {
 	} else if (hilo_bloqueado->estado == ESTADO_SUSPENDED_BLOCK) {
 		colas_mover_susp_block_finish(hilo_bloqueado);
 	} else {
-		loggear_error("[COLAS] - El hilo a finalikzar no esta bloqueado");
+		loggear_error("[COLAS] - El hilo a finalizar no esta bloqueado");
 		loggear_error("[COLAS] - Si entro acá significa que al eliminar un hilo del deadlock, se le liberaron los recursos y eso hizo que este hilo se desbloqueara");
 		loggear_error("[COLAS] - Arreglar funcion deadlock.eliminar_proceso_deadlock para que controle esto");
 		return NULL;

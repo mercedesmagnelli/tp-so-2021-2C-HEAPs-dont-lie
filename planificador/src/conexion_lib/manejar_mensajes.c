@@ -82,27 +82,27 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			return 0;
 		case MATELIB_SEM_WAIT:
-			loggear_info("[MATELIB_SEM_WAIT], reducir en uno el contador del semaforo y bloquear cuando corresponda");
-
 			semaforo = deserializar_semaforo(mensaje->payload);
 			ejecucion_semaforo = semaforo_wait(semaforo);
 
+			loggear_info("[MENSAJE] - [MATELIB_SEM_WAIT] - [PID: %zu] - [SEM: %s]", semaforo->pid, semaforo->semaforo_nombre);
+
 			if (ejecucion_semaforo == SEM_OK) {
-				loggear_info("[PID: %zu] - [Mensaje] - WAIT se hizo WAIT del semaforo", semaforo->pid);
+				loggear_info("[PID: %zu] - [SEM: %s] - [Mensaje] - WAIT se hizo WAIT del semaforo", semaforo->pid, semaforo->semaforo_nombre);
 
 				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 			} else if (ejecucion_semaforo == SEM_BLOQUEAR) {
-				loggear_info("[PID: %zu] - [Mensaje] - WAIT hay que bloquear el hilo", semaforo->pid);
+				loggear_info("[PID: %zu] - [SEM: %s] - [Mensaje] - WAIT hay que bloquear el hilo", semaforo->pid, semaforo->semaforo_nombre);
 
 				if (hilos_check_finalizo_proceso(semaforo->pid)) {
-					loggear_info("[PID: %zu] - [Mensaje] - WAIT se elimino el hilo por deadlock", semaforo->pid);
+					loggear_info("[PID: %zu] - [SEM: %s] - [Mensaje] - WAIT se elimino el hilo por deadlock", semaforo->pid, semaforo->semaforo_nombre);
 					enviar_mensaje_protocolo(mensaje->socket, EXITO_PROCESO_ELIMINADO, 0, NULL);
 				} else {
-					loggear_info("[PID: %zu] - [Mensaje] - WAIT termino el bloqueo del hilo", semaforo->pid);
+					loggear_info("[PID: %zu] - [SEM: %s] - [Mensaje] - WAIT termino el bloqueo del hilo", semaforo->pid, semaforo->semaforo_nombre);
 					enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 				}
 			} else {
-				loggear_error("[PID: %zu] - [Mensaje] - No se pudo crear el semaforo", semaforo->pid);
+				loggear_error("[PID: %zu] - [SEM: %s] - [Mensaje] - No se pudo crear el semaforo", semaforo->pid, semaforo->semaforo_nombre);
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
@@ -111,17 +111,17 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			return 0;
 		case MATELIB_SEM_POST:
-			loggear_info("[MATELIB_SEM_POST], incrementar en uno el contador del semaforo y tal vez desbloquear un proceso");
-
 			semaforo = deserializar_semaforo(mensaje->payload);
 			ejecucion_semaforo = semaforo_post(semaforo);
 
+			loggear_info("[MENSAJE] - [MATELIB_SEM_POST] - [PID: %zu] - [SEM: %s]", semaforo->pid, semaforo->semaforo_nombre);
+
 			if (ejecucion_semaforo == SEM_OK) {
-				loggear_info("[PID: %zu] - [Mensaje] - POST se envio el desbloqueo", semaforo->pid);
+				loggear_info("[PID: %zu] - [SEM: %s] - [Mensaje] - POST se envio el desbloqueo", semaforo->pid, semaforo->semaforo_nombre);
 
 				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 			} else {
-				loggear_error("[PID: %zu] - [Mensaje] - POST no se pudo ejeuctar", semaforo->pid);
+				loggear_error("[PID: %zu] - [SEM: %s] - [Mensaje] - POST no se pudo ejeuctar", semaforo->pid, semaforo->semaforo_nombre);
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 

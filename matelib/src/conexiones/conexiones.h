@@ -48,7 +48,7 @@ int enviar_mate_memwrite(t_instance_metadata* instancia, t_matelib_memoria_write
  * @NAME: conexiones_cerrar_conexiones
  * @DESC: Cierra los hilos y libera toda la memoria ocupada
  */
-void conexiones_cerrar_conexiones(bool safe_close);
+void conexiones_cerrar_conexiones();
 
 /**
  * @NAME: conexiones_iniciar
