@@ -139,8 +139,8 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 		archivo->espacio_libre = archivo->espacio_libre - get_marcos_maximos();
 
 	}else{ //ACA SERIA SI LA ASGINACION ES GLOBAL
-		loggear_debug("LLEGO UNA SOLICITUD DE UN CARPINCHO Y COMO LA ASIGNACION ES GLOBAL SE RESERVAN LOS MARCOS %d SOLICITADOS PID:%d", cantidad_paginas_reservadas, carpincho->pid_carpincho);
-		if(cantidad_paginas_reservadas <= archivo->espacio_libre){
+		loggear_debug("LLEGO UNA SOLICITUD DE UN CARPINCHO Y COMO LA ASIGNACION ES GLOBAL SOLO SE CREA LA ESTRUCTURA ADMINISTRATIVA PARA EL PID: ", carpincho->pid_carpincho);
+		/*if(cantidad_paginas_reservadas <= archivo->espacio_libre){
 			for(int j = 0; j < cantidad_paginas_reservadas; j++){
 				int marco_global = marco_libre(archivo);
 				list_add(carpincho->marcos_reservados, string_itoa(marco_global));
@@ -148,7 +148,7 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 			}
 			archivo->espacio_libre = archivo->espacio_libre - cantidad_paginas_reservadas;
 		}
-
+*/
 
 	}
 
