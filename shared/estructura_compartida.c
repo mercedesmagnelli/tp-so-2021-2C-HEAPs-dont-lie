@@ -446,8 +446,7 @@ void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* siz
 
 
 void* deserializar_pedir_pagina(void* respuesta){
-	void* rta = malloc(32);
-	memcpy(rta, respuesta, 32);
+
 	return respuesta;
 
 }

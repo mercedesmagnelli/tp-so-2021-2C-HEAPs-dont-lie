@@ -136,22 +136,27 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	//FIXME: puede que acá haya que traer a memoria???
 	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
 	if(list_is_empty(listaHMD)) {
+		loggear_trace("antes de agregar peoceso");
 		agregar_proceso(PID, tamanio);
+		loggear_trace("dsp de agregar proceso");
 	}else {
 		heap_metadata* heap = get_HEAP(PID,ptro);
 		int nextNextAlloc = heap->nextAlloc;
 			heap->nextAlloc = ptro+tamanio;
 			heap->isFree = 0;
 			guardar_HEAP_en_memoria(PID, heap);
-
+			loggear_trace("guardado primer heap");
 
 			heap_metadata* nuevoHeap = malloc(sizeof(heap_metadata));
 			nuevoHeap->currAlloc = heap->nextAlloc;
 			nuevoHeap->prevAlloc = heap->currAlloc;
 			nuevoHeap->nextAlloc = nextNextAlloc;
 			nuevoHeap->isFree    = 1;
+
 			agregar_HEAP_a_PID(PID,nuevoHeap);
+
 			guardar_HEAP_en_memoria(PID, nuevoHeap);
+
 
 			//si no es el ultimo alloc, traemos el sig HEAP para modificarlo y actualizamos en mem
 			if(nuevoHeap->nextAlloc != -1){
@@ -202,15 +207,18 @@ void agregar_proceso(uint32_t PID, uint32_t tam){
 
 	guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
 
-
+	loggear_debug("SEGUNDO HEAP");
 
 	heap_metadata* nuevoHeapUltimo = malloc(sizeof(heap_metadata));
 	nuevoHeapUltimo->currAlloc = tam+9;
 	nuevoHeapUltimo->prevAlloc = 0;
 	nuevoHeapUltimo->nextAlloc = -1;
 	nuevoHeapUltimo->isFree    = 1;
+
 	agregar_HEAP_a_PID(PID,nuevoHeapUltimo);
 	guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
+
+	loggear_trace("SEGUNDO HEAP");
 
 
 
@@ -569,6 +577,7 @@ void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t punt
 	uint32_t nro_pag = calcular_pagina_de_puntero_logico(puntero);
 	uint32_t offset = calcular_offset_puntero_en_pagina(puntero);
 	guardar_en_memoria_paginada(pid, nro_pag, offset, valor, size);
+	loggear_trace("aaaaaaaaaaa");
 
 }
 
@@ -649,17 +658,21 @@ void* leer_de_memoria_paginada(uint32_t PID, int nroPag, int offset, int tamDato
 }
 
 void guardar_HEAP_en_memoria(uint32_t PID, heap_metadata* heap){
+
 	int nroPag = heap->currAlloc / get_tamanio_pagina();
 	int offset = heap->currAlloc % get_tamanio_pagina();
 	void* dataHeap = serializar_HEAP(heap);
 	guardar_en_memoria_paginada(PID, nroPag, offset, dataHeap, 9);
 	free(dataHeap);
+
+
 }
 
 void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* data, int tamDato){
 	int desplazamientoEnDato = 0;
 	uint32_t marcoPag;
 	int ptro_escritura;
+
 	while(tamDato>0){
 		marcoPag = obtener_marco_de_pagina_en_memoria(PID, nroPag, 1);
 		ptro_escritura = marcoPag * get_tamanio_pagina() + offset;
@@ -670,15 +683,19 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 			int tamDatoParcial = get_tamanio_pagina()- offset;
 			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDatoParcial, ptro_escritura);
 			desplazamientoEnDato += tamDatoParcial;
+
 			tamDato -= tamDatoParcial;
 			offset = 0;
 		}
 	}
+
 }
 
 uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t bitModificado){
 	uint32_t marco;
+	loggear_trace("antes del if");
 	if(esta_en_tlb(PID, nroPag)){
+		loggear_trace("si, estoy en la tlb");
 		actualizar_datos_TLB(PID, nroPag);
 		marco = obtener_frame_de_tlb(PID, nroPag);
 		actualizar_datos_pagina(PID, nroPag, bitModificado, 1);
@@ -686,20 +703,17 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 	}else{
 		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
 		if(esta_en_RAM(PID, nroPag)){
-			loggear_debug("rompo");
 			marco = obtener_frame_de_RAM(PID, nroPag);
-			loggear_debug("rompo2");
 			actualizar_datos_pagina(PID, nroPag, bitModificado, 0);
-			loggear_debug("rompo3");
+
 		}else{
-			loggear_warning("else 1");
 			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima. Tmbn tiene que actualizar la cant de Pags en asig FIJA
 			loggear_info("[RAM] - El marco que voy a usar es: %d", marco);
 			inicializar_datos_pagina(PID, nroPag, marco, bitModificado);//podriamos poner esta funcion dentro de obtener fram asi tmbn se encarga de modificar lo administrativo dsps del cambio de pags?
-			loggear_warning("else 3");
 			loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
 		}
 		agregar_entrada_tlb(PID, nroPag, marco);
+		loggear_trace("ya agregue una entrada a la TLB");
 	}
 	return marco;
 }
@@ -715,9 +729,7 @@ void* serializar_HEAP(heap_metadata* heap){//TODO revisar serializacion
 bool esta_en_RAM(uint32_t PID, uint32_t nroPag){
 
 	t_list* tabla_paginas = obtener_tabla_paginas_mediante_PID(PID);
-	loggear_debug("rompo!!");
 	t_pagina* pag = (t_pagina*) list_get(tabla_paginas, nroPag);
-	loggear_debug("rompo!!2");
 	loggear_debug("el bit de presencia es: %d",pag->bit_presencia);
 	return pag->bit_presencia == 1 ? true : false;
 }
@@ -760,23 +772,19 @@ uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
     uint32_t extra;
     int tamanioProceso = list_size(proceso->tabla_paginas) * get_tamanio_pagina();
     t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
-    loggear_trace("casi llego");
-    if(listaHMD == NULL){
-        loggear_info("la lista es nula");
-    }
+
+
     heap_metadata* ultimoHeap;
-    loggear_trace("casi llegox2");
+
     int tamanio_lista = list_size(listaHMD);
-    loggear_trace("casi llegox3 %d", tamanio_lista);
+
     if(tamanio_lista == 0){
     extra = 0;
-    loggear_trace("casi llegox4 %d", tamanio_lista);
     }else{
     ultimoHeap = list_get(listaHMD, list_size(listaHMD)-1);
-extra = ultimoHeap->currAlloc;
-    loggear_trace("casi llegox5 %d", tamanio_lista);
+    	extra = ultimoHeap->currAlloc;
     }
-    loggear_trace("no llgue");
+
 
     return tamanioProceso - extra;
 }
@@ -796,8 +804,8 @@ void actualizar_cantidad_frames_por_proceso_RAM(uint32_t PID, int32_t modCant){
 }
 
 char* calcular_hash_key_dic(uint32_t proceso) {
-	char** key = string_from_format("%d",proceso);
-	return *key;
+	char* key = string_from_format("%d",proceso);
+	return key;
 }
 
 int calcular_paginas_para_tamanio(uint32_t tam) {

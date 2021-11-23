@@ -31,30 +31,19 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 	uint32_t frame;
 	void* info_a_guardar;
 	if(hay_que_hacer_swap(PID)) {
-		loggear_warning("pase el if1");
 		frame = obtener_frame_libre(PID);
-		loggear_warning("pase el if2");
 		info_a_guardar =  recibir_info_en_pagina(nroPag, PID);
-		loggear_warning("pase el if3");
 	}else {
-		loggear_warning("pase el else1");
 		t_list* lista_frames = obtener_lista_frames_en_memoria(PID);
-		loggear_warning("pase el else12");
 		t_list* lista_paginas = obtener_lista_paginas_de_frames(lista_frames);
-		loggear_warning("pase el else13");
 		t_pagina* pagina_victima = obtener_pagina_victima(lista_paginas, PID);
-		loggear_warning("pase el else14");
 		frame = pagina_victima->frame;
-		loggear_warning("pase el else15");
 		info_a_guardar = traer_y_controlar_consistencia_paginas(pagina_victima, nroPag, PID);
-		loggear_warning("pase el else16");
+
 
 	}
-	loggear_warning("FRAME!!: %d", frame);
-	loggear_warning("antes de escribir en memoria");
-	loggear_warning("tamanio pagina: %d", get_tamanio_pagina());
+
 	escribir_directamente_en_memoria(info_a_guardar, get_tamanio_pagina(), frame * get_tamanio_pagina());
-	loggear_warning("dsp de escribir en memoria");
 	return frame;
 }
 
@@ -115,20 +104,12 @@ void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir) {
 	loggear_trace("[SWAP] - Se va a pedir la pagina: %d del proceso %d", pag_a_pedir, pid_a_pedir);
 	size_t tamanio;
 	t_pedir_o_liberar_pagina_s* pedido = shared_crear_pedir_o_liberar(pid_a_pedir, pag_a_pedir);
-	loggear_trace("pedido pid %zu", pedido->pid);
-	loggear_trace("pedido pag %zu", pedido->nro_pag);
 
 	void* mensaje_serializado = serializar_pedir_pagina(pedido, &tamanio);
-	t_pedir_o_liberar_pagina_s* pedido2 = deserializar_mensaje_peticion_liberacion_pagina(mensaje_serializado);
-
-	loggear_trace("pedido2 pid %zu", pedido2->pid);
-	loggear_trace("pedido2 pag %zu", pedido2->nro_pag);
 
 	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 	enviar_mensaje_protocolo(socket_swap,R_S_PEDIR_PAGINA,tamanio,mensaje_serializado);
-	loggear_trace("termine de enviar mensaje de tamanio %d:", tamanio);
 	t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
-	loggear_trace("termine de recibir mensaje");
 	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
 
 	free(mensaje_serializado);
