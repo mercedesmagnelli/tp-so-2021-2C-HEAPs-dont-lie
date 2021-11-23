@@ -1,16 +1,27 @@
 
 #include "matelib.h"
 
+void mate_instance_close(mate_instance * lib_ref){
+
+	t_instance_metadata * metadata = (t_instance_metadata*) lib_ref->group_info;
+
+	free(metadata->ip);
+	free(metadata->log_app_name);
+	free(metadata->log_route);
+	free(metadata);
+	free(lib_ref);
+}
+
+
 int mate_init(mate_instance *lib_ref, char *config) {
 
 	int error = 0;
 
-	init_mutex_log("./matelib.log", "Matelib", 1, LOG_LEVEL_TRACE);
-
-
 	t_instance_metadata* metadata = malloc(sizeof(t_instance_metadata));
 	metadata->pid = generar_pid();
 	error = cargar_archivo(metadata, config);
+
+	init_mutex_log(metadata->log_route, metadata->log_app_name, metadata->log_in_console, metadata->log_level_info);
 
 	if(error != STATUS_OK){
 		loggear_error("Hubo un error al leer el archivo");
@@ -39,7 +50,7 @@ int mate_close(mate_instance *lib_ref) {
 
 	t_matelib_nuevo_proceso * nuevo_proceso = shared_crear_nuevo_proceso(metadata->pid);
 	int error = enviar_mate_close(metadata, nuevo_proceso);
-	free(lib_ref->group_info);
+	mate_instance_close(lib_ref);
 
 	return error;
 
@@ -72,7 +83,8 @@ int mate_sem_wait(mate_instance *lib_ref, mate_sem_name sem) {
 
 	if (error == EXITO_PROCESO_ELIMINADO) {
 		loggear_warning("Destruimos el hilo actual");
-		pthread_exit(NULL);
+		mate_instance_close(lib_ref);
+	//	pthread_exit(NULL);
 	}
 
 	return error;

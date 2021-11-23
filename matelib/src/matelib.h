@@ -25,6 +25,8 @@ typedef char *mate_sem_name;
 typedef int32_t mate_pointer;
 
 //------------------General Functions---------------------/
+void mate_instance_close(mate_instance * lib_ref);
+
 /**
  * @NAME: mate_init
  * @DESC: Recibe la instancia y el path del archivo de configuración e inicializa la estructura administrativa necesaria para gestionar la instancia
