@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 	iniciar_swamp();
 
 // ULTIMAS PRUEBAS REALIZADAS, ACA ESTA EL CAMINO QEU SE DEBE HACER SIEMPRE AL CREAR UN CARPINCHO. NO BORRAAAAAR
-/*  t_carpincho_swamp* carpincho = crear_carpincho(14,5); // 1 	5
+  t_carpincho_swamp* carpincho = crear_carpincho(14,5); // 1 	5
     t_carpincho_swamp* carpincho1 = crear_carpincho(13,4); // 2 4
     t_carpincho_swamp* carpincho2 = crear_carpincho(11,12); // 2 16
     t_carpincho_swamp* carpincho3 = crear_carpincho(10,9); // 1 13
@@ -76,6 +76,34 @@ int main(int argc, char** argv) {
 
 
     escribir_particion(carpincho, 11, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+    escribir_particion(carpincho, 15, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+    escribir_particion(carpincho, 16, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+    escribir_particion(carpincho, 18, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+    escribir_particion(carpincho, 20, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+
+    loggear_error("asdadas %s", list_get(carpincho->marcos_usados,0));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_usados,1));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_usados,2));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_usados,3));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_usados,4));
+
+
+    borrar_x_cantidad_de_marcos(carpincho, 3);
+
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,0));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,1));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,2));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,3));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,4));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,5));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,6));
+
+    loggear_error("usados %s", list_get(carpincho->marcos_usados,0));
+    loggear_error("usados %s", list_get(carpincho->marcos_usados,1));
+   // loggear_error("usados %s", list_get(carpincho->marcos_usados,2));
+
+/*
+    escribir_particion(carpincho, 11, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
 
     loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,0));
     loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,1));
@@ -104,8 +132,8 @@ int main(int argc, char** argv) {
     loggear_trace("contenido: %s", asd);
 
     free(asd);
-*/
 
+*/
 
 //SIRVE PARA MOSTRAR EL BITMAP DEJAR POR AHORA
  /*
@@ -131,7 +159,7 @@ int main(int argc, char** argv) {
 */
 
 	debug_variables();
-
+/*
 	pthread_t ram_handshake = thread_ejecutar_funcion(enviar_handshake);
 
 
@@ -143,7 +171,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-
+*/
 
 	cerrar_todo();
 

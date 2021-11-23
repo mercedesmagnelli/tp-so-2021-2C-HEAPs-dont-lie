@@ -51,4 +51,6 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 
 int reservar_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos, t_archivo_swamp* swamp);
 
+int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_paginas);
+
 #endif /* MANEJO_FILESYSTEM_MANEJO_ARCHIVOS_H_ */

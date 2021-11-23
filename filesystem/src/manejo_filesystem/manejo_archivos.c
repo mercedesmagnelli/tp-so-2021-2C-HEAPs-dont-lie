@@ -212,16 +212,46 @@ int obtener_marco_desde_pagina(uint32_t pagina, t_carpincho_swamp* carpincho){
 	return -1;
 }
 
-/*
- * PAGINA = 10
- * BUSCO ESPACIO Y ENCUENTRO QUE TENGO LIBRE EL MARCO 1
- * TENGO QUE CONSIDERAR QUE CON ASIGNACION FIJA TENGO QUE RESERVAR CONTIGUOS
+
+/*-FIJA: siendo M la cantidad de frames reservados y N la cantidad de frames usados dentro de esas M,
+ *  nosotros te vamos a decir que "liberes" las ultims 3 paginas, ergo,
+ *   vas a agarrar los ultimmos 3 frames de N y vas a marcarlos como que estan
+ *   sin usar PERO ESTAS SIGUEN PERTENECIENDO A LOS FRAMES RESERVADOS DEL PROCESO,
+ *   solo que ahora no estan sieno usados.
  *
- *
- *
- *
+ * -GLOBAL: en este caso no se reservan frames, simplemente tenemos los N frames usaos por el proceso,
+ * en este caso liberas los ultios frames de N al marcalos que ahora estan disponbles para su uso por parte de cualquier
+ * proceso
  */
 
+int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_paginas){
+
+	loggear_warning("llegue hasta aqui");
+	int j = list_size(carpincho->marcos_usados);
+	loggear_warning("el list size es %d", j);
+
+	if(j < cantidad_paginas){
+		loggear_warning("ME PIDEN QUE BORRE MAS PAGINAS DE LAS USADAS POR ESTE PROCESO ESTO NO DEBERÍA SUCEDER, NO SE ELIMINAN PAGINAS Y SE MANDA UN MENSAJE DE FALLO A LA RAM");
+		return -1;
+	}
+
+	if(get_asignacion() == FIJA){
+		loggear_trace("soy fija");
+		for(int i = 0; i < cantidad_paginas; i++){
+			loggear_trace("aca paso?");
+			void* marco = list_get(carpincho->marcos_usados, j - i - 1);
+			loggear_trace("el marco a eliminar es %s", marco);
+			list_add(carpincho->marcos_reservados, marco); //validar si se agrega bien
+			list_remove(carpincho->marcos_usados, j - i - 1); //ver si hace falta un remove.
+		}
+	}else{
+		for(int i = 0; i < cantidad_paginas; i++){
+			list_remove_and_destroy_element(carpincho->marcos_usados, j - i - 1, free); // ver si hace falta un remove.
+		}
+	}
+
+	return 0;
+}
 
 
 
