@@ -10,10 +10,8 @@
 #include <commons/config.h>
 #include <commons/string.h>
 
-#include "matelib_configuracion_guardada.h"
-
 #include "../../../shared/codigo_error.h"
-
+#include "../matelib.h"
 
 
 /**
@@ -32,6 +30,9 @@ bool son_validos_los_parametros(int argc, char ** argv);
  * @DESC: Lee el archivo de configuracion que pasan por parametro e inicializa las variables
  */
 int iniciar_configuracion(int argc, char ** argv);
+
+int cargar_archivo(t_instance_metadata * lib_ref, char * path);
+
 
 /**
  * @NAME: destroy_configuracion

@@ -1,7 +1,7 @@
 #include "../src/configuracion/matelib_configuracion.h"
 #include <cspecs/cspec.h>
 #include <stdlib.h>
-
+/*
 context(test_archivo_configuracion) {
 	describe("configuracion.h - son_validos_los_parametros") {
 		it("Si mando 1 argumento devuelve false") {
@@ -40,3 +40,4 @@ context(test_archivo_configuracion) {
 		// No se puede testear mas esta funcion porque requiere de leer el archivo y no vamos a hacer inyeccion de dependencias
 	} end
 }
+*/
