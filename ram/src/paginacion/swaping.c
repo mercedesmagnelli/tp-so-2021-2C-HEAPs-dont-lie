@@ -35,19 +35,22 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 		frame = obtener_frame_libre(PID);
 		t_frame* f = (t_frame*) list_get(listaFrames, frame);
 		f->estado=1;
+		f->proceso=PID;
+		f->pagina=nroPag;
 		info_a_guardar =  recibir_info_en_pagina(nroPag, PID);
 	}else {
 		loggear_info("Tengo que hacer swaping para pagina traida a RAM");
 		t_list* lista_frames = obtener_lista_frames_en_memoria(PID);
 		t_list* lista_paginas = obtener_lista_paginas_de_frames(lista_frames);
 		t_pagina* pagina_victima = obtener_pagina_victima(lista_paginas, PID);
+		loggear_info("[SWAP] - Se eligio la pagina victima - TODO: VER COMO SABER A QUE PROCESO PERTENECE");
 		frame = pagina_victima->frame;
 		info_a_guardar = traer_y_controlar_consistencia_paginas(pagina_victima, nroPag, PID);
-		loggear_error("La pagina que fue swapeada fue la pag nro %d, del proceso %d que quedo con el bit de presencia en %d", nroPag, PID, pagina_victima->bit_presencia);
 
 	}
-
+	loggear_info("antes de escribir el frame es %d", frame);
 	escribir_directamente_en_memoria(info_a_guardar, get_tamanio_pagina(), frame * get_tamanio_pagina());
+	loggear_info("X2");
 	return frame;
 }
 
@@ -55,20 +58,19 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 	// fijarse si esta modificado, setear en 0 el bit de presencia de la pagina victima
 
 	void* info_en_frame = obtener_info_en_frame(pagina_victima->frame);
-
 	uint32_t pid_pag_victima = obtener_pid_en_frame(pagina_victima->frame);
+	loggear_trace("[SWAP] pid de la victima: %d", pid_pag_victima);
 	uint32_t nro_pag_victima = obtener_pag_en_frame(pagina_victima->frame);
+	loggear_trace("[SWAP] pag  de la victima: %d", nro_pag_victima);
 
 	if(pagina_victima->bit_modificacion == 1) {
 		size_t tamanio;
 		t_write_s* mensaje = shared_crear_write_s(nro_pag_victima, pid_pag_victima, info_en_frame);
 		void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio, get_tamanio_pagina());
-
 		pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 		enviar_mensaje_protocolo(socket_swap,R_S_ESCRIBIR_EN_PAGINA,tamanio,mensaje_serializado);
 		t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
 		pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
-
 		free(mensaje_serializado);
 		if(rec->head== FALLO_EN_LA_TAREA){
 			loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag_victima, pid_pag_victima);
@@ -78,10 +80,7 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 
 	pagina_victima->bit_presencia = 0;
 
-
-
 	void* info_en_pagina = recibir_info_en_pagina(nro_pag_a_pedir, pid_a_pedir);
-
 
 	return info_en_pagina;
 }
@@ -89,14 +88,14 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 uint32_t obtener_pid_en_frame(uint32_t frame) {
 	pthread_mutex_lock(&mutex_acceso_lista_frames);
 	t_frame* frame_i = (t_frame*) list_get(listaFrames, frame);
-	return frame_i->proceso;
 	pthread_mutex_unlock(&mutex_acceso_lista_frames);
+	return frame_i->proceso;
 }
 uint32_t obtener_pag_en_frame(uint32_t frame) {
 	pthread_mutex_lock(&mutex_acceso_lista_frames);
 	t_frame* frame_i = (t_frame*) list_get(listaFrames, frame);
-	return frame_i->pagina;
 	pthread_mutex_unlock(&mutex_acceso_lista_frames);
+	return frame_i->pagina;
 }
 void* obtener_info_en_frame(uint32_t frame) {
 	uint32_t tam_memoria = get_tamanio_pagina();
@@ -157,9 +156,12 @@ t_list* obtener_lista_paginas_de_frames(t_list* lista_frames){
 t_pagina* obtener_pagina_victima(t_list* lista_paginas, uint32_t pid) {
 
 	t_pagina* pagina_victima;
+	loggear_info("Voy a elegir algoritmo de pagina vistima");
 	if(get_algoritmo_reemplazo_mmu() == CLOCKM){
+		loggear_info("Algoritmo de CLOCKM");
 		pagina_victima = obtener_victima_Clock_Modificado(lista_paginas, pid);
 	}else {
+		loggear_info("Algoritmo LRU");
 		pagina_victima = obtener_victima_LRU(lista_paginas);
 	}
 	return pagina_victima;
@@ -168,10 +170,11 @@ t_pagina* obtener_pagina_victima(t_list* lista_paginas, uint32_t pid) {
 t_pagina* obtener_victima_LRU(t_list* lista_paginas){
 	t_pagina* pagina_victima;
 	t_pagina* pagina_anterior = (t_pagina*) list_get(lista_paginas, 0);
+	loggear_info("ya obtuve la pag anterior");
 	for(int i = 0; i < list_size(lista_paginas); i++) {
 
 		t_pagina* pagina_actual = (t_pagina*) list_get(lista_paginas, i);
-		if(pagina_actual-> timestamp < pagina_anterior->timestamp) {
+		if(pagina_actual-> timestamp <= pagina_anterior->timestamp) {
 			pagina_victima = pagina_actual;
 		}
 
