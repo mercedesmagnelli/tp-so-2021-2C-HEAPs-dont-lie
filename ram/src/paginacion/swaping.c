@@ -30,16 +30,20 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 
 	uint32_t frame;
 	void* info_a_guardar;
-	if(hay_que_hacer_swap(PID)) {
+	if(hay_frame_disponible_en_RAM(PID)) {
+		loggear_info("Hay frame disponible para pagina traida a RAM");
 		frame = obtener_frame_libre(PID);
+		t_frame* f = (t_frame*) list_get(listaFrames, frame);
+		f->estado=1;
 		info_a_guardar =  recibir_info_en_pagina(nroPag, PID);
 	}else {
+		loggear_info("Tengo que hacer swaping para pagina traida a RAM");
 		t_list* lista_frames = obtener_lista_frames_en_memoria(PID);
 		t_list* lista_paginas = obtener_lista_paginas_de_frames(lista_frames);
 		t_pagina* pagina_victima = obtener_pagina_victima(lista_paginas, PID);
 		frame = pagina_victima->frame;
 		info_a_guardar = traer_y_controlar_consistencia_paginas(pagina_victima, nroPag, PID);
-
+		loggear_error("La pagina que fue swapeada fue la pag nro %d, del proceso %d que quedo con el bit de presencia en %d", nroPag, PID, pagina_victima->bit_presencia);
 
 	}
 
@@ -73,6 +77,8 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 	}
 
 	pagina_victima->bit_presencia = 0;
+
+
 
 	void* info_en_pagina = recibir_info_en_pagina(nro_pag_a_pedir, pid_a_pedir);
 
@@ -273,7 +279,7 @@ uint32_t calcular_indice(uint32_t puntero, uint32_t cantidad_it, uint32_t tamani
 	return indice;
 }
 
-int32_t hay_que_hacer_swap(uint32_t PID){
+int32_t hay_frame_disponible_en_RAM(uint32_t PID){
 	//Revisar si hay frame libre segun el tipo de asignacion. Seguramente sea la misma logica que obtener frame pero en vez de conseguir uno preguntamos si hay uno
 	t_list* frames = obtener_lista_frames_en_memoria(PID);
 	return list_any_satisfy(frames, frame_disponible);

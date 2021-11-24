@@ -67,7 +67,7 @@ t_pagina* obtener_victima_Clock_Modificado(t_list* lista_paginas,uint32_t pid);
  * 		0 No hay que hacer swaping
  * 		1 Si hay que hacer swaping
  **/
-int32_t hay_que_hacer_swap(uint32_t PID);
+int32_t hay_frame_disponible_en_RAM(uint32_t PID);
 
 /**
  * @NAME: obtener_frame_libre
