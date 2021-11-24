@@ -299,6 +299,8 @@ uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size) {
 
 	uint32_t excedente = (size+9) % get_tamanio_pagina();
 
+	loggear_warning("[MATELIB_MEM_ALLOC] cantidad %d, resto_ult_pag %d, excedente %d", cantidad, resto_ult_pag, excedente);
+
 	if(resto_ult_pag < excedente) {
 		cantidad++;
 	}
@@ -797,11 +799,11 @@ uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
     int tamanio_lista = list_size(listaHMD);
 
     if(tamanio_lista == 0){
-    extra = 0;
+    	extra = 0;
     }else{
     	ultimoHeap = list_get(listaHMD, list_size(listaHMD)-1);
     	loggear_trace("el curr_alloc del ultimo heap es: %d", ultimoHeap->currAlloc);
-    	extra = ultimoHeap->currAlloc;
+    	extra = ultimoHeap->currAlloc + 9;
     	loggear_trace("Lo que tengo que restarle al proceso es: %d", extra);
     }
 
