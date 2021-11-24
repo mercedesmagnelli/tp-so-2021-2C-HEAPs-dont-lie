@@ -147,6 +147,8 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 
 	//FIXME: puede que acá haya que traer a memoria???
 	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
+	t_proceso* nuevoProceso = get_proceso_PID(PID);
+	loggear_warning("----2 TENGO %d PAGINAS EN EL PROCESO %d",list_size(nuevoProceso->tabla_paginas), PID);
 	if(list_is_empty(listaHMD)) {
 		agregar_proceso(PID, tamanio);
 	}else {
@@ -201,13 +203,16 @@ void agregar_proceso(uint32_t PID, uint32_t tam){
 	int cantPags = calcular_paginas_para_tamanio(tam);
 	loggear_trace("----VOY A AGREGAR %d PAGINAS AL PROCESO %d:",cantPags, PID);
 	t_pagina* nuevaPagina;
+
+	loggear_trace("----TENGO %d PAGINAS PARA EL PROCESO %d antes de asignarle nuevas paginas",list_size(nuevoProceso->tabla_paginas), PID);
+
 	for(int i = 0;i<cantPags;i++){
 		nuevaPagina = malloc(sizeof(t_pagina));
 		nuevaPagina->bit_presencia=0;//es el unico dato que llenamos
 		list_add(nuevoProceso->tabla_paginas,nuevaPagina);
 	}
 
-
+	loggear_trace("----TENGO %d PAGINAS PARA EL PROCESO %d:",list_size(nuevoProceso->tabla_paginas), PID);
 
 	heap_metadata* nuevoHeapPrimero = malloc(sizeof(heap_metadata));
 	nuevoHeapPrimero->currAlloc = 0;
@@ -266,14 +271,20 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 
 	t_pagina* nueva_pagina;
 
-	t_proceso* proceso = get_proceso_PID(pid);
-	if(respuesta_final == 1){
-		for(int i = 0;i<cantidad_paginas_extras;i++){
-			nueva_pagina= malloc(sizeof(t_pagina));
-			nueva_pagina->bit_presencia=0;//es el unico dato que llenamos
-			list_add(proceso->tabla_paginas,nueva_pagina);
-		}
-	}
+//	t_proceso* nuevoProceso = get_proceso_PID(pid);
+//	loggear_warning("----0 TENGO %d PAGINAS EN EL PROCESO %d",list_size(nuevoProceso->tabla_paginas), pid);
+//
+//	t_proceso* proceso = get_proceso_PID(pid);
+//	if(respuesta_final == 1){
+//		for(int i = 0;i<cantidad_paginas_extras;i++){
+//			nueva_pagina= malloc(sizeof(t_pagina));
+//			nueva_pagina->bit_presencia=0;//es el unico dato que llenamos
+//			list_add(proceso->tabla_paginas,nueva_pagina);
+//		}
+//	}
+//	loggear_error("El numero de cantidad de paginas extras a agregar al proceso es: %d", cantidad_paginas_extras);
+//
+//	loggear_warning("----1 TENGO %d PAGINAS EN EL PROCESO %d",list_size(nuevoProceso->tabla_paginas), pid);
 
 	free(mensaje);
 	return respuesta_final;

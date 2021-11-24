@@ -33,7 +33,6 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 	} else {
 		int32_t ptro = ptro_donde_entra_data(pid, size);
 		loggear_error("El valor del puntero es %d", ptro);
-
 		if(ptro>=0) {
 			loggear_trace("[MATELIB_MEM_ALLOC] - Se puede asignar el espacio solicitado para el proceso %d", pid);
 			//puedo asignar en algo que ya estaba
@@ -42,7 +41,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 		}else {
 			loggear_trace("[MATELIB_MEM_ALLOC] Se verifica memoria en SWAP");
 			if(memoria_suficiente_en_swap(pid,size)) {
-				loggear_trace("[MATELIB_MEM_ALLOC] Se pide mas espacio para el proceso %d", pid);
+				t_proceso* nuevoProceso = get_proceso_PID(pid);
 				//como hay espacio disponble, expando lo que ya tenia
 				actualizar_proceso(pid,  (-1) * ptro,  size);
 				return (-1) * ptro;
