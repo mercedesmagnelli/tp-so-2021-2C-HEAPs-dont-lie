@@ -94,8 +94,9 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 		}else{
 			loggear_debug("Se logro escribir la pagina mandada en SWAP");
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 		}
-		enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+
 
 		free(write_deserializado->data);
 		free(write_deserializado);
@@ -103,19 +104,17 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		return 0;
 	case R_S_PEDIR_PAGINA:
 		loggear_info("llego una peticion de pagina de la ram");
-		mensaje_serializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
-		memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
-		t_pedir_o_liberar_pagina_s* pedir_deserializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+		//mensaje_serializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+		//memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
+		//t_pedir_o_liberar_pagina_s* pedir_deserializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
 
-		pedir_deserializado = deserializar_mensaje_peticion_liberacion_pagina(mensaje_serializado);
+		t_pedir_o_liberar_pagina_s* pedir_deserializado = deserializar_mensaje_peticion_liberacion_pagina(mensaje->payload);
 
 		loggear_warning("me pide la pagina %zu", pedir_deserializado->nro_pag); //TODO xq me llega cualquier verdura aca.
 
 		carpincho  = buscar_carpincho_en_lista(pedir_deserializado->pid);
 
-		char* pagina_info = malloc(get_tamanio_pagina() + 1);
-
-		pagina_info = leer_particion(pedir_deserializado->nro_pag, particion_a_escribir(carpincho->pid_carpincho), carpincho); //TODO resta bien hacer lo del error en esto
+		char* pagina_info = leer_particion(pedir_deserializado->nro_pag, particion_a_escribir(carpincho->pid_carpincho), carpincho); //TODO resta bien hacer lo del error en esto
 		loggear_warning("info pag %s", pagina_info);
 		int codigo_mensaje = enviar_mensaje_protocolo(mensaje->socket, R_S_PEDIR_PAGINA, string_length(pagina_info) + 1, pagina_info);
 
@@ -125,22 +124,36 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 						loggear_info("Se mando a la RAM la pagina solicitada");
 					}
 
-		free(mensaje_serializado);
+		//free(mensaje_serializado);
 		free(pedir_deserializado);
 		//free(pagina_info); TODO porque no me deja hacer este free???
 		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_ELIMINAR_PROCESO:
 		loggear_info("llego una peticion para eliminar un proceso"); //TODO necesito saber cual es el struct
+		t_matelib_nuevo_proceso* PID_proceso_eliminar = deserializar_crear_proceso(mensaje->payload);
+		loggear_info("Se solicita eliminar el proceso %d", PID_proceso_eliminar->pid);
 
+		carpincho = buscar_carpincho_en_lista(PID_proceso_eliminar->pid);
+
+		error = eliminar_proceso(carpincho);
+
+		if(error < 0){
+			loggear_warning("OCURRIO UN ERROR AL ELIMINAR EL PROCESO QUE SOLICITO LA RAM");
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+		}else{
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+		}
+		free(PID_proceso_eliminar);
+		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_LIBERAR_PAGINA:
 		loggear_info("llego una peticion liberar paginas");
-		mensaje_serializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
-		memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
-		t_pedir_o_liberar_pagina_s* liberar_deserializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+		//mensaje_serializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+		//memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
+		//t_pedir_o_liberar_pagina_s* liberar_deserializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
 
-		liberar_deserializado = deserializar_mensaje_peticion_liberacion_pagina(mensaje_serializado);
+		t_pedir_o_liberar_pagina_s* liberar_deserializado = deserializar_mensaje_peticion_liberacion_pagina(mensaje->payload);
 		loggear_warning("la cantidad de paginas a liberar es %zu", liberar_deserializado->nro_pag);
 		carpincho  = buscar_carpincho_en_lista(liberar_deserializado->pid);
 		error = borrar_x_cantidad_de_marcos(carpincho,  liberar_deserializado->nro_pag);
@@ -150,7 +163,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		}
 
 		enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
-		free(mensaje_serializado);
+	//	free(mensaje_serializado);
 		free(liberar_deserializado);
 		destruir_mensaje(mensaje);
 		return 0;;

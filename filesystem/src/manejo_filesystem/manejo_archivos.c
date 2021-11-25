@@ -252,7 +252,7 @@ int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_
 			loggear_debug("se libera el marco %d por peticion de la RAM ya que se borro informacion del proceso %d del archivo %s", aux, carpincho->pid_carpincho, archivo->ruta_archivo);
 			list_remove_and_destroy_element(carpincho->marcos_usados, j - i - 1, free); // ver si hace falta un remove.
 			bitarray_clean_bit(archivo->bitmap_bitarray, aux);
-			vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
+			//vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
 		}
 	}
 
@@ -288,7 +288,7 @@ int eliminar_proceso(t_carpincho_swamp* carpincho){
 		char* marco = list_get(carpincho->marcos_usados, i);
 		int aux = atoi(marco);
 		bitarray_clean_bit(archivo->bitmap_bitarray, aux);
-		vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
+		//vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
 	}
 	for(int j = 0; j < list_size(carpincho->marcos_reservados); j++){
 		char* marco = list_get(carpincho->marcos_reservados, j);
