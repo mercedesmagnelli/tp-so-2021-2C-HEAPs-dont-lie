@@ -22,13 +22,18 @@ int main(int argc, char** argv) {
 	}
 
 
+	// pid 2
 	void multi_hilo1(int * n) {
 		mate_instance * lib_ref = malloc(sizeof(mate_instance));
 
 		mate_init(lib_ref, string_from_format("Proceso %d", n));
 
 		mate_sem_wait(lib_ref, "SEM_CCC");
+
+		sleep(3);
+
 		mate_sem_wait(lib_ref, "SEM_BBB");
+
 		mate_sem_wait(lib_ref, "SEM_AAA");
 
 		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
@@ -36,31 +41,45 @@ int main(int argc, char** argv) {
 		loggear_trace("[PID: %zu] - SEM_POST A SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
 		mate_sem_post(lib_ref, "SEM_AAA");
+
+		mate_close(lib_ref);
 	}
 
+	// pid 3
 	void multi_hilo2(int * n) {
 		mate_instance * lib_ref = malloc(sizeof(mate_instance));
 
 		mate_init(lib_ref, string_from_format("Proceso %d", n));
 
 		mate_sem_wait(lib_ref, "SEM_AAA");
-		mate_sem_wait(lib_ref, "SEM_CCC");
 		mate_sem_wait(lib_ref, "SEM_BBB");
+
+		sleep(5);
+
+		mate_sem_wait(lib_ref, "SEM_CCC");
+
 
 		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
 		loggear_trace("[PID: %zu] - SEM_POST a SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
 		mate_sem_post(lib_ref, "SEM_AAA");
+
+		mate_close(lib_ref);
 	}
 
+	// pid 4
 	void multi_hilo3(int * n) {
 		mate_instance * lib_ref = malloc(sizeof(mate_instance));
 
 		mate_init(lib_ref, string_from_format("Proceso %d", n));
 
-		mate_sem_wait(lib_ref, "SEM_BBB");
+		sleep(2);
+
 		mate_sem_wait(lib_ref, "SEM_AAA");
+
+		sleep(3);
+		mate_sem_wait(lib_ref, "SEM_BBB");
 		mate_sem_wait(lib_ref, "SEM_CCC");
 
 		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
@@ -68,6 +87,8 @@ int main(int argc, char** argv) {
 		loggear_trace("[PID: %zu] - SEM_POST A SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
 
 		mate_sem_post(lib_ref, "SEM_AAA");
+
+		mate_close(lib_ref);
 	}
 
 	mate_instance * referencia = malloc(sizeof(mate_instance));
@@ -102,9 +123,9 @@ int main(int argc, char** argv) {
 
 	mate_close(referencia);
 
-	loggear_warning("ESperamos 60 segundos para cerrar todo");
-	sleep(60);
-	loggear_warning("PAsaron 60 segundos");
+	loggear_warning("ESperamos 5 segundos para cerrar todo");
+	sleep(5);
+	loggear_warning("PAsaron 5 segundos");
 
 	cerrar_todo();
 	return EXIT_SUCCESS;

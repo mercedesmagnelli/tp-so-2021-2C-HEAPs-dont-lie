@@ -83,6 +83,8 @@ void planificador_destruir_de_hilos() {
 		hilos_destruir_hilo_finish(pid(hilo));
 
 		loggear_info("[Finish] - [PID: %zu] - Eliminado estructuras de sincronizacion", pid(hilo));
+
+		free(hilo);
 	}
 }
 
@@ -95,6 +97,7 @@ int planificadores_iniciar() {
 
 	int error = 0;
 
+	// TODO SOLUCIONAR LEAK EN ESTOS HILOS
 	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_largo_plazo, NULL);
 	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_corto_plazo, NULL);
 	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_medio_plazo, NULL);

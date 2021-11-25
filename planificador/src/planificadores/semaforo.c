@@ -11,7 +11,9 @@ char * lista_hilos(t_list * lista) {
 
 	for (int i = 0; i < list_size(lista); ++i) {
 		t_hilo * hilo = list_get(lista, i);
-		string_append(&hilos, string_from_format("%zu ", pid(hilo)));
+		char * key = string_from_format("%zu ", pid(hilo));
+		string_append(&hilos, key);
+		free(key);
 	}
 	string_append(&hilos, "]");
 	return hilos;
@@ -21,11 +23,17 @@ void semaforo_imprimir_status() {
 	void imprimir(char * key, void * sem) {
 		t_semaforo * semaforo = (t_semaforo *) sem;
 
+		char * procesos_bloqueados = lista_hilos(semaforo->list_procesos_bloqueados);
+		char * procesos_retenidos = lista_hilos(semaforo->list_procesos_retienen);
+
 		loggear_warning("--- Nombre: %s --- Valor: %d --- Bloqueados: %s --- Retenidos: %s ---",
 		semaforo->nombre,
 		semaforo->valor,
-		lista_hilos(semaforo->list_procesos_bloqueados),
-		lista_hilos(semaforo->list_procesos_retienen));
+		procesos_bloqueados,
+		procesos_retenidos);
+
+		free(procesos_bloqueados);
+		free(procesos_retenidos);
 	}
 	pthread_mutex_lock(&mutex_semaforos);
 	loggear_warning("--------------INICIO SEMAFOROS--------------");
@@ -44,6 +52,15 @@ t_semaforo * crear_semaforo(t_matelib_semaforo * semaforo) {
 	sem->list_procesos_bloqueados = list_create();
 
 	return sem;
+}
+
+void destruir_semaforo(void * sem) {
+	t_semaforo * semaforo = (t_semaforo *) sem;
+
+	list_destroy(semaforo->list_procesos_retienen);
+	list_destroy(semaforo->list_procesos_bloqueados);
+
+	free(semaforo);
 }
 
 t_semaforo * semaforo_get(char * nombre_semaforo) {
@@ -77,7 +94,7 @@ int semaforo_estructuras_destruir() {
 		free(sem);
 	}
 
-	dictionary_clean_and_destroy_elements(semaforos, destruir);
+	dictionary_destroy_and_destroy_elements(semaforos, destruir);
     return 0;
 }
 

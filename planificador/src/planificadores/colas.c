@@ -87,6 +87,7 @@ t_hilo * colas_insertar_new(uint32_t pid) {
 	//hilo->nombre_bloqueante = "";
 	hilo->semaforos_pedidos = list_create();
 
+
 	pthread_mutex_lock(&mutex_new_queue);
 	queue_push(new_queue, hilo);
 	pthread_mutex_unlock(&mutex_new_queue);
@@ -225,8 +226,8 @@ t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante,
     return hilo;
 }
 
-t_hilo * colas_obtener_hilo_en_exec(uint32_t pid) {
-	bool son_iguales(void * hilo2) { return pid == ((t_hilo *) hilo2)->pid; }
+t_hilo * colas_obtener_hilo_en_exec(uint32_t ppid) {
+	bool son_iguales(void * hilo2) { return ppid == pid(hilo2); }
 
 	pthread_mutex_lock(&mutex_exec_list);
 	t_hilo * hilo = list_find(exec_list, son_iguales);
@@ -235,8 +236,8 @@ t_hilo * colas_obtener_hilo_en_exec(uint32_t pid) {
 	return hilo;
 }
 
-void colas_agregar_wait_semaforo(uint32_t pid, void * semaforo) {
-	bool son_iguales(void * hilo) { return pid == ((t_hilo *) hilo)->pid; }
+void colas_agregar_wait_semaforo(uint32_t ppid, void * semaforo) {
+	bool son_iguales(void * hilo) { return ppid == pid(hilo); }
 
 	pthread_mutex_lock(&mutex_exec_list);
 	t_hilo * hilo = list_find(exec_list, son_iguales);

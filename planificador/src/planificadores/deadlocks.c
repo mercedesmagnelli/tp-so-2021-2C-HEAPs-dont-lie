@@ -10,6 +10,18 @@ t_dictionary * dict_visitados;
 
 int eliminar_proceso_deadlock(t_list * hilos_deadlock);
 
+void reiniciar_diccionario_visitados() {
+	for (int i = 0; i < list_size(list_bloqueados); ++i) {
+		t_hilo * hilo = list_get(list_bloqueados, i);
+
+		char * key = string_from_format("%zu", pid(hilo));
+
+		bool * visitado = dictionary_get(dict_visitados, key);
+		*visitado = false;
+		free(key);
+	}
+}
+
 void iniciar_evaluacion_deadlock() {
 	list_bloqueados = colas_obtener_listas_bloqueados(SEMAFORO);
 
@@ -26,8 +38,9 @@ void iniciar_evaluacion_deadlock() {
 		*visitado = false;
 
 		dictionary_put(dict_visitados, key, visitado);
-	}
 
+		free(key);
+	}
 }
 
 void destruir_evaluacion_deadlock() {
@@ -43,7 +56,9 @@ bool esta_bloqueado_por_semaforo(void * hilo) {
 }
 
 t_list * dfs(t_hilo * first_hilo, t_hilo * hilo_preguntar, int nivel) {
-	bool * visitado = dictionary_get(dict_visitados, string_from_format("%zu", pid(hilo_preguntar)));
+	char * key = string_from_format("%zu", pid(hilo_preguntar));
+	bool * visitado = dictionary_get(dict_visitados, key);
+	free(key);
 
 	if (*visitado) { return NULL; }
 	*visitado = true;
@@ -64,6 +79,7 @@ t_list * dfs(t_hilo * first_hilo, t_hilo * hilo_preguntar, int nivel) {
 
 	char * tabs = string_repeat('\t', nivel);
 	loggear_trace("%s PID: %zu - SEM_BLOQUEANTE: %s - PROCESOS_RETIENEN: %d", tabs, hilo_preguntar->pid, semaforo_bloqueante->nombre, list_size(procesos_ocupan_semaforo));
+	free(tabs);
 
 	for (int i = 0; i < list_size(procesos_ocupan_semaforo); ++i) {
 		t_hilo * hilo_ocupan = list_get(procesos_ocupan_semaforo, i);
@@ -75,6 +91,8 @@ t_list * dfs(t_hilo * first_hilo, t_hilo * hilo_preguntar, int nivel) {
 			return lista;
 		}
 	}
+
+	list_destroy(procesos_ocupan_semaforo);
 
 	return NULL;
 }
@@ -120,6 +138,8 @@ int deadlocks_ejecutar() {
 
 		for (int i = 0; i < list_size(list_bloqueados); ++i) {
 			t_hilo * hilo_bloqueado = list_get(list_bloqueados, i);
+			loggear_warning("[DEADLOCK] - Hilo busca deadlock - [PID: %zu]", pid(hilo_bloqueado));
+			reiniciar_diccionario_visitados();
 			t_list * hilos_deadlock = dfs(NULL, hilo_bloqueado, 1);
 
 			if (hilos_deadlock != NULL) {
@@ -127,6 +147,9 @@ int deadlocks_ejecutar() {
 				if (error != 0) {
 					loggear_error("[DEADLOCK] - Ocurrió un error al eliminar el hilo de mayor PID");
 				}
+
+				list_clean(hilos_deadlock);
+				list_destroy(hilos_deadlock);
 
 				esperar = false;
 				break;
@@ -141,6 +164,7 @@ int deadlocks_ejecutar() {
 
 int iniciar_control_deadlock() {
 	int ret = pthread_create(&thread_deadlock, NULL, (void *) deadlocks_ejecutar, NULL);
+	pthread_detach(thread_deadlock);
 
 	if (ret != 0) {
 		loggear_error("[DEADLOCK] - Ocurrió un error al crear el hilo para controlar deadlocks, Error: %d", ret);
@@ -200,6 +224,8 @@ void imprimir_mensaje_deadlock(t_list * hilos) {
 		loggear_warning("[DEADLOCK] ||| PID: %zu \t||| %s \t||| SEM: %s  ||| [ %s]", pid(hilo), get_estado_nombre(hilo), hilo->nombre_bloqueante, get_semaforos_retenidos(hilo));
 	}
 	loggear_warning("[DEADLOCK] -----------------------------------------------------------");
+
+	free(hilos_deadlock);
 }
 
 int eliminar_proceso_deadlock(t_list * hilos_deadlock) {
