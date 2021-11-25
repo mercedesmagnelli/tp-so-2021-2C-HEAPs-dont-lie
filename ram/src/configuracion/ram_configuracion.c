@@ -127,6 +127,8 @@ int set_variable_enum(t_config * config, char * param_leer, int * param, int (*t
 int obtener_algoritmo_reemplazo_mmu(char * algoritmo) {
 	if (strcmp(algoritmo, ALGORITMO_REEMPLAZO_MMU_CLOCK_M) == 0) {
 		return (int) CLOCKM;
+	}else if(strcmp(algoritmo, ALGORITMO_REEMPLAZO_MMU_LRU) == 0) {
+		return (int) LRUM;
 	}
 
 	return (int) CONFIG_ERROR_EN_ARCHIVO;

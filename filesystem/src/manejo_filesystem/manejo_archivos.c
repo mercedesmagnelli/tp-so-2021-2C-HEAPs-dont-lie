@@ -6,10 +6,14 @@ int obtener_marco_desde_pagina(uint32_t pagina, t_carpincho_swamp* carpincho);
 
 int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
 
+	loggear_trace("ENTRE A ESCRIBIR");
 	FILE* archivo;
 	char* ruta_particion = swamp->ruta_archivo;
 
+	loggear_trace("ENTRE A ESCRIBIRx2");
+	loggear_debug("TIENE %d marcos reservados", list_size(carpincho->marcos_reservados));
 	uint32_t marco = atoi(list_get(carpincho->marcos_reservados, 0));
+	loggear_trace("ENTRE A ESCRIBIRx3");
 
 	loggear_debug("SE PROCEDE A ESCRIBIR LA PAGINA %d EN EL MARCO %d DE LA PARTICION %s", pagina, marco, ruta_particion);
 
@@ -103,7 +107,7 @@ uint32_t marco_libre(t_archivo_swamp* swamp){
 				i++;
 			}
 
-	if(i == get_cantidad_marcos()){
+	if(i == get_cantidad_marcos() - 1){
 			loggear_error("NO HAY MARCO DISPONIBLE PARA ASIGNARLE");
 				return -1;
 			}
@@ -180,10 +184,13 @@ int reservar_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos, t_ar
 			return -1;
 		}
 		list_add(marcos_lista, string_itoa(marco));
+		loggear_warning("cantidad marcos reservados en reserva %d", list_size(marcos_lista));
 		bitarray_set_bit(swamp->bitmap_bitarray, marco);
 	}
 
 	list_add_all(carpincho->marcos_reservados, marcos_lista);
+
+	loggear_warning("cantidad marcos carpincho en reserva %d", list_size(carpincho->marcos_reservados));
 	swamp->espacio_libre = swamp->espacio_libre - cantidad_marcos;
 
 	loggear_warning("aca voy bien");
@@ -252,7 +259,7 @@ int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_
 			loggear_debug("se libera el marco %d por peticion de la RAM ya que se borro informacion del proceso %d del archivo %s", aux, carpincho->pid_carpincho, archivo->ruta_archivo);
 			list_remove_and_destroy_element(carpincho->marcos_usados, j - i - 1, free); // ver si hace falta un remove.
 			bitarray_clean_bit(archivo->bitmap_bitarray, aux);
-			vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
+			//vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
 		}
 	}
 
@@ -288,7 +295,7 @@ int eliminar_proceso(t_carpincho_swamp* carpincho){
 		char* marco = list_get(carpincho->marcos_usados, i);
 		int aux = atoi(marco);
 		bitarray_clean_bit(archivo->bitmap_bitarray, aux);
-		vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
+		//vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
 	}
 	for(int j = 0; j < list_size(carpincho->marcos_reservados); j++){
 		char* marco = list_get(carpincho->marcos_reservados, j);
