@@ -2,135 +2,44 @@
 #include <pthread.h>
 #include <commons/string.h>
 
-void cerrar_todo();
+//void cerrar_todo();
+
+#define SEMAFORO_SALUDO "SEM_HELLO"
 
 int main(int argc, char** argv) {
 
-	int error = 0;
+	if(argc < 2){
+	        printf("No se ingresó archivo de configuración");
+	        exit(EXIT_FAILURE);
+	    }
 
-	error = iniciar_configuracion(argc, argv);
-	if (error != STATUS_OK) {
-		puts("Error en los argumentos\n");
-		return EXIT_FAILURE;
-	}
-
-	error = init_mutex_log(get_log_route(), get_log_app_name(), get_log_in_console(), LOG_LEVEL_TRACE);
-	if (error != STATUS_OK) {
-		puts("Error al crear el logger\n");
-		cerrar_todo();
-		return EXIT_FAILURE;
-	}
+	    char* config = argv[1];
 
 
-	// pid 2
-	void multi_hilo1(int * n) {
-		mate_instance * lib_ref = malloc(sizeof(mate_instance));
+		printf("MAIN - Utilizando el archivo de config: %s\n", config);
 
-		mate_init(lib_ref, string_from_format("Proceso %d", n));
+		mate_instance instance;
 
-		mate_sem_wait(lib_ref, "SEM_CCC");
+		mate_init(&instance, (char*)config);
 
-		sleep(3);
+	    char saludo[] = "No, ¡hola humedal!\n";
 
-		mate_sem_wait(lib_ref, "SEM_BBB");
+	    mate_pointer saludoRef = mate_memalloc(&instance, strlen(saludo));
 
-		mate_sem_wait(lib_ref, "SEM_AAA");
+	    mate_memwrite(&instance, saludo, saludoRef, strlen(saludo));
 
-		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
+	    mate_sem_init(&instance, SEMAFORO_SALUDO, 0);
 
-		loggear_trace("[PID: %zu] - SEM_POST A SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
+	    mate_sem_wait(&instance, SEMAFORO_SALUDO);
 
-		mate_sem_post(lib_ref, "SEM_AAA");
+	    mate_memread(&instance, saludoRef, saludo, strlen(saludo));
 
-		mate_close(lib_ref);
-	}
-
-	// pid 3
-	void multi_hilo2(int * n) {
-		mate_instance * lib_ref = malloc(sizeof(mate_instance));
-
-		mate_init(lib_ref, string_from_format("Proceso %d", n));
-
-		mate_sem_wait(lib_ref, "SEM_AAA");
-		mate_sem_wait(lib_ref, "SEM_BBB");
-
-		sleep(5);
-
-		mate_sem_wait(lib_ref, "SEM_CCC");
+	    printf(saludo);
 
 
-		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
-
-		loggear_trace("[PID: %zu] - SEM_POST a SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
-
-		mate_sem_post(lib_ref, "SEM_AAA");
-
-		mate_close(lib_ref);
-	}
-
-	// pid 4
-	void multi_hilo3(int * n) {
-		mate_instance * lib_ref = malloc(sizeof(mate_instance));
-
-		mate_init(lib_ref, string_from_format("Proceso %d", n));
-
-		sleep(2);
-
-		mate_sem_wait(lib_ref, "SEM_AAA");
-
-		sleep(3);
-		mate_sem_wait(lib_ref, "SEM_BBB");
-		mate_sem_wait(lib_ref, "SEM_CCC");
-
-		loggear_trace("[PID: %zu] - En 10 segundos, hace SEM_POST", ((t_instance_metadata *) lib_ref->group_info)->pid);
-
-		loggear_trace("[PID: %zu] - SEM_POST A SEM_AAA", ((t_instance_metadata *) lib_ref->group_info)->pid);
-
-		mate_sem_post(lib_ref, "SEM_AAA");
-
-		mate_close(lib_ref);
-	}
-
-	mate_instance * referencia = malloc(sizeof(mate_instance));
-
-	mate_init(referencia, "Proceso 01");
-	mate_sem_init(referencia, "SEM_AAA", 1);
-	mate_sem_init(referencia, "SEM_BBB", 1);
-	mate_sem_init(referencia, "SEM_CCC", 1);
-
-	pthread_t thread_uno;
-	pthread_t thread_dos;
-	pthread_t thread_tres;
-
-	int uno = 10;
-	int dos = 20;
-	int tres = 30;
-
-	pthread_create(&thread_uno, NULL, (void *) multi_hilo1, &uno);
-	pthread_create(&thread_dos, NULL, (void *) multi_hilo2, &dos);
-	pthread_create(&thread_tres, NULL, (void *) multi_hilo3, &tres);
-
-	loggear_debug("Esperamos a que finalice 1");
-	pthread_join(thread_uno, NULL);
-	loggear_debug("Esperamos a que finalice 2");
-	pthread_join(thread_dos, NULL);
-	loggear_debug("Esperamos a que finalice 3");
-	pthread_join(thread_tres, NULL);
-
-	mate_sem_destroy(referencia, "SEM_AAA");
-	mate_sem_destroy(referencia, "SEM_BBB");
-	mate_sem_destroy(referencia, "SEM_CCC");
-
-	mate_close(referencia);
-
-	loggear_warning("ESperamos 20 segundos para cerrar todo");
-	sleep(20);
-	loggear_warning("PAsaron 20 segundos");
-
-	cerrar_todo();
 	return EXIT_SUCCESS;
 }
-
+/*
 void cerrar_todo() {
 	conexiones_cerrar_conexiones();
 	loggear_info("Cerrada conexion con backend");
@@ -139,4 +48,4 @@ void cerrar_todo() {
 	destroy_log();
 	puts("Destruido logs");
 }
-
+*/
