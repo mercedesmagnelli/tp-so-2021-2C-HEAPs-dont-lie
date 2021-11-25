@@ -4,12 +4,24 @@ void debug_configuracion();
 void imprimir_hdm(t_list* lista_heaps);
 void imprimir_procesos();
 void testeamos();
-int main(int argc, char** argv) {
 
-	// TODO: Implementar signal de CtrlC y  tal vez CtrlZ
+void manejar_signal() {
 	signal(SIGINT, manejar_sigint);
 	signal(SIGUSR1, manejar_sigusr1);
 	signal(SIGUSR1, manejar_sigusr2);
+
+	if (true) {
+		semaforo_post_fin();
+	}
+}
+
+int main(int argc, char** argv) {
+	semaforo_iniciar();
+
+	pthread_t hilo;
+	pthread_create(&hilo, NULL, (void *) manejar_signal, NULL);
+	pthread_detach(hilo);
+
 
 	int error = iniciar_configuracion(argc, argv);
 
@@ -32,7 +44,7 @@ int main(int argc, char** argv) {
 
 	testeamos();
 
-
+	semaforo_wait_fin();
 	cerrar_todo();
 	destruir_estructuras_administrativas();
 

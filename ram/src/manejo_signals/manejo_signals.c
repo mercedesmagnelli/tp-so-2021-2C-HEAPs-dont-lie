@@ -38,7 +38,7 @@ void manejar_sigint(){
 
 
 void cerrar_todo() {
-	cerrar_conexiones(true); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga
+	cerrar_conexiones(false); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga
 	destroy_configuracion();
 	destroy_log();
 }

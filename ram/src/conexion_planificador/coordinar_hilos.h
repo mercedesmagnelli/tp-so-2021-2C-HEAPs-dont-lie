@@ -7,6 +7,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include "../sincronizacionsemaforo/semaforo.h"
+
 #include "../../../shared/logger.h"
 #include "../../../shared/protocolo.h"
 
