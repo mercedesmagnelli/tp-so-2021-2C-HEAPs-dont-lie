@@ -22,7 +22,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_PROCESO_NUEVO:
-
+		loggear_info("LLEGO UN PROCESO NUEVO");
 		loggear_error("ENTRO AQUI");
 		mensaje_serializado = malloc(sizeof(t_mensaje_r_s));
 		loggear_error("ENTRO AQUIx2");
@@ -51,7 +51,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_SOLICITUD_ESPACIO:
-
+		loggear_info("LLEGO SOLICITUD ESPACIO");
 		loggear_error("ENTRO AQUIx7");
 		mensaje_serializado = malloc(sizeof(t_mensaje_r_s));
 		memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));

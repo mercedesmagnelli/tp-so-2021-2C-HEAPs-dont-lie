@@ -107,7 +107,7 @@ uint32_t marco_libre(t_archivo_swamp* swamp){
 				i++;
 			}
 
-	if(i == get_cantidad_marcos()){
+	if(i == get_cantidad_marcos() - 1){
 			loggear_error("NO HAY MARCO DISPONIBLE PARA ASIGNARLE");
 				return -1;
 			}
