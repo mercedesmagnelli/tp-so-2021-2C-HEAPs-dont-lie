@@ -48,7 +48,8 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 		info_a_guardar = traer_y_controlar_consistencia_paginas(pagina_victima, nroPag, PID);
 
 	}
-	loggear_info("antes de escribir el frame es %d", frame);
+	char* string = (char*) info_a_guardar;
+	loggear_info("antes de escribir el frame es %d con la info %s", frame, string);
 	escribir_directamente_en_memoria(info_a_guardar, get_tamanio_pagina(), frame * get_tamanio_pagina());
 	loggear_info("X2");
 	return frame;
@@ -74,6 +75,8 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 		free(mensaje_serializado);
 		if(rec->head== FALLO_EN_LA_TAREA){
 			loggear_error("[RAM] - Hubo un problema en la escritura de la pagina %d del proceos %d en swamp", nro_pag_victima, pid_pag_victima);
+		}else {
+			loggear_trace("[RAM] - Se escribio bien la pagina en swap");
 		}
 
 	}

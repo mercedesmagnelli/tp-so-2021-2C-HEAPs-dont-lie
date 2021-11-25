@@ -84,17 +84,16 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		return 0;
 	case R_S_ESCRIBIR_EN_PAGINA:
 		loggear_info("llega una solicitud de escritura desde la RAM");
-		 mensaje_serializado = malloc(sizeof(t_write_s));
 
-		 t_write_s* write_deserializado = malloc(sizeof(t_write_s));
-
-		 write_deserializado = deserializar_mensaje_write_s(mensaje_serializado);
+		 t_write_s* write_deserializado = deserializar_mensaje_write_s(mensaje->payload);
 		 carpincho = buscar_carpincho_en_lista(write_deserializado->pid); //TODO HACER FUNCION
 
-		error = escribir_particion(carpincho, write_deserializado->nro_pag, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+		error = escribir_particion(carpincho, write_deserializado->nro_pag, write_deserializado->data, particion_a_escribir(carpincho->pid_carpincho));
 		if(error < 0){
 			loggear_debug("OCURRIO UN ERROR INESPERADO AL QUERER ESCRIBIR EL ARCHIVO DE SWAP NO SE GUARDO CORRECTAMENTE");
 			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+		}else{
+			loggear_debug("Se logro escribir la pagina mandada en SWAP");
 		}
 		enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 
