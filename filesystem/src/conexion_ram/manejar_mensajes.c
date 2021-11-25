@@ -31,7 +31,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 			t_mensaje_r_s* mensaje_deserializado_nuevo = malloc(sizeof(t_mensaje_r_s));
 			loggear_error("ENTRO AQUIx4");
-
+			loggear_warning("EL PROCESO QUE LLEGO ES %d", mensaje_deserializado_nuevo->pid);
 			if(get_asignacion() == FIJA){
 				carpincho = crear_carpincho(mensaje_deserializado_nuevo->pid,mensaje_deserializado_nuevo->cant_pag);
 				if(carpincho->estado_carpincho > 0){
@@ -59,18 +59,20 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		t_mensaje_r_s* mensaje_deserializado = malloc(sizeof(t_mensaje_r_s));
 
 		mensaje_deserializado = deserializar_mensaje_solicitud_r_s(mensaje_serializado);
-
+		loggear_warning("EL PROCESO QUE SOLICITA ESPACIO ES %d", mensaje_deserializado->pid);
 		carpincho = buscar_carpincho_en_lista(mensaje_deserializado->pid);
 		loggear_error("ENTRO AQUIx9");
 		if( carpincho == NULL){
 			loggear_debug("EL CARPINCHO NO ESTA EN LA LISTA");
 			carpincho = crear_carpincho(mensaje_deserializado->pid,mensaje_deserializado->cant_pag);
-			if(carpincho->estado_carpincho > 0){
-				destroy_carpinchos_swamp(carpincho);
-				loggear_debug("NO HAY MAS ESPACIO POR LO QUE SE ENVIA A LA RAM EL MENSAJE DE ERROR AL GUARDAR");
-				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL); //TODO esto no se si es así revisar bien.
+			if(get_asignacion() == GLOBAL){
+			error = reservar_marcos(carpincho,mensaje_deserializado->cant_pag, particion_a_escribir(carpincho->pid_carpincho));
+				if(error < 0){
+					enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+				}else{
+					enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+					}
 			}
-			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 		}else{
 
 		loggear_error("ENTRO AQUIx10");
@@ -93,7 +95,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		 t_write_s* write_deserializado = deserializar_mensaje_write_s(mensaje->payload);
 		 carpincho = buscar_carpincho_en_lista(write_deserializado->pid); //TODO HACER FUNCION
-
+		 loggear_warning("EL PROCESO QUE QUIERE ESCRIBIR ES %d", write_deserializado->pid);
 		 loggear_error("Se esta escribiendo %s", write_deserializado->data);
 		error = escribir_particion(carpincho, write_deserializado->nro_pag, write_deserializado->data, particion_a_escribir(carpincho->pid_carpincho));
 		if(error < 0){
@@ -118,7 +120,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		t_pedir_o_liberar_pagina_s* pedir_deserializado = deserializar_mensaje_peticion_liberacion_pagina(mensaje->payload);
 
 		loggear_warning("me pide la pagina %zu", pedir_deserializado->nro_pag); //TODO xq me llega cualquier verdura aca.
-
+		loggear_warning("EL PROCESO QUE ME PIDE LA PAGINA ES %d", pedir_deserializado->pid);
 		carpincho  = buscar_carpincho_en_lista(pedir_deserializado->pid);
 
 		char* pagina_info = leer_particion(pedir_deserializado->nro_pag, particion_a_escribir(carpincho->pid_carpincho), carpincho); //TODO resta bien hacer lo del error en esto

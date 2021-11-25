@@ -9,9 +9,33 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 	loggear_trace("ENTRE A ESCRIBIR");
 	FILE* archivo;
 	char* ruta_particion = swamp->ruta_archivo;
+	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
 
 	loggear_trace("ENTRE A ESCRIBIRx2");
 	loggear_debug("TIENE %d marcos reservados", list_size(carpincho->marcos_reservados));
+
+	for(int i = 0; i < list_size(carpincho->dupla); i++){
+		dupla = list_get(carpincho->dupla, i);
+		if(dupla->pagina == pagina){
+			loggear_warning("TENGO ESTA PAGINA YA ESCRITA POR LO QUE LA SOBRESCRIBO");
+			archivo = fopen(ruta_particion, "r+");
+
+			if(archivo == NULL){
+				loggear_error("Ocurrio un error al abrir el archivo %s, puede deberse a que no esta creado o no es la ruta correcta", ruta_particion);
+				return -1;
+			}
+
+			int posicion_escribir = dupla->marco * get_tamanio_pagina();
+
+			fseek(archivo, posicion_escribir, SEEK_SET);
+
+			fputs(texto_escribir, archivo);
+
+			fclose(archivo);
+			return 0;
+		}
+	}
+
 	uint32_t marco = atoi(list_get(carpincho->marcos_reservados, 0));
 	loggear_trace("ENTRE A ESCRIBIRx3");
 
@@ -32,7 +56,7 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 	fclose(archivo);
 
-	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
+
 	dupla->marco = marco;
 	dupla->pagina = pagina;
 
