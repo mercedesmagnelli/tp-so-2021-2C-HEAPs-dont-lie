@@ -26,13 +26,19 @@ int levantar_servidor() {
 	return 0;
 }
 
+void cancelar_notificaciones() {
+	pthread_cancel(thread_escuchar_notificaciones);
+}
+
 // Publica
 void cerrar_conexiones(bool safe_close) {
 
 	if (safe_close) {
 		pthread_join(thread_escuchar_notificaciones, NULL);
+		//pthread_join(hilo_signals, NULL);
 	} else {
 		pthread_detach(thread_escuchar_notificaciones);
+		//pthread_join(hilo_signals, NULL);
 	}
 
 	loggear_trace("Cerramos todos los threads que no hayan terminado");

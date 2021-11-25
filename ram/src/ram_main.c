@@ -4,19 +4,21 @@ void debug_configuracion();
 void imprimir_hdm(t_list* lista_heaps);
 void imprimir_procesos();
 void testeamos();
+void* signal_handler();
+void* manejo_seniales(void*);
+pthread_t hilo_senial;
+
 int main(int argc, char** argv) {
 
-	// TODO: Implementar signal de CtrlC y  tal vez CtrlZ
-	//signal(SIGINT, manejar_sigint);
-	//signal(SIGUSR1, manejar_sigusr1);
-	//signal(SIGUSR1, manejar_sigusr2);
+	//pthread_create(&hilo_senial,NULL, manejo_seniales, NULL);
+	//int a = pthread_detach(hilo_senial);
 
 	int error = iniciar_configuracion(argc, argv);
 
 	error = init_mutex_log(get_log_route(), get_log_app_name(), get_log_in_console(), get_log_level_info());
 	if (error != STATUS_OK) {
 		puts("Error al crear el logger\n");
-		cerrar_todo();
+		cerrar_todo(true);
 		return EXIT_FAILURE;
 	}
 
@@ -24,7 +26,7 @@ int main(int argc, char** argv) {
 
 	error = levantar_servidor();
 	if (error != STATUS_OK) {
-		cerrar_todo();
+		cerrar_todo(true);
 		return EXIT_FAILURE;
 	}
 
@@ -33,12 +35,54 @@ int main(int argc, char** argv) {
 	testeamos();
 	imprimir_procesos();
 
-	cerrar_todo();
+	cerrar_todo(true);
 	destruir_estructuras_administrativas();
 
 	return EXIT_SUCCESS;
 }
 
+void* signal_handler(int n){
+
+
+	void* x = manejar_sigint();
+	loggear_trace("ya termine de manejar el sigint");
+//	int a = pthread_join(hilo_senial, NULL);
+//	loggear_trace("termine de joinear");
+//	if (a !=0 ) {
+//		loggear_error("hubo un problema joineando el hilo de las seniales");
+//	}
+	cancelar_notificaciones();
+	return x;
+	//cerrar_todo();
+			/*switch (n){
+				case SIGUSR1:
+					manejar_sigusr1();
+						break;
+				case SIGUSR2:
+					manejar_sigusr2();
+						break;
+				case SIGINT:
+					manejar_sigint();
+					pthread_join(hilo_senial, NULL);
+					//cerrar_todo();
+					break;
+			}*/
+}
+
+void* manejo_seniales(void* s) {
+	signal(SIGINT,signal_handler);
+
+	//signal(SIGUSR1,signal_handler);
+	//signal(SIGUSR2,signal_handler);
+	return NULL;
+}
+
+
+void cerrar_todo(bool cierro) {
+	cerrar_conexiones(cierro); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga
+	destroy_configuracion();
+	destroy_log();
+}
 
 
 
