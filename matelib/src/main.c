@@ -123,9 +123,9 @@ int main(int argc, char** argv) {
 
 	mate_close(referencia);
 
-	loggear_warning("ESperamos 5 segundos para cerrar todo");
-	sleep(5);
-	loggear_warning("PAsaron 5 segundos");
+	loggear_warning("ESperamos 20 segundos para cerrar todo");
+	sleep(20);
+	loggear_warning("PAsaron 20 segundos");
 
 	cerrar_todo();
 	return EXIT_SUCCESS;

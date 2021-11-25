@@ -16,6 +16,7 @@ typedef struct {
 	pthread_mutex_t mutex;
 	t_list * list_procesos_retienen;
 	t_list * list_procesos_bloqueados;
+	int show;
 } t_semaforo;
 
 typedef enum {
