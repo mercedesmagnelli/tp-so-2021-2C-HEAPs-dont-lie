@@ -26,12 +26,19 @@ int levantar_servidor() {
 	return 0;
 }
 
+void cancelar_notificaciones() {
+	pthread_cancel(thread_escuchar_notificaciones);
+}
+
 // Publica
 void cerrar_conexiones(bool safe_close) {
 
 	if (safe_close) {
+		loggear_debug("Invocado SAFE CLOSE");
 		pthread_join(thread_escuchar_notificaciones, NULL);
+		//pthread_join(hilo_signals, NULL);
 	} else {
+		loggear_debug("Invocado NO SAFE CLOSE");
 		pthread_cancel(thread_escuchar_notificaciones);
 	}
 

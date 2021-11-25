@@ -17,7 +17,7 @@
 
  **/
 
-void manejar_sigint();
+void* manejar_sigint();
 
 /**
  * @NAME: manejar_sisr1
@@ -43,7 +43,7 @@ void manejar_sigusr2();
  * @NAME: cerrrar_todo
  * @DESC: cierra todo
 */
-void cerrar_todo();
+void cerrar_todo(bool cierre);
 /**
  * @NAME: imprimir_entrada_proceso
  * @DESC: funcion auxiliar que terciariza la impresión por pantalla de una línea de info en el informe de procesos

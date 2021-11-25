@@ -1,6 +1,6 @@
 #include "manejo_signals.h"
 
-void manejar_sigint(){
+void* manejar_sigint(){
 	//char* nombre_archivo;
 	//loggear_info("Se va a generar el archivo del dump, con el nombre %s", nombre_archivo);
 
@@ -20,9 +20,11 @@ void manejar_sigint(){
 		loggear_info("CANTIDAD DE MISS TOTALES: 0");
 		loggear_info("CANTIDAD DE HITS TOTALES: 0");
 	}else{
-
+		loggear_trace("aber");
 	list_iterate(listaProcesos,sumar_miss);
+	loggear_trace("aber2");
 	list_iterate(listaProcesos, sumar_hits);
+	loggear_trace("aber33");
 
 	loggear_info("CANTIDAD DE MISS TOTALES: %d", total_miss);
 	loggear_info("CANTIDAD DE HITS TOTALES: %d", total_hits);
@@ -33,16 +35,9 @@ void manejar_sigint(){
 		imprimir_entrada_proceso(p);
 		}
 	}
-	cerrar_todo();
+	loggear_trace("YA TERMINE DE IMPRIMIR TODO");
+	return NULL;
 }
-
-
-void cerrar_todo() {
-	cerrar_conexiones(false); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga
-	destroy_configuracion();
-	destroy_log();
-}
-
 
 void imprimir_entrada_proceso(t_proceso* p){
 
@@ -51,6 +46,7 @@ void imprimir_entrada_proceso(t_proceso* p){
 
 }
 void manejar_sigusr1(){
+
 	char* ruta = temporal_get_string_time("%s/DUMP_%y%m%d%H%M%S.txt",get_path_dump_tlb());
 	loggear_info("[SIGUSR1] - Se va a generar el archivo dump en la ruta: %s");
 	FILE* dump = fopen(ruta, "wb+");
@@ -83,6 +79,7 @@ void manejar_sigusr1(){
 }
 
 void manejar_sigusr2(){
+
 	loggear_warning("[SIGUSR2] - Se van a limpiar todas las entradas de la tlb");
 	if(list_size(TLB)==0) {
 		loggear_warning("[SIGNURS2] - No hay ninguna entrada para eliminar");

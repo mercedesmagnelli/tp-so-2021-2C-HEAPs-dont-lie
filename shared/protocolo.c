@@ -26,32 +26,23 @@ int enviar_mensaje_protocolo(int socket_destino, t_header header , size_t tamani
 	// Se arma el paquete de envio
 	t_prot_mensaje * mensaje = armar_mensaje(header, tamanio_payload, payload);
 
-	loggear_trace("pase por aqui");
 	// Envio del tamaño del mensaje, siendo mensaje : header + payload
 	resultado_send = send(socket_destino, &(mensaje->tamanio_total) , sizeof(size_t), 0);
-	loggear_trace("pase por aquix2");
 	if (resultado_send <= 0) {
 		destruir_mensaje(mensaje);
-		loggear_trace("pase por aquix3");
 	} else {
 		//1. Reservar lugar para crear el buffer
-		loggear_trace("pase por aquix4");
 		void* buffer = malloc(mensaje->tamanio_total);
-		loggear_trace("pase por aquix5");
 		//2. Los primeros bytes son para el HEADER
 		memcpy(buffer, &(mensaje->head), sizeof(t_header));
-		loggear_trace("pase por aquix6");
 
 		//3. El resto para el payload
 		memcpy(buffer + sizeof(t_header), mensaje->payload, mensaje->tamanio_total - sizeof(t_header));
-		loggear_trace("pase por aquix7");
 		resultado_send = send(socket_destino, buffer, mensaje->tamanio_total, 0);
-		loggear_trace("pase por aquix8");
 		free(buffer);
 		destruir_mensaje(mensaje);
 
 		if (resultado_send <= 0) {
-			loggear_trace("pase por aquix9");
 			return FALLO_AL_ENVIAR_A_TRAVES_DEL_SOCKET;
 		}
 

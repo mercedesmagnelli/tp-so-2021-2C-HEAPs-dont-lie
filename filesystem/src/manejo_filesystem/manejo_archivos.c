@@ -6,10 +6,38 @@ int obtener_marco_desde_pagina(uint32_t pagina, t_carpincho_swamp* carpincho);
 
 int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
 
+	loggear_trace("ENTRE A ESCRIBIR");
 	FILE* archivo;
 	char* ruta_particion = swamp->ruta_archivo;
+	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
+
+	loggear_trace("ENTRE A ESCRIBIRx2");
+	loggear_debug("TIENE %d marcos reservados", list_size(carpincho->marcos_reservados));
+
+	for(int i = 0; i < list_size(carpincho->dupla); i++){
+		dupla = list_get(carpincho->dupla, i);
+		if(dupla->pagina == pagina){
+			loggear_warning("TENGO ESTA PAGINA YA ESCRITA POR LO QUE LA SOBRESCRIBO");
+			archivo = fopen(ruta_particion, "r+");
+
+			if(archivo == NULL){
+				loggear_error("Ocurrio un error al abrir el archivo %s, puede deberse a que no esta creado o no es la ruta correcta", ruta_particion);
+				return -1;
+			}
+
+			int posicion_escribir = dupla->marco * get_tamanio_pagina();
+
+			fseek(archivo, posicion_escribir, SEEK_SET);
+
+			fputs(texto_escribir, archivo);
+
+			fclose(archivo);
+			return 0;
+		}
+	}
 
 	uint32_t marco = atoi(list_get(carpincho->marcos_reservados, 0));
+	loggear_trace("ENTRE A ESCRIBIRx3");
 
 	loggear_debug("SE PROCEDE A ESCRIBIR LA PAGINA %d EN EL MARCO %d DE LA PARTICION %s", pagina, marco, ruta_particion);
 
@@ -28,7 +56,7 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 	fclose(archivo);
 
-	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
+
 	dupla->marco = marco;
 	dupla->pagina = pagina;
 
@@ -51,6 +79,7 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 	int marco = obtener_marco_desde_pagina(pagina, carpincho);
 	if(marco < 0){
 		loggear_trace("NO EXISTE LA PAGINA %d del carpincho %d dentro de la swap", pagina, carpincho->pid_carpincho);
+		return string_repeat('b', get_tamanio_pagina());
 	}
 	loggear_debug("Se comienza a leer la pagina %d de la particion %s", marco, ruta_particion);
 
@@ -102,7 +131,7 @@ uint32_t marco_libre(t_archivo_swamp* swamp){
 				i++;
 			}
 
-	if(i == get_cantidad_marcos()){
+	if(i == get_cantidad_marcos() - 1){
 			loggear_error("NO HAY MARCO DISPONIBLE PARA ASIGNARLE");
 				return -1;
 			}
@@ -138,8 +167,8 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 		archivo->espacio_libre = archivo->espacio_libre - get_marcos_maximos();
 
 	}else{ //ACA SERIA SI LA ASGINACION ES GLOBAL
-		loggear_debug("LLEGO UNA SOLICITUD DE UN CARPINCHO Y COMO LA ASIGNACION ES GLOBAL SE RESERVAN LOS MARCOS %d SOLICITADOS PID:%d", cantidad_paginas_reservadas, carpincho->pid_carpincho);
-		if(cantidad_paginas_reservadas <= archivo->espacio_libre){
+		loggear_debug("LLEGO UNA SOLICITUD DE UN CARPINCHO Y COMO LA ASIGNACION ES GLOBAL SOLO SE CREA LA ESTRUCTURA ADMINISTRATIVA PARA EL PID: ", carpincho->pid_carpincho);
+		/*if(cantidad_paginas_reservadas <= archivo->espacio_libre){
 			for(int j = 0; j < cantidad_paginas_reservadas; j++){
 				int marco_global = marco_libre(archivo);
 				list_add(carpincho->marcos_reservados, string_itoa(marco_global));
@@ -147,7 +176,7 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 			}
 			archivo->espacio_libre = archivo->espacio_libre - cantidad_paginas_reservadas;
 		}
-
+*/
 
 	}
 
@@ -179,13 +208,16 @@ int reservar_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos, t_ar
 			return -1;
 		}
 		list_add(marcos_lista, string_itoa(marco));
+		loggear_warning("cantidad marcos reservados en reserva %d", list_size(marcos_lista));
 		bitarray_set_bit(swamp->bitmap_bitarray, marco);
 	}
 
 	list_add_all(carpincho->marcos_reservados, marcos_lista);
+
+	loggear_warning("cantidad marcos carpincho en reserva %d", list_size(carpincho->marcos_reservados));
 	swamp->espacio_libre = swamp->espacio_libre - cantidad_marcos;
 
-
+	loggear_warning("aca voy bien");
 	list_destroy(marcos_lista);
 	return 0;
 }
@@ -211,16 +243,104 @@ int obtener_marco_desde_pagina(uint32_t pagina, t_carpincho_swamp* carpincho){
 	return -1;
 }
 
-/*
- * PAGINA = 10
- * BUSCO ESPACIO Y ENCUENTRO QUE TENGO LIBRE EL MARCO 1
- * TENGO QUE CONSIDERAR QUE CON ASIGNACION FIJA TENGO QUE RESERVAR CONTIGUOS
+
+/*-FIJA: siendo M la cantidad de frames reservados y N la cantidad de frames usados dentro de esas M,
+ *  nosotros te vamos a decir que "liberes" las ultims 3 paginas, ergo,
+ *   vas a agarrar los ultimmos 3 frames de N y vas a marcarlos como que estan
+ *   sin usar PERO ESTAS SIGUEN PERTENECIENDO A LOS FRAMES RESERVADOS DEL PROCESO,
+ *   solo que ahora no estan sieno usados.
  *
- *
- *
- *
+ * -GLOBAL: en este caso no se reservan frames, simplemente tenemos los N frames usaos por el proceso,
+ * en este caso liberas los ultios frames de N al marcalos que ahora estan disponbles para su uso por parte de cualquier
+ * proceso
  */
 
+int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_paginas){
 
+	loggear_warning("llegue hasta aqui");
+	int j = list_size(carpincho->marcos_usados);
+	loggear_warning("el list size es %d", j);
+
+	if(j < cantidad_paginas){
+		loggear_warning("ME PIDEN QUE BORRE MAS PAGINAS DE LAS USADAS POR ESTE PROCESO ESTO NO DEBERÍA SUCEDER, NO SE ELIMINAN PAGINAS Y SE MANDA UN MENSAJE DE FALLO A LA RAM");
+		return -1;
+	}
+
+	if(get_asignacion() == FIJA){
+		loggear_trace("soy fija");
+		for(int i = 0; i < cantidad_paginas; i++){
+			loggear_trace("aca paso?");
+			void* marco = list_get(carpincho->marcos_usados, j - i - 1);
+			loggear_trace("el marco a eliminar es %s", marco);
+			list_add(carpincho->marcos_reservados, marco); //validar si se agrega bien
+			list_remove(carpincho->marcos_usados, j - i - 1); //ver si hace falta un remove.
+		}
+	}else{
+		t_archivo_swamp* archivo = particion_a_escribir(carpincho->pid_carpincho);
+		for(int i = 0; i < cantidad_paginas; i++){
+			char* marco = list_get(carpincho->marcos_usados, j - i - 1);
+			int aux = atoi(marco);
+			loggear_debug("se libera el marco %d por peticion de la RAM ya que se borro informacion del proceso %d del archivo %s", aux, carpincho->pid_carpincho, archivo->ruta_archivo);
+			list_remove_and_destroy_element(carpincho->marcos_usados, j - i - 1, free); // ver si hace falta un remove.
+			bitarray_clean_bit(archivo->bitmap_bitarray, aux);
+			//vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
+		}
+	}
+
+	return 0;
+}
+
+int vaciar_marco_del_archivo(uint32_t marco, char* ruta_archivo){
+
+	FILE* archivo;
+	archivo = fopen(ruta_archivo, "r+");
+
+	if(archivo == NULL){
+		loggear_error("Ocurrio un error al abrir el archivo %s, puede deberse a que no esta creado o no es la ruta correcta", ruta_archivo);
+		return -1;
+	}
+
+	int posicion_escribir = marco * get_tamanio_pagina();
+
+	fseek(archivo, posicion_escribir, SEEK_SET);
+	char* texto_escribir = string_repeat('?', get_tamanio_pagina());
+
+	fputs(texto_escribir, archivo);
+
+	fclose(archivo);
+
+	free(texto_escribir);
+	return 0;
+}
+
+int eliminar_proceso(t_carpincho_swamp* carpincho){
+	t_archivo_swamp* archivo = particion_a_escribir(carpincho->pid_carpincho);
+	for(int i = 0; i < list_size(carpincho->marcos_usados); i++){
+		char* marco = list_get(carpincho->marcos_usados, i);
+		int aux = atoi(marco);
+		bitarray_clean_bit(archivo->bitmap_bitarray, aux);
+		//vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
+	}
+	for(int j = 0; j < list_size(carpincho->marcos_reservados); j++){
+		char* marco = list_get(carpincho->marcos_reservados, j);
+		int aux = atoi(marco);
+		bitarray_clean_bit(archivo->bitmap_bitarray, aux);
+	}
+
+	for(int w = 0; w < list_size(lista_carpinchos); w++){
+		t_carpincho_swamp* carpi = list_get(lista_carpinchos, w);
+		if(carpi->pid_carpincho == carpincho->pid_carpincho){
+			loggear_info("la posicion es %d", w);
+			list_remove(lista_carpinchos, w);
+		}
+	}
+
+	destroy_carpinchos_swamp(carpincho);
+
+
+
+
+	return 0;
+}
 
 

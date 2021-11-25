@@ -10,7 +10,15 @@ void semaforo_destruir() {
 	sem_destroy(&semaforo_finalizar);
 }
 
-void semaforo_post_fin() { sem_post(&semaforo_finalizar); }
+void * semaforo_post_fin() {
+	loggear_debug("SE CIERRA TODO!!!!");
+	sem_post(&semaforo_finalizar);
+	return NULL;
+}
 
-void semaforo_wait_fin() { sem_wait(&semaforo_finalizar); }
+void semaforo_wait_fin() {
+	loggear_debug("ESPERAMOS A QUE TERMINE TODO!!!");
+	sem_wait(&semaforo_finalizar);
+	loggear_debug("TERMINO LA ESPERA PARA CERRAR TODO");
+}
 

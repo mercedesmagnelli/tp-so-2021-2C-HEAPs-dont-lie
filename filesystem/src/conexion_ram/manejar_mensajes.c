@@ -12,6 +12,7 @@ int recibir_mensaje(int socket_ram) {
 
 int manejar_mensajes(t_prot_mensaje * mensaje) {
 
+	int error;
 	void* mensaje_serializado;
 	t_carpincho_swamp* carpincho;
 	switch (mensaje->head) {
@@ -21,7 +22,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_PROCESO_NUEVO:
-
+		loggear_info("LLEGO UN PROCESO NUEVO");
 		loggear_error("ENTRO AQUI");
 		mensaje_serializado = malloc(sizeof(t_mensaje_r_s));
 		loggear_error("ENTRO AQUIx2");
@@ -30,7 +31,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 			t_mensaje_r_s* mensaje_deserializado_nuevo = malloc(sizeof(t_mensaje_r_s));
 			loggear_error("ENTRO AQUIx4");
-
+			loggear_warning("EL PROCESO QUE LLEGO ES %d", mensaje_deserializado_nuevo->pid);
 			if(get_asignacion() == FIJA){
 				carpincho = crear_carpincho(mensaje_deserializado_nuevo->pid,mensaje_deserializado_nuevo->cant_pag);
 				if(carpincho->estado_carpincho > 0){
@@ -50,7 +51,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_SOLICITUD_ESPACIO:
-
+		loggear_info("LLEGO SOLICITUD ESPACIO");
 		loggear_error("ENTRO AQUIx7");
 		mensaje_serializado = malloc(sizeof(t_mensaje_r_s));
 		memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
@@ -58,60 +59,72 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		t_mensaje_r_s* mensaje_deserializado = malloc(sizeof(t_mensaje_r_s));
 
 		mensaje_deserializado = deserializar_mensaje_solicitud_r_s(mensaje_serializado);
-
+		loggear_warning("EL PROCESO QUE SOLICITA ESPACIO ES %d", mensaje_deserializado->pid);
+		carpincho = buscar_carpincho_en_lista(mensaje_deserializado->pid);
 		loggear_error("ENTRO AQUIx9");
-		carpincho = crear_carpincho(mensaje_deserializado->pid,mensaje_deserializado->cant_pag);
-
-		if(carpincho->estado_carpincho > 0){
-			destroy_carpinchos_swamp(carpincho);
-			loggear_debug("NO HAY MAS ESPACIO POR LO QUE SE ENVIA A LA RAM EL MENSAJE DE ERROR AL GUARDAR");
-			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL); //TODO esto no se si es así revisar bien.
-		}
+		if( carpincho == NULL){
+			loggear_debug("EL CARPINCHO NO ESTA EN LA LISTA");
+			carpincho = crear_carpincho(mensaje_deserializado->pid,mensaje_deserializado->cant_pag);
+			if(get_asignacion() == GLOBAL){
+			error = reservar_marcos(carpincho,mensaje_deserializado->cant_pag, particion_a_escribir(carpincho->pid_carpincho));
+				if(error < 0){
+					enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+				}else{
+					enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+					}
+			}
+		}else{
 
 		loggear_error("ENTRO AQUIx10");
-		reservar_marcos(carpincho,mensaje_deserializado->cant_pag, particion_a_escribir(carpincho->pid_carpincho));
-
+		error = reservar_marcos(carpincho,mensaje_deserializado->cant_pag, particion_a_escribir(carpincho->pid_carpincho));
+		if(error < 0){
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+		}else{
 		enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
-
-		loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,0));
-		loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,1));
+		}
+		}
 
 
 		free(mensaje_serializado);
 		free(mensaje_deserializado);
-
+		destruir_mensaje(mensaje);
+		loggear_warning("aca voy re bien");
 		return 0;
 	case R_S_ESCRIBIR_EN_PAGINA:
-		 mensaje_serializado = malloc(sizeof(t_write_s));
+		loggear_info("llega una solicitud de escritura desde la RAM");
 
-		 t_write_s* write_deserializado = malloc(sizeof(t_write_s));
-
-		 write_deserializado = deserializar_mensaje_write_s(mensaje_serializado);
+		 t_write_s* write_deserializado = deserializar_mensaje_write_s(mensaje->payload);
 		 carpincho = buscar_carpincho_en_lista(write_deserializado->pid); //TODO HACER FUNCION
-
-		int error = escribir_particion(carpincho, write_deserializado->nro_pag, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+		 loggear_warning("EL PROCESO QUE QUIERE ESCRIBIR ES %d", write_deserializado->pid);
+		 loggear_error("Se esta escribiendo %s", write_deserializado->data);
+		error = escribir_particion(carpincho, write_deserializado->nro_pag, write_deserializado->data, particion_a_escribir(carpincho->pid_carpincho));
 		if(error < 0){
 			loggear_debug("OCURRIO UN ERROR INESPERADO AL QUERER ESCRIBIR EL ARCHIVO DE SWAP NO SE GUARDO CORRECTAMENTE");
 			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+		}else{
+			loggear_debug("Se logro escribir la pagina mandada en SWAP");
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 		}
-		enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+
 
 		free(write_deserializado->data);
 		free(write_deserializado);
-
+		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_PEDIR_PAGINA:
-		mensaje_serializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+		loggear_info("llego una peticion de pagina de la ram");
+		//mensaje_serializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+		//memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
+		//t_pedir_o_liberar_pagina_s* pedir_deserializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
 
-		t_pedir_o_liberar_pagina_s* pedir_deserializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+		t_pedir_o_liberar_pagina_s* pedir_deserializado = deserializar_mensaje_peticion_liberacion_pagina(mensaje->payload);
 
-		pedir_deserializado = deserializar_mensaje_peticion_liberacion_pagina(mensaje_serializado);
-
+		loggear_warning("me pide la pagina %zu", pedir_deserializado->nro_pag); //TODO xq me llega cualquier verdura aca.
+		loggear_warning("EL PROCESO QUE ME PIDE LA PAGINA ES %d", pedir_deserializado->pid);
 		carpincho  = buscar_carpincho_en_lista(pedir_deserializado->pid);
 
-		char* pagina_info = malloc(get_tamanio_pagina() + 1);
-
-		pagina_info = leer_particion(pedir_deserializado->nro_pag, particion_a_escribir(carpincho->pid_carpincho), carpincho); //TODO resta bien hacer lo del error en esto
+		char* pagina_info = leer_particion(pedir_deserializado->nro_pag, particion_a_escribir(carpincho->pid_carpincho), carpincho); //TODO resta bien hacer lo del error en esto
+		loggear_warning("info pag %s", pagina_info);
 		int codigo_mensaje = enviar_mensaje_protocolo(mensaje->socket, R_S_PEDIR_PAGINA, string_length(pagina_info) + 1, pagina_info);
 
 					if (codigo_mensaje < 0) {
@@ -120,13 +133,48 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 						loggear_info("Se mando a la RAM la pagina solicitada");
 					}
 
-		free(pagina_info);
+		//free(mensaje_serializado);
+		free(pedir_deserializado);
+		//free(pagina_info); TODO porque no me deja hacer este free???
+		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_ELIMINAR_PROCESO:
+		loggear_info("llego una peticion para eliminar un proceso"); //TODO necesito saber cual es el struct
+		t_matelib_nuevo_proceso* PID_proceso_eliminar = deserializar_crear_proceso(mensaje->payload);
+		loggear_info("Se solicita eliminar el proceso %d", PID_proceso_eliminar->pid);
 
+		carpincho = buscar_carpincho_en_lista(PID_proceso_eliminar->pid);
+
+		error = eliminar_proceso(carpincho);
+
+		if(error < 0){
+			loggear_warning("OCURRIO UN ERROR AL ELIMINAR EL PROCESO QUE SOLICITO LA RAM");
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+		}else{
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+		}
+		free(PID_proceso_eliminar);
+		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_LIBERAR_PAGINA:
+		loggear_info("llego una peticion liberar paginas");
+		//mensaje_serializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
+		//memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
+		//t_pedir_o_liberar_pagina_s* liberar_deserializado = malloc(sizeof(t_pedir_o_liberar_pagina_s));
 
+		t_pedir_o_liberar_pagina_s* liberar_deserializado = deserializar_mensaje_peticion_liberacion_pagina(mensaje->payload);
+		loggear_warning("la cantidad de paginas a liberar es %zu", liberar_deserializado->nro_pag);
+		carpincho  = buscar_carpincho_en_lista(liberar_deserializado->pid);
+		error = borrar_x_cantidad_de_marcos(carpincho,  liberar_deserializado->nro_pag);
+		if(error < 0){
+			loggear_debug("OCURRIO UN ERROR INESPERADO AL QUERER LIBERAR LAS PAGINAS SOLICITIDAS PARA EL PROCESO %zu", liberar_deserializado->pid);
+			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+		}
+
+		enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+	//	free(mensaje_serializado);
+		free(liberar_deserializado);
+		destruir_mensaje(mensaje);
 		return 0;;
 	case DESCONEXION_TOTAL:
 		loggear_error("Se cerró la conexión con ram");
