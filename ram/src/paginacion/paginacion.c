@@ -224,6 +224,8 @@ void agregar_proceso(uint32_t PID, uint32_t tam){
 
 	guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
 
+	loggear_trace("guardado primer heap");
+
 
 	heap_metadata* nuevoHeapUltimo = malloc(sizeof(heap_metadata));
 	nuevoHeapUltimo->currAlloc = tam+9;
@@ -293,7 +295,14 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 
 uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size) {
 
-	uint32_t cantidad =  (size+9) / get_tamanio_pagina();
+	uint32_t cantidad;
+
+	t_proceso* proceso = get_proceso_PID(pid);
+	if(list_is_empty(proceso->tabla_paginas)){
+		cantidad =  (size+18) / get_tamanio_pagina();//al ser el primer alloc se tiene que agregar dos heaps más el tamanio de la data a guardar, por eso sele suma 18
+	}else{
+		cantidad =  (size+9) / get_tamanio_pagina();//los demas allocs realizados tienen que agregar un heaps más el tamanio de la data a guardar, por eso sele suma 9
+	}
 
 	uint32_t resto_ult_pag = calcular_tamanio_ultimo_HEAP(pid);
 
@@ -792,6 +801,7 @@ void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uin
 	pag->timestamp = obtener_timestamp_actual();
 	pag->bit_uso = 1;
 	pag->bit_modificacion = bitModificado;
+	loggear_trace("Se trajo a RAM la pagina %d del proceso %d con el timestamp %f",PID, nroPag, pag->timestamp);
 }
 
 uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
