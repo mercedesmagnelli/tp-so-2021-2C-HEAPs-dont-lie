@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "../../src/configuracion/ram_config_guardada.h"
+#include "../paginacion/estructuras_paginacion.h"
 
 #include "../../../shared/logger.h"
 t_list* TLB;
@@ -17,7 +18,7 @@ typedef struct{
 	double timestamp; //ver si es necesario, lo agrego por ahora porque no sé como vamos a hacer para seleccionar la entrada que vuela
 }entrada_tlb;
 
-
+int tiempo;
 
 
 //	FUNCIONES PUBLICAS

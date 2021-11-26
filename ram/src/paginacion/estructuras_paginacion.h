@@ -16,6 +16,7 @@ pthread_mutex_t mutex_acceso_lista_frames;
 pthread_mutex_t mutex_acceso_lista_frames_r;
 pthread_mutex_t mutex_acceso_diccionario;
 pthread_mutex_t mutex_enviar_mensaje_swap;
+pthread_mutex_t mutex_acceso_tiempo;
 
 typedef struct{
     uint32_t en_mp; //me sirve de flag para comprobar cuando realmente hacer el swap
@@ -52,7 +53,7 @@ typedef struct {
 typedef struct{
 	uint32_t bit_presencia;
 	uint32_t frame;
-	double timestamp;
+	int timestamp;
 	uint32_t bit_uso;
 	uint32_t bit_modificacion;
 }t_pagina;

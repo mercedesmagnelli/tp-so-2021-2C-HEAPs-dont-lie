@@ -17,6 +17,7 @@ void inicializar_estructuras_administrativas() {
     	frame->estado=0;
     	list_add(listaFrames, frame);
     }
+    tiempo = 0;
     puntero_global = 0;
     cant_frames_por_proceso = dictionary_create();
     inicializar_tlb();
@@ -30,6 +31,7 @@ void inicializar_semaforos() {
 	pthread_mutex_init(&mutex_acceso_memoria, NULL);
 	pthread_mutex_init(&mutex_acceso_lista_frames_r, NULL);
 	pthread_mutex_init(&mutex_acceso_diccionario, NULL);
+	pthread_mutex_init(&mutex_acceso_tiempo, NULL);
 }
 
 void destruir_estructuras_administrativas() {
@@ -801,7 +803,7 @@ void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uin
 	pag->timestamp = obtener_timestamp_actual();
 	pag->bit_uso = 1;
 	pag->bit_modificacion = bitModificado;
-	loggear_trace("Se trajo a RAM la pagina %d del proceso %d con el timestamp %f",PID, nroPag, pag->timestamp);
+	loggear_trace("Se trajo a RAM la pagina %d del proceso %d con el timestamp %d",PID, nroPag, pag->timestamp);
 }
 
 uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
