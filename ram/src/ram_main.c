@@ -119,7 +119,7 @@ void debug_configuracion() {
 
 void testeamos() {
     uint32_t pid = 0;
-    int32_t size = 6;
+    int32_t size = 31;
 
 		//printf("Ingrese el numero de proceso y el tamanio");
 
@@ -128,38 +128,59 @@ void testeamos() {
 	loggear_trace("HOLA, soy dora!!");
 	sleep(10);
 	inicializar_proceso(pid);
-	int a = memalloc(pid, size);
+
+	int a = memalloc(pid,31);
 	loggear_trace("Hice el memalloc en %d", a);
-    loggear_trace("----AHORA VOY A ESCRIBIR-----");
 
-    uint32_t x = memwrite("Hola", a, pid, 5);
-
-    loggear_trace("termine de escribir");
-
-    if(x < 0) {
-    	loggear_error("fua le chingue en la escritura");
-    }
-
-    loggear_debug("Me voy a mimir 3 segundos porque me canse de escribir Hola");
-    	sleep(3);
-
-    void* ptroLectura = malloc(5);
-	memcpy(ptroLectura, memoria_principal + 9, 5);
-	char* leido = (char*) ptroLectura;
-	loggear_info("lo leido manualmente fue %s", leido);
-
-    void* lectura = NULL;
-    loggear_trace("antes del memread");
-    int s = memread(a, pid, 5, &lectura);
-    loggear_trace("dsp del memread");
-	 if(s < 0) {
-			loggear_error("fua le chingue en la lectura");
-		}else{
-		loggear_debug("Lei bien! %s", (char*) lectura);
+//	a = memalloc(pid, 10);
+//	loggear_trace("Hice el memalloc en %d", a);
+//
+//	a = memalloc(pid,22);
+//	loggear_trace("Hice el memalloc en %d", a);
 
 
-	}
-	 	 sleep(3);
+	loggear_trace("--PROCESOS ANTES DE HACER CUALQUIER TIPO DE LIBERACION--");
+
+	imprimir_procesos();
+
+	loggear_trace("----AHORA VOY A  PROBAR LA LIBERACIÓN DE ALLOCS------");
+
+	memfree(9, pid);
+	loggear_trace("-- PROCESOS DESPUÉS DE LIBERAR EL HEAP DE 9 --");
+
+	imprimir_procesos();
+
+
+//    loggear_trace("----AHORA VOY A ESCRIBIR-----");
+//
+//    uint32_t x = memwrite("Hola", a, pid, 5);
+//
+//    loggear_trace("termine de escribir");
+//
+//    if(x < 0) {
+//    	loggear_error("fua le chingue en la escritura");
+//    }
+//
+//    loggear_debug("Me voy a mimir 3 segundos porque me canse de escribir Hola");
+//    	sleep(3);
+//
+//    void* ptroLectura = malloc(5);
+//	memcpy(ptroLectura, memoria_principal + 9, 5);
+//	char* leido = (char*) ptroLectura;
+//	loggear_info("lo leido manualmente fue %s", leido);
+//
+//    void* lectura = NULL;
+//    loggear_trace("antes del memread");
+//    int s = memread(a, pid, 5, &lectura);
+//    loggear_trace("dsp del memread");
+//	 if(s < 0) {
+//			loggear_error("fua le chingue en la lectura");
+//		}else{
+//		loggear_debug("Lei bien! %s", (char*) lectura);
+//
+//
+//	}
+//	 	 sleep(3);
 
 //    memwrite("Chau", 41, pid, 5);
 //    loggear_debug("Me voy a mimir 2 segundos porque me canse de escribir Chau");
@@ -177,7 +198,7 @@ void testeamos() {
 //    loggear_debug("Me voy a mimir 2 segundos porque me canse de escribir Hydrochaeris");
 //    sleep(2000);
 
-    imprimir_procesos();
+
 
 }
 
