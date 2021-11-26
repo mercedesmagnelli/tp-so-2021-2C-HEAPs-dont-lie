@@ -1,6 +1,6 @@
 #include "manejo_signals.h"
 
-void* manejar_sigint(){
+void manejar_sigint(){
 	//char* nombre_archivo;
 	//loggear_info("Se va a generar el archivo del dump, con el nombre %s", nombre_archivo);
 
@@ -16,9 +16,11 @@ void* manejar_sigint(){
 		total_hits+= (p->hits_proceso);
 	}
 	if(list_size(listaProcesos) == 0){
+
 		loggear_warning("[SIGINT] - La lista está vacia, no hay nada para calcular");
 		loggear_info("CANTIDAD DE MISS TOTALES: 0");
 		loggear_info("CANTIDAD DE HITS TOTALES: 0");
+
 	}else{
 		loggear_trace("aber");
 	list_iterate(listaProcesos,sumar_miss);
@@ -28,16 +30,16 @@ void* manejar_sigint(){
 
 	loggear_info("CANTIDAD DE MISS TOTALES: %d", total_miss);
 	loggear_info("CANTIDAD DE HITS TOTALES: %d", total_hits);
-
 	loggear_info("   PID   |   HITS   |   MISS   ");
+
 	for (int i = 0; i <list_size(listaProcesos);i++) {
 		t_proceso* p = (t_proceso*) list_get(listaProcesos, i);
 		imprimir_entrada_proceso(p);
 		}
 	}
-	loggear_trace("YA TERMINE DE IMPRIMIR TODO");
+
 	semaforo_post_fin();
-	return NULL;
+
 }
 
 void imprimir_entrada_proceso(t_proceso* p){

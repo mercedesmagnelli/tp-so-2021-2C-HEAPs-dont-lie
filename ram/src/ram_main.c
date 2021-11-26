@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 
 	inicializar_estructuras_administrativas();
 
-	//testeamos();
+	testeamos();
 	//imprimir_procesos();
 
 	semaforo_wait_fin();

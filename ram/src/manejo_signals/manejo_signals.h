@@ -18,7 +18,7 @@
 
  **/
 
-void* manejar_sigint();
+void manejar_sigint();
 
 /**
  * @NAME: manejar_sisr1
