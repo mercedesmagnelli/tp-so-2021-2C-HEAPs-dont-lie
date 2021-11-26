@@ -16,6 +16,21 @@ void* memoria_principal;
 
 /*Funciones que pide el TP obligatorias*/
 
+/**
+ * @NAME: inicializar_proceso
+ * @DESC: Le avisa a SWAP de la creacion de un proceso, y si se puede almacenar en SWAP, inicializa el proceso y sus estructuras administrativas en RAM
+  * @RET:
+ *   0		se pudo crear el proceso
+ *   -43    espacio en SWAP insuficiente
+ *   -47	el proceso ya existia
+ */
+uint32_t inicializar_proceso(uint32_t PID);
+
+/**
+ * @NAME: PID_listo
+ * @DESC: El proceso reserva frames en caso de estar en asig FIJA
+ **/
+uint32_t PID_listo(uint32_t PID);
 
 /**
  * @NAME: memalloc
@@ -49,7 +64,7 @@ int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid);
  **/
 
 
-int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t size, void* lectura);
+int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t size, void** lectura);
 
 /**
  * @NAME: memwrite

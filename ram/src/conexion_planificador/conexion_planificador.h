@@ -33,4 +33,6 @@ int levantar_servidor();
  */
 void cerrar_conexiones(bool safe_close);
 
+void cancelar_notificaciones();
+
 #endif /* CONEXION_PLANIFICADOR_CONEXION_PLANIFICADOR_H_ */

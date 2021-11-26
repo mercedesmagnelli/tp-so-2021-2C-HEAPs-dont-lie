@@ -4,7 +4,10 @@
 #include "../paginacion/estructuras_paginacion.h"
 #include "../TLB/tlb.h"
 #include <stdint.h>
+#include <commons/temporal.h>
 #include "../../../shared/logger.h"
+#include "../conexion_planificador/conexion_planificador.h"
+
 /**
  * @NAME: manejar_sigint
  * @DESC: Esta funcion se desencadena tras apretar ctrl + c y lo que hace es hacer un reporte de la smetricas de hit y miss
@@ -41,7 +44,7 @@ void manejar_sigusr2();
  * @NAME: cerrrar_todo
  * @DESC: cierra todo
 */
-void cerrar_todo();
+void cerrar_todo(bool cierre);
 /**
  * @NAME: imprimir_entrada_proceso
  * @DESC: funcion auxiliar que terciariza la impresión por pantalla de una línea de info en el informe de procesos

@@ -12,6 +12,7 @@
 
 /// NUEVO
 
+
 typedef enum {
 	MATELIB,
 	KERNEL,
@@ -74,18 +75,18 @@ typedef struct {
 typedef struct{
 uint32_t cant_pag;
 uint32_t pid;
-}t_mensaje_r_s;
+}t_mensaje_r_s; //solicitud de espacio
 
 typedef struct{
 	uint32_t nro_pag;
 	uint32_t pid;
-	void* data;
-}t_write_s;
+	char* data;
+}t_write_s; //solicitud escritura
 
 typedef struct{
 	uint32_t pid;
 	uint32_t nro_pag; //tmb puede ser la cantidad de paginas a liberar - dsp ver de poner un mejor nombre
-}t_pedir_o_liberar_pagina_s;
+}t_pedir_o_liberar_pagina_s; //leer y liberar paginas
 
 /**
  * ALLOC: Devuelve un int32_t
@@ -128,18 +129,20 @@ t_ram_read * deserializar_ram_read(void * puntero);
 void* serializar_solicitud_espacio(t_mensaje_r_s* mensaje, size_t* size_final);
 void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final, size_t tamanio_pagina);
 void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
-void* serializar_eliminar_proceso(uint32_t pid, size_t* size_final);
 void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
 
-uint32_t deserializar_solicitud_espacio(void* respuesta);
-uint32_t deserializar_escritura_en_pagina(void* respuesta);
+
 void* deserializar_pedir_pagina(void* respuesta);
-uint32_t deserializar_eliminar_proceso(void* respuesta);
-uint32_t deserializar_liberar_paginas(void* respuesta);
+
 
 t_pedir_o_liberar_pagina_s* shared_crear_pedir_o_liberar(uint32_t pid, uint32_t nro_pag);
 t_write_s* shared_crear_write_s(uint32_t nro_pag, uint32_t pid, void* data);
 t_mensaje_r_s* shared_crear_t_mensaje_r_s(uint32_t cant_pag, uint32_t pid);
+
+//PARA EL SWAP
+t_mensaje_r_s * deserializar_mensaje_solicitud_r_s(void * puntero);
+t_write_s * deserializar_mensaje_write_s(void* puntero);
+t_pedir_o_liberar_pagina_s* deserializar_mensaje_peticion_liberacion_pagina(void* puntero);
 
 
 #endif /* ESTRUCTURA_COMPARTIDA_H_ */

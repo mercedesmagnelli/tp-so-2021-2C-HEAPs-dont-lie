@@ -3,7 +3,7 @@
 #define CONFIGURACION_RAM_CONFIG_GUARDADA_H_
 
 #define ALGORITMO_REEMPLAZO_MMU_CLOCK_M "CLOCK-M"
-
+#define ALGORITMO_REEMPLAZO_MMU_LRU "LRU"
 #define TIPO_ASIGNACION_FIJA "FIJA"
 #define TIPO_ASIGNACION_DINAMICA "DINAMICA"
 
@@ -17,6 +17,7 @@ typedef enum {
 
 typedef enum {
 	CLOCKM,
+	LRUM
 } t_algoritmo_reemplazo_mmu;
 
 typedef enum {

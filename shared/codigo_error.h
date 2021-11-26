@@ -38,6 +38,7 @@
 #define PUNTERO_INVALIDO -44
 #define PUNTERO_YA_LIBERADO -45
 #define DATA_MUY_GRANDE -46
+#define PROCESO_EXISTENTE -47
 
 
 #endif

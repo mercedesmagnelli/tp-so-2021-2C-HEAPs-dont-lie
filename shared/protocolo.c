@@ -28,21 +28,17 @@ int enviar_mensaje_protocolo(int socket_destino, t_header header , size_t tamani
 
 	// Envio del tamaño del mensaje, siendo mensaje : header + payload
 	resultado_send = send(socket_destino, &(mensaje->tamanio_total) , sizeof(size_t), 0);
-
 	if (resultado_send <= 0) {
 		destruir_mensaje(mensaje);
 	} else {
 		//1. Reservar lugar para crear el buffer
 		void* buffer = malloc(mensaje->tamanio_total);
-
 		//2. Los primeros bytes son para el HEADER
 		memcpy(buffer, &(mensaje->head), sizeof(t_header));
 
 		//3. El resto para el payload
 		memcpy(buffer + sizeof(t_header), mensaje->payload, mensaje->tamanio_total - sizeof(t_header));
-
 		resultado_send = send(socket_destino, buffer, mensaje->tamanio_total, 0);
-
 		free(buffer);
 		destruir_mensaje(mensaje);
 

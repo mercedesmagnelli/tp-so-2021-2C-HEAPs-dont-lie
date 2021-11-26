@@ -73,13 +73,21 @@ uint32_t conseguir_victima_entrada_LRU() {
 }
 
 bool esta_en_tlb(uint32_t pid, uint32_t pag) {
+
 	char* key = calcular_hash_key(pid, pag);
 
 	bool condicion(void* entrada_i){
+
 		entrada_tlb* entrada = (entrada_tlb*) entrada_i;
-		//TODO: ver si esta bien este return o deberia ser:
-				//  strcmp(entrada->hash_key, key) == 0 ? 1: 0
-		return strcmp(key, entrada->hash_key);
+
+		if(strcmp(entrada->hash_key, key) == 0) {
+
+			return true;
+		}else {
+
+			return false;
+		}
+		//return strcmp(entrada->hash_key, key) == 0 ? 1: 0;
 	}
 
 	return list_any_satisfy(TLB, condicion);
@@ -113,17 +121,17 @@ void destruir_tlb(){
 
 // FUNCIONES PRIVADAS
 char* calcular_hash_key(uint32_t proceso, uint32_t pagina) {
-	char** key = string_from_format("%d-%d",proceso, pagina);
-	return *key;
+	char* key = string_from_format("%d-%d",proceso, pagina);
+	return key;
 }
 
 double obtener_timestamp_actual(){
 
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	unsigned long long result = (((unsigned long long)tv.tv_sec) * 1000 + ((unsigned long long)tv.tv_usec) / 1000);
-	double a = result;
-	return a;
+	pthread_mutex_lock(&mutex_acceso_tiempo);
+	int valor_actual = tiempo;
+	tiempo++;
+	pthread_mutex_unlock(&mutex_acceso_tiempo);
+	return valor_actual;
 }
 
 uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina){

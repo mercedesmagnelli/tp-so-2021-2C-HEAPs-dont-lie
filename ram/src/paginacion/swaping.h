@@ -10,6 +10,14 @@
 #include "../../../shared/estructura_compartida.h"
 uint32_t socket_swap;
 
+/**
+ * @NAME: crear_proceso_SWAP
+ * @DESC: solicitamos la creacion del proceso en SWAP
+ * @RET:
+ * 		1 Se pudo inicializar el proceso en SWAP
+ * 		0 No se pudo inicializar el proceso en SWAP
+*/
+uint32_t crear_proceso_SWAP(uint32_t PID);
 
 /**
  * @NAME: traer_pagina_de_SWAP
@@ -59,7 +67,7 @@ t_pagina* obtener_victima_Clock_Modificado(t_list* lista_paginas,uint32_t pid);
  * 		0 No hay que hacer swaping
  * 		1 Si hay que hacer swaping
  **/
-int32_t hay_que_hacer_swap(uint32_t PID);
+int32_t hay_frame_disponible_en_RAM(uint32_t PID);
 
 /**
  * @NAME: obtener_frame_libre
@@ -67,11 +75,6 @@ int32_t hay_que_hacer_swap(uint32_t PID);
  **/
 uint32_t obtener_frame_libre(uint32_t PID);
 
-/**
- * @NAME: pedir_a_swamp_info_pagina
- * @DESC: se conecta con SWAMP para poedirle a informacion de una determinada pagian de un proceso
- **/
-void* pedir_a_swamp_info_pagina(uint32_t PID, int nroPag);
 
 /**
  * @NAME: traer_y_controlar_consistencia_paginas
@@ -142,7 +145,6 @@ void enviar_pagina_a_SWAP(uint32_t PID, uint32_t nroPag, void* dataPag);
 /*falta poner los headers*/
 
 void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir);
-void enviar_info_pagina(void* info, uint32_t pid, uint32_t pag);
 void* obtener_info_en_frame(uint32_t pagina_victima);
 uint32_t obtener_pid_en_frame(uint32_t frame);
 uint32_t obtener_pag_en_frame(uint32_t frame);

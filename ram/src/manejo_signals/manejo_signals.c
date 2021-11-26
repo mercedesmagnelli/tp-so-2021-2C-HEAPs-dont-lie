@@ -16,33 +16,31 @@ void manejar_sigint(){
 		total_hits+= (p->hits_proceso);
 	}
 	if(list_size(listaProcesos) == 0){
+
 		loggear_warning("[SIGINT] - La lista está vacia, no hay nada para calcular");
 		loggear_info("CANTIDAD DE MISS TOTALES: 0");
 		loggear_info("CANTIDAD DE HITS TOTALES: 0");
-	}else{
 
+	}else{
+		loggear_trace("aber");
 	list_iterate(listaProcesos,sumar_miss);
+	loggear_trace("aber2");
 	list_iterate(listaProcesos, sumar_hits);
+	loggear_trace("aber33");
 
 	loggear_info("CANTIDAD DE MISS TOTALES: %d", total_miss);
 	loggear_info("CANTIDAD DE HITS TOTALES: %d", total_hits);
-
 	loggear_info("   PID   |   HITS   |   MISS   ");
+
 	for (int i = 0; i <list_size(listaProcesos);i++) {
 		t_proceso* p = (t_proceso*) list_get(listaProcesos, i);
 		imprimir_entrada_proceso(p);
 		}
 	}
-	cerrar_todo();
+
+	semaforo_post_fin();
+
 }
-
-
-void cerrar_todo() {
-	cerrar_conexiones(true); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga
-	destroy_configuracion();
-	destroy_log();
-}
-
 
 void imprimir_entrada_proceso(t_proceso* p){
 
@@ -51,7 +49,9 @@ void imprimir_entrada_proceso(t_proceso* p){
 
 }
 void manejar_sigusr1(){
-	char* ruta = temporal_get_string_time("%s/DUMP_%y%m%d%H%M%S.txt",get_path_dump_tlb());
+
+	char* timestamp = temporal_get_string_time("%s%y%m%d%H%M%S.txt");
+	char* ruta = string_from_format("DUMP_%s", timestamp);
 	loggear_info("[SIGUSR1] - Se va a generar el archivo dump en la ruta: %s");
 	FILE* dump = fopen(ruta, "wb+");
 	char** pid_pag;
@@ -83,6 +83,7 @@ void manejar_sigusr1(){
 }
 
 void manejar_sigusr2(){
+
 	loggear_warning("[SIGUSR2] - Se van a limpiar todas las entradas de la tlb");
 	if(list_size(TLB)==0) {
 		loggear_warning("[SIGNURS2] - No hay ninguna entrada para eliminar");

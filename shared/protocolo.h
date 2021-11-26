@@ -33,8 +33,8 @@ typedef enum {
 
 	// Ram => Filesystem
 	HANDSHAKE_R_F,
-	R_S_PROCESO_NUEVO, //Un proceso nuevo solicita espacio a la SWAP para su almacenamiento. 				pid, cant_pags
-	R_S_PROCESO_EXISTENTE, //Un proceso solicita mas espacio a la SWAP. 									pid, cant_pags
+	R_S_PROCESO_NUEVO,
+	R_S_SOLICITUD_ESPACIO,
 	R_S_ESCRIBIR_EN_PAGINA, //Un proceso solicita escribir en su pagina, siempre se manda pagina completa. 	pid, nro_pag, data
 	R_S_PEDIR_PAGINA, //Un proceso solicita su pagina a SWAP												pid, nro_pag
 	R_S_ELIMINAR_PROCESO, //Un proceso es eliminado de SWAP													pid

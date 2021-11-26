@@ -18,6 +18,8 @@ int conectar_clientes(void * socket_servidor) {
 			loggear_trace("Se desconectara el planificador");
 
 			destruir_mensaje(mensaje);
+
+			semaforo_post_fin();
 			break;
 		}
 

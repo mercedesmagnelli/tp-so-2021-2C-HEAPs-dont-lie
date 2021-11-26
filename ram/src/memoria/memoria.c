@@ -1,5 +1,29 @@
 #include "memoria.h"
 
+uint32_t inicializar_proceso(uint32_t PID){
+	if(!existe_proceso(PID)){
+		loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
+		if (iniciar_proceso_SWAP(PID)) {
+			loggear_trace("[MATELIB_INIT] Se crea un proceso nuevo de pid %d", PID);
+			iniciar_proceso_RAM(PID);
+			return 0;
+		} else {
+			loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
+			return ESPACIO_EN_MEMORIA_INSUF;
+		}
+	}else{
+		loggear_trace("[MATELIB_INIT] el proceso ya existia en memoria");
+		return PROCESO_EXISTENTE;
+	}
+}
+
+uint32_t PID_listo(uint32_t PID){
+	if(existe_proceso(PID)){
+		alistar_proceso(PID);
+		return 1;
+	}else
+		return 0;
+}
 
 int32_t memalloc(uint32_t pid, int32_t size) {
 	loggear_trace("[MATELIB_MEM_ALLOC] estoy entrando al meamalloc");
@@ -7,37 +31,26 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 		//corto la ejecucion si ya no tengo que analizar
 			return VALOR_MEMORIA_SOLICITADO_INVALIDO;
 	} else {
-		if (existe_proceso(pid)){
-			loggear_trace("[MATELIB_MEM_ALLOC] Existe el proceso %d", pid);
-			int32_t ptro = ptro_donde_entra_data(pid, size);
-			if (ptro >= 0) {
-				actualizar_proceso(pid,ptro,size);
-				return ptro;
-			} else {
-				if (se_puede_almacenar_el_alloc_para_proceso(R_S_PROCESO_EXISTENTE, pid, size)) {
-					loggear_trace("[MATELIB_MEM_ALLOC] Se pide mas espacio para el proceso %d", pid);
-					//como hay espacio disponble, expando lo que ya tenia
-					actualizar_proceso(pid,  (-1) * ptro,  size);
-					return (-1) * ptro;
-				} else {
-					loggear_error("[MATELIB_MEM_ALLOC] No se puede almacenar el alloc para el proceso %d porque no hay espacio suficiente en memoria", pid);
-					return ESPACIO_EN_MEMORIA_INSUF;
-				}
-			}
-		} else {
-			//si no existe, entonces tengo que crear el nuevo proceso
-			if (se_puede_almacenar_el_alloc_para_proceso(R_S_PROCESO_NUEVO, pid, size)) {
-				loggear_trace("[MATELIB_MEM_ALLOC] Se crea un proceso nuevo de pid %d", pid);
-				int32_t ptro_nuevo_proc = agregar_proceso(pid, size);
-				return ptro_nuevo_proc;
-			} else {
+		int32_t ptro = ptro_donde_entra_data(pid, size);
+		loggear_error("El valor del puntero es %d", ptro);
+		if(ptro>=0) {
+			loggear_trace("[MATELIB_MEM_ALLOC] - Se puede asignar el espacio solicitado para el proceso %d", pid);
+			//puedo asignar en algo que ya estaba
+			actualizar_proceso(pid,ptro,size);
+			return ptro;
+		}else {
+			loggear_trace("[MATELIB_MEM_ALLOC] Se verifica memoria en SWAP");
+			if(memoria_suficiente_en_swap(pid,size)) {
+				//como hay espacio disponble, expando lo que ya tenia
+				actualizar_proceso(pid,  (-1) * ptro,  size);
+				return (-1) * ptro;
+			}else {
+				loggear_warning("[MATELIB_MEM_ALLOC] - No se puede pedir mas memoria para el proceso %d", pid);
 				return no_se_asigna_proceso(pid, size);
 			}
 		}
-
 	}
 }
-
 
 
 int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
@@ -54,19 +67,19 @@ int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
 }
 
 
-int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer, void* lectura) {
+int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer, void** lectura) {
 
-    if(!ptro_valido(pid, direccionLogicaALeer) || ptro_liberado(direccionLogicaALeer,pid) || tamanio_de_direccion(direccionLogicaALeer, pid) < tamanioALeer){
+    if(!ptro_valido(pid, direccionLogicaALeer) || ptro_liberado(pid, direccionLogicaALeer) || tamanio_de_direccion(direccionLogicaALeer, pid) < tamanioALeer){
         return -6; //MEM_READ_FAULT
     }else{
-        lectura = leer_de_memoria(direccionLogicaALeer, pid, tamanioALeer);
+        (*lectura) = leer_de_memoria(direccionLogicaALeer, pid, tamanioALeer);
         return 0;
     }
 }
 
 int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir,uint32_t pid, uint32_t tamanioAEscribir){
 
-    if(!ptro_valido(pid, direccionLogicaAEscribir) || ptro_liberado(direccionLogicaAEscribir,pid) || tamanio_de_direccion(direccionLogicaAEscribir, pid) < tamanioAEscribir){
+    if(!ptro_valido(pid, direccionLogicaAEscribir) || ptro_liberado(pid, direccionLogicaAEscribir) || tamanio_de_direccion(direccionLogicaAEscribir, pid) < tamanioAEscribir){
             return -7; // MEM_WRITE_FAULT
     }else {
         escribir_en_memoria(pid, valorAEscribir, tamanioAEscribir, direccionLogicaAEscribir);
@@ -76,12 +89,19 @@ int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir,uint32_t
 }
 
 void leer_directamente_de_memoria(void* ptroLectura, int32_t tamanio, uint32_t direccionLogica){
+	//TODO: CREO QUE NO VA
+	//pthread_mutex_lock(&mutex_acceso_memoria);
 	memcpy(ptroLectura, memoria_principal + direccionLogica, tamanio);
+	//pthread_mutex_unlock(&mutex_acceso_memoria);
 
 }
 
 void escribir_directamente_en_memoria(void* valorAEscribir, int32_t tamanio, uint32_t direccionLogica){
+	//TODO: CREO QUE NO VA
+	//pthread_mutex_lock(&mutex_acceso_memoria);
 	memcpy(memoria_principal + direccionLogica, valorAEscribir, tamanio);
+
+	//pthread_mutex_unlock(&mutex_acceso_memoria);
 
 }
 

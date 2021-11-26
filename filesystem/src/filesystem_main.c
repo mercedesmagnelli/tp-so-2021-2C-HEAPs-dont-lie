@@ -71,8 +71,28 @@ int main(int argc, char** argv) {
     loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,7));
     loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,8));
     loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,9));
-    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,10));
-    loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,11));
+    //loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,10));
+    //loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,11));
+
+
+    escribir_particion(carpincho, 11, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+    escribir_particion(carpincho, 15, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+    escribir_particion(carpincho, 16, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+    escribir_particion(carpincho, 18, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+    escribir_particion(carpincho, 20, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+
+    loggear_error("asdadas %s", list_get(carpincho->marcos_usados,0));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_usados,1));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_usados,2));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_usados,3));
+    loggear_error("asdadas %s", list_get(carpincho->marcos_usados,4));
+
+
+   // borrar_x_cantidad_de_marcos(carpincho, 3);
+
+    eliminar_proceso(carpincho);
+
+   // loggear_error("usados %s", list_get(carpincho->marcos_usados,2));
 
 
     escribir_particion(carpincho, 11, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
@@ -104,11 +124,11 @@ int main(int argc, char** argv) {
     loggear_trace("contenido: %s", asd);
 
     free(asd);
+
 */
 
-
 //SIRVE PARA MOSTRAR EL BITMAP DEJAR POR AHORA
- /*
+/*
 	t_archivo_swamp* asd = list_get(lista_swamp, 0);
 
 	for(int w = 0; w < get_cantidad_marcos(); w++){
@@ -128,8 +148,8 @@ int main(int argc, char** argv) {
 			loggear_debug("0");
 		}
 	}
-*/
 
+*/
 	debug_variables();
 
 	pthread_t ram_handshake = thread_ejecutar_funcion(enviar_handshake);

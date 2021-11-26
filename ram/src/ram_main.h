@@ -10,6 +10,7 @@
 #include "memoria/memoria.h"
 #include "conexion_planificador/conexion_planificador.h"
 #include "manejo_signals/manejo_signals.h"
+#include "sincronizacionsemaforo/semaforo.h"
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <string.h>
@@ -17,13 +18,5 @@
 
 #include <readline/readline.h>
 
-
-
-/*BORRAR!!!!!!!!!!!! son para testing*/
-
-
-void testeamos();
-void imprimir_hdm();
-void imprimir_procesos();
 
 #endif /* RAM_MAIN_H_ */

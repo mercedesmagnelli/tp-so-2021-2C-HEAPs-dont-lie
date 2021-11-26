@@ -22,14 +22,6 @@
  **/
 void inicializar_estructuras_administrativas_paginacion();
 
-
-/**
- * @NAME: obtener_socket
- * @DESC: obtiene el socket de comunicacion con el swamp
-*/
-
-uint32_t obtener_socket();
-
 // FUNCIONES PUBLICAS
 
 /**
@@ -40,6 +32,27 @@ uint32_t obtener_socket();
  *   0 no existe el proceso
  **/
 int32_t existe_proceso(uint32_t PID);
+
+/**
+ * @NAME: iniciar_proceso_SWAP
+ * @DESC: pasamanos para SWAP de inicializacion de proceso
+ * @RET:
+ * 		1 Se pudo inicializar el proceso en SWAP
+ * 		0 No se pudo inicializar el proceso en SWAP
+*/
+uint32_t iniciar_proceso_SWAP(uint32_t PID);
+
+/**
+ * @NAME: iniciar_proceso_RAM
+ * @DESC: se encarga de inicializar las estructuras administrativas del proceso los proceso
+*/
+void iniciar_proceso_RAM(uint32_t PID);
+
+/**
+ * @NAME: alistar_proceso
+ * @DESC: se encarga de reservar los frames en caso de estar en asignacion FIJA
+*/
+void alistar_proceso(uint32_t PID);
 
 /**
  * @NAME: ptro_donde_entra_data
@@ -61,7 +74,7 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio);
  * @DESC: Agrega el proceso a la lista de procesos y crea los 2 HEAPs necesarios
  * @RET: devuelve el puntero en el cual entra el tamaño solicitado
  **/
-int32_t agregar_proceso(uint32_t PID, uint32_t tam);
+void agregar_proceso(uint32_t PID, uint32_t tam);
 
 /**
 * @NAME: se_puede_almacenar_el_alloc_para_proceso
@@ -123,13 +136,13 @@ void inicializar_estructuras_administrativas();
 void destruir_estructuras_administrativas();
 
 /**
-* @NAME: se_puede_almacenar_el_alloc_para_proceso
-* @DESC: Dado un proceso  (nuevo o existente) y un tamanio, se establece si puede ser guardado en memoria. Se usa para preguntarle a
+* @NAME: memoria_suficiente_en_swap
+* @DESC:Dado un proceso, se establece si puede ser guardado en memoria. Se usa para preguntarle a
 * 		la swap si tiene espacion para guardarlo.
 * @RET: 0 si no puede
 * 		1 si puede
 **/
-int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, uint32_t size);
+int32_t memoria_suficiente_en_swap( uint32_t pid, uint32_t size);
 
 /**
 * @NAME: no_se_asigna_proceso
@@ -161,6 +174,12 @@ void destruir_proceso(void* proceso);
 **/
 void* leer_de_memoria(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer);
 
+/**
+* @NAME: leer_heap
+* @DESC: lee el heap de memoria
+**/
+
+void* leer_heap(heap_metadata* heap, uint32_t PID);
 
 /**
  * @NAME: calcular_pagina_de_puntero_logico
@@ -409,5 +428,21 @@ void liberar_frames_eliminar_proceso(t_proceso* proceso);
  * @DESC: Agara la lista de frames reservados por el proceso y los remueve de la lista de frames reservados por todos los procesos
 */
 void eliminar_frames_reservados(t_proceso* proceso);
+/**
+ * @NAME: inicializar_semaforos
+ * @DESC: inicializa todos los semaforos de la ram
+
+*/
+
+void  inicializar_semaforos();
+
+/**
+ * @NAME: destruir_semaforos
+ * @DESC: elimina los semaforos
+
+*/
+
+void destruir_semaforos();
+
 
 #endif /* PAGINACION_PAGINACION_H_ */
