@@ -41,20 +41,21 @@ int main(int argc, char** argv) {
 
 	inicializar_estructuras_administrativas();
 
-	testeamos();
-	imprimir_procesos();
+	//testeamos();
+	//imprimir_procesos();
 
 	//semaforo_wait_fin();
+
 	cerrar_todo(false);
 	destruir_estructuras_administrativas();
 
 	return EXIT_SUCCESS;
 }
 
-void* signal_handler(int n){
+void signal_handler(int n){
 
 
-	void* x = manejar_sigint();
+	manejar_sigint();
 	loggear_trace("ya termine de manejar el sigint");
 //	int a = pthread_join(hilo_senial, NULL);
 //	loggear_trace("termine de joinear");
@@ -62,7 +63,7 @@ void* signal_handler(int n){
 //		loggear_error("hubo un problema joineando el hilo de las seniales");
 //	}
 	cancelar_notificaciones();
-	return x;
+	//return x;
 	//cerrar_todo();
 			/*switch (n){
 				case SIGUSR1:

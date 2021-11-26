@@ -10,10 +10,10 @@ void semaforo_destruir() {
 	sem_destroy(&semaforo_finalizar);
 }
 
-void * semaforo_post_fin() {
+void semaforo_post_fin() {
 	loggear_debug("SE CIERRA TODO!!!!");
 	sem_post(&semaforo_finalizar);
-	return NULL;
+	//return NULL;
 }
 
 void semaforo_wait_fin() {
