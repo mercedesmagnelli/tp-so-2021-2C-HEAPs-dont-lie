@@ -64,7 +64,7 @@ int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid);
  **/
 
 
-int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t size, void* lectura);
+int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t size, void** lectura);
 
 /**
  * @NAME: memwrite

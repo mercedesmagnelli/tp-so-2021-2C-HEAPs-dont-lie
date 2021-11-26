@@ -15,7 +15,7 @@ void manejar_signal() {
 }
 
 int main(int argc, char** argv) {
-	semaforo_iniciar();
+	//semaforo_iniciar();
 
 	//pthread_t hilo;
 	//pthread_create(&hilo, NULL, (void *) manejar_signal, NULL);
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 	testeamos();
 	imprimir_procesos();
 
-	semaforo_wait_fin();
+	//semaforo_wait_fin();
 	cerrar_todo(false);
 	destruir_estructuras_administrativas();
 
@@ -116,14 +116,63 @@ void debug_configuracion() {
 
 void testeamos() {
     uint32_t pid = 0;
-    int32_t size;
-    while(pid!= -1){
-		printf("Ingrese el numero de proceso y el tamanio");
+    int32_t size = 6;
 
-		scanf("%d %d", &pid, &size);
-		inicializar_proceso(pid);
-		memalloc(pid, size);
+		//printf("Ingrese el numero de proceso y el tamanio");
+
+		//scanf("%d %d", &pid, &size);
+
+	loggear_trace("HOLA, soy dora!!");
+	sleep(10);
+	inicializar_proceso(pid);
+	int a = memalloc(pid, size);
+	loggear_trace("Hice el memalloc en %d", a);
+    loggear_trace("----AHORA VOY A ESCRIBIR-----");
+
+    uint32_t x = memwrite("Hola", a, pid, 5);
+
+    loggear_trace("termine de escribir");
+
+    if(x < 0) {
+    	loggear_error("fua le chingue en la escritura");
     }
+
+    loggear_debug("Me voy a mimir 3 segundos porque me canse de escribir Hola");
+    	sleep(3);
+
+    void* ptroLectura = malloc(5);
+	memcpy(ptroLectura, memoria_principal + 9, 5);
+	char* leido = (char*) ptroLectura;
+	loggear_info("lo leido manualmente fue %s", leido);
+
+    void* lectura = NULL;
+    loggear_trace("antes del memread");
+    int s = memread(a, pid, 5, &lectura);
+    loggear_trace("dsp del memread");
+	 if(s < 0) {
+			loggear_error("fua le chingue en la lectura");
+		}else{
+		loggear_debug("Lei bien! %s", (char*) lectura);
+
+
+	}
+	 	 sleep(3);
+
+//    memwrite("Chau", 41, pid, 5);
+//    loggear_debug("Me voy a mimir 2 segundos porque me canse de escribir Chau");
+//    sleep(2000);
+//
+//    memwrite("Carpincho", 73, pid, 10);
+//    loggear_debug("Me voy a mimir 2 segundos porque me canse de escribir Carpincho");
+//    sleep(2000);
+//
+//    memwrite("Capibara",105, pid, 10);
+//    loggear_debug("Me voy a mimir 2 segundos porque me canse de escribir Capibara");
+//    sleep(2000);
+//
+//    memwrite("Hydrochaeris",105, pid, 13);
+//    loggear_debug("Me voy a mimir 2 segundos porque me canse de escribir Hydrochaeris");
+//    sleep(2000);
 
     imprimir_procesos();
 
