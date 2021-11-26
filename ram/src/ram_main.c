@@ -138,18 +138,25 @@ void testeamos() {
     }
 
     loggear_debug("Me voy a mimir 3 segundos porque me canse de escribir Hola");
-    sleep(3);
+    	sleep(3);
 
-    void* lectura;
+    void* ptroLectura = malloc(5);
+	memcpy(ptroLectura, memoria_principal + 9, 5);
+	char* leido = (char*) ptroLectura;
+	loggear_info("lo leido manualmente fue %s", leido);
+
+    void* lectura = NULL;
     loggear_trace("antes del memread");
-    int s = memread(a, pid, 5, lectura);
+    int s = memread(a, pid, 5, &lectura);
     loggear_trace("dsp del memread");
 	 if(s < 0) {
 			loggear_error("fua le chingue en la lectura");
 		}else{
-		loggear_debug("Lei bien: %s", (char*) lectura);
+		loggear_debug("Lei bien! %s", (char*) lectura);
+
+
 	}
-		sleep(3);
+	 	 sleep(3);
 
 //    memwrite("Chau", 41, pid, 5);
 //    loggear_debug("Me voy a mimir 2 segundos porque me canse de escribir Chau");

@@ -67,13 +67,12 @@ int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
 }
 
 
-int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer, void* lectura) {
+int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer, void** lectura) {
 
-	lectura = malloc(tamanioALeer);
     if(!ptro_valido(pid, direccionLogicaALeer) || ptro_liberado(pid, direccionLogicaALeer) || tamanio_de_direccion(direccionLogicaALeer, pid) < tamanioALeer){
         return -6; //MEM_READ_FAULT
     }else{
-        lectura = leer_de_memoria(direccionLogicaALeer, pid, tamanioALeer);
+        (*lectura) = leer_de_memoria(direccionLogicaALeer, pid, tamanioALeer);
         return 0;
     }
 }

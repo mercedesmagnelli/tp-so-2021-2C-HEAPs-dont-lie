@@ -690,6 +690,7 @@ void* leer_de_memoria_paginada(uint32_t PID, int nroPag, int offset, int tamDato
 	void* data = malloc(tamDato);
 	while(tamDato>0){
 		marcoPag = obtener_marco_de_pagina_en_memoria(PID, nroPag, 0);
+		loggear_trace("el ");
 		ptro_escritura = marcoPag * get_tamanio_pagina() + offset;
 		if((offset+tamDato) <= get_tamanio_pagina()){
 			leer_directamente_de_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
