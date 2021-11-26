@@ -40,8 +40,8 @@ int main(int argc, char** argv) {
 
 	inicializar_estructuras_administrativas();
 
-	testeamos();
-	imprimir_procesos();
+	//testeamos();
+	//imprimir_procesos();
 	//semaforo_wait_fin();
 
 	cerrar_todo(false);
