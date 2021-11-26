@@ -199,23 +199,6 @@ int32_t no_se_asigna_proceso(uint32_t pid, uint32_t size) {
 void agregar_proceso(uint32_t PID, uint32_t tam){
 	//creo el proceso y lo inicializo
 
-	t_proceso* nuevoProceso = get_proceso_PID(PID);
-
-/*
-	int cantPags = calcular_paginas_para_tamanio(tam);
-	loggear_trace("----VOY A AGREGAR %d PAGINAS AL PROCESO %d:",cantPags, PID);
-	t_pagina* nuevaPagina;
-
-	loggear_trace("----TENGO %d PAGINAS PARA EL PROCESO %d antes de asignarle nuevas paginas",list_size(nuevoProceso->tabla_paginas), PID);
-
-	for(int i = 0;i<cantPags;i++){
-		nuevaPagina = malloc(sizeof(t_pagina));
-		nuevaPagina->bit_presencia=0;//es el unico dato que llenamos
-		list_add(nuevoProceso->tabla_paginas,nuevaPagina);
-	}
-
-	loggear_trace("----TENGO %d PAGINAS PARA EL PROCESO %d:",list_size(nuevoProceso->tabla_paginas), PID);
-*/
 	heap_metadata* nuevoHeapPrimero = malloc(sizeof(heap_metadata));
 	nuevoHeapPrimero->currAlloc = 0;
 	nuevoHeapPrimero->prevAlloc = -1;
@@ -238,10 +221,6 @@ void agregar_proceso(uint32_t PID, uint32_t tam){
 	agregar_HEAP_a_PID(PID,nuevoHeapUltimo);
 	guardar_HEAP_en_memoria(PID, nuevoHeapUltimo);
 
-
-
-
-	//return nuevoHeapPrimero->currAlloc+9;//siempre el primer alloc va a ser 9 porque el primer dato se guarda al comienzo, y el metadata ocupa 9 bytes
 }
 
 int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {

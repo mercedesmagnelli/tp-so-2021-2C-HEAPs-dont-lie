@@ -4,6 +4,7 @@
 #include "../paginacion/estructuras_paginacion.h"
 #include "../TLB/tlb.h"
 #include <stdint.h>
+#include <commons/temporal.h>
 #include "../../../shared/logger.h"
 #include "../conexion_planificador/conexion_planificador.h"
 

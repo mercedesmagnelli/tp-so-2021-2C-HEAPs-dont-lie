@@ -47,7 +47,8 @@ void imprimir_entrada_proceso(t_proceso* p){
 }
 void manejar_sigusr1(){
 
-	char* ruta = temporal_get_string_time("%s/DUMP_%y%m%d%H%M%S.txt",get_path_dump_tlb());
+	char* timestamp = temporal_get_string_time("%s%y%m%d%H%M%S.txt");
+	char* ruta = string_from_format("DUMP_%s", timestamp);
 	loggear_info("[SIGUSR1] - Se va a generar el archivo dump en la ruta: %s");
 	FILE* dump = fopen(ruta, "wb+");
 	char** pid_pag;
