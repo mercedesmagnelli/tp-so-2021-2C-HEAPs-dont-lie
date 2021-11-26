@@ -16,7 +16,6 @@ void manejar_signal() {
 
 int main(int argc, char** argv) {
 	//semaforo_iniciar();
-
 	//pthread_t hilo;
 	//pthread_create(&hilo, NULL, (void *) manejar_signal, NULL);
 	//pthread_detach(hilo);
@@ -43,7 +42,6 @@ int main(int argc, char** argv) {
 
 	//testeamos();
 	//imprimir_procesos();
-
 	//semaforo_wait_fin();
 
 	cerrar_todo(false);
