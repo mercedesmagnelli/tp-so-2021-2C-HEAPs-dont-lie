@@ -18,16 +18,17 @@ int enviar_handshake() {
 		return resultado;
 	}
 
+	int error = 0;
 	loggear_trace("Enviado handshake a la ram");
-	while(1){
-	int error = recibir_mensaje(socket_ram);
+	while(error == 0){
+	error = recibir_mensaje(socket_ram);
 	if (error != 0) {
-		loggear_info("La RAM nos desconoce, no podemos trabajar");
-		return error;
+		loggear_info("La RAM nos desconoce, no podemos trabajar, por lo que finalizamos el SWAMP");
+		return 0;
 	}
 
 	}
-	//pthread_exit(NULL);
+	pthread_exit(NULL);
 	return 0;
 }
 
