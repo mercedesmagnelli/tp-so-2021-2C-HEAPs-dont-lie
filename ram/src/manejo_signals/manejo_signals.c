@@ -36,6 +36,7 @@ void* manejar_sigint(){
 		}
 	}
 	loggear_trace("YA TERMINE DE IMPRIMIR TODO");
+	semaforo_post_fin();
 	return NULL;
 }
 

@@ -250,9 +250,9 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			return 0;
 		case DESCONEXION:
 			loggear_info("Se desconectaron");
-
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
+			cerrar_todo(false);
 
 			return 0;
 		case FALLO_AL_RECIBIR:

@@ -6,8 +6,7 @@ void imprimir_procesos();
 void testeamos();
 
 void manejar_signal() {
-	//signal(SIGINT, manejar_sigint);
-	signal(SIGINT, semaforo_post_fin);
+	signal(SIGINT, manejar_sigint);
 	signal(SIGUSR1, manejar_sigusr1);
 	signal(SIGUSR1, manejar_sigusr2);
 
@@ -16,11 +15,11 @@ void manejar_signal() {
 
 int main(int argc, char** argv) {
 
-	//TODO: DESCOMENTAR CUANDO CATCHEEMOS LAS SEÑALES
-	//semaforo_iniciar();
-	//pthread_t hilo;
-	//pthread_create(&hilo, NULL, (void *) manejar_signal, NULL);
-	//pthread_detach(hilo);
+
+	semaforo_iniciar();
+	pthread_t hilo;
+	pthread_create(&hilo, NULL, (void *) manejar_signal, NULL);
+	pthread_detach(hilo);
 
 
 	int error = iniciar_configuracion(argc, argv);
@@ -35,6 +34,7 @@ int main(int argc, char** argv) {
 	debug_configuracion();
 
 	error = levantar_servidor();
+
 	if (error != STATUS_OK) {
 		cerrar_todo(true);
 		return EXIT_FAILURE;
@@ -45,9 +45,10 @@ int main(int argc, char** argv) {
 	//testeamos();
 	//imprimir_procesos();
 
-	//semaforo_wait_fin();
+	semaforo_wait_fin();
 
 	cerrar_todo(false);
+
 	destruir_estructuras_administrativas();
 
 	return EXIT_SUCCESS;
