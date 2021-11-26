@@ -70,12 +70,27 @@ void planificador_destruir_de_hilos() {
 
 		t_hilo * hilo = colas_obtener_finalizado();
 
-		hilos_se_movio_finalizado(hilo->pid); // TODO: La estructura para manejar esto hay que borrarla luego de responder
-		// TODO: Podria haber un WAIT a que se enviara el mensaje
+		hilos_se_movio_finalizado(pid(hilo));
 
-		loggear_debug("[PID: %d] --- [Destructor] --- Se eliminara el hilo", pid(hilo));
+		sleep(5); // TODO: Ver una forma mejor de no detener esto asi. Pero sino puede fallar cuando se responde un WAIT
 
-		loggear_error("[Destructor] TODO: Codear, eliminar semaforos ocupados y recursos consumiendo (tal vez, cancelar hilo IO) ");
+		loggear_info("[Finish] - [PID: %zu] - Se va a eliminar toda la informacion", pid(hilo));
+
+		semaforo_eliminar_proceso(hilo);
+
+		loggear_info("[Finish] - [PID: %zu] - Eliminado semaforos", pid(hilo));
+
+		hilos_destruir_hilo_finish(pid(hilo));
+
+		loggear_info("[Finish] - [PID: %zu] - Eliminado estructuras de sincronizacion", pid(hilo));
+
+		if (hilo->semaforos_pedidos != NULL) {
+			list_clean(hilo->semaforos_pedidos);
+			list_destroy(hilo->semaforos_pedidos);
+			hilo->semaforos_pedidos = NULL;
+		}
+
+		free(hilo);
 	}
 }
 
@@ -91,6 +106,7 @@ int planificadores_iniciar() {
 	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_largo_plazo, NULL);
 	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_corto_plazo, NULL);
 	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_medio_plazo, NULL);
+	error += pthread_create(hilos_crear_hilo(), NULL, (void *) planificador_destruir_de_hilos, NULL);
 
     return error;
 }
@@ -103,7 +119,6 @@ void planificadores_destruir() {
 	deadlocks_destruir();
 }
 
-// CERRADO
 int planificadores_proceso_iniciar(uint32_t ppid) {
 	loggear_debug("[SYSTEM] --- Llego un nuevo proceso al planificador");
 
@@ -124,42 +139,6 @@ int planificadores_proceso_cerrar(uint32_t ppid) {
 
 	loggear_debug("[PID: %d] --- [SYSTEM] --- Se movió a FINISH", pid(hilo));
 
-    return 0;
-}
-
-int planificadores_semaforos_iniciar(void * proceso, void * semaforo) {
-    return 0;
-}
-
-int planificadores_semaforos_wait(void * proceso, void * semaforo) {
-    return 0;
-}
-
-int planificadores_semaforos_post(void * proceso, void * semaforo) {
-    return 0;
-}
-
-int planificadores_semaforos_destruir(void * proceso, void * semaforo) {
-    return 0;
-}
-
-int planificadores_io_llamar(void * proceso, void * dispositivo_io) {
-    return 0;
-}
-
-void * planificadores_memoria_alloc(void * proceso, void * llamada_memoria) {
-    return NULL;
-}
-
-int planificadores_memoria_free(void * proceso, void * llamada_memoria) {
-    return 0;
-}
-
-void * planificadores_memoria_read(void * proceso, void * llamada_memoria) {
-    return NULL;
-}
-
-int planificadores_memoria_write(void * proceso, void * llamada_memoria) {
     return 0;
 }
 

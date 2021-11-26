@@ -16,6 +16,7 @@ typedef struct {
 	pthread_mutex_t mutex;
 	t_list * list_procesos_retienen;
 	t_list * list_procesos_bloqueados;
+	int show;
 } t_semaforo;
 
 typedef enum {
@@ -24,7 +25,8 @@ typedef enum {
 	SEM_ERROR_YA_EXISTIA,
 	SEM_ERROR_NO_EXISTE,
 	SEM_ERROR_MENOR_CERO,
-	SEM_PROCESO_FINALIZADO
+	SEM_PROCESO_FINALIZADO,
+	SEM_ERROR
 } t_estado_ejecucion;
 
 /**
@@ -79,5 +81,11 @@ void semaforo_deadlock_post(t_semaforo * semaforo);
  * @DESC: Destruye un semaforo y avisa para liberar todos los que lo esten usando.
  * */
 t_estado_ejecucion semaforo_destruir(t_matelib_semaforo * sem);
+
+/**
+ * @NAME: semaforo_eliminar_proceso
+ * @DESC: Elimina el semaforo que puede bloquear o no al hilo y hace post a todos los recursos que tenga reservados
+ */
+void semaforo_eliminar_proceso(t_hilo * hilo);
 
 #endif

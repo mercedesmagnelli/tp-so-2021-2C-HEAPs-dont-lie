@@ -52,10 +52,8 @@ int ram_enviar_proceso_ready(uint32_t pid);
  * @NAME: ram_cerrar_conexiones
  * @DESC: Cierra los hilos y libera toda la memoria ocupada
  * @PARAM:
- * safe_close = true, hace pthread_join
- * safe_close = false, hace pthread_detach
  */
-void conexiones_cerrar_conexiones(bool safe_close);
+void ram_cerrar_conexiones();
 
 /**
  * @NAME: iniciar_conexion_ram

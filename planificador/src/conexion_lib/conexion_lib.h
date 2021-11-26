@@ -31,6 +31,6 @@ int levantar_servidor();
  * @NAME: cerrar_conexiones
  * @DESC: Cierra todos los sockets y libera la memoria de las variables. Llamar siempre
  */
-void cerrar_conexiones(bool safe_close);
+void lib_cerrar_conexiones(bool safe_close);
 
 #endif /* CONEXION_PLANIFICADOR_CONEXION_PLANIFICADOR_H_ */

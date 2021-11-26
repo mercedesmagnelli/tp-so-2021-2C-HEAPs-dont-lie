@@ -65,7 +65,7 @@ t_ram_respuesta * ram_enviar_alloc(t_matelib_memoria_alloc * memoria_alloc) {
 
 	free(size);
 	free(mensaje_lib);
-	free(respuesta_ram);
+	free(respuesta_ram); // No destruimos .payload porque se va a necesitar
 
 	return respuesta;
 }
@@ -84,7 +84,7 @@ t_ram_respuesta * ram_enviar_write(t_matelib_memoria_write * memoria_write) {
 
 	free(size);
 	free(mensaje_lib);
-	free(respuesta_ram);
+	destruir_mensaje(respuesta_ram);
 
 	return respuesta;
 }
@@ -103,7 +103,7 @@ t_ram_respuesta * ram_enviar_free(t_matelib_memoria_free * memoria_free) {
 
 	free(size);
 	free(mensaje_lib);
-	free(respuesta_ram);
+	destruir_mensaje(respuesta_ram);
 
 	return respuesta;
 }
@@ -125,10 +125,12 @@ t_ram_respuesta * ram_enviar_read(t_matelib_memoria_read * memoria_read) {
 	respuesta->size = *size_mensaje_serializado;
 	respuesta->mensaje = mensaje_serializado;
 
-	free(size_mensaje_serializado);
 	free(size);
+	free(size_mensaje_serializado);
 	free(mensaje_lib);
-	free(respuesta_ram);
+	destruir_mensaje(respuesta_ram);
+	free(ram_read->mem_read);
+	free(ram_read);
 
 	return respuesta;
 }
@@ -147,7 +149,7 @@ t_ram_respuesta * ram_enviar_close(t_matelib_nuevo_proceso * muerto_proceso) {
 
 	free(size);
 	free(mensaje_lib);
-	free(respuesta_ram);
+	destruir_mensaje(respuesta_ram);
 
 	return respuesta;
 }
@@ -166,7 +168,7 @@ t_ram_respuesta * ram_enviar_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 
 	free(size);
 	free(mensaje_lib);
-	free(respuesta_ram);
+	destruir_mensaje(respuesta_ram);
 
 	return respuesta;
 }
@@ -185,7 +187,7 @@ int ram_enviar_cambio_estado_proceso(uint32_t pid, t_header estado) {
 	}
 
 	free(pid_m);
-	free(respuesta_ram);
+	destruir_mensaje(respuesta_ram);
 
 	return error;
 }
@@ -203,7 +205,7 @@ int ram_enviar_proceso_ready(uint32_t pid) {
 }
 
 // Publica
-void conexiones_cerrar_conexiones(bool safe_close) {
+void ram_cerrar_conexiones() {
 	avisar_ram_desconexion();
 
 	loggear_trace("Cerrado los threads y sockets");

@@ -18,8 +18,6 @@
 typedef struct {
 	sem_t sem_ejecutar;
 	bool finalizo;
-
-	void * mensaje;
 } t_hilos_semaforo;
 
 
@@ -41,6 +39,11 @@ void hilos_planificador_destruir();
  */
 pthread_t * hilos_crear_hilo();
 
+/**
+ * @NAME: hilos_wait_ejecucion
+ * @DESC: Espera a que ejecute el hilo y continua cuando entra a EXEC
+ */
+void hilos_wait_ejecucion(uint32_t pid);
 
 /**
  * @NAME: hilos_agregar_nuevo_hilo
@@ -55,16 +58,22 @@ void hilos_agregar_nuevo_hilo(uint32_t pid);
 void hilos_post_ejecucion(uint32_t pid);
 
 /**
+ * @NAME: hilos_destruir_hilo_finish
+ * @DESC: Elimina el hilo del registro de hilos
+ */
+void hilos_destruir_hilo_finish(uint32_t pid);
+
+/**
  * @NAME: hilos_se_movio_finalizado
  * @DESC: Marca el hilo como que esta finalizado por DEADLOCK y hace el post para avisar que puede continuar ejecucion
  */
 void hilos_se_movio_finalizado(uint32_t pid);
 
 /**
- * @NAME: hilos_wait_ejecucion
- * @DESC: HAce un wait en el semaforo del hilo para esperar que entre en ejecucion
+ * @NAME: hilos_wait_no_se_usa_mas_hilo
+ * @DESC: WAit en el semaforo del hilo
  */
-void hilos_wait_ejecucion(uint32_t pid);
+void hilos_wait_no_se_usa_mas_hilo(uint32_t pid);
 
 /**
  * @NAME: hilos_check_finalizo_proceso

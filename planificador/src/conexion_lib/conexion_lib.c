@@ -26,7 +26,7 @@ int levantar_servidor() {
 }
 
 // Publica
-void cerrar_conexiones(bool safe_close) {
+void lib_cerrar_conexiones(bool safe_close) {
 
 	if (safe_close) {
 		pthread_join(thread_escuchar_notificaciones, NULL);

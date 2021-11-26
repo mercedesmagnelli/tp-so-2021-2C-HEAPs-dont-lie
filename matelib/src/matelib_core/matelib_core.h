@@ -5,8 +5,6 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "../configuracion/matelib_configuracion_guardada.h"
-
 #include "../../../shared/logger.h"
 
 /*

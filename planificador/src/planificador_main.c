@@ -37,40 +37,23 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-
 	error = planificadores_iniciar();
 	if (error != 0) {
 		loggear_error("Ocurrio un error en el planificador, Error: %d", error);
 		cerrar_todo();
 		return EXIT_FAILURE;
 	}
+
 	loggear_debug("Se creo el planificador con el estatus en %d", error);
 
-	/*
-	planificadores_proceso_iniciar(1);
-	loggear_debug("Se creo el proceso 1");
-
-	planificadores_proceso_iniciar(2);
-	loggear_debug("Se creo el proceso 2");
-
-	planificadores_proceso_iniciar(3);
-	loggear_debug("Se creo el proceso 3");
-
-	planificadores_proceso_iniciar(4);
-	loggear_debug("Se creo el proceso 4");
-
-	planificadores_proceso_iniciar(5);
-	loggear_debug("Se creo el proceso 5");
-	*/
-
-	//levantar_consola();
-	sleep(120);
 	cerrar_todo();
 	return EXIT_SUCCESS;
 }
 
 void cerrar_todo() {
-	conexiones_cerrar_conexiones(false);
+	lib_cerrar_conexiones(true);
+	ram_cerrar_conexiones();
+
 	loggear_info("Cerrada conexion con ram");
 
 	planificadores_destruir();

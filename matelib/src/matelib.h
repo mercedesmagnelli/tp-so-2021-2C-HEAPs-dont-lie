@@ -11,6 +11,8 @@
 
 #include "../../shared/estructura_compartida.h"
 
+#include "../../shared/logger.h"
+
 //-------------------Type Definitions----------------------/
 typedef struct mate_instance {
     void *group_info;
@@ -22,13 +24,9 @@ typedef char *mate_sem_name;
 
 typedef int32_t mate_pointer;
 
-typedef struct {
-	uint32_t pid;
-	//uint32_t heap;//not so sure
-}t_instance_metadata;
-// TODO: Docstrings
-
 //------------------General Functions---------------------/
+void mate_instance_close(mate_instance * lib_ref);
+
 /**
  * @NAME: mate_init
  * @DESC: Recibe la instancia y el path del archivo de configuración e inicializa la estructura administrativa necesaria para gestionar la instancia

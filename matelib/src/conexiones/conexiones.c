@@ -1,12 +1,12 @@
 #include "conexiones.h"
 
-int conexiones_iniciar();
+
 
 void avisar_desconexion();
 
 // Publica
-int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
-	int socket = conexiones_iniciar();
+int enviar_mate_init(t_instance_metadata* instancia, t_matelib_nuevo_proceso * nuevo_proceso) {
+	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		return socket;
 	}
@@ -39,8 +39,8 @@ int enviar_mate_init(t_matelib_nuevo_proceso * nuevo_proceso) {
 	return error;
 }
 
-int enviar_mate_close(t_matelib_nuevo_proceso * nuevo_proceso) {
-	int socket = conexiones_iniciar();
+int enviar_mate_close(t_instance_metadata* instancia, t_matelib_nuevo_proceso * nuevo_proceso) {
+	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		return socket;
 	}
@@ -74,9 +74,9 @@ int enviar_mate_close(t_matelib_nuevo_proceso * nuevo_proceso) {
 	return error;
 }
 
-int enviar_mate_sem_init(t_matelib_semaforo* nuevo_semaforo){
+int enviar_mate_sem_init(t_instance_metadata* instancia, t_matelib_semaforo* nuevo_semaforo){
 
-	int socket = conexiones_iniciar();
+	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		return socket;
 	}
@@ -111,9 +111,9 @@ int enviar_mate_sem_init(t_matelib_semaforo* nuevo_semaforo){
 
 }
 
-int enviar_mate_sem_wait(t_matelib_semaforo* semaforo){
+int enviar_mate_sem_wait(t_instance_metadata* instancia, t_matelib_semaforo* semaforo){
 
-	int socket = conexiones_iniciar();
+	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		return socket;
 	}
@@ -133,10 +133,15 @@ int enviar_mate_sem_wait(t_matelib_semaforo* semaforo){
 	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
 	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
 		loggear_info("El proceso [PID: %zu] hizo wait al semáforo %s", semaforo->pid, semaforo->semaforo_nombre);
-	}else if(mensaje_respuesta->head == FALLO_EN_LA_TAREA){
+	} else if(mensaje_respuesta->head == FALLO_EN_LA_TAREA){
 		loggear_info("El proceso [PID: %zu] no pudo hacer wait al semáforo %s", semaforo->pid, semaforo->semaforo_nombre);
 		error = 1;
-	}else {
+	} else if (mensaje_respuesta->head == EXITO_PROCESO_ELIMINADO) {
+		loggear_info("El proceso [PID: %zu] fue desalojado por un deadlock", semaforo->pid);
+		error = EXITO_PROCESO_ELIMINADO;
+	} else if (mensaje_respuesta->head == DESCONEXION) {
+		loggear_debug("Desconeccion [PID: %zu]", semaforo->pid);
+	} else {
 		loggear_warning("El proceso [PID: %zu] devolvió un código extraño: %d al hacer MATE_SEM_WAIT", semaforo->pid, mensaje_respuesta->head);
 		error = 2;
 	}
@@ -146,9 +151,9 @@ int enviar_mate_sem_wait(t_matelib_semaforo* semaforo){
 	return error;
 }
 
-int enviar_mate_sem_post(t_matelib_semaforo* semaforo){
+int enviar_mate_sem_post(t_instance_metadata* instancia, t_matelib_semaforo* semaforo){
 
-	int socket = conexiones_iniciar();
+	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		return socket;
 	}
@@ -181,9 +186,9 @@ int enviar_mate_sem_post(t_matelib_semaforo* semaforo){
 	return error;
 }
 
-int enviar_mate_sem_destroy(t_matelib_semaforo* semaforo){
+int enviar_mate_sem_destroy(t_instance_metadata* instancia, t_matelib_semaforo* semaforo){
 
-	int socket = conexiones_iniciar();
+	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		return socket;
 	}
@@ -216,9 +221,9 @@ int enviar_mate_sem_destroy(t_matelib_semaforo* semaforo){
 	return error;
 }
 
-int enviar_mate_call_io(t_matelib_io* entrada_salida){
+int enviar_mate_call_io(t_instance_metadata* instancia, t_matelib_io* entrada_salida){
 
-	int socket = conexiones_iniciar();
+	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		return socket;
 	}
@@ -251,9 +256,9 @@ int enviar_mate_call_io(t_matelib_io* entrada_salida){
 	return error;
 }
 
-int32_t enviar_mate_memalloc(t_matelib_memoria_alloc* alloc){
+int32_t enviar_mate_memalloc(t_instance_metadata* instancia, t_matelib_memoria_alloc* alloc){
 
-	int socket = conexiones_iniciar();
+	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		return socket;
 	}
@@ -280,9 +285,9 @@ int32_t enviar_mate_memalloc(t_matelib_memoria_alloc* alloc){
 	return error;
 }
 
-int enviar_mate_memfree(t_matelib_memoria_free* liberar){
+int enviar_mate_memfree(t_instance_metadata* instancia, t_matelib_memoria_free* liberar){
 
-	int socket = conexiones_iniciar();
+	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		return socket;
 	}
@@ -310,9 +315,9 @@ int enviar_mate_memfree(t_matelib_memoria_free* liberar){
 
 }
 
-int enviar_mate_memread(t_matelib_memoria_read* leer){
+int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* leer){
 
-	int socket = conexiones_iniciar();
+	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		return socket;
 	}
@@ -340,9 +345,9 @@ int enviar_mate_memread(t_matelib_memoria_read* leer){
 }
 
 
-int enviar_mate_memwrite(t_matelib_memoria_write* escribir){
+int enviar_mate_memwrite(t_instance_metadata* instancia, t_matelib_memoria_write* escribir){
 
-	int socket = conexiones_iniciar();
+	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		return socket;
 	}
@@ -368,9 +373,9 @@ int enviar_mate_memwrite(t_matelib_memoria_write* escribir){
 
 	return 0;
 }
-
+/*
 // Publica
-void conexiones_cerrar_conexiones(bool safe_close) {
+void conexiones_cerrar_conexiones() {
 	avisar_desconexion();
 
 	loggear_trace("Cerrado los threads y sockets");
@@ -383,10 +388,10 @@ void avisar_desconexion() {
 
 	close(socket_avisar);
 }
-
-int conexiones_iniciar() {
-	char * ip = get_ip();
-	int puerto = get_puerto();
+*/
+int conexiones_iniciar(t_instance_metadata* instancia) {
+	char * ip = instancia->ip;
+	int puerto = instancia->port;
 
 	int socket_server = conectar_a_servidor(ip, puerto);
 	if (socket_server < 0) {
