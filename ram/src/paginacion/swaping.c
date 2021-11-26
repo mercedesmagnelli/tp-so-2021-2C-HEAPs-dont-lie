@@ -173,11 +173,11 @@ t_pagina* obtener_pagina_victima(t_list* lista_paginas, uint32_t pid) {
 t_pagina* obtener_victima_LRU(t_list* lista_paginas){
 	t_pagina* pagina_victima;
 	t_pagina* pagina_anterior = (t_pagina*) list_get(lista_paginas, 0);
-	loggear_info("la primer pagina tiene un timestamp %f", pagina_anterior->timestamp);
+	loggear_info("la primer pagina tiene un timestamp %d", pagina_anterior->timestamp);
 	for(int i = 0; i < list_size(lista_paginas); i++) {
 
 		t_pagina* pagina_actual = (t_pagina*) list_get(lista_paginas, i);
-		loggear_info("la pagina %d de la lista de paginas tiene un timestamp %f", i, pagina_anterior->timestamp);
+		loggear_info("la pagina %d de la lista de paginas tiene un timestamp %d", i, pagina_actual->timestamp);
 		if(pagina_actual-> timestamp <= pagina_anterior->timestamp) {
 			pagina_victima = pagina_actual;
 		}
