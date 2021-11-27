@@ -118,38 +118,37 @@ void debug_configuracion() {
 
 
 void testeamos() {
-    uint32_t pid = 0;
-    int32_t size = 31;
+	 	uint32_t pid = 0;
+	    int32_t size = 31;
 
-		//printf("Ingrese el numero de proceso y el tamanio");
+	        //printf("Ingrese el numero de proceso y el tamanio");
 
-		//scanf("%d %d", &pid, &size);
+	        //scanf("%d %d", &pid, &size);
 
-	loggear_trace("HOLA, soy dora!!");
-	sleep(10);
-	inicializar_proceso(pid);
+	    loggear_trace("HOLA, soy dora!!");
+	    sleep(10);
+	    inicializar_proceso(pid);
 
-	int a = memalloc(pid,31);
-	loggear_trace("Hice el memalloc en %d", a);
+	    int a = memalloc(pid,10);
+	    loggear_trace("Hice el memalloc en %d", a);
 
-//	a = memalloc(pid, 10);
-//	loggear_trace("Hice el memalloc en %d", a);
-//
-//	a = memalloc(pid,22);
-//	loggear_trace("Hice el memalloc en %d", a);
+	    a = memalloc(pid, 37);
+	    loggear_trace("Hice el memalloc en %d", a);
+
+	    a = memalloc(pid,5);
+	    loggear_trace("Hice el memalloc en %d", a);
 
 
-	loggear_trace("--PROCESOS ANTES DE HACER CUALQUIER TIPO DE LIBERACION--");
+	    loggear_trace("--PROCESOS ANTES DE HACER CUALQUIER TIPO DE LIBERACION--");
 
-	imprimir_procesos();
+	    imprimir_procesos();
 
-	loggear_trace("----AHORA VOY A  PROBAR LA LIBERACIÓN DE ALLOCS------");
+	    loggear_trace("----AHORA VOY A  PROBAR LA LIBERACIÓN DE ALLOCS------");
 
-	memfree(9, pid);
-	loggear_trace("-- PROCESOS DESPUÉS DE LIBERAR EL HEAP DE 9 --");
+	    memfree(9, pid);
+	    loggear_trace("-- PROCESOS DESPUÉS DE LIBERAR EL HEAP DE 9 --");
 
-	imprimir_procesos();
-
+	    imprimir_procesos();
 
 //    loggear_trace("----AHORA VOY A ESCRIBIR-----");
 //
