@@ -408,6 +408,7 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 
 	uint32_t paginasUsadas = list_size(tp);
 	uint32_t cantPagABorrar = paginasUsadas - cantPagNOBORRAR;
+	loggear_trace("---- SE VAN A ELIMINAR %d PAGINAS PORQUE LOS HEAPS GENERAN LIBERACIONES ---- ", cantPagABorrar);
 
 	t_pagina* paginaEliminar;
 
@@ -729,14 +730,14 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t bitModificado){
 	uint32_t marco;
 	if(esta_en_tlb(PID, nroPag)){
-		loggear_trace("HOLAAA ACA ESTOY!!!");
-		loggear_error("[RAM] - Estoy en la TLB");
+		loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
+		usleep(1000 *  get_retardo_acierto_tlb());
 		actualizar_datos_TLB(PID, nroPag);
 		marco = obtener_frame_de_tlb(PID, nroPag);
 		actualizar_datos_pagina(PID, nroPag, bitModificado, 1);
-		loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
 	}else{
 		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
+		usleep(1000 *  get_retardo_fallo_tlb());
 		if(esta_en_RAM(PID, nroPag)){
 			loggear_error("[RAM] - Estoy en la RAM");
 			marco = obtener_frame_de_RAM(PID, nroPag);
@@ -748,6 +749,7 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 			loggear_info("[RAM] - El marco que voy a usar es: %d", marco);
 			inicializar_datos_pagina(PID, nroPag, marco, bitModificado);//podriamos poner esta funcion dentro de obtener fram asi tmbn se encarga de modificar lo administrativo dsps del cambio de pags?
 			loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
+			//retardo hit
 		}
 		agregar_entrada_tlb(PID, nroPag, marco);
 		loggear_trace("ya agregue una entrada a la TLB");
