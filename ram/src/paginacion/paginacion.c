@@ -408,7 +408,7 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 
 	uint32_t paginasUsadas = list_size(tp);
 	uint32_t cantPagABorrar = paginasUsadas - cantPagNOBORRAR;
-	loggear_trace("---- SE VAN A ELIMINAR %d PAGINAS PORQUE LOS HEAPS GENERAN LIBERACIONES ---- ", cantPagABorrar);
+	loggear_trace("---- SE VAN A ELIMINAR %zu PAGINAS PORQUE LOS HEAPS GENERAN LIBERACIONES ---- ", cantPagABorrar);
 
 	t_pagina* paginaEliminar;
 
@@ -419,11 +419,15 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 	            frameLiberado->estado=0;
 	        }
 	        list_remove_and_destroy_element(tp, cantPagNOBORRAR, free);
-	    }
+	 }
+	//TODO: Ver porqué con == 0 ROMPE
+
+	if(cantPagABorrar < 0){
 
 	size_t tamanio;
 	t_pedir_o_liberar_pagina_s* mensaje = shared_crear_pedir_o_liberar(pid, cantPagABorrar);
 	void* mensaje_serializado = serializar_liberar_pagina(mensaje, &tamanio);
+
 
 	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 	enviar_mensaje_protocolo(socket_swap, R_S_LIBERAR_PAGINA, tamanio, mensaje_serializado);
@@ -434,6 +438,7 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
     if(respuesta->head == FALLO_EN_LA_TAREA){
         loggear_error("[RAM] - Hubo un problema en la liberacion de la paginas del proceos %d en swamp", pid);
     }
+  }
 }
 
 t_list* obtener_tabla_paginas_mediante_PID(uint32_t PID){
@@ -835,6 +840,10 @@ uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
 
 
     int tam = tamanioProceso - extra;
+
+    if(tam < 0) {
+    	loggear_warning("------------------- ESTOY EN EL ULTIMO -----------------------");
+    }
 
     loggear_trace("tamanio disponible en el proceso en una pagina es :%d", tam);
 
