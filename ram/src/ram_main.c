@@ -129,15 +129,11 @@ void testeamos() {
 	    sleep(10);
 	    inicializar_proceso(pid);
 
-	    int a = memalloc(pid,10);
+	    int a = memalloc(pid,12);
 	    loggear_trace("Hice el memalloc en %d", a);
 
-	    a = memalloc(pid, 37);
+	    a = memalloc(pid, 10);
 	    loggear_trace("Hice el memalloc en %d", a);
-
-	    a = memalloc(pid,5);
-	    loggear_trace("Hice el memalloc en %d", a);
-
 
 	    loggear_trace("--PROCESOS ANTES DE HACER CUALQUIER TIPO DE LIBERACION--");
 
@@ -145,7 +141,7 @@ void testeamos() {
 
 	    loggear_trace("----AHORA VOY A  PROBAR LA LIBERACIÓN DE ALLOCS------");
 
-	    memfree(9, pid);
+	    memfree(30, pid);
 	    loggear_trace("-- PROCESOS DESPUÉS DE LIBERAR EL HEAP DE 9 --");
 
 	    imprimir_procesos();

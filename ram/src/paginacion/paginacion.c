@@ -422,8 +422,8 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 	 }
 	//TODO: Ver porqué con == 0 ROMPE
 
-	if(cantPagABorrar < 0){
-
+	if(cantPagABorrar > 0){
+	loggear_trace("[MEMFREE] - Estoy mandandole a SWAP que tiene que liberar %d paginas", cantPagABorrar);
 	size_t tamanio;
 	t_pedir_o_liberar_pagina_s* mensaje = shared_crear_pedir_o_liberar(pid, cantPagABorrar);
 	void* mensaje_serializado = serializar_liberar_pagina(mensaje, &tamanio);
@@ -627,8 +627,15 @@ t_proceso* get_proceso_PID(uint32_t PID){
 
 uint32_t espacio_de_HEAP(heap_metadata* heap){
 
+	//FIXME: ACÁ PUEDE QUE HAYA QUE CAMBIARLO PORQUE HAY VECES QUE DA NEGATIVO. SI AFECTA A LOS RESULTADOS DE LAS PRUEBAS, ENTONCES LO DEJAMOS ASÍ.
+	//SI HAY QUE CMABIARLO HAY QUE PASARLE EL PID PARA PODER OBTENER EL TAMANIO DEL PROCESO. COn eso calcular el tamanio y desocmetnar lo que hice
 
-	loggear_warning("TERMINE LA TERCERA VERIFICACION: el espacio del heap es %d",  heap->nextAlloc - heap->currAlloc - 9);
+	int tamanio_proceso;
+	//loggear_warning("TERMINE LA TERCERA VERIFICACION: el espacio del heap es %d",  heap->nextAlloc - heap->currAlloc - 9);
+	uint32_t tamanio;
+//	if(heap->nextAlloc == -1) {
+//		tamanio = tamanio_proceso - heap->currAlloc - 9;
+//	}
 	return heap->nextAlloc - heap->currAlloc - 9;
 }
 
