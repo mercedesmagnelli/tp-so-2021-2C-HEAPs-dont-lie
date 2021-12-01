@@ -153,6 +153,8 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		}else{
 			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 		}
+
+		loggear_trace("TENEMOS %d cantidad de carpinchos en swamp", list_size(lista_carpinchos));
 		free(PID_proceso_eliminar);
 		destruir_mensaje(mensaje);
 		return 0;
@@ -165,6 +167,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		t_pedir_o_liberar_pagina_s* liberar_deserializado = deserializar_mensaje_peticion_liberacion_pagina(mensaje->payload);
 		loggear_warning("la cantidad de paginas a liberar es %zu", liberar_deserializado->nro_pag);
 		carpincho  = buscar_carpincho_en_lista(liberar_deserializado->pid);
+		loggear_warning("EL CARPINCHO QUE QUIERE LIBERAR ES %d %d", liberar_deserializado->pid, carpincho->pid_carpincho);
 		error = borrar_x_cantidad_de_marcos(carpincho,  liberar_deserializado->nro_pag);
 		if(error < 0){
 			loggear_debug("OCURRIO UN ERROR INESPERADO AL QUERER LIBERAR LAS PAGINAS SOLICITIDAS PARA EL PROCESO %zu", liberar_deserializado->pid);

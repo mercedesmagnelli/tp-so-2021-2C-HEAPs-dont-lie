@@ -261,13 +261,9 @@ int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_
 	int j = list_size(carpincho->marcos_usados);
 	loggear_warning("el list size es %d", j);
 
-	if(j < cantidad_paginas){
-		loggear_warning("ME PIDEN QUE BORRE MAS PAGINAS DE LAS USADAS POR ESTE PROCESO ESTO NO DEBERÍA SUCEDER, NO SE ELIMINAN PAGINAS Y SE MANDA UN MENSAJE DE FALLO A LA RAM");
-		return -1;
-	}
-
 	if(get_asignacion() == FIJA){
 		loggear_trace("soy fija");
+
 		for(int i = 0; i < cantidad_paginas; i++){
 			loggear_trace("aca paso?");
 			void* marco = list_get(carpincho->marcos_usados, j - i - 1);

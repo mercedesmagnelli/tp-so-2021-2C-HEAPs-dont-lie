@@ -335,7 +335,7 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tabla_paginas, uint32_t
 * @NAME: actualizar_datos_pagina
 * @DESC: actualiza los datos administrativos de la pagina tras su uso
 **/
-void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModificado, uint32_t bitTLB);
+void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModificado, bool bitTLB);
 
 /**
 * @NAME: inicializar_datos_pagina

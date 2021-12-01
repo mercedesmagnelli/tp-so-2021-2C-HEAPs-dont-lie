@@ -28,6 +28,9 @@ int tiempo;
  * @DESC: inicializa la TLB, se reservan los espacios de memoria.
  *
  **/
+
+void imprimir_tlb();
+
 void inicializar_tlb();
 
 /**

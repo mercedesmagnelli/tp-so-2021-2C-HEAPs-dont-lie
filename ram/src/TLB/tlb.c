@@ -20,9 +20,24 @@ void limpiar_tlb(){
 	}
 }
 
+void imprimir_tlb(){
+
+	loggear_trace("----------------------------------------------------------");
+	loggear_trace("-----------------VOY A IMPRIMIR LA TLB--------------------");
+	loggear_trace("----------------------------------------------------------");
+	for(int i = 0; i < list_size(TLB); i++) {
+	entrada_tlb* entrada = (entrada_tlb*) list_get(TLB,i);
+	loggear_trace("ENTRADA: %d | KEY: %s | FRAME: %d | TIMESTAMP %f", i, entrada->hash_key, entrada->frame, entrada->timestamp);
+
+}
+	loggear_trace("----------------------------------------------------------");
+	loggear_trace("-----------------------I'M DONE---------------------------");
+	loggear_trace("----------------------------------------------------------");
+}
+
 void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
-
+	if(max_entradas > 0) {
 	entrada_tlb* entrada = malloc(sizeof(entrada_tlb));
 	entrada->timestamp = obtener_timestamp_actual();
 	entrada->frame = frame;
@@ -30,10 +45,12 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
 	if(max_entradas == list_size(TLB)) {
 		uint32_t indice_victima = obtener_entrada_victima();
+		loggear_trace("[TLB] - Voy a reemplazar la entrada %d", indice_victima);
 		eliminar_entrada(indice_victima);
 	}
 
 	list_add(TLB, entrada);
+}
 }
 
 
@@ -74,6 +91,10 @@ uint32_t conseguir_victima_entrada_LRU() {
 
 bool esta_en_tlb(uint32_t pid, uint32_t pag) {
 
+	if(max_entradas == 0){
+		return false;
+	}else {
+
 	char* key = calcular_hash_key(pid, pag);
 
 	bool condicion(void* entrada_i){
@@ -91,6 +112,7 @@ bool esta_en_tlb(uint32_t pid, uint32_t pag) {
 	}
 
 	return list_any_satisfy(TLB, condicion);
+	}
 }
 
 void actualizar_datos_TLB(uint32_t PID, uint32_t nroPag){
@@ -127,11 +149,11 @@ char* calcular_hash_key(uint32_t proceso, uint32_t pagina) {
 
 double obtener_timestamp_actual(){
 
-	pthread_mutex_lock(&mutex_acceso_tiempo);
-	int valor_actual = tiempo;
-	tiempo++;
-	pthread_mutex_unlock(&mutex_acceso_tiempo);
-	return valor_actual;
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	unsigned long long result = (((unsigned long long)tv.tv_sec) * 1000 + ((unsigned long long)tv.tv_usec) / 1000);
+	double a = result;
+	return a;
 }
 
 uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina){

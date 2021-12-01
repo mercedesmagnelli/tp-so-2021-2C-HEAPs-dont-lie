@@ -4,15 +4,17 @@ void manejar_sigint(){
 	//char* nombre_archivo;
 	//loggear_info("Se va a generar el archivo del dump, con el nombre %s", nombre_archivo);
 
-	uint32_t total_miss;
-	uint32_t total_hits;
+	uint32_t total_miss = 0;
+	uint32_t total_hits = 0;
 
 	void sumar_miss(void* pr) {
 		t_proceso* p = (t_proceso*) pr;
+		loggear_trace("AHORA VOY A SUMARLE AL CONTADOR %d DEL PROCESO %d", p->miss_proceso, p->PID);
 		total_miss+= (p->miss_proceso);
 	}
 	void sumar_hits(void* pr) {
 		t_proceso* p = (t_proceso*) pr;
+		loggear_trace("AHORA VOY A SUMARLE AL CONTADOR %d DEL PROCESO %d", p->hits_proceso, p->PID);
 		total_hits+= (p->hits_proceso);
 	}
 	if(list_size(listaProcesos) == 0){
@@ -22,14 +24,14 @@ void manejar_sigint(){
 		loggear_info("CANTIDAD DE HITS TOTALES: 0");
 
 	}else{
-		loggear_trace("aber");
-	list_iterate(listaProcesos,sumar_miss);
-	loggear_trace("aber2");
-	list_iterate(listaProcesos, sumar_hits);
-	loggear_trace("aber33");
 
-	loggear_info("CANTIDAD DE MISS TOTALES: %d", total_miss);
-	loggear_info("CANTIDAD DE HITS TOTALES: %d", total_hits);
+		list_iterate(listaProcesos,sumar_miss);
+
+		list_iterate(listaProcesos,sumar_hits);
+
+
+	loggear_info("CANTIDAD DE MISS TOTALES: %zu", total_miss);
+	loggear_info("CANTIDAD DE HITS TOTALES: %zu", total_hits);
 	loggear_info("   PID   |   HITS   |   MISS   ");
 
 	for (int i = 0; i <list_size(listaProcesos);i++) {
