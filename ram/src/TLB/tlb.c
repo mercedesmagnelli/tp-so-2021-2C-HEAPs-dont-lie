@@ -22,7 +22,7 @@ void limpiar_tlb(){
 
 void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
-
+	if(max_entradas > 0) {
 	entrada_tlb* entrada = malloc(sizeof(entrada_tlb));
 	entrada->timestamp = obtener_timestamp_actual();
 	entrada->frame = frame;
@@ -34,6 +34,7 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 	}
 
 	list_add(TLB, entrada);
+}
 }
 
 
@@ -74,6 +75,10 @@ uint32_t conseguir_victima_entrada_LRU() {
 
 bool esta_en_tlb(uint32_t pid, uint32_t pag) {
 
+	if(max_entradas == 0){
+		return false;
+	}else {
+
 	char* key = calcular_hash_key(pid, pag);
 
 	bool condicion(void* entrada_i){
@@ -91,6 +96,7 @@ bool esta_en_tlb(uint32_t pid, uint32_t pag) {
 	}
 
 	return list_any_satisfy(TLB, condicion);
+	}
 }
 
 void actualizar_datos_TLB(uint32_t PID, uint32_t nroPag){

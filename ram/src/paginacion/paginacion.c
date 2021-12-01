@@ -743,17 +743,17 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 	uint32_t marco;
 	if(esta_en_tlb(PID, nroPag)){
 		marco = obtener_frame_de_tlb(PID, nroPag);
-		loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
 		usleep(1000 *  get_retardo_acierto_tlb());
+		loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
 		actualizar_datos_TLB(PID, nroPag);
-		actualizar_datos_pagina(PID, nroPag, bitModificado, 1);
+		actualizar_datos_pagina(PID, nroPag, bitModificado, true);
 	}else{
-		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
 		usleep(1000 *  get_retardo_fallo_tlb());
-		if(esta_en_RAM(PID, nroPag)){
+		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
+			if(esta_en_RAM(PID, nroPag)){
 			loggear_error("[RAM] - Estoy en la RAM");
 			marco = obtener_frame_de_RAM(PID, nroPag);
-			actualizar_datos_pagina(PID, nroPag, bitModificado, 0);
+			actualizar_datos_pagina(PID, nroPag, bitModificado, false);
 
 		}else{
 			loggear_error("[RAM] - TENGO QUE TRAER PAGINA A MEMORIA");
@@ -761,12 +761,24 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima. Tmbn tiene que actualizar la cant de Pags en asig FIJA
 
 			loggear_info("[RAM] - El marco que voy a usar es: %d", marco);
+
 			inicializar_datos_pagina(PID, nroPag, marco, bitModificado);//podriamos poner esta funcion dentro de obtener fram asi tmbn se encarga de modificar lo administrativo dsps del cambio de pags?
-			loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
-			//retardo hit
+
+			if(max_entradas > 0){
+				usleep(1000 *  get_retardo_acierto_tlb());
+				loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
+
+			}
+
+
 		}
+
+		if(max_entradas > 0){
 		agregar_entrada_tlb(PID, nroPag, marco);
 		loggear_trace("ya agregue una entrada a la TLB");
+		}else {
+			loggear_warning("---EL TAMANIO DE LA TLB ES 0, ENTONCES NO AGREGO NINGUNA ENTRADA");
+		}
 	}
 	return marco;
 }
@@ -795,9 +807,10 @@ uint32_t obtener_frame_de_RAM(uint32_t PID, uint32_t nroPag){
 	return pag->frame;
 }
 
-void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModificado, uint32_t bitTLB){
+void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModificado, bool bitTLB){
 	t_proceso* proceso = get_proceso_PID(PID);
-	if(bitTLB){
+	if(bitTLB && max_entradas >0){
+		loggear_warning(" 1. %d CANTIDAD DE HITS ANTES DE ++", proceso->hits_proceso);
 		proceso->hits_proceso++;
 	}else{
 		proceso->miss_proceso++;
@@ -813,7 +826,8 @@ void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModifica
 void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado){
 	t_proceso* proceso = get_proceso_PID(PID);
 	proceso->miss_proceso++;
-	proceso->hits_proceso++;
+
+	if(max_entradas != 0){proceso->hits_proceso++;}
 	t_pagina* pag = list_get(proceso->tabla_paginas, nroPag);
 	pag->bit_presencia = 1;
 	pag->frame = marco;
