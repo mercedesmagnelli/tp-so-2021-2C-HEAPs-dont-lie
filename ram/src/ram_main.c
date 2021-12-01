@@ -43,7 +43,6 @@ int main(int argc, char** argv) {
 	inicializar_estructuras_administrativas();
 
 	testeamos();
-	//imprimir_procesos();
 
 	semaforo_wait_fin();
 
@@ -119,7 +118,6 @@ void debug_configuracion() {
 
 void testeamos() {
 	 	uint32_t pid = 0;
-	    int32_t size = 31;
 
 	        //printf("Ingrese el numero de proceso y el tamanio");
 
@@ -129,22 +127,38 @@ void testeamos() {
 	    sleep(10);
 	    inicializar_proceso(pid);
 
-	    int a = memalloc(pid,12);
+	    int a = memalloc(pid,23);
 	    loggear_trace("Hice el memalloc en %d", a);
 
-	    a = memalloc(pid, 10);
+	    a = memalloc(pid, 23);
 	    loggear_trace("Hice el memalloc en %d", a);
 
-	    loggear_trace("--PROCESOS ANTES DE HACER CUALQUIER TIPO DE LIBERACION--");
+	    a = memalloc(pid, 23);
+	   	loggear_trace("Hice el memalloc en %d", a);
 
-	    imprimir_procesos();
+	   	imprimir_tlb();
 
-	    loggear_trace("----AHORA VOY A  PROBAR LA LIBERACIÓN DE ALLOCS------");
+	    a = memalloc(pid, 23);
+	  	loggear_trace("Hice el memalloc en %d", a);
 
-	    memfree(30, pid);
-	    loggear_trace("-- PROCESOS DESPUÉS DE LIBERAR EL HEAP DE 9 --");
+	  	imprimir_tlb();
 
-	    imprimir_procesos();
+	    a = memalloc(pid, 23);
+	  	loggear_trace("Hice el memalloc en %d", a);
+
+
+
+
+//	    loggear_trace("--PROCESOS ANTES DE HACER CUALQUIER TIPO DE LIBERACION--");
+//
+//	    imprimir_procesos();
+//
+//	    loggear_trace("----AHORA VOY A  PROBAR LA LIBERACIÓN DE ALLOCS------");
+//
+//	    memfree(30, pid);
+//	    loggear_trace("-- PROCESOS DESPUÉS DE LIBERAR EL HEAP DE 9 --");
+//
+//	    imprimir_procesos();
 
 //    loggear_trace("----AHORA VOY A ESCRIBIR-----");
 //

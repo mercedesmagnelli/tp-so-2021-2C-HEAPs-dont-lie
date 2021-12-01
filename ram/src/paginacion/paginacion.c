@@ -148,6 +148,7 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 
 	//FIXME: puede que acá haya que traer a memoria???
+
 	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
 	t_proceso* nuevoProceso = get_proceso_PID(PID);
 	loggear_warning("----2 TENGO %d PAGINAS EN EL PROCESO %d",list_size(nuevoProceso->tabla_paginas), PID);
@@ -291,7 +292,7 @@ uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size) {
 
 	loggear_warning("[MATELIB_MEM_ALLOC] cantidad %d, resto_ult_pag %d, excedente %d", cantidad, resto_ult_pag, excedente);
 
-	if(resto_ult_pag < excedente) {
+	if(resto_ult_pag <= excedente) {
 		cantidad++;
 	}
 
@@ -794,8 +795,11 @@ void* serializar_HEAP(heap_metadata* heap){//TODO revisar serializacion
 bool esta_en_RAM(uint32_t PID, uint32_t nroPag){
 
 	t_list* tabla_paginas = obtener_tabla_paginas_mediante_PID(PID);
-	loggear_debug("la tabla de paginas tiene una longitud de %d", list_size(tabla_paginas));
+	loggear_debug("la tabla de paginas tiene una longitud de %d y la pagina que quiero obtener es la %d", list_size(tabla_paginas), nroPag);
 	t_pagina* pag = (t_pagina*) list_get(tabla_paginas, nroPag);
+	if(pag==NULL) {
+		loggear_error("toi nula");
+	}
 	loggear_debug("el bit de presencia es: %d",pag->bit_presencia);
 	return pag->bit_presencia == 1 ? true : false;
 }

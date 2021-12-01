@@ -20,6 +20,21 @@ void limpiar_tlb(){
 	}
 }
 
+void imprimir_tlb(){
+
+	loggear_trace("----------------------------------------------------------");
+	loggear_trace("-----------------VOY A IMPRIMIR LA TLB--------------------");
+	loggear_trace("----------------------------------------------------------");
+	for(int i = 0; i < list_size(TLB); i++) {
+	entrada_tlb* entrada = (entrada_tlb*) list_get(TLB,i);
+	loggear_trace("ENTRADA: %d | KEY: %s | FRAME: %d | TIMESTAMP %f", i, entrada->hash_key, entrada->frame, entrada->timestamp);
+
+}
+	loggear_trace("----------------------------------------------------------");
+	loggear_trace("-----------------------I'M DONE---------------------------");
+	loggear_trace("----------------------------------------------------------");
+}
+
 void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
 	if(max_entradas > 0) {
@@ -30,6 +45,7 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
 	if(max_entradas == list_size(TLB)) {
 		uint32_t indice_victima = obtener_entrada_victima();
+		loggear_trace("[TLB] - Voy a reemplazar la entrada %d", indice_victima);
 		eliminar_entrada(indice_victima);
 	}
 
