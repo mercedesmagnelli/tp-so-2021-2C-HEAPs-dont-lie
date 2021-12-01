@@ -109,7 +109,7 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 			heap_metadata* heap = (heap_metadata*) element;
 			leer_heap(heap, PID);
 			if(heap->nextAlloc==-1){
-				loggear_trace("te voy a asignar le primer heap");
+				loggear_trace("te voy a asignar el primer heap");
 				rta = true;
 			}else{
 				if(espacio_de_HEAP(heap)>= tam+9 && heap->isFree){
@@ -304,21 +304,43 @@ uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size) {
 
 bool ptro_valido(uint32_t PID, uint32_t ptro) {
 
-	loggear_warning("ESTOY VERIFICANDO QUE EL PUNTERO SERA VALIDO");
-	t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
+    loggear_warning("ESTOY VERIFICANDO QUE EL PUNTERO SERA VALIDO");
+    t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
 
-	bool condition(void* heap) {
-		heap_metadata* heap_md = (heap_metadata*) heap;
-		leer_heap(heap, PID);
-		return (heap_md->currAlloc + 9) == ptro;
-	}
-	return list_any_satisfy(lista_heaps,condition);
+    int index=-1;
+    int index_del_encontrado;
+
+    bool condition(void* heap) {
+        heap_metadata* heap_md = (heap_metadata*) heap;
+        index++;
+        bool rta;
+        if((heap_md->currAlloc + 9) == ptro){
+            index_del_encontrado = index;
+            rta=true;
+        }else{
+            rta=false;
+        }
+        return rta;
+    }
+
+    bool alguno_satisface = list_any_satisfy(lista_heaps,condition);
+
+    if(!alguno_satisface){
+        index_del_encontrado = list_size(lista_heaps);
+    }
+
+    for(int i=0;i<=index_del_encontrado;i++){
+        heap_metadata* heap = list_get(lista_heaps,i);
+        leer_heap(heap, PID);
+    }
+
+    return alguno_satisface;
 }
 
 uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t PID){
-	loggear_warning("---ESTOY HACIENDO LA TERCERA VERIFICACION");
 	heap_metadata* heap = get_HEAP(PID, direccionLogicaALeer);
-	leer_heap(heap, PID);
+	//leer_heap(heap, PID);
+	//FIXME esperar respuesta de verificaciones, y en caso de que nos den luz verde, tendriamos que traer todos los heaps hasta llegar al heap deseado
     return espacio_de_HEAP(heap);
 }
 
@@ -336,17 +358,10 @@ bool ptro_liberado(uint32_t PID, uint32_t ptro){
 
 	loggear_warning("ESTOY VERIFICANDO QUE EL PUNTERO NO ESTE LIBERADO");
 	t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
-	loggear_debug("consegui la lista de heaps");
-	if(lista_heaps == NULL) {
-		loggear_trace("tengo la lista nula");
-	}else if(list_size(lista_heaps) == 0) {
-		loggear_trace("tengo la lista vacia");
-	}
 
 	bool condicion(void* heap_i) {
 		heap_metadata* heap = (heap_metadata*) heap_i;
 		leer_heap(heap, PID);
-		loggear_trace("aa");
 		return (heap->currAlloc + 9) == ptro;
 	}
 
@@ -631,9 +646,9 @@ uint32_t espacio_de_HEAP(heap_metadata* heap){
 	//FIXME: ACÁ PUEDE QUE HAYA QUE CAMBIARLO PORQUE HAY VECES QUE DA NEGATIVO. SI AFECTA A LOS RESULTADOS DE LAS PRUEBAS, ENTONCES LO DEJAMOS ASÍ.
 	//SI HAY QUE CMABIARLO HAY QUE PASARLE EL PID PARA PODER OBTENER EL TAMANIO DEL PROCESO. COn eso calcular el tamanio y desocmetnar lo que hice
 
-	int tamanio_proceso;
+	//int tamanio_proceso;
 	//loggear_warning("TERMINE LA TERCERA VERIFICACION: el espacio del heap es %d",  heap->nextAlloc - heap->currAlloc - 9);
-	uint32_t tamanio;
+	//uint32_t tamanio;
 //	if(heap->nextAlloc == -1) {
 //		tamanio = tamanio_proceso - heap->currAlloc - 9;
 //	}
@@ -838,7 +853,7 @@ void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uin
 	pag->timestamp = obtener_timestamp_actual();
 	pag->bit_uso = 1;
 	pag->bit_modificacion = bitModificado;
-	loggear_trace("Se trajo a RAM la pagina %d del proceso %d con el timestamp %d",PID, nroPag, pag->timestamp);
+	loggear_trace("Se trajo a RAM la pagina %d del proceso %d con el timestamp %f",PID, nroPag, pag->timestamp);
 }
 
 uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){

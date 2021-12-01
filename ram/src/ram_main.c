@@ -33,6 +33,8 @@ int main(int argc, char** argv) {
 
 	debug_configuracion();
 
+	inicializar_estructuras_administrativas();
+
 	error = levantar_servidor();
 
 	if (error != STATUS_OK) {
@@ -40,9 +42,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	inicializar_estructuras_administrativas();
-
-	testeamos();
+	//testeamos();
 
 	semaforo_wait_fin();
 
