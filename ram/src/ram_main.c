@@ -119,10 +119,6 @@ void debug_configuracion() {
 void testeamos() {
 	 	uint32_t pid = 0;
 
-	        //printf("Ingrese el numero de proceso y el tamanio");
-
-	        //scanf("%d %d", &pid, &size);
-
 	    loggear_trace("HOLA, soy dora!!");
 	    sleep(10);
 	    inicializar_proceso(pid);
