@@ -149,11 +149,11 @@ char* calcular_hash_key(uint32_t proceso, uint32_t pagina) {
 
 double obtener_timestamp_actual(){
 
-	pthread_mutex_lock(&mutex_acceso_tiempo);
-	int valor_actual = tiempo;
-	tiempo++;
-	pthread_mutex_unlock(&mutex_acceso_tiempo);
-	return valor_actual;
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	unsigned long long result = (((unsigned long long)tv.tv_sec) * 1000 + ((unsigned long long)tv.tv_usec) / 1000);
+	double a = result;
+	return a;
 }
 
 uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina){

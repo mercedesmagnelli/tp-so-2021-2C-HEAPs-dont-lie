@@ -138,7 +138,9 @@ void testeamos() {
 
 	   	imprimir_tlb();
 
-	    a = memalloc(pid, 23);
+	   	inicializar_proceso(1);
+
+	    a = memalloc(1, 23);
 	  	loggear_trace("Hice el memalloc en %d", a);
 
 	  	imprimir_tlb();
