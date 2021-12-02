@@ -123,26 +123,30 @@ void testeamos() {
 	    sleep(10);
 	    inicializar_proceso(pid);
 
-	    int a = memalloc(pid,23);
+	    int a = memalloc(pid,10);
 	    loggear_trace("Hice el memalloc en %d", a);
+	    imprimir_tlb();
 
-	    a = memalloc(pid, 23);
+	    a = memalloc(pid, 5);
 	    loggear_trace("Hice el memalloc en %d", a);
+	    imprimir_tlb();
 
-	    a = memalloc(pid, 23);
+	    a = memalloc(pid, 54);
 	   	loggear_trace("Hice el memalloc en %d", a);
-
 	   	imprimir_tlb();
 
-	   	inicializar_proceso(1);
 
-	    a = memalloc(1, 23);
-	  	loggear_trace("Hice el memalloc en %d", a);
+	   	imprimir_procesos();
 
-	  	imprimir_tlb();
-
-	    a = memalloc(pid, 23);
-	  	loggear_trace("Hice el memalloc en %d", a);
+//	   	inicializar_proceso(1);
+//
+//	    a = memalloc(1, 23);
+//	  	loggear_trace("Hice el memalloc en %d", a);
+//
+//	  	imprimir_tlb();
+//
+//	    a = memalloc(pid, 23);
+//	  	loggear_trace("Hice el memalloc en %d", a);
 
 
 

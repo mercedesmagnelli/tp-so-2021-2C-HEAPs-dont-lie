@@ -150,8 +150,6 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	//FIXME: puede que acá haya que traer a memoria???
 
 	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
-	t_proceso* nuevoProceso = get_proceso_PID(PID);
-	loggear_warning("----2 TENGO %d PAGINAS EN EL PROCESO %d",list_size(nuevoProceso->tabla_paginas), PID);
 	if(list_is_empty(listaHMD)) {
 		agregar_proceso(PID, tamanio);
 	}else {
@@ -255,9 +253,6 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 
 	t_pagina* nueva_pagina;
 
-	t_proceso* nuevoProceso = get_proceso_PID(pid);
-	loggear_warning("----0 TENGO %d PAGINAS EN EL PROCESO %d",list_size(nuevoProceso->tabla_paginas), pid);
-
 	t_proceso* proceso = get_proceso_PID(pid);
 	if(respuesta_final == 1){
 		for(int i = 0;i<cantidad_paginas_extras;i++){
@@ -267,8 +262,6 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 		}
 	}
 	loggear_error("El numero de cantidad de paginas extras a agregar al proceso es: %d", cantidad_paginas_extras);
-
-	loggear_warning("----1 TENGO %d PAGINAS EN EL PROCESO %d",list_size(nuevoProceso->tabla_paginas), pid);
 
 	free(mensaje);
 	return respuesta_final;
@@ -679,7 +672,6 @@ void* leer_de_memoria_paginada(uint32_t PID, int nroPag, int offset, int tamDato
 	void* data = malloc(tamDato);
 	while(tamDato>0){
 		marcoPag = obtener_marco_de_pagina_en_memoria(PID, nroPag, 0);
-		loggear_trace("el ");
 		ptro_escritura = marcoPag * get_tamanio_pagina() + offset;
 		if((offset+tamDato) <= get_tamanio_pagina()){
 			leer_directamente_de_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
@@ -808,7 +800,6 @@ uint32_t obtener_frame_de_RAM(uint32_t PID, uint32_t nroPag){
 void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModificado, bool bitTLB){
 	t_proceso* proceso = get_proceso_PID(PID);
 	if(bitTLB && max_entradas >0){
-		loggear_warning(" 1. %d CANTIDAD DE HITS ANTES DE ++", proceso->hits_proceso);
 		proceso->hits_proceso++;
 	}else{
 		proceso->miss_proceso++;
@@ -832,7 +823,7 @@ void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uin
 	pag->timestamp = obtener_timestamp_actual();
 	pag->bit_uso = 1;
 	pag->bit_modificacion = bitModificado;
-	loggear_trace("Se trajo a RAM la pagina %d del proceso %d con el timestamp %f",PID, nroPag, pag->timestamp);
+	loggear_trace("Se trajo a RAM la pagina %d del proceso %d con el timestamp %f", nroPag, PID, pag->timestamp);
 }
 
 uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){
