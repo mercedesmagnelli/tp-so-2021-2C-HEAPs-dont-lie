@@ -117,7 +117,7 @@ uint32_t calcular_indice(uint32_t puntero, uint32_t cantidad_it, uint32_t tamani
  * 		 el algoritmo de clock modificado
  **/
 
-bool buscar_combinacion(t_list* paginas, uint32_t puntero, uint32_t uso, uint32_t mod, uint32_t* indice_encontrado);
+bool buscar_combinacion(t_list* paginas, uint32_t uso, uint32_t mod, uint32_t puntero,  uint32_t* indice_encontrado);
 
 /**
  * @NAME: obtener_valor_puntero
