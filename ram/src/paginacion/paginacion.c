@@ -304,37 +304,12 @@ uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size) {
 
 bool ptro_valido(uint32_t PID, uint32_t ptro) {
 
-    loggear_warning("ESTOY VERIFICANDO QUE EL PUNTERO SERA VALIDO");
-    t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
 
-    int index=-1;
-    int index_del_encontrado;
+	uint32_t pagina_puntero = ptro / get_tamanio_pagina();
+	t_list* tp = obtener_tabla_paginas_mediante_PID(PID);
+	uint32_t tamanio_proceso  = list_size(tp);
 
-    bool condition(void* heap) {
-        heap_metadata* heap_md = (heap_metadata*) heap;
-        index++;
-        bool rta;
-        if((heap_md->currAlloc + 9) == ptro){
-            index_del_encontrado = index;
-            rta=true;
-        }else{
-            rta=false;
-        }
-        return rta;
-    }
-
-    bool alguno_satisface = list_any_satisfy(lista_heaps,condition);
-
-    if(!alguno_satisface){
-        index_del_encontrado = list_size(lista_heaps);
-    }
-
-    for(int i=0;i<=index_del_encontrado;i++){
-        heap_metadata* heap = list_get(lista_heaps,i);
-        leer_heap(heap, PID);
-    }
-
-    return alguno_satisface;
+    return pagina_puntero <= tamanio_proceso - 1;
 }
 
 uint32_t tamanio_de_direccion(uint32_t direccionLogicaALeer, uint32_t PID){
@@ -354,9 +329,9 @@ uint32_t traducir_a_dir_fisica(uint32_t PID, uint32_t ptroHEAP, uint32_t bitModi
 }
 
 
-bool ptro_liberado(uint32_t PID, uint32_t ptro){
+heap_metadata* encontrar_heap(uint32_t PID, uint32_t ptro){
 
-	loggear_warning("ESTOY VERIFICANDO QUE EL PUNTERO NO ESTE LIBERADO");
+
 	t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
 
 	bool condicion(void* heap_i) {
@@ -366,16 +341,17 @@ bool ptro_liberado(uint32_t PID, uint32_t ptro){
 	}
 
 	heap_metadata* heap_encontrado = (heap_metadata*) list_find(lista_heaps, condicion);
+
 	if(heap_encontrado == NULL) {
 		loggear_error("problemas xd");
 	}
 
-	return heap_encontrado -> isFree;
+	return heap_encontrado;
 }
 
 
 void liberar_memoria(uint32_t PID, uint32_t ptro){
-	heap_metadata* heap_encontrado = get_HEAP(PID, ptro);
+	heap_metadata* heap_encontrado = encontrar_heap(PID, ptro);
 	heap_encontrado ->isFree = 1;
 }
 
@@ -554,7 +530,7 @@ void* leer_heap(heap_metadata* heap, uint32_t PID){
 
 void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
 
-	heap_metadata* heap = get_HEAP(PID, ptroHEAP);
+	heap_metadata* heap = encontrar_heap(PID, ptroHEAP);
 	int nroPag = calcular_pagina_de_puntero_logico(heap->currAlloc);
 	int offset = calcular_offset_puntero_en_pagina(heap->currAlloc);
 	void* dataLeida = leer_de_memoria_paginada(PID, nroPag, offset, tamanioALeer);
@@ -619,12 +595,15 @@ uint32_t calcular_offset_puntero_en_pagina(uint32_t puntero) {
 
 void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t puntero) {
 
-	loggear_trace("VOY A ESCRIBIR %d BITS", size);
+	loggear_trace("[MEMWRITE] - VOY A ESCRIBIR %d BITS", size);
+	//esto está agregado para que traiga los heaps leidos no más dasjdjas aka un parche de ultimo momento
+	encontrar_heap(pid, puntero);
 	uint32_t nro_pag = calcular_pagina_de_puntero_logico(puntero);
 	uint32_t offset = calcular_offset_puntero_en_pagina(puntero);
 	guardar_en_memoria_paginada(pid, nro_pag, offset, valor, size);
+
 	loggear_error("--- PID: %d, NRO PAG: %d, OFFSET: %d, VALOR: %s , DONDE: %d",pid, nro_pag, offset, valor, puntero);
-	loggear_trace("aaaaaaaaaaa");
+
 
 }
 

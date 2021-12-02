@@ -89,14 +89,14 @@ int32_t se_puede_almacenar_el_alloc_para_proceso(t_header header, uint32_t pid, 
  * @NAME: ptro_valido
  * @DESC: Retorna si la el puntero pertenece a la direccion de punteros asignados al proceso
 */
-bool ptro_valido(uint32_t PID, uint32_t ptro);
+heap_metadata* encontrar_heap(uint32_t PID, uint32_t ptro);
 
 /**
  * @NAME: ptro_liberado
  * @DESC: Avisa si el puntero del proceso esta liberado
  **/
 
-bool ptro_liberado(uint32_t PID, uint32_t ptro);
+bool ptro_valido(uint32_t PID, uint32_t ptro);
 
 /**
  * @NAME: liberar_memoria
