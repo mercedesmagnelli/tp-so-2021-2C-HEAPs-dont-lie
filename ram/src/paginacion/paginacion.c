@@ -127,15 +127,9 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
 		ptro = heap->currAlloc + 9;
 
-		loggear_warning("[MATELIB_MEM_ALLOC] el ptro conseguido es %d", ptro);
-
-		loggear_warning("[MATELIB_MEM_ALLOC] el next alloc es %d y su tamanio es %d", heap->nextAlloc, calcular_tamanio_ultimo_HEAP(PID));
-
 		if(heap->nextAlloc==-1 && calcular_tamanio_ultimo_HEAP(PID)<tam+9){
 			ptro = (-1)* ptro;
 		}
-
-		loggear_warning("[MATELIB_MEM_ALLOC] el ptro posta real 100 no fake conseguido es %d", ptro);
 
 	}else {
 		loggear_trace("estoy con el primer heap");
@@ -285,7 +279,7 @@ uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size) {
 
 	loggear_warning("[MATELIB_MEM_ALLOC] cantidad %d, resto_ult_pag %d, excedente %d", cantidad, resto_ult_pag, excedente);
 
-	if(resto_ult_pag <= excedente) {
+	if(resto_ult_pag < excedente) {
 		cantidad++;
 	}
 
@@ -643,9 +637,7 @@ heap_metadata* get_HEAP(uint32_t PID, int32_t ptro){
 }
 
 t_list* conseguir_listaHMD_mediante_PID(uint32_t PID){
-	loggear_error("busco el proceso con PID %d", PID);
     t_proceso* proceso = get_proceso_PID(PID);
-    loggear_error("consegui el proceso %d", proceso->PID);
     t_list* listaHMD = proceso->lista_hmd;
     return listaHMD;
 }
