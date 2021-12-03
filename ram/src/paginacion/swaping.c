@@ -36,19 +36,20 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 		info_a_guardar =  recibir_info_en_pagina(nroPag, PID);
 	}else {
 		loggear_info("Tengo que hacer swaping para pagina traida a RAM");
+		pthread_mutex_lock(&mutex_swapping);
 		t_list* lista_frames = obtener_lista_frames_en_memoria(PID);
 		t_list* lista_paginas = obtener_lista_paginas_de_frames(lista_frames);
 		t_pagina* pagina_victima = obtener_pagina_victima(lista_paginas, PID);
-		loggear_info("[SWAP] - Se eligio la pagina victima - TODO: VER COMO SABER A QUE PROCESO PERTENECE");
+		loggear_info("[SWAP] - Se eligio la pagina victima");
 		frame = pagina_victima->frame;
 		info_a_guardar = traer_y_controlar_consistencia_paginas(pagina_victima, nroPag, PID);
+		pthread_mutex_unlock(&mutex_swapping);
 
 	}
 	t_frame* f = (t_frame*) list_get(listaFrames, frame);
 	f->estado=1;
 	f->proceso=PID;
 	f->pagina=nroPag;
-	char* string = (char*) info_a_guardar;
 	escribir_directamente_en_memoria(info_a_guardar, get_tamanio_pagina(), frame * get_tamanio_pagina());
 	return frame;
 }
@@ -191,30 +192,54 @@ t_pagina* obtener_victima_LRU(t_list* lista_paginas){
 t_pagina* obtener_victima_Clock_Modificado(t_list* lista_paginas, uint32_t pid){
 
  	t_pagina* pagina_victima;
+ 	loggear_warning("aa");
  	t_proceso* proc = get_proceso_PID(pid);
+ 	loggear_warning("aa1");
  	uint32_t puntero = obtener_valor_puntero(proc);
-
+ 	loggear_warning("aa2");
 
 
  	uint32_t indice_encontrado;
  	//si no funciona el puntero por referencia entonces ver de hacer una funcion que se encargeu de actualizar el puntero y retornarlo
+ 	loggear_trace("PRIMERA VERIFICACION (0,0)");
  	if(buscar_combinacion(lista_paginas,0,0, puntero, &indice_encontrado)){
+ 		loggear_trace("CUMPLO CON PRIMERA VERIFICACION (0,0)");
  		pagina_victima = (t_pagina*) list_get(lista_paginas, indice_encontrado);
+ 		loggear_warning("aa3");
  	}else {
+ 		loggear_trace("PRIMERA VERIFICACION (0,1)");
  		if(buscar_combinacion(lista_paginas, 0,1, puntero, &indice_encontrado)) {
+ 			loggear_trace("CUMPLO CON PRIMERA VERIFICACION (0,1)");
  			pagina_victima =  (t_pagina*) list_get(lista_paginas, indice_encontrado);
+ 			loggear_warning("aa4");
  		}else {
  			modificar_bit_uso(lista_paginas);
+ 			loggear_trace("SEGUNDA VERIFICACION (0,0)");
  			if(buscar_combinacion(lista_paginas, 0,0, puntero, &indice_encontrado)){
+ 				loggear_trace("ENCONTRÉ EN SEGUNDA VERIFICACION (0,0)");
  				pagina_victima = (t_pagina*) list_get(lista_paginas, indice_encontrado);
+ 				loggear_warning("aa5");
  			}else {
+ 				loggear_trace("SEGUNDA VERIFICACION (0,1)");
  				buscar_combinacion(lista_paginas, 0, 1, puntero, &indice_encontrado);
+ 				loggear_trace("el victima es: %d", indice_encontrado);
  				pagina_victima =  (t_pagina*) list_get(lista_paginas, indice_encontrado);
+
+ 				loggear_warning("ENCONTRE EN SEGUNDA VERIFICACION (0,1) ");
  			}
  		}
  	}
 
- 	actualizar_puntero(proc, indice_encontrado + 1);
+ 	loggear_trace("sali del algoritmo");
+
+ 	uint32_t puntero_nuevo = indice_encontrado + 1;
+
+ 	if(indice_encontrado > list_size(lista_paginas) - 1) {
+ 		puntero_nuevo = (indice_encontrado + 1) % list_size(lista_paginas);
+ 	}
+
+
+ 	actualizar_puntero(proc, puntero_nuevo);
 
 	return pagina_victima;
 }
@@ -252,17 +277,19 @@ void modificar_bit_uso(t_list* lista_paginas) {
 
 
 
-bool buscar_combinacion(t_list* paginas, uint32_t puntero, uint32_t uso, uint32_t mod, uint32_t* indice_encontrado){
+bool buscar_combinacion(t_list* paginas, uint32_t uso, uint32_t mod, uint32_t puntero, uint32_t* indice_encontrado){
 
-
+	loggear_trace("el valor inicial de puntero es: %d", puntero);
+	loggear_trace("la combinacion (U,M) es: (%d, %d)", uso, mod);
 	bool encontrado = false;
 	int cantidad_iteraciones = 0;
 	uint32_t indice;
-	while(!encontrado && cantidad_iteraciones <= list_size(paginas)){
+	while(!encontrado && cantidad_iteraciones < list_size(paginas)){
 		indice = calcular_indice(puntero, cantidad_iteraciones, list_size(paginas));
 		t_pagina* pagina_apuntada = (t_pagina*) list_get(paginas, indice);
-
+		loggear_warning("la pagina apuntada tiene (U,M) : (%d , %d) ", pagina_apuntada->bit_uso, pagina_apuntada->bit_modificacion);
 		if(pagina_apuntada->bit_modificacion == mod && pagina_apuntada->bit_uso == uso) {
+			loggear_info("SE ENCONTRO PAGINA VICTIMA EN EL INDICE %d", indice);
 			encontrado = true;
 			(*indice_encontrado) = indice;
 		}
@@ -270,6 +297,7 @@ bool buscar_combinacion(t_list* paginas, uint32_t puntero, uint32_t uso, uint32_
 		cantidad_iteraciones++;
 
 	}
+	loggear_debug("encontrado: %d", encontrado);
 	return encontrado;
 
 }
