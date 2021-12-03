@@ -32,6 +32,7 @@ void inicializar_semaforos() {
 	pthread_mutex_init(&mutex_acceso_lista_frames_r, NULL);
 	pthread_mutex_init(&mutex_acceso_diccionario, NULL);
 	pthread_mutex_init(&mutex_acceso_tiempo, NULL);
+	pthread_mutex_init(&mutex_swapping, NULL);
 }
 
 void destruir_estructuras_administrativas() {
@@ -49,6 +50,7 @@ void destruir_semaforos() {
 		pthread_mutex_destroy(&mutex_acceso_memoria);
 		pthread_mutex_destroy(&mutex_acceso_lista_frames_r);
 		pthread_mutex_destroy(&mutex_acceso_diccionario);
+		pthread_mutex_destroy(&mutex_swapping);
 }
 void destruir_proceso(void* proceso) {
 

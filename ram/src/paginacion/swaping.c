@@ -40,19 +40,19 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 		info_a_guardar =  recibir_info_en_pagina(nroPag, PID);
 	}else {
 		loggear_info("Tengo que hacer swaping para pagina traida a RAM");
+		pthread_mutex_lock(&mutex_swapping);
 		t_list* lista_frames = obtener_lista_frames_en_memoria(PID);
 		t_list* lista_paginas = obtener_lista_paginas_de_frames(lista_frames);
 		t_pagina* pagina_victima = obtener_pagina_victima(lista_paginas, PID);
 		loggear_info("[SWAP] - Se eligio la pagina victima");
 		frame = pagina_victima->frame;
 		info_a_guardar = traer_y_controlar_consistencia_paginas(pagina_victima, nroPag, PID);
-		loggear_trace("ya le avise al swap");
+		pthread_mutex_unlock(&mutex_swapping);
 
 	}
 	char* string = (char*) info_a_guardar;
 	loggear_info("antes de escribir el frame es %d con la info %s", frame, string);
 	escribir_directamente_en_memoria(info_a_guardar, get_tamanio_pagina(), frame * get_tamanio_pagina());
-	loggear_info("X2");
 	return frame;
 }
 
