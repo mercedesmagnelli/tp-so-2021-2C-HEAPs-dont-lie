@@ -32,7 +32,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 			return VALOR_MEMORIA_SOLICITADO_INVALIDO;
 	} else {
 		int32_t ptro = ptro_donde_entra_data(pid, size);
-		loggear_error("El valor del puntero es %d", ptro);
+		loggear_trace("El valor del puntero es %d", ptro);
 		if(ptro>=0) {
 			loggear_trace("[MATELIB_MEM_ALLOC] - Se puede asignar el espacio solicitado para el proceso %d", pid);
 			//puedo asignar en algo que ya estaba

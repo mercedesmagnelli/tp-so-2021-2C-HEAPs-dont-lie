@@ -49,6 +49,7 @@ void destruir_semaforos() {
 		pthread_mutex_destroy(&mutex_acceso_memoria);
 		pthread_mutex_destroy(&mutex_acceso_lista_frames_r);
 		pthread_mutex_destroy(&mutex_acceso_diccionario);
+		pthread_mutex_destroy(&mutex_acceso_tiempo);
 }
 void destruir_proceso(void* proceso) {
 
@@ -109,7 +110,7 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 			heap_metadata* heap = (heap_metadata*) element;
 			leer_heap(heap, PID);
 			if(heap->nextAlloc==-1){
-				loggear_trace("te voy a asignar el primer heap");
+				loggear_trace("te voy a asignar el ultimo heap");
 				rta = true;
 			}else{
 				if(espacio_de_HEAP(heap)>= tam+9 && heap->isFree){
@@ -147,7 +148,7 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 	if(list_is_empty(listaHMD)) {
 		agregar_proceso(PID, tamanio);
 	}else {
-		loggear_debug("Se va a actualizar algo que ya tenia un alloc previo");
+		loggear_trace("Se va a actualizar algo que ya tenia un alloc previo");
 		heap_metadata* heap = get_HEAP(PID,ptro);
 		int nextNextAlloc = heap->nextAlloc;
 		heap->nextAlloc = ptro+tamanio;
@@ -255,7 +256,7 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 			list_add(proceso->tabla_paginas,nueva_pagina);
 		}
 	}
-	loggear_error("El numero de cantidad de paginas extras a agregar al proceso es: %d", cantidad_paginas_extras);
+	loggear_trace("El numero de cantidad de paginas extras a agregar al proceso es: %d", cantidad_paginas_extras);
 
 	free(mensaje);
 	return respuesta_final;
@@ -700,7 +701,7 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 	while(tamDato>0){
 		loggear_warning("[RAM] - busco marco de pagina");
 		marcoPag = obtener_marco_de_pagina_en_memoria(PID, nroPag, 1);
-		loggear_error("[RAM] - encontre marco de pagina");
+		loggear_trace("[RAM] - encontre marco de pagina");
 		ptro_escritura = marcoPag * get_tamanio_pagina() + offset;
 		if((offset+tamDato) <= get_tamanio_pagina()){
 			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
@@ -720,7 +721,9 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 
 uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t bitModificado){
 	uint32_t marco;
-	if(esta_en_tlb(PID, nroPag)){
+	t_proceso* proceso = get_proceso_PID(PID);
+	t_pagina* pag = list_get(proceso->tabla_paginas ,nroPag);
+	if(pag->bit_presencia==1 && esta_en_tlb(PID, nroPag)){
 		marco = obtener_frame_de_tlb(PID, nroPag);
 		usleep(1000 *  get_retardo_acierto_tlb());
 		loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
@@ -730,7 +733,7 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 		usleep(1000 *  get_retardo_fallo_tlb());
 		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
 			if(esta_en_RAM(PID, nroPag)){
-			loggear_error("[RAM] - Estoy en la RAM");
+			loggear_trace("[RAM] - Estoy en la RAM");
 			marco = obtener_frame_de_RAM(PID, nroPag);
 			actualizar_datos_pagina(PID, nroPag, bitModificado, false);
 
@@ -802,6 +805,7 @@ void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModifica
 	if(bitModificado){
 		pag->bit_modificacion = bitModificado;
 	}
+	loggear_trace("Se actualizo la pagina %d del proceso %d con el timestamp %d", nroPag, PID, pag->timestamp);
 }
 
 void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado){
@@ -815,7 +819,7 @@ void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uin
 	pag->timestamp = obtener_timestamp_actual();
 	pag->bit_uso = 1;
 	pag->bit_modificacion = bitModificado;
-	loggear_trace("Se trajo a RAM la pagina %d del proceso %d con el timestamp %f", nroPag, PID, pag->timestamp);
+	loggear_trace("Se trajo a RAM la pagina %d del proceso %d con el timestamp %d", nroPag, PID, pag->timestamp);
 }
 
 uint32_t calcular_tamanio_ultimo_HEAP(uint32_t PID){

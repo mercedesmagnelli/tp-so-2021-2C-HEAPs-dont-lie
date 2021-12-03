@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	testeamos();
+	//testeamos();
 
 	semaforo_wait_fin();
 
@@ -131,9 +131,13 @@ void testeamos() {
 	    loggear_trace("Hice el memalloc en %d", a);
 	    imprimir_tlb();
 
-	    a = memalloc(pid, 54);
+	    a = memalloc(pid, 22);
 	   	loggear_trace("Hice el memalloc en %d", a);
 	   	imprimir_tlb();
+
+	   	a = memalloc(pid, 23);
+		loggear_trace("Hice el memalloc en %d", a);
+		imprimir_tlb();
 
 
 	   	imprimir_procesos();

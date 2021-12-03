@@ -53,7 +53,7 @@ typedef struct {
 typedef struct{
 	uint32_t bit_presencia;
 	uint32_t frame;
-	float timestamp;
+	int timestamp;
 	uint32_t bit_uso;
 	uint32_t bit_modificacion;
 }t_pagina;

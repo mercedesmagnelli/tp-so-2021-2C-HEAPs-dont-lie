@@ -33,10 +33,6 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 	if(hay_frame_disponible_en_RAM(PID)) {
 		loggear_info("Hay frame disponible para pagina traida a RAM");
 		frame = obtener_frame_libre(PID);
-		t_frame* f = (t_frame*) list_get(listaFrames, frame);
-		f->estado=1;
-		f->proceso=PID;
-		f->pagina=nroPag;
 		info_a_guardar =  recibir_info_en_pagina(nroPag, PID);
 	}else {
 		loggear_info("Tengo que hacer swaping para pagina traida a RAM");
@@ -48,10 +44,12 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 		info_a_guardar = traer_y_controlar_consistencia_paginas(pagina_victima, nroPag, PID);
 
 	}
+	t_frame* f = (t_frame*) list_get(listaFrames, frame);
+	f->estado=1;
+	f->proceso=PID;
+	f->pagina=nroPag;
 	char* string = (char*) info_a_guardar;
-	loggear_info("antes de escribir el frame es %d con la info %s", frame, string);
 	escribir_directamente_en_memoria(info_a_guardar, get_tamanio_pagina(), frame * get_tamanio_pagina());
-	loggear_info("X2");
 	return frame;
 }
 
@@ -172,11 +170,12 @@ t_pagina* obtener_pagina_victima(t_list* lista_paginas, uint32_t pid) {
 
 t_pagina* obtener_victima_LRU(t_list* lista_paginas){
 	t_pagina* pagina_victima;
+	t_pagina* pagina_actual;
 	t_pagina* pagina_anterior = (t_pagina*) list_get(lista_paginas, 0);
-	loggear_info("la primer pagina tiene un timestamp %f", pagina_anterior->timestamp);
+	loggear_info("el primer frame de la lista tiene una pagina con un timestamp %d", pagina_anterior->timestamp);
 	for(int i = 0; i < list_size(lista_paginas); i++) {
-		t_pagina* pagina_actual = (t_pagina*) list_get(lista_paginas, i);
-		loggear_info("la pagina %d de la lista de paginas tiene un timestamp %f", i, pagina_actual->timestamp);
+		pagina_actual = (t_pagina*) list_get(lista_paginas, i);
+		loggear_info("el frame %d de la lista de frames tiene una pagina con un timestamp %d", i, pagina_actual->timestamp);
 		if(pagina_actual-> timestamp <= pagina_anterior->timestamp) {
 			pagina_victima = pagina_actual;
 		}

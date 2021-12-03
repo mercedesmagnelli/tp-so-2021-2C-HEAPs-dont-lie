@@ -147,13 +147,20 @@ char* calcular_hash_key(uint32_t proceso, uint32_t pagina) {
 	return key;
 }
 
-double obtener_timestamp_actual(){
+int obtener_timestamp_actual(){
 
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	unsigned long long result = (((unsigned long long)tv.tv_sec) * 1000 + ((unsigned long long)tv.tv_usec) / 1000);
-	double a = result;
-	return a;
+//	struct timespec timestamp;
+//
+//	clock_gettime(CLOCK_REALTIME, &timestamp);
+//
+//	return timestamp.tv_sec + 1e-9 * timestamp.tv_nsec;
+	int valor;
+
+	pthread_mutex_lock(&mutex_acceso_tiempo);
+	valor = tiempo;
+	tiempo++;
+	pthread_mutex_unlock(&mutex_acceso_tiempo);
+	return valor;
 }
 
 uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina){
