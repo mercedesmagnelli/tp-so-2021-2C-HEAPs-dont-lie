@@ -2,6 +2,8 @@
 
 t_dictionary * dispositivos;
 
+pthread_mutex_t lock;
+
 int dispositivo_io_estructuras_crear() {
 	dispositivos = dictionary_create();
 
@@ -15,6 +17,8 @@ int dispositivo_io_estructuras_crear() {
 
 		io->nombre = get_dispositivos_io()[i];
 		io->duracion = atoi(get_duraciones_io()[i]);
+
+		pthread_mutex_init(&io->mutex, NULL);
 
 		dictionary_put(dispositivos, io->nombre, io);
 	}
@@ -38,15 +42,19 @@ int dispositivo_io_usar(uint32_t pid, char * nombre) {
 
 	t_hilo * hilo = colas_mover_exec_block(IO, io->nombre, pid);
 	if (hilo == NULL) {
-		loggear_error("No existe el hilo");
+		loggear_error("[IO] [PID: %zu] No existe el hilo", pid);
 		return 0;
 	}
 
-	loggear_trace("[PID: %zu] se va a bloquear para usar %s durante %d milisegundos", pid, io->nombre, io->duracion);
-	pthread_mutex_lock(&(io->mutex));
+	loggear_trace("[IO] [PID: %zu] se va a bloquear para usar [%s] durante %d milisegundos", pid, io->nombre, io->duracion);
+
+	pthread_mutex_lock(&io->mutex);
+
+	loggear_trace("[IO] [PID: %zu] está usando el dispositivo [%s]", pid, io->nombre);
 	usleep(io->duracion * 1000);
-	pthread_mutex_unlock(&(io->mutex));
-	loggear_trace("[PID: %zu] se desbloqueo de la llamada a %s", pid, io->nombre);
+	pthread_mutex_unlock(&io->mutex);
+
+	loggear_trace("[IO] [PID: %zu] se desbloqueo de la llamada a [%s]", pid, io->nombre);
 
 	colas_desbloquear_hilo_concreto(hilo);
 

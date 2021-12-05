@@ -146,6 +146,7 @@ t_hilo * colas_mover_exec_finish(uint32_t pid_mover) {
 	pthread_mutex_unlock(&mutex_finish_queue);
 
 	hilos_post_finalizado();
+	hilos_post_multitarea();
 
     return hilo;
 }
@@ -198,15 +199,15 @@ t_hilo * colas_obtener_finalizado() {
 	return hilo;
 }
 
-t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante, char * nombre_bloqueante, uint32_t pid) {
-	bool son_iguales(void * hilo2) { return pid == ((t_hilo *) hilo2)->pid; }
+t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante, char * nombre_bloqueante, uint32_t ppid) {
+	bool son_iguales(void * hilo2) { return ppid == pid(hilo2); }
 	pthread_mutex_lock(&mutex_exec_list);
 	t_hilo * hilo = list_remove_by_condition(exec_list, son_iguales);
 	pthread_mutex_unlock(&mutex_exec_list);
 
 	if (hilo == NULL) {
 		loggear_error("TODO: Ver que pasa aca, no se puede mover exec a bloqueado un hilo que no existe");
-		loggear_error("PID: %zu, Dispositivo: %d, NOmbre: %s", pid, dispositivo_bloqueante, nombre_bloqueante);
+		loggear_error("PID: %zu, Dispositivo: %d, NOmbre: %s", ppid, dispositivo_bloqueante, nombre_bloqueante);
 		return hilo;
 	}
 

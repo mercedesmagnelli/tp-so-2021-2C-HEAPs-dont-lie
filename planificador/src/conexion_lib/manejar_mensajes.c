@@ -56,7 +56,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 				respuesta_ram = ram_enviar_close(muerto_proceso);
 
-				enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, respuesta_ram->size, respuesta_ram->mensaje);
+				// TODO: CAmbiar por respuesta_ram->respuesta cuando ande
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, respuesta_ram->size, respuesta_ram->mensaje);
 
 				destruir_respuesta_ram(respuesta_ram);
 			} else {
@@ -160,8 +161,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			return 0;
 		case MATELIB_CALL_IO:
-			loggear_info("[MATELIB_CALL_IO], bloquear un proceso porque llama a IO");
+			;
 			t_matelib_io * io = deserializar_io(mensaje->payload);
+
+			loggear_info("[PID: %zu] - [MATELIB_CALL_IO], bloquear un proceso porque llama a IO", io->pid);
 
 			int respuesta_io = dispositivo_io_usar(io->pid, io->io_nombre);
 			if (respuesta_io == -1) {

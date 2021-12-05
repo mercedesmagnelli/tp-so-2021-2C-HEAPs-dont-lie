@@ -7,9 +7,8 @@ void mate_instance_close(mate_instance * lib_ref){
 
 	free(metadata->ip);
 	free(metadata->log_app_name);
-	free(metadata->log_route);
 	free(metadata);
-	free(lib_ref);
+	// TODO: A veces falla el free(lib_ref)
 }
 
 
@@ -48,9 +47,13 @@ int mate_close(mate_instance *lib_ref) {
 
 	t_instance_metadata * metadata = (t_instance_metadata*) lib_ref->group_info;
 
-	t_matelib_nuevo_proceso * nuevo_proceso = shared_crear_nuevo_proceso(metadata->pid);
+	uint32_t pid = metadata->pid;
+
+	t_matelib_nuevo_proceso * nuevo_proceso = shared_crear_nuevo_proceso(pid);
 	int error = enviar_mate_close(metadata, nuevo_proceso);
 	mate_instance_close(lib_ref);
+
+	loggear_debug("[PID: %zu] - Se ejecutó mate_close", pid);
 
 	return error;
 

@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	testeamos();
+	//testeamos();
 
 	semaforo_wait_fin();
 
@@ -117,7 +117,7 @@ void debug_configuracion() {
 
 
 void testeamos() {
-	 	uint32_t pid = 0;
+	 	uint32_t pid = 1;
 
 	    loggear_trace("HOLA, soy dora!!");
 	    sleep(10);
