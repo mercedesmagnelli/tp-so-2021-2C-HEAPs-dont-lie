@@ -32,7 +32,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 			return VALOR_MEMORIA_SOLICITADO_INVALIDO;
 	} else {
 		int32_t ptro = ptro_donde_entra_data(pid, size);
-		loggear_error("El valor del puntero es %d", ptro);
+		loggear_trace("El valor del puntero es %d", ptro);
 		if(ptro>=0) {
 			loggear_trace("[MATELIB_MEM_ALLOC] - Se puede asignar el espacio solicitado para el proceso %d", pid);
 			//puedo asignar en algo que ya estaba
@@ -55,7 +55,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 
 int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
 
-	if(!existe_proceso(pid) || !ptro_valido(pid, direccionLogicaALiberar) || ptro_liberado(pid, direccionLogicaALiberar)){
+	if(!existe_proceso(pid) || !ptro_valido(pid, direccionLogicaALiberar)){
 		return -5; // MATE_FREE_FAULT
 	}else{
 		loggear_trace("[MATELIB_MEM_FREE] Liberaremos el ptro %d del proceso %d", direccionLogicaALiberar, pid);
@@ -69,7 +69,7 @@ int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
 
 int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer, void** lectura) {
 
-    if(!ptro_valido(pid, direccionLogicaALeer) || ptro_liberado(pid, direccionLogicaALeer) || tamanio_de_direccion(direccionLogicaALeer, pid) < tamanioALeer){
+    if(!ptro_valido(pid, direccionLogicaALeer)){
         return -6; //MEM_READ_FAULT
     }else{
         (*lectura) = leer_de_memoria(direccionLogicaALeer, pid, tamanioALeer);
@@ -79,7 +79,7 @@ int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALee
 
 int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir,uint32_t pid, uint32_t tamanioAEscribir){
 
-    if(!ptro_valido(pid, direccionLogicaAEscribir) || ptro_liberado(pid, direccionLogicaAEscribir) || tamanio_de_direccion(direccionLogicaAEscribir, pid) < tamanioAEscribir){
+    if(!ptro_valido(pid, direccionLogicaAEscribir)){
             return -7; // MEM_WRITE_FAULT
     }else {
         escribir_en_memoria(pid, valorAEscribir, tamanioAEscribir, direccionLogicaAEscribir);

@@ -100,7 +100,7 @@ void reemplazar_entrada_tlb(entrada_tlb* entradaNueva, uint32_t indice);
  * @DESC: se obtiene la timestamp
  *
  **/
-double obtener_timestamp_actual();
+int obtener_timestamp_actual();
 
 /**
  * @NAME: conseguir_victima_entrada_LRU
