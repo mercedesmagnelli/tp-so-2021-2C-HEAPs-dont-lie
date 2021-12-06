@@ -3,14 +3,16 @@
 uint32_t inicializar_proceso(uint32_t PID){
 	if(!existe_proceso(PID)){
 		loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
-		if (iniciar_proceso_SWAP(PID)) {
+
+		uint32_t respuesta_swap = iniciar_proceso_SWAP(PID);
+		if (respuesta_swap) {
 			loggear_trace("[MATELIB_INIT] Se crea un proceso nuevo de pid %d", PID);
 			iniciar_proceso_RAM(PID);
 			return 0;
-		} else {
-			loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
-			return ESPACIO_EN_MEMORIA_INSUF;
 		}
+
+		loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
+		return ESPACIO_EN_MEMORIA_INSUF;
 	}else{
 		loggear_trace("[MATELIB_INIT] el proceso ya existia en memoria");
 		return PROCESO_EXISTENTE;

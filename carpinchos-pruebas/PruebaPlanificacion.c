@@ -3,11 +3,11 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "matelib.h"
+#include <lib/matelib.h>
 #include <commons/log.h>
 
-char *LOG_PATH = "./matelib.log";
-char *PROGRAM_NAME = "matelib";
+char *LOG_PATH = "./planificacion.log";
+char *PROGRAM_NAME = "planificacion";
 sem_t *va_el_2;
 sem_t *va_el_3;
 t_log *logger;

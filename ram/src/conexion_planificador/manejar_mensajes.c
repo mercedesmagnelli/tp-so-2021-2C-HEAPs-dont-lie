@@ -40,11 +40,11 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			int rtaInit = inicializar_proceso(PID_proceso_nuevo->pid);
 			uint32_t headerI;
 
-			if(rtaInit){
+			if(rtaInit == 0){
 				loggear_info("[MATELIB_INIT], proceso %d fue inicializado en la memoria", PID_proceso_nuevo->pid);
 				headerI = EXITO_EN_LA_TAREA;
 			}else{
-				loggear_info("[MATELIB_INIT], proceso %d NO fue inicializado en la memoria", PID_proceso_nuevo->pid);
+				loggear_error("[MATELIB_INIT], proceso %d NO fue inicializado en la memoria", PID_proceso_nuevo->pid);
 				headerI = FALLO_EN_LA_TAREA;
 			}
 

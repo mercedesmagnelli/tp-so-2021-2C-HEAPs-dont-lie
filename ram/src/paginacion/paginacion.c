@@ -645,6 +645,9 @@ heap_metadata* get_HEAP(uint32_t PID, int32_t ptro){
 
 t_list* conseguir_listaHMD_mediante_PID(uint32_t PID){
     t_proceso* proceso = get_proceso_PID(PID);
+    if (proceso == NULL) {
+    	loggear_error("[Conseguir_listaHMD_mediante_PID], devuelve NULL. Luego de esta linea se va a romper.");
+    }
     t_list* listaHMD = proceso->lista_hmd;
     return listaHMD;
 }
