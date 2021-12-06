@@ -2,11 +2,11 @@
 
 uint32_t inicializar_proceso(uint32_t PID){
 	if(!existe_proceso(PID)){
-		loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
+		loggear_trace("[MATELIB_INIT] estoy inicializando el proceso nuevo %d", PID);
 
 		uint32_t respuesta_swap = iniciar_proceso_SWAP(PID);
 		if (respuesta_swap) {
-			loggear_trace("[MATELIB_INIT] Se crea un proceso nuevo de pid %d", PID);
+			loggear_trace("[MATELIB_INIT] Se crea el proceso nuevo de pid %d", PID);
 			iniciar_proceso_RAM(PID);
 			return 0;
 		}
@@ -28,7 +28,7 @@ uint32_t PID_listo(uint32_t PID){
 }
 
 int32_t memalloc(uint32_t pid, int32_t size) {
-	loggear_trace("[MATELIB_MEM_ALLOC] estoy entrando al meamalloc para el proceso %d",pid);
+	loggear_info("[MATELIB_MEM_ALLOC], el proceso %d pide espacio en la RAM", pid);
 	if (!cantidad_valida(size)) {
 		//corto la ejecucion si ya no tengo que analizar
 			return VALOR_MEMORIA_SOLICITADO_INVALIDO;
@@ -74,6 +74,7 @@ int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALee
     if(!ptro_valido(pid, direccionLogicaALeer)){
         return -6; //MEM_READ_FAULT
     }else{
+    	loggear_trace("[MATELIB_MEM_READ] Leeremos el ptro %d del proceso %d", direccionLogicaALeer, pid);
         (*lectura) = leer_de_memoria(direccionLogicaALeer, pid, tamanioALeer);
         return 0;
     }
@@ -84,6 +85,7 @@ int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir,uint32_t
     if(!ptro_valido(pid, direccionLogicaAEscribir)){
             return -7; // MEM_WRITE_FAULT
     }else {
+       loggear_trace("[MATELIB_MEM_WRITE] Escribiremos en e ptro %d del proceso %d", direccionLogicaAEscribir, pid);
         escribir_en_memoria(pid, valorAEscribir, tamanioAEscribir, direccionLogicaAEscribir);
     	return 0;
 
@@ -119,6 +121,7 @@ bool cantidad_valida(int32_t size) {
 
 int32_t close_PID(uint32_t PID){
 	if(existe_proceso(PID)){
+		loggear_trace("[MATELIB_CLOSE] Cerraremos el proceso %d en memoria", PID);
 		eliminar_proceso(PID);
 		return 1;
 	}else
@@ -127,6 +130,7 @@ int32_t close_PID(uint32_t PID){
 
 int32_t suspender_PID(uint32_t PID){
 	if(existe_proceso(PID)){
+		loggear_trace("[SUSPENDER] Suspenderemos el proceso %d en memoria", PID);
 		suspender_proceso(PID);
 		return 1;
 	}else

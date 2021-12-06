@@ -209,7 +209,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			destruir_mensaje(mensaje);
 			return 0;
 		case SUSPENDER_PROCESO:
-			loggear_info("[SUSPENDER_PROCESO], hay que cerrar el proceso");
+			loggear_info("[SUSPENDER_PROCESO], hay que cerrar un proceso");
 			t_matelib_nuevo_proceso* PID_proceso_suspender = deserializar_crear_proceso(mensaje->payload);
 
 			int32_t rtaSuspender = suspender_PID(PID_proceso_suspender->pid);
@@ -229,7 +229,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			destruir_mensaje(mensaje);
 			return 0;
 		case PROCESO_EN_READY:
-			loggear_info("[PROCESO_EN_READY], Se movio a ready un proceso");
+			loggear_info("[PROCESO_EN_READY], Se movio a ready el proceso");
 			t_matelib_nuevo_proceso* PID_proceso_ready = deserializar_crear_proceso(mensaje->payload);
 
 			int32_t rtaReady = PID_listo(PID_proceso_ready->pid);
