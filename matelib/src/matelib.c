@@ -85,9 +85,9 @@ int mate_sem_wait(mate_instance *lib_ref, mate_sem_name sem) {
 	int error = enviar_mate_sem_wait(metadata, semaforo);
 
 	if (error == EXITO_PROCESO_ELIMINADO) {
-		loggear_warning("Destruimos el hilo actual");
-		mate_instance_close(lib_ref);
-	//	pthread_exit(NULL);
+	   loggear_warning("[PID: %zu] - Entro en deadlock y murio, cerramos el hilo", metadata->pid);
+	   mate_instance_close(lib_ref);
+	   pthread_exit(NULL);
 	}
 
 	return error;

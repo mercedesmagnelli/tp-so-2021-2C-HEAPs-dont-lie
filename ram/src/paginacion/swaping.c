@@ -12,7 +12,7 @@ uint32_t crear_proceso_SWAP(uint32_t PID){
 
 
 	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
-	enviar_mensaje_protocolo(socket_swap,R_S_PROCESO_NUEVO, tamanio, mensaje_serializado);
+	enviar_mensaje_protocolo(socket_swap, R_S_PROCESO_NUEVO, tamanio, mensaje_serializado);
 	t_prot_mensaje* respuesta = recibir_mensaje_protocolo(socket_swap);
 	pthread_mutex_unlock(&mutex_enviar_mensaje_swap);
 

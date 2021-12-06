@@ -255,6 +255,8 @@ void desbloquear_todos_eliminar_semaforo(t_semaforo * semaforo) {
 }
 
 t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
+	bool es_hilo(void * hilov) { return pid(hilov) == sem->pid; }
+
 	pthread_mutex_lock(&mutex_semaforos);
 	bool has_key = dictionary_has_key(semaforos, sem->semaforo_nombre);
 	if (!has_key) {
@@ -273,7 +275,7 @@ t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
 
 	t_hilo * hilo_desbloqueado = desbloquear_semaforo(semaforo, false);
 	if (hilo_desbloqueado != NULL) {
-		loggear_trace("[SEMAFORO] - PID: %zu - Luego del SEM_POST, se desbloqueo este hilo", pid(hilo_desbloqueado));
+		loggear_trace("[SEMAFORO] - El [PID: %zu], desbloqueo con SEM_POST A [PID: %zu]", sem->pid, pid(hilo_desbloqueado));
 	} else {
 		loggear_trace("[SEMAFORO] - EL SEM_POST a %s, no desbloqueo ningun hilo", semaforo->nombre);
 	}
@@ -293,6 +295,8 @@ t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
 			break;
 		}
 	}
+
+	list_remove_by_condition(semaforo->list_procesos_retienen, es_hilo);
 
 	semaforo_imprimir_status();
 

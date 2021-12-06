@@ -1,13 +1,12 @@
 #include "conexiones.h"
 
-
-
 void avisar_desconexion();
 
 // Publica
 int enviar_mate_init(t_instance_metadata* instancia, t_matelib_nuevo_proceso * nuevo_proceso) {
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
+		loggear_error("[MATE_INIT] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
 		return socket;
 	}
 
@@ -42,6 +41,7 @@ int enviar_mate_init(t_instance_metadata* instancia, t_matelib_nuevo_proceso * n
 int enviar_mate_close(t_instance_metadata* instancia, t_matelib_nuevo_proceso * nuevo_proceso) {
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
+		loggear_error("[MATE_CLOSE] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
 		return socket;
 	}
 
@@ -78,6 +78,7 @@ int enviar_mate_sem_init(t_instance_metadata* instancia, t_matelib_semaforo* nue
 
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
+		loggear_error("[MATE_SEM_INIT] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
 		return socket;
 	}
 
@@ -115,6 +116,7 @@ int enviar_mate_sem_wait(t_instance_metadata* instancia, t_matelib_semaforo* sem
 
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
+		loggear_error("[MATE_SEM_WAIT] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
 		return socket;
 	}
 
@@ -155,6 +157,7 @@ int enviar_mate_sem_post(t_instance_metadata* instancia, t_matelib_semaforo* sem
 
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
+		loggear_error("[MATE_SEM_POST] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
 		return socket;
 	}
 
@@ -190,6 +193,7 @@ int enviar_mate_sem_destroy(t_instance_metadata* instancia, t_matelib_semaforo* 
 
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
+		loggear_error("[MATE_SEM_DESTROY] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
 		return socket;
 	}
 
@@ -225,6 +229,7 @@ int enviar_mate_call_io(t_instance_metadata* instancia, t_matelib_io* entrada_sa
 
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
+		loggear_error("[MATE_CALL_IO] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
 		return socket;
 	}
 
@@ -260,6 +265,7 @@ int32_t enviar_mate_memalloc(t_instance_metadata* instancia, t_matelib_memoria_a
 
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
+		loggear_error("[MATE_MEM_ALLOC] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
 		return socket;
 	}
 
@@ -289,6 +295,7 @@ int enviar_mate_memfree(t_instance_metadata* instancia, t_matelib_memoria_free* 
 
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
+		loggear_error("[MATE_MEM_FREE] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
 		return socket;
 	}
 
@@ -319,6 +326,7 @@ int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* 
 
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
+		loggear_error("[MATE_MEM_READ] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
 		return socket;
 	}
 
@@ -349,6 +357,7 @@ int enviar_mate_memwrite(t_instance_metadata* instancia, t_matelib_memoria_write
 
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
+		loggear_error("[MATE_MEM_WRITE] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
 		return socket;
 	}
 

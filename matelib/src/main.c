@@ -22,7 +22,7 @@ void* carpincho1_func(void* config){
     printf("C1 - libera SEM2\n");
     mate_sem_post(&instance, "SEM2");
 
-    printf("C2 - Se retira a descansar\n");
+    printf("C1 - Se retira a descansar\n");
     mate_close(&instance);
     return 0;
 }

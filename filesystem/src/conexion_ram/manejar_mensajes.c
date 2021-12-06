@@ -26,24 +26,24 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		loggear_error("ENTRO AQUI");
 		mensaje_serializado = malloc(sizeof(t_mensaje_r_s));
 		loggear_error("ENTRO AQUIx2");
-			memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
-			loggear_error("ENTRO AQUIx3");
+		memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
+		loggear_error("ENTRO AQUIx3");
 
-			t_mensaje_r_s* mensaje_deserializado_nuevo = malloc(sizeof(t_mensaje_r_s));
-			loggear_error("ENTRO AQUIx4");
-			loggear_warning("EL PROCESO QUE LLEGO ES %d", mensaje_deserializado_nuevo->pid);
-			if(get_asignacion() == FIJA){
-				carpincho = crear_carpincho(mensaje_deserializado_nuevo->pid,mensaje_deserializado_nuevo->cant_pag);
-				if(carpincho->estado_carpincho > 0){
-						destroy_carpinchos_swamp(carpincho);
-						loggear_debug("NO HAY MAS ESPACIO POR LO QUE SE ENVIA A LA RAM EL MENSAJE DE ERROR AL GUARDAR");
-						enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL); //TODO esto no se si es así revisar bien.
-					}
-				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
-			}else{
-				loggear_error("ENTRO AQUIx5");
-				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
-			}
+		t_matelib_nuevo_proceso * mensaje_deserializado_nuevo = deserializar_crear_proceso(mensaje->payload);
+
+		loggear_warning("EL PROCESO QUE LLEGO ES %d", mensaje_deserializado_nuevo->pid);
+		if(get_asignacion() == FIJA){
+			carpincho = crear_carpincho(mensaje_deserializado_nuevo->pid, get_marcos_maximos());
+			if(carpincho->estado_carpincho > 0){
+					destroy_carpinchos_swamp(carpincho);
+					loggear_debug("NO HAY MAS ESPACIO POR LO QUE SE ENVIA A LA RAM EL MENSAJE DE ERROR AL GUARDAR");
+					enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL); //TODO esto no se si es así revisar bien.
+				}
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+		}else{
+			loggear_error("TODO: NO HAY NADA CUANDO NO ES FIJA. ENTRO AQUIx5");
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+		}
 
 		free(mensaje_serializado);
 		free(mensaje_deserializado_nuevo);
@@ -53,12 +53,9 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 	case R_S_SOLICITUD_ESPACIO:
 		loggear_info("LLEGO SOLICITUD ESPACIO");
 		loggear_error("ENTRO AQUIx7");
-		mensaje_serializado = malloc(sizeof(t_mensaje_r_s));
-		memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
-		loggear_error("ENTRO AQUIx8");
-		t_mensaje_r_s* mensaje_deserializado = malloc(sizeof(t_mensaje_r_s));
 
-		mensaje_deserializado = deserializar_mensaje_solicitud_r_s(mensaje_serializado);
+		t_mensaje_r_s* mensaje_deserializado = deserializar_mensaje_solicitud_r_s(mensaje->payload);
+
 		loggear_warning("EL PROCESO QUE SOLICITA ESPACIO ES %d", mensaje_deserializado->pid);
 		carpincho = buscar_carpincho_en_lista(mensaje_deserializado->pid);
 		loggear_error("ENTRO AQUIx9");
@@ -66,26 +63,24 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 			loggear_debug("EL CARPINCHO NO ESTA EN LA LISTA");
 			carpincho = crear_carpincho(mensaje_deserializado->pid,mensaje_deserializado->cant_pag);
 			if(get_asignacion() == GLOBAL){
-			error = reservar_marcos(carpincho,mensaje_deserializado->cant_pag, particion_a_escribir(carpincho->pid_carpincho));
+				error = reservar_marcos(carpincho,mensaje_deserializado->cant_pag, particion_a_escribir(carpincho->pid_carpincho));
 				if(error < 0){
 					enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 				}else{
 					enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
-					}
+				}
 			}
 		}else{
 
-		loggear_error("ENTRO AQUIx10");
-		error = reservar_marcos(carpincho,mensaje_deserializado->cant_pag, particion_a_escribir(carpincho->pid_carpincho));
-		if(error < 0){
-			enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
-		}else{
-		enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
-		}
+			loggear_error("ENTRO AQUIx10");
+			error = reservar_marcos(carpincho,mensaje_deserializado->cant_pag, particion_a_escribir(carpincho->pid_carpincho));
+			if(error < 0){
+				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
+			}else{
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
+			}
 		}
 
-
-		free(mensaje_serializado);
 		free(mensaje_deserializado);
 		destruir_mensaje(mensaje);
 		loggear_warning("aca voy re bien");
@@ -127,11 +122,11 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		loggear_warning("info pag %s", pagina_info);
 		int codigo_mensaje = enviar_mensaje_protocolo(mensaje->socket, R_S_PEDIR_PAGINA, string_length(pagina_info) + 1, pagina_info);
 
-					if (codigo_mensaje < 0) {
-						loggear_error("Ocurrio un error al pedir la lectura de la pagina");
-					} else {
-						loggear_info("Se mando a la RAM la pagina solicitada");
-					}
+		if (codigo_mensaje < 0) {
+			loggear_error("Ocurrio un error al pedir la lectura de la pagina");
+		} else {
+			loggear_info("Se mando a la RAM la pagina solicitada");
+		}
 
 		//free(mensaje_serializado);
 		free(pedir_deserializado);
@@ -144,8 +139,12 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		loggear_info("Se solicita eliminar el proceso %d", PID_proceso_eliminar->pid);
 
 		carpincho = buscar_carpincho_en_lista(PID_proceso_eliminar->pid);
-
-		error = eliminar_proceso(carpincho);
+		if (carpincho == NULL) {
+			loggear_error("No encontro el carpincho en la lista para borrar");
+			error = -1;
+		} else {
+			error = eliminar_proceso(carpincho);
+		}
 
 		if(error < 0){
 			loggear_warning("OCURRIO UN ERROR AL ELIMINAR EL PROCESO QUE SOLICITO LA RAM");
@@ -209,20 +208,11 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 t_carpincho_swamp* buscar_carpincho_en_lista(uint32_t pid){
 	for(int i = 0; i < list_size(lista_carpinchos); i++){
-	t_carpincho_swamp* carpi = list_get(lista_carpinchos, i);
-	if(carpi->pid_carpincho == pid){
-		return carpi;
-	}
+		t_carpincho_swamp* carpi = list_get(lista_carpinchos, i);
+		if(carpi->pid_carpincho == pid){
+			return carpi;
+		}
 	}
 	return NULL;
-
 }
-
-
-
-
-
-
-
-
 
