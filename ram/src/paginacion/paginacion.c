@@ -33,6 +33,7 @@ void inicializar_semaforos() {
 	pthread_mutex_init(&mutex_acceso_diccionario, NULL);
 	pthread_mutex_init(&mutex_acceso_tiempo, NULL);
 	pthread_mutex_init(&mutex_swapping, NULL);
+	pthread_mutex_init(&mutex_lista_procesos, NULL);
 }
 
 void destruir_estructuras_administrativas() {
@@ -52,6 +53,7 @@ void destruir_semaforos() {
 		pthread_mutex_destroy(&mutex_acceso_diccionario);
 		pthread_mutex_destroy(&mutex_acceso_tiempo);
 		pthread_mutex_destroy(&mutex_swapping);
+		pthread_mutex_destroy(&mutex_lista_procesos);
 }
 void destruir_proceso(void* proceso) {
 
@@ -84,7 +86,11 @@ void iniciar_proceso_RAM(uint32_t PID){
 	nuevoProceso->lista_frames_reservados = list_create();
 	nuevoProceso->hits_proceso = 0;
 	nuevoProceso->miss_proceso = 0;
+
+	pthread_mutex_lock(&mutex_lista_procesos);
 	list_add(listaProcesos, nuevoProceso);
+	pthread_mutex_unlock(&mutex_lista_procesos);
+
 }
 
 void alistar_proceso(uint32_t PID){
@@ -608,7 +614,9 @@ t_proceso* get_proceso_PID(uint32_t PID){
 			return proceso->PID == PID;
 	}
 
+	pthread_mutex_lock(&mutex_lista_procesos);
 	t_proceso* proceso = list_find(listaProcesos, proceso_PID);
+	pthread_mutex_unlock(&mutex_lista_procesos);
 	return proceso;
 
 }
@@ -932,7 +940,9 @@ t_proceso* remover_proceso_PID_lista_procesos(uint32_t PID){
 		return proceso->PID == PID;
 	}
 
+	pthread_mutex_lock(&mutex_lista_procesos);
 	t_proceso* procesoRemovido = list_remove_by_condition(listaProcesos, proceso_PID);
+	pthread_mutex_unlock(&mutex_lista_procesos);
 	return procesoRemovido;
 }
 
