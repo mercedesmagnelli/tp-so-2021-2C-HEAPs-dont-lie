@@ -285,6 +285,7 @@ t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
 		semaforo_imprimir_status();
 		return SEM_ERROR;
 	}
+
 	for (int i = 0; i < list_size(hilo_wait->semaforos_pedidos); ++i) {
 		t_semaforo * semaforo_hilo = list_get(hilo_wait->semaforos_pedidos, i);
 		if (strcmp(semaforo_hilo->nombre, semaforo->nombre) == 0) {
