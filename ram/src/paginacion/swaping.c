@@ -56,8 +56,9 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 
 void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_pag_a_pedir, uint32_t pid_a_pedir) {
 	// fijarse si esta modificado, setear en 0 el bit de presencia de la pagina victima
-
+	loggear_warning("Veo consistencia de frame victima %d", pagina_victima->frame);
 	void* info_en_frame = obtener_info_en_frame(pagina_victima->frame);
+	loggear_warning("Leo lo que tiene frame victima %d", pagina_victima->frame);
 	uint32_t pid_pag_victima = obtener_pid_en_frame(pagina_victima->frame);
 	loggear_trace("[SWAP] pid de la victima: %d", pid_pag_victima);
 	uint32_t nro_pag_victima = obtener_pag_en_frame(pagina_victima->frame);
@@ -102,7 +103,7 @@ uint32_t obtener_pag_en_frame(uint32_t frame) {
 void* obtener_info_en_frame(uint32_t frame) {
 	uint32_t tam_memoria = get_tamanio_pagina();
 	void* info = malloc(tam_memoria);
-	leer_directamente_de_memoria(info, tam_memoria * frame, tam_memoria);
+	leer_directamente_de_memoria(info, tam_memoria, tam_memoria * frame);
 	return info;
 }
 
