@@ -267,18 +267,22 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 
 uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size) {
 
-	uint32_t cantidad;
-
 	t_proceso* proceso = get_proceso_PID(pid);
+
+	int tamanio_solicitar;
+
+	loggear_trace("La cantidad de paginas que tiene el proceso %d es %d y se pide un espacio de %d", pid, list_size(proceso->tabla_paginas), size);
 	if(list_is_empty(proceso->tabla_paginas)){
-		cantidad =  (size+18) / get_tamanio_pagina();//al ser el primer alloc se tiene que agregar dos heaps más el tamanio de la data a guardar, por eso sele suma 18
+		tamanio_solicitar =  (size+18);//al ser el primer alloc se tiene que agregar dos heaps más el tamanio de la data a guardar, por eso sele suma 18
 	}else{
-		cantidad =  (size+9) / get_tamanio_pagina();//los demas allocs realizados tienen que agregar un heaps más el tamanio de la data a guardar, por eso sele suma 9
+		tamanio_solicitar =  (size+9);//los demas allocs realizados tienen que agregar un heaps más el tamanio de la data a guardar, por eso sele suma 9
 	}
+
+	uint32_t cantidad =  tamanio_solicitar / get_tamanio_pagina();
 
 	uint32_t resto_ult_pag = calcular_tamanio_ultimo_HEAP(pid);
 
-	uint32_t excedente = (size+9) % get_tamanio_pagina();
+	uint32_t excedente = tamanio_solicitar % get_tamanio_pagina();
 
 	loggear_warning("[MATELIB_MEM_ALLOC] cantidad %d, resto_ult_pag %d, excedente %d", cantidad, resto_ult_pag, excedente);
 
@@ -286,7 +290,7 @@ uint32_t paginas_extras_para_proceso(uint32_t pid, uint32_t size) {
 		cantidad++;
 	}
 
-	loggear_info("[MATELIB_MEM_ALLOC] Se van a pedir %d paginas extras a swamp", cantidad);
+	loggear_info("[MATELIB_MEM_ALLOC] Se van a pedir %d paginas extras a swamp para el proceso %d", cantidad, pid);
 
 	return cantidad;
 }

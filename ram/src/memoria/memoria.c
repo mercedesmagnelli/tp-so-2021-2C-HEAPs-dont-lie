@@ -26,7 +26,7 @@ uint32_t PID_listo(uint32_t PID){
 }
 
 int32_t memalloc(uint32_t pid, int32_t size) {
-	loggear_trace("[MATELIB_MEM_ALLOC] estoy entrando al meamalloc");
+	loggear_trace("[MATELIB_MEM_ALLOC] estoy entrando al meamalloc para el proceso %d",pid);
 	if (!cantidad_valida(size)) {
 		//corto la ejecucion si ya no tengo que analizar
 			return VALOR_MEMORIA_SOLICITADO_INVALIDO;

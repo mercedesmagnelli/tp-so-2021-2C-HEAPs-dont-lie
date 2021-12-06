@@ -127,7 +127,7 @@ void testeamos() {
 	    inicializar_proceso(pid+3);
 	    inicializar_proceso(pid+4);
 
-	    int a = memalloc(pid,10);
+	    int a = memalloc(pid,14);
 	    loggear_trace("Hice el memalloc en %d", a);
 	    imprimir_tlb();
 
@@ -148,7 +148,7 @@ void testeamos() {
 	  	loggear_trace("Hice el memalloc en %d", a);
 
 //		PRUEBAS UTILIZADAS PARA LRU
-//
+
 //	  	int a = memalloc(pid,10);
 //		loggear_trace("Hice el memalloc en %d", a);
 //		imprimir_tlb();
