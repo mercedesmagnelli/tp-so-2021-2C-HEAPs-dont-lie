@@ -60,7 +60,7 @@ void *carpincho_acaparador(void * config) {
   int x = mate_memalloc(&mate_ref, 20000);
 
   while(1) {
-	  printf("Hicimos un alloc y los punteros que nos dieron fueron %d y %d",key, x);
+	printf("Hicimos un alloc y los punteros que nos dieron fueron %d y %d",key, x);
     mate_memread(&mate_ref, key, thread_name, 10);
     log_message("thread name: %s", thread_name);
   }
@@ -144,11 +144,11 @@ int main(int argc, char *argv[])
   th_3_info->th_number = 3;
 
   pthread_create(&carpincho_th_3, NULL, &carpincho_acaparador, (void *)th_3_info);
- /// pthread_create(&carpincho_th_1, NULL, &carpincho, (void *)th_1_info);
- // pthread_create(&carpincho_th_2, NULL, &carpincho, (void *)th_2_info);
+  pthread_create(&carpincho_th_1, NULL, &carpincho, (void *)th_1_info);
+  pthread_create(&carpincho_th_2, NULL, &carpincho, (void *)th_2_info);
 
-  //pthread_join(carpincho_th_1, NULL);
- // pthread_join(carpincho_th_2, NULL);
+  pthread_join(carpincho_th_1, NULL);
+  pthread_join(carpincho_th_2, NULL);
 
   return 0;
 }

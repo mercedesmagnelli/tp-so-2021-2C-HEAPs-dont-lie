@@ -168,8 +168,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			t_matelib_memoria_read* read = deserializar_memoria_read(mensaje->payload);
 
 
-			void* ptroLectura = NULL;
-			int32_t rtaRead = memread(read->memoria_mate_pointer, read->pid, read->memoria_size, ptroLectura);
+			void* ptroLectura;
+			int32_t rtaRead = memread(read->memoria_mate_pointer, read->pid, read->memoria_size, &ptroLectura);
 
 			if(rtaRead>=0){
 				t_ram_read* estructuraRead = shared_crear_ram_read(rtaRead, ptroLectura);
