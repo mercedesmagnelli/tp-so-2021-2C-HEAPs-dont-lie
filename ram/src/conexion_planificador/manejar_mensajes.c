@@ -123,11 +123,15 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			int32_t ptroAlloc = memalloc(alloc->pid, alloc->memoria_size);
 
+			loggear_error("PUTO EL QUE LEE");
 			if(ptroAlloc>=0){
-				loggear_info("[MATELIB_MEM_ALLOC], proceso %d se le asigna espacio solicitado", alloc->pid);
-				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 4, &ptroAlloc);
+				loggear_warning("[MATELIB_MEM_ALLOC], proceso %d se le asigna espacio solicitado en el ptro %d", alloc->pid, ptroAlloc);
+				void* paquete_enviar = malloc(sizeof(int32_t));
+				memcpy(paquete_enviar, &ptroAlloc, sizeof(int32_t));
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, sizeof(int32_t), paquete_enviar);
+				free(paquete_enviar);
 			}else{
-				loggear_info("[MATELIB_MEM_ALLOC], proceso %d NO se le asigna espacio solicitado", alloc->pid);
+				loggear_error("[MATELIB_MEM_ALLOC], proceso %d NO se le asigna espacio solicitado", alloc->pid);
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
@@ -164,8 +168,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			t_matelib_memoria_read* read = deserializar_memoria_read(mensaje->payload);
 
 
-			void* ptroLectura = NULL;
-			int32_t rtaRead = memread(read->memoria_mate_pointer, read->pid, read->memoria_size, ptroLectura);
+			void* ptroLectura;
+			int32_t rtaRead = memread(read->memoria_mate_pointer, read->pid, read->memoria_size, &ptroLectura);
 
 			if(rtaRead>=0){
 				t_ram_read* estructuraRead = shared_crear_ram_read(rtaRead, ptroLectura);
@@ -186,9 +190,9 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			return 0;
 		case MATELIB_MEM_WRITE:
 			loggear_info("[MATELIB_MEM_WRITE], un proceso quiere escribir en la RAM");
-			t_matelib_memoria_read* escritura = deserializar_memoria_read(mensaje->payload);
+			 t_matelib_memoria_write* escritura = deserializar_memoria_write(mensaje->payload);
 
-			void * write_memoria_write = NULL;
+			void * write_memoria_write = escritura->memoria_write;
 
 			int32_t rtaWrite = memwrite(write_memoria_write, escritura->memoria_mate_pointer, escritura->pid, escritura->memoria_size);
 			uint32_t headerW;
@@ -209,7 +213,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			destruir_mensaje(mensaje);
 			return 0;
 		case SUSPENDER_PROCESO:
-			loggear_info("[SUSPENDER_PROCESO], hay que cerrar el proceso");
+			loggear_info("[SUSPENDER_PROCESO], hay que cerrar un proceso");
 			t_matelib_nuevo_proceso* PID_proceso_suspender = deserializar_crear_proceso(mensaje->payload);
 
 			int32_t rtaSuspender = suspender_PID(PID_proceso_suspender->pid);
@@ -229,7 +233,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			destruir_mensaje(mensaje);
 			return 0;
 		case PROCESO_EN_READY:
-			loggear_info("[PROCESO_EN_READY], Se movio a ready un proceso");
+			loggear_info("[PROCESO_EN_READY], Se movio a ready el proceso");
 			t_matelib_nuevo_proceso* PID_proceso_ready = deserializar_crear_proceso(mensaje->payload);
 
 			int32_t rtaReady = PID_listo(PID_proceso_ready->pid);

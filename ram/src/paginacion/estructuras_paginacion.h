@@ -18,7 +18,7 @@ pthread_mutex_t mutex_acceso_diccionario;
 pthread_mutex_t mutex_enviar_mensaje_swap;
 pthread_mutex_t mutex_acceso_tiempo;
 pthread_mutex_t mutex_swapping;
-
+pthread_mutex_t mutex_lista_procesos;
 typedef struct{
     uint32_t en_mp; //me sirve de flag para comprobar cuando realmente hacer el swap
     uint32_t en_mv; // me sirve para tener el control de la cant maxima por proceso

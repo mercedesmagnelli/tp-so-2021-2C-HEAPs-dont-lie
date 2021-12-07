@@ -280,15 +280,20 @@ int32_t enviar_mate_memalloc(t_instance_metadata* instancia, t_matelib_memoria_a
 	}
 	free(size);
 
-	int32_t error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
-	}
+	t_prot_mensaje * mensajito = recibir_mensaje_protocolo(socket);
+	t_matelib_nuevo_proceso * el_pipi = deserializar_crear_proceso(mensajito->payload);
+	destruir_mensaje(mensajito);
+	uint32_t pasamanos_horrible = el_pipi->pid;
+	free(el_pipi);
+
+//	if (error != 0) {
+//		loggear_info("Nos descnocimos, no podemos trabajar");
+//		return error;
+//	}
 
 	close(socket);
 
-	return error;
+	return pasamanos_horrible;
 }
 
 int enviar_mate_memfree(t_instance_metadata* instancia, t_matelib_memoria_free* liberar){

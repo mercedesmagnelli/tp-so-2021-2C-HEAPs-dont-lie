@@ -33,6 +33,7 @@ void inicializar_semaforos() {
 	pthread_mutex_init(&mutex_acceso_diccionario, NULL);
 	pthread_mutex_init(&mutex_acceso_tiempo, NULL);
 	pthread_mutex_init(&mutex_swapping, NULL);
+	pthread_mutex_init(&mutex_lista_procesos, NULL);
 }
 
 void destruir_estructuras_administrativas() {
@@ -52,6 +53,7 @@ void destruir_semaforos() {
 		pthread_mutex_destroy(&mutex_acceso_diccionario);
 		pthread_mutex_destroy(&mutex_acceso_tiempo);
 		pthread_mutex_destroy(&mutex_swapping);
+		pthread_mutex_destroy(&mutex_lista_procesos);
 }
 void destruir_proceso(void* proceso) {
 
@@ -84,7 +86,11 @@ void iniciar_proceso_RAM(uint32_t PID){
 	nuevoProceso->lista_frames_reservados = list_create();
 	nuevoProceso->hits_proceso = 0;
 	nuevoProceso->miss_proceso = 0;
+
+	pthread_mutex_lock(&mutex_lista_procesos);
 	list_add(listaProcesos, nuevoProceso);
+	pthread_mutex_unlock(&mutex_lista_procesos);
+
 }
 
 void alistar_proceso(uint32_t PID){
@@ -325,7 +331,6 @@ uint32_t traducir_a_dir_fisica(uint32_t PID, uint32_t ptroHEAP, uint32_t bitModi
 
 heap_metadata* encontrar_heap(uint32_t PID, uint32_t ptro){
 
-
 	t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
 
 	bool condicion(void* heap_i) {
@@ -333,10 +338,11 @@ heap_metadata* encontrar_heap(uint32_t PID, uint32_t ptro){
 		leer_heap(heap, PID);
 		return (heap->currAlloc + 9) == ptro;
 	}
-
+	loggear_error("[RAM] - quiero encontrar el HEAP %d", ptro);
 	heap_metadata* heap_encontrado = (heap_metadata*) list_find(lista_heaps, condicion);
 
 	if(heap_encontrado == NULL) {
+		loggear_error("[RAM] - quiero encontrar el HEAP %d", ptro);
 		loggear_error("problemas xd");
 	}
 
@@ -594,9 +600,10 @@ void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t punt
 	encontrar_heap(pid, puntero);
 	uint32_t nro_pag = calcular_pagina_de_puntero_logico(puntero);
 	uint32_t offset = calcular_offset_puntero_en_pagina(puntero);
+	loggear_error("--- PID: %d, NRO PAG: %d, OFFSET: %d, VALOR: %s , DONDE: %d",pid, nro_pag, offset, valor, puntero);
 	guardar_en_memoria_paginada(pid, nro_pag, offset, valor, size);
 
-	loggear_error("--- PID: %d, NRO PAG: %d, OFFSET: %d, VALOR: %s , DONDE: %d",pid, nro_pag, offset, valor, puntero);
+
 
 
 }
@@ -608,7 +615,9 @@ t_proceso* get_proceso_PID(uint32_t PID){
 			return proceso->PID == PID;
 	}
 
+	pthread_mutex_lock(&mutex_lista_procesos);
 	t_proceso* proceso = list_find(listaProcesos, proceso_PID);
+	pthread_mutex_unlock(&mutex_lista_procesos);
 	return proceso;
 
 }
@@ -710,12 +719,14 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 	while(tamDato>0){
 		loggear_warning("[RAM] - busco marco de pagina");
 		marcoPag = obtener_marco_de_pagina_en_memoria(PID, nroPag, 1);
-		loggear_trace("[RAM] - encontre marco de pagina");
+		loggear_trace("[RAM] - encontre marco %d de pagina", marcoPag);
 		ptro_escritura = marcoPag * get_tamanio_pagina() + offset;
 		if((offset+tamDato) <= get_tamanio_pagina()){
+			loggear_trace("[RAM] - voy a escribir ultima parte de datos en %d con tamanio de %d con un desplazamiento de %d", ptro_escritura, tamDato, desplazamientoEnDato);
 			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
 			tamDato=0;
 		}else{
+			loggear_trace("[RAM] - voy a escribir parte parcial de los datos");
 			int tamDatoParcial = get_tamanio_pagina()- offset;
 			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDatoParcial, ptro_escritura);
 
@@ -724,6 +735,7 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 			offset = 0;
 			nroPag++;
 		}
+		loggear_trace("[RAM] - guarde una parte del dato");
 	}
 
 }
@@ -932,7 +944,9 @@ t_proceso* remover_proceso_PID_lista_procesos(uint32_t PID){
 		return proceso->PID == PID;
 	}
 
+	pthread_mutex_lock(&mutex_lista_procesos);
 	t_proceso* procesoRemovido = list_remove_by_condition(listaProcesos, proceso_PID);
+	pthread_mutex_unlock(&mutex_lista_procesos);
 	return procesoRemovido;
 }
 
