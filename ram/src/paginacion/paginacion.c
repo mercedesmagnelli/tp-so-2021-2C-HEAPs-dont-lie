@@ -721,7 +721,7 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 		loggear_trace("[RAM] - encontre marco %d de pagina", marcoPag);
 		ptro_escritura = marcoPag * get_tamanio_pagina() + offset;
 		if((offset+tamDato) <= get_tamanio_pagina()){
-			loggear_trace("[RAM] - voy a escribir ultima parte de datos");
+			loggear_trace("[RAM] - voy a escribir ultima parte de datos en %d con tamanio de %d con un desplazamiento de %d", ptro_escritura, tamDato, desplazamientoEnDato);
 			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
 			tamDato=0;
 		}else{

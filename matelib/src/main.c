@@ -57,10 +57,10 @@ void *carpincho_acaparador(void * config) {
   mate_memwrite(&mate_ref, thread_name, key, 10);
 
   //acaparo un archivo de swamp
-  mate_memalloc(&mate_ref, 20000);
+  int x = mate_memalloc(&mate_ref, 20000);
 
   while(1) {
-	  printf("Hicimos un alloc y el puntero que nos dieron fue %d",key);
+	  printf("Hicimos un alloc y los punteros que nos dieron fueron %d y %d",key, x);
     mate_memread(&mate_ref, key, thread_name, 10);
     log_message("thread name: %s", thread_name);
   }
