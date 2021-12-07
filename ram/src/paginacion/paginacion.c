@@ -698,9 +698,11 @@ void* leer_de_memoria_paginada(uint32_t PID, int nroPag, int offset, int tamDato
 			loggear_trace("[RAM] - voy a leer parte parcial de los datos");
 			int tamDatoParcial = get_tamanio_pagina()- offset;
 			leer_directamente_de_memoria(data + desplazamientoEnDato, tamDatoParcial, ptro_lectura);
+
 			desplazamientoEnDato += tamDatoParcial;
 			tamDato -= tamDatoParcial;
 			offset = 0;
+			nroPag++;
 		}
 	}
 	return data;

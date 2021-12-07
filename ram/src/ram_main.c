@@ -128,28 +128,29 @@ void testeamos() {
 //	    inicializar_proceso(pid+4);
 
 	    //pido malloc
-	    int a = memalloc(pid,23);
+	    int a = memalloc(pid,33);
 	    loggear_trace("Hice el memalloc en %d", a);
 	    imprimir_tlb();
 
 	    //escribo
-	    char* pedido_Dora = "puedsHacermUnSanwitch?";
-	    void* sandwitch = malloc(23);
-	    memcpy(sandwitch, pedido_Dora,23);
+	    char* pedido_Dora = "¿puedes hacerme un sanwitch? e_e";
+	    void* sandwitch = malloc(33);
+	    memcpy(sandwitch, pedido_Dora,33);
+	    loggear_info("lo que voy a guardar en memoria es %s", ((char*) sandwitch));
 
 	    //loggear_error("Copie exitosamente de forma puntero el sig msj %s", ((char*) sandwitch));
-	    memwrite(sandwitch, a, pid, 23);
+	    memwrite(sandwitch, a, pid, 33);
 	    free(sandwitch);
 
-		void* sandwitch2 = malloc(23);
-		memcpy(sandwitch2, memoria_principal + 9, 23);
+		void* sandwitch2 = malloc(33);
+		memcpy(sandwitch2, memoria_principal + 9, 33);
 		loggear_info("lo leido manualmente fue %s", ((char*) sandwitch2));
 		sleep(3);
 		free(sandwitch2);
 
 	    //leo
 		void* ptro_tengo_q_leer;
-	    memread(a, pid, 23,&ptro_tengo_q_leer);
+	    memread(a, pid, 34, &ptro_tengo_q_leer);
 	    loggear_info("lo leido manualmente fue %s", ((char*) ptro_tengo_q_leer));
 
 	    //variante 2
