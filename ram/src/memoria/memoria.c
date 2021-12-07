@@ -85,7 +85,7 @@ int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir,uint32_t
     if(!ptro_valido(pid, direccionLogicaAEscribir)){
             return -7; // MEM_WRITE_FAULT
     }else {
-       loggear_trace("[MATELIB_MEM_WRITE] Escribiremos en e ptro %d del proceso %d", direccionLogicaAEscribir, pid);
+       loggear_trace("[MATELIB_MEM_WRITE - PID: %d] Escribiremos en el ptro %d", pid, direccionLogicaAEscribir);
         escribir_en_memoria(pid, valorAEscribir, tamanioAEscribir, direccionLogicaAEscribir);
     	return 0;
 

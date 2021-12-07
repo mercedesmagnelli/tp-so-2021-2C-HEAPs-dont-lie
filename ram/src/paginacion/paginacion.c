@@ -600,9 +600,10 @@ void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t punt
 	encontrar_heap(pid, puntero);
 	uint32_t nro_pag = calcular_pagina_de_puntero_logico(puntero);
 	uint32_t offset = calcular_offset_puntero_en_pagina(puntero);
+	loggear_error("--- PID: %d, NRO PAG: %d, OFFSET: %d, VALOR: %s , DONDE: %d",pid, nro_pag, offset, (char*)valor, puntero);
 	guardar_en_memoria_paginada(pid, nro_pag, offset, valor, size);
 
-	loggear_error("--- PID: %d, NRO PAG: %d, OFFSET: %d, VALOR: %s , DONDE: %d",pid, nro_pag, offset, valor, puntero);
+
 
 
 }

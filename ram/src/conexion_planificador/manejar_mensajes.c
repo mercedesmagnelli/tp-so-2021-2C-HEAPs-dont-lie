@@ -190,9 +190,9 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			return 0;
 		case MATELIB_MEM_WRITE:
 			loggear_info("[MATELIB_MEM_WRITE], un proceso quiere escribir en la RAM");
-			t_matelib_memoria_read* escritura = deserializar_memoria_read(mensaje->payload);
+			 t_matelib_memoria_write* escritura = deserializar_memoria_write(mensaje->payload);
 
-			void * write_memoria_write = NULL;
+			void * write_memoria_write = escritura->memoria_write;
 
 			int32_t rtaWrite = memwrite(write_memoria_write, escritura->memoria_mate_pointer, escritura->pid, escritura->memoria_size);
 			uint32_t headerW;
