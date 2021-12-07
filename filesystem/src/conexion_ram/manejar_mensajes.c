@@ -15,6 +15,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 	int error;
 	void* mensaje_serializado;
 	t_carpincho_swamp* carpincho;
+	usleep(1000 *  get_retardo_swap());
 	switch (mensaje->head) {
 	case HANDSHAKE_R_P:
 		loggear_info("Llegó un handshake de la ram! La aceptamos <3");
@@ -119,7 +120,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		//free(mensaje_serializado);
 		free(pedir_deserializado);
-		//free(pagina_info); TODO porque no me deja hacer este free???
+		free(pagina_info); //TODO porque no me deja hacer este free???
 		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_ELIMINAR_PROCESO:
@@ -168,7 +169,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		return 0;;
 	case DESCONEXION_TOTAL:
 		loggear_error("Se cerró la conexión con ram");
-
+		destruir_mensaje(mensaje);
 		return ERROR_DESCONEXION_RAM;
 	case DESCONEXION:
 		loggear_warning("Se cerró la conexión con ram");
@@ -195,7 +196,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 }
 
 t_carpincho_swamp* buscar_carpincho_en_lista(uint32_t pid){
-	loggear_trace("SE PROCEDE A BUSCAR EL CARPINCHO EN LA LISTA [PID: %d]");
+	loggear_trace("SE PROCEDE A BUSCAR EL CARPINCHO EN LA LISTA [PID: %d]", pid);
 	for(int i = 0; i < list_size(lista_carpinchos); i++){
 		t_carpincho_swamp* carpi = list_get(lista_carpinchos, i);
 		if(carpi->pid_carpincho == pid){
