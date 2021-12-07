@@ -123,11 +123,15 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			int32_t ptroAlloc = memalloc(alloc->pid, alloc->memoria_size);
 
+			loggear_error("PUTO EL QUE LEE");
 			if(ptroAlloc>=0){
-				loggear_info("[MATELIB_MEM_ALLOC], proceso %d se le asigna espacio solicitado", alloc->pid);
-				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 4, &ptroAlloc);
+				loggear_warning("[MATELIB_MEM_ALLOC], proceso %d se le asigna espacio solicitado en el ptro %d", alloc->pid, ptroAlloc);
+				void* paquete_enviar = malloc(sizeof(int32_t));
+				memcpy(paquete_enviar, &ptroAlloc, sizeof(int32_t));
+				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, sizeof(int32_t), paquete_enviar);
+				free(paquete_enviar);
 			}else{
-				loggear_info("[MATELIB_MEM_ALLOC], proceso %d NO se le asigna espacio solicitado", alloc->pid);
+				loggear_error("[MATELIB_MEM_ALLOC], proceso %d NO se le asigna espacio solicitado", alloc->pid);
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 

@@ -5,10 +5,6 @@ uint32_t generar_pid(){
 
 	id++;
 
-	if(id > 100){
-		id = 1;
-	}
-
 	return id;
 }
 

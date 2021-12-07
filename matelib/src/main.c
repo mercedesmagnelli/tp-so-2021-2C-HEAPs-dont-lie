@@ -60,6 +60,7 @@ void *carpincho_acaparador(void * config) {
   mate_memalloc(&mate_ref, 20000);
 
   while(1) {
+	  printf("Hicimos un alloc y el puntero que nos dieron fue %d",key);
     mate_memread(&mate_ref, key, thread_name, 10);
     log_message("thread name: %s", thread_name);
   }

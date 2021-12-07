@@ -147,6 +147,7 @@ t_hilo * colas_mover_exec_finish(uint32_t pid_mover) {
 
 	hilos_post_finalizado();
 	hilos_post_multitarea();
+	hilos_post_multiprogramacion();
 
     return hilo;
 }
@@ -166,7 +167,7 @@ t_hilo * colas_mover_block_finish(t_hilo * hilo_mover) {
 	pthread_mutex_unlock(&mutex_finish_queue);
 
 	hilos_post_finalizado();
-	hilos_post_multitarea();
+	hilos_post_multiprogramacion();
 
     return hilo;
 }
@@ -282,7 +283,7 @@ t_hilo * colas_mover_block_block_susp() {
 }
 
 t_hilo * colas_mover_block_susp_block_ready(t_hilo * hilo_mover) {
-	bool son_iguales(void * hilo2) { return hilo_mover->pid == ((t_hilo *) hilo2)->pid; }
+	bool son_iguales(void * hilo2) { return pid(hilo_mover) == pid(hilo2); }
 	pthread_mutex_lock(&mutex_suspended_blocked_list);
 	t_hilo * hilo = list_remove_by_condition(suspended_blocked_list, son_iguales);
 	pthread_mutex_unlock(&mutex_suspended_blocked_list);

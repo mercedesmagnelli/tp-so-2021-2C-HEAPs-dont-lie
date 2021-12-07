@@ -331,7 +331,6 @@ uint32_t traducir_a_dir_fisica(uint32_t PID, uint32_t ptroHEAP, uint32_t bitModi
 
 heap_metadata* encontrar_heap(uint32_t PID, uint32_t ptro){
 
-
 	t_list* lista_heaps = conseguir_listaHMD_mediante_PID(PID);
 
 	bool condicion(void* heap_i) {
@@ -339,10 +338,11 @@ heap_metadata* encontrar_heap(uint32_t PID, uint32_t ptro){
 		leer_heap(heap, PID);
 		return (heap->currAlloc + 9) == ptro;
 	}
-
+	loggear_error("[RAM] - quiero encontrar el HEAP %d", ptro);
 	heap_metadata* heap_encontrado = (heap_metadata*) list_find(lista_heaps, condicion);
 
 	if(heap_encontrado == NULL) {
+		loggear_error("[RAM] - quiero encontrar el HEAP %d", ptro);
 		loggear_error("problemas xd");
 	}
 
@@ -718,12 +718,14 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 	while(tamDato>0){
 		loggear_warning("[RAM] - busco marco de pagina");
 		marcoPag = obtener_marco_de_pagina_en_memoria(PID, nroPag, 1);
-		loggear_trace("[RAM] - encontre marco de pagina");
+		loggear_trace("[RAM] - encontre marco %d de pagina", marcoPag);
 		ptro_escritura = marcoPag * get_tamanio_pagina() + offset;
 		if((offset+tamDato) <= get_tamanio_pagina()){
+			loggear_trace("[RAM] - voy a escribir ultima parte de datos");
 			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
 			tamDato=0;
 		}else{
+			loggear_trace("[RAM] - voy a escribir parte parcial de los datos");
 			int tamDatoParcial = get_tamanio_pagina()- offset;
 			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDatoParcial, ptro_escritura);
 
@@ -732,6 +734,7 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 			offset = 0;
 			nroPag++;
 		}
+		loggear_trace("[RAM] - guarde una parte del dato");
 	}
 
 }
