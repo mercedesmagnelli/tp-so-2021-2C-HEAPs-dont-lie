@@ -134,7 +134,7 @@ uint32_t marco_libre(t_archivo_swamp* swamp){
 				return -1;
 			}
 
-	loggear_trace("Es posible que se asigne el [MARCO: %d] de la solitud enviada");
+	loggear_trace("Es posible que se asigne el [MARCO: %d] de la solitud enviada", i);
 	return i;
 }
 

@@ -120,7 +120,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		//free(mensaje_serializado);
 		free(pedir_deserializado);
-		//free(pagina_info); TODO porque no me deja hacer este free???
+		free(pagina_info); //TODO porque no me deja hacer este free???
 		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_ELIMINAR_PROCESO:
@@ -169,7 +169,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		return 0;;
 	case DESCONEXION_TOTAL:
 		loggear_error("Se cerró la conexión con ram");
-
+		destruir_mensaje(mensaje);
 		return ERROR_DESCONEXION_RAM;
 	case DESCONEXION:
 		loggear_warning("Se cerró la conexión con ram");
