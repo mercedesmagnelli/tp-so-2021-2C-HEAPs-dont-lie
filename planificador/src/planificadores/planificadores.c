@@ -41,7 +41,7 @@ void planificador_medio_plazo() {
 	while (true) {
 		hilos_wait_nuevo_bloqueado();
 
-		hilos_post_multitarea();
+		hilos_post_multitarea(); // MULTIPROCESAMIENTO
 
 		bool multiprogramacion_copada = deberia_suspenderse_procesos();
 
@@ -50,14 +50,12 @@ void planificador_medio_plazo() {
 
 			loggear_debug("[PID: %d] --- [Mediano Plazo] --- Se movió de BLOCK a SUSP-BLOCK", pid(hilo));
 
-			int error_ram = ram_enviar_proceso_suspendido(hilo->pid);
+			int error_ram = ram_enviar_proceso_suspendido(pid(hilo));
 			if (error_ram != 0) {
 				loggear_error("TODO: HACER ALGO ACA");
 			}
 
 			hilos_post_multiprogramacion();
-
-			loggear_error("[PID: %d] --- [Mediano Plazo] --- TODO: Avisar a la RAM de la suspension", pid(hilo));
 		}
 	}
 }
