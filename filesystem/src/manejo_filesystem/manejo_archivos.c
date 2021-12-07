@@ -6,18 +6,17 @@ int obtener_marco_desde_pagina(uint32_t pagina, t_carpincho_swamp* carpincho);
 
 int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
 
-	loggear_trace("ENTRE A ESCRIBIR");
+	loggear_debug("SE COMIENZA A ESCRIBIR EL ARCHIVO %s PARA LA PAGINA %d DEL CARPINCHO %d", swamp->ruta_archivo, pagina, carpincho->pid_carpincho);
 	FILE* archivo;
 	char* ruta_particion = swamp->ruta_archivo;
 	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
 
-	loggear_trace("ENTRE A ESCRIBIRx2");
-	loggear_debug("TIENE %d marcos reservados", list_size(carpincho->marcos_reservados));
+	loggear_debug("El carpincho tiene %d marcos reservados [PID: %d]", list_size(carpincho->marcos_reservados), carpincho->pid_carpincho);
 
 	for(int i = 0; i < list_size(carpincho->dupla); i++){
 		dupla = list_get(carpincho->dupla, i);
 		if(dupla->pagina == pagina){
-			loggear_warning("TENGO ESTA PAGINA YA ESCRITA POR LO QUE LA SOBRESCRIBO");
+			loggear_warning("TENGO LA PAGINA %d YA ESCRITA POR LO QUE SE SOBREESCRIBE CON LA NUEVA DATA [PID: %d]", pagina, carpincho->pid_carpincho);
 			archivo = fopen(ruta_particion, "r+");
 
 			if(archivo == NULL){
@@ -37,9 +36,8 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 	}
 
 	uint32_t marco = atoi(list_get(carpincho->marcos_reservados, 0));
-	loggear_trace("ENTRE A ESCRIBIRx3");
 
-	loggear_debug("SE PROCEDE A ESCRIBIR LA PAGINA %d EN EL MARCO %d DE LA PARTICION %s", pagina, marco, ruta_particion);
+	loggear_debug("SE PROCEDE A ESCRIBIR LA PAGINA %d EN EL MARCO %d DE LA PARTICION %s [PID: %d]", pagina, marco, ruta_particion, carpincho->pid_carpincho);
 
 	archivo = fopen(ruta_particion, "r+");
 
@@ -65,7 +63,7 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 	list_add(carpincho->marcos_usados, list_get(carpincho->marcos_reservados, 0));
 	list_remove(carpincho->marcos_reservados, 0);
 
-	loggear_debug("Se escribio con exito la pagina %d en el marco %d", pagina, marco);
+	loggear_debug("Se escribio con exito la pagina %d en el marco %d [PID: %d]", pagina, marco, carpincho->pid_carpincho);
 
 	return 0;
 }
@@ -73,7 +71,7 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 
 char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp* carpincho){
-
+	loggear_debug("SE PROCEDE A LEER LA PAGINA %d DEL ARCHIVO %s [PID: %d]",pagina, swamp->ruta_archivo, carpincho->pid_carpincho);
 	char* ruta_particion = swamp->ruta_archivo;
 
 	int marco = obtener_marco_desde_pagina(pagina, carpincho);
@@ -81,7 +79,7 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 		loggear_trace("NO EXISTE LA PAGINA %d del carpincho %d dentro de la swap", pagina, carpincho->pid_carpincho);
 		return string_repeat('b', get_tamanio_pagina());
 	}
-	loggear_debug("Se comienza a leer la pagina %d de la particion %s", marco, ruta_particion);
+	loggear_debug("Se comienza a leer el marco %d de la particion %s [PID: %d]", marco, ruta_particion, carpincho->pid_carpincho);
 
 	FILE* archivo_lectura;
 	char* contenido_pagina = malloc(get_tamanio_pagina() + 1);
@@ -101,7 +99,7 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 
 	fclose(archivo_lectura);
 
-	loggear_debug("Se termino la lectura de la pagina %d de la particion %s", marco, ruta_particion);
+	loggear_debug("Se termino la lectura de la pagina %d de la particion %s [PID: %d]", marco, ruta_particion, carpincho->pid_carpincho);
 
 	return contenido_pagina;
 }
@@ -136,7 +134,7 @@ uint32_t marco_libre(t_archivo_swamp* swamp){
 				return -1;
 			}
 
-	loggear_trace("Se asigna el marco %d", i);
+	loggear_trace("Es posible que se asigne el [MARCO: %d] de la solitud enviada");
 	return i;
 }
 
@@ -152,11 +150,11 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 
 	t_archivo_swamp* archivo = archivo_a_escribir(pid_carpincho);
 	if(get_asignacion() == FIJA){
-		loggear_debug("LLEGO LA SOLICITUD DE UN CARPINCHO Y COMO LA ASIGNACION ES FIJA SE PROCEDE A RESERVAR SUS MARCOS MAXIMOS PID: %d", carpincho->pid_carpincho);
+		loggear_debug("LLEGO LA SOLICITUD DE UN CARPINCHO Y COMO LA ASIGNACION ES FIJA SE PROCEDE A RESERVAR SUS MARCOS MAXIMOS [PID: %d] ", carpincho->pid_carpincho);
 		for(int i = 0; i < get_marcos_maximos(); i++){
 			int marco = marco_libre(archivo);
 			if(marco < 0){
-				loggear_error("NO HAY MARCOS DISPONIBLES PARA ASIGNAR, NO SE PUEDE GUARDAR EL CARPINCHO EN LA SWAP YA QUE NO ESTAN LOS MARCOS SUFICIENTES pid: %d", carpincho->pid_carpincho);
+				loggear_warning("NO HAY MARCOS DISPONIBLES PARA ASIGNAR, NO SE PUEDE GUARDAR EL CARPINCHO EN LA SWAP YA QUE NO ESTAN LOS MARCOS SUFICIENTES [PID: %d] ", carpincho->pid_carpincho);
 				carpincho->estado_carpincho = 1;
 				return carpincho;
 			}
@@ -180,6 +178,7 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 
 	}
 
+	loggear_trace("SE AGREGA EL CARPINCHO A LA LISTA CARPINCHOS [PID: %d]", carpincho->pid_carpincho);
 	list_add(lista_carpinchos, carpincho);
 
 	return carpincho;
@@ -187,14 +186,13 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 
 
 int reservar_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos, t_archivo_swamp* swamp){
-
+	loggear_debug("SE PROCEDE A RESERVAR %d MARCOS PARA EL CARPINCHO [PID: %d]", cantidad_marcos, carpincho->pid_carpincho);
 	if(get_asignacion() == FIJA){
-		loggear_warning("como la asignacion es fija no entro aqui");
+		loggear_trace("como la asignacion es fija no entro a reservar marcos porque ya estan reservados");
 		return 0;
 		}
 	 // ACA SI ES FIJA YA LOS MARCOS SE LE RESERVARON CON ANTERIORIDAD AL CREAR EL CARPINCHO
 
-		loggear_warning("pase para asginacion global pid: %d", carpincho->pid_carpincho);
 	t_list* marcos_lista = list_create();
 	for(int i = 0; i < cantidad_marcos; i++){
 		int marco = marco_libre(swamp);
@@ -210,14 +208,13 @@ int reservar_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos, t_ar
 		list_add(marcos_lista, string_itoa(marco));
 		loggear_warning("cantidad marcos reservados en reserva %d", list_size(marcos_lista));
 		bitarray_set_bit(swamp->bitmap_bitarray, marco);
+		loggear_debug("SE ASIGNARON LOS MARCOS MENCIONADOS PARA EL CARPINCHO [PID: %d]", carpincho->pid_carpincho);
 	}
 
 	list_add_all(carpincho->marcos_reservados, marcos_lista);
 
-	loggear_warning("cantidad marcos carpincho en reserva %d", list_size(carpincho->marcos_reservados));
+	loggear_warning("cantidad marcos carpincho en reserva %d, [PID: %d]", list_size(carpincho->marcos_reservados), carpincho->pid_carpincho);
 	swamp->espacio_libre = swamp->espacio_libre - cantidad_marcos;
-
-	loggear_warning("aca voy bien");
 	list_destroy(marcos_lista);
 	return 0;
 }
@@ -257,17 +254,16 @@ int obtener_marco_desde_pagina(uint32_t pagina, t_carpincho_swamp* carpincho){
 
 int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_paginas){
 
-	loggear_warning("llegue hasta aqui");
+	loggear_debug("SE PROCEDE A BORRAR %d cantidad de paginas[PID: %d]", cantidad_paginas, carpincho->pid_carpincho);
 	int j = list_size(carpincho->marcos_usados);
-	loggear_warning("el list size es %d", j);
+	loggear_trace("el tamaño de la lista de marcos usados del carpincho es %d [PID: %d]", j, carpincho->pid_carpincho);
 
 	if(get_asignacion() == FIJA){
-		loggear_trace("soy fija");
+		loggear_trace("la asignacion es FIJA");
 
 		for(int i = 0; i < cantidad_paginas; i++){
-			loggear_trace("aca paso?");
 			void* marco = list_get(carpincho->marcos_usados, j - i - 1);
-			loggear_trace("el marco a eliminar es %s", marco);
+			loggear_trace("EL MARCO QUE SE VA A ELIMINAR ES %s [PID: %d]", marco, carpincho->pid_carpincho);
 			list_add(carpincho->marcos_reservados, marco); //validar si se agrega bien
 			list_remove(carpincho->marcos_usados, j - i - 1); //ver si hace falta un remove.
 		}
@@ -276,9 +272,10 @@ int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_
 		for(int i = 0; i < cantidad_paginas; i++){
 			char* marco = list_get(carpincho->marcos_usados, j - i - 1);
 			int aux = atoi(marco);
-			loggear_debug("se libera el marco %d por peticion de la RAM ya que se borro informacion del proceso %d del archivo %s", aux, carpincho->pid_carpincho, archivo->ruta_archivo);
+			loggear_debug("se libera el marco %d por peticion de la RAM ya que se borro informacion del proceso del archivo %s [PID: %d]", aux, archivo->ruta_archivo, carpincho->pid_carpincho);
 			list_remove_and_destroy_element(carpincho->marcos_usados, j - i - 1, free); // ver si hace falta un remove.
 			bitarray_clean_bit(archivo->bitmap_bitarray, aux);
+			archivo->espacio_libre = archivo->espacio_libre + 1;
 			//vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
 		}
 	}
@@ -326,7 +323,7 @@ int eliminar_proceso(t_carpincho_swamp* carpincho){
 	for(int w = 0; w < list_size(lista_carpinchos); w++){
 		t_carpincho_swamp* carpi = list_get(lista_carpinchos, w);
 		if(carpi->pid_carpincho == carpincho->pid_carpincho){
-			loggear_info("la posicion es %d", w);
+			loggear_trace("la posicion del carpincho en la lista es  %d [PID: %d]", w, carpincho->pid_carpincho);
 			list_remove(lista_carpinchos, w);
 		}
 	}
