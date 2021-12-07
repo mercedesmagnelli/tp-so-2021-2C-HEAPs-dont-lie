@@ -74,7 +74,7 @@ int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALee
     if(!ptro_valido(pid, direccionLogicaALeer)){
         return -6; //MEM_READ_FAULT
     }else{
-    	loggear_trace("[MATELIB_MEM_READ] Leeremos el ptro %d del proceso %d", direccionLogicaALeer, pid);
+    	loggear_trace("[MATELIB_MEM_READ] Leeremos el ptro %d del proceso %d con tamanio %d", direccionLogicaALeer, pid, tamanioALeer);
         (*lectura) = leer_de_memoria(direccionLogicaALeer, pid, tamanioALeer);
 
         return 0;

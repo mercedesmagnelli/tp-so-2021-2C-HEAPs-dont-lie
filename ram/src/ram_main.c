@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	//testeamos();
+	testeamos();
 
 	semaforo_wait_fin();
 
@@ -122,30 +122,60 @@ void testeamos() {
 	    loggear_trace("HOLA, soy dora!!");
 	    sleep(10);
 	    inicializar_proceso(pid);
-	    inicializar_proceso(pid+1);
-	    inicializar_proceso(pid+2);
-	    inicializar_proceso(pid+3);
-	    inicializar_proceso(pid+4);
+//	    inicializar_proceso(pid+1);
+//	    inicializar_proceso(pid+2);
+//	    inicializar_proceso(pid+3);
+//	    inicializar_proceso(pid+4);
 
-	    int a = memalloc(pid,14);
+	    //pido malloc
+	    int a = memalloc(pid,23);
 	    loggear_trace("Hice el memalloc en %d", a);
 	    imprimir_tlb();
 
-	    a = memalloc(pid + 1, 23);
-	    loggear_trace("Hice el memalloc en %d", a);
-	    imprimir_tlb();
+	    //escribo
+	    char* pedido_Dora = "puedsHacermUnSanwitch?";
+	    void* sandwitch = malloc(23);
+	    memcpy(sandwitch, pedido_Dora,23);
 
-	    a = memalloc(pid + 2, 23);
-	   	loggear_trace("Hice el memalloc en %d", a);
-	   	imprimir_tlb();
+	    //loggear_error("Copie exitosamente de forma puntero el sig msj %s", ((char*) sandwitch));
+	    memwrite(sandwitch, a, pid, 23);
+	    free(sandwitch);
 
-	    a = memalloc(pid + 3, 23);
-	  	loggear_trace("Hice el memalloc en %d", a);
+		void* sandwitch2 = malloc(23);
+		memcpy(sandwitch2, memoria_principal + 9, 23);
+		loggear_info("lo leido manualmente fue %s", ((char*) sandwitch2));
+		sleep(3);
+		free(sandwitch2);
 
-	   	imprimir_procesos();
+	    //leo
+		void* ptro_tengo_q_leer;
+	    memread(a, pid, 23,&ptro_tengo_q_leer);
+	    loggear_info("lo leido manualmente fue %s", ((char*) ptro_tengo_q_leer));
 
-	    a = memalloc(pid + 4, 23);
-	  	loggear_trace("Hice el memalloc en %d", a);
+	    //variante 2
+
+	    //escribo
+
+	    //malloc 1
+
+	    //leo
+
+
+//	    a = memalloc(pid + 1, 23);
+//	    loggear_trace("Hice el memalloc en %d", a);
+//	    imprimir_tlb();
+//
+//	    a = memalloc(pid + 2, 23);
+//	   	loggear_trace("Hice el memalloc en %d", a);
+//	   	imprimir_tlb();
+//
+//	    a = memalloc(pid + 3, 23);
+//	  	loggear_trace("Hice el memalloc en %d", a);
+//
+//	   	imprimir_procesos();
+//
+//	    a = memalloc(pid + 4, 23);
+//	  	loggear_trace("Hice el memalloc en %d", a);
 
 //		PRUEBAS UTILIZADAS PARA LRU
 
