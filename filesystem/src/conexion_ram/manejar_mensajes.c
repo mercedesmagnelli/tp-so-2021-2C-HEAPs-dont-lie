@@ -29,8 +29,8 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		t_matelib_nuevo_proceso * mensaje_deserializado_nuevo = deserializar_crear_proceso(mensaje->payload);
 
 		loggear_debug("Se procede a crear la estructura administrativa del carpincho [PID: %d]", mensaje_deserializado_nuevo->pid);
-		if(get_asignacion() == FIJA){
-		loggear_trace("La asignación es fija");
+		//if(get_asignacion() == FIJA){
+		//loggear_trace("La asignación es fija");
 			carpincho = crear_carpincho(mensaje_deserializado_nuevo->pid, get_marcos_maximos());
 			if(carpincho->estado_carpincho > 0){
 					destroy_carpinchos_swamp(carpincho);
@@ -38,10 +38,10 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 					enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL); //TODO esto no se si es así revisar bien.
 				}
 			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
-		}else{
+		/*}else{
 			loggear_trace("La asignación es global");
 			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
-		}
+		}*/
 
 		free(mensaje_serializado);
 		free(mensaje_deserializado_nuevo);
