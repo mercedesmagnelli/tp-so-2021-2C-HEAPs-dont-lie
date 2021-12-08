@@ -43,12 +43,11 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	testeamos();
+	//testeamos();
 
 	semaforo_wait_fin();
 
 	cerrar_todo(false);
-	imprimir_frames();
 	destruir_estructuras_administrativas();
 
 	return EXIT_SUCCESS;

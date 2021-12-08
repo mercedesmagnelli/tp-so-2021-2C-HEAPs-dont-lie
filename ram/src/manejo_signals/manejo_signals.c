@@ -17,7 +17,7 @@ void manejar_sigint(){
 		loggear_trace("AHORA VOY A SUMARLE AL CONTADOR %d DEL PROCESO %d", p->hit, p->pid);
 		total_hits+= (p->hit);
 	}
-	if(list_size(listaProcesos) == 0){
+	if(list_size(metricas) == 0){
 
 		loggear_warning("[SIGINT] - La lista está vacia, no hay nada para calcular");
 		loggear_info("CANTIDAD DE MISS TOTALES: 0");
@@ -39,7 +39,7 @@ void manejar_sigint(){
 		imprimir_entrada_proceso(p);
 		}
 	}
-
+	imprimir_frames();
 	semaforo_post_fin();
 
 }
