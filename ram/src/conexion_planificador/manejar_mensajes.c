@@ -223,7 +223,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				loggear_info("[SUSPENDER_PROCESO], proceso %d fue suspendido", PID_proceso_suspender->pid);
 				headerS = EXITO_EN_LA_TAREA;
 			}else{
-				loggear_info("[SUSPENDER_PROCESO], proceso %d NO fue suspendido", PID_proceso_suspender->pid);
+				loggear_error("[SUSPENDER_PROCESO], proceso %d NO fue suspendido", PID_proceso_suspender->pid);
 				headerS = FALLO_EN_LA_TAREA;
 			}
 
@@ -240,10 +240,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			uint32_t headerR;
 
 			if(rtaReady){
-				loggear_info("[SUSPENDER_PROCESO], proceso %d fue suspendido", PID_proceso_ready->pid);
+				loggear_info("[PROCESO_EN_READY], proceso %d fue puesto en ready", PID_proceso_ready->pid);
 				headerR = EXITO_EN_LA_TAREA;
 			}else{
-				loggear_info("[SUSPENDER_PROCESO], proceso %d NO fue suspendido", PID_proceso_ready->pid);
+				loggear_error("[PROCESO_EN_READY], proceso %d NO fue puesto ready", PID_proceso_ready->pid);
 				headerR = FALLO_EN_LA_TAREA;
 			}
 
