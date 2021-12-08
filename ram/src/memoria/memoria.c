@@ -1,17 +1,26 @@
 #include "memoria.h"
 
-uint32_t inicializar_proceso(uint32_t PID){
+int32_t inicializar_proceso(uint32_t PID){
 	if(!existe_proceso(PID)){
 		loggear_trace("[MATELIB_INIT] estoy inicializando el proceso nuevo %d", PID);
 
+
+		//corroboraicon local
+		uint32_t cant_frames_libres = frames_libres();
+		if(get_tipo_asignacion() == FIJA && cant_frames_libres < get_marcos_maximos() ) {
+			loggear_warning("Como estoy en asignacion fija, no puedo guardar en memoria algo que no entra, asi que chequeo la cantidad de frames libres");
+			loggear_error("No puedo asignar en memoria al proceso %d porque no hay suficientes frames disponibles, solo hay: %d",PID, cant_frames_libres);
+			return ESPACIO_EN_MEMORIA_INSUF;
+		}
+		// corroboracion global - con swamp
 		uint32_t respuesta_swap = iniciar_proceso_SWAP(PID);
-		if (respuesta_swap) {
+		if (respuesta_swap == 1) {
 			loggear_trace("[MATELIB_INIT] Se crea el proceso nuevo de pid %d", PID);
 			iniciar_proceso_RAM(PID);
 			return 0;
 		}
 
-		loggear_trace("[MATELIB_INIT] estoy inicializando un proceso nuevo");
+		loggear_error("[MATELIB_INIT] - No hay espacio suficiente");
 		return ESPACIO_EN_MEMORIA_INSUF;
 	}else{
 		loggear_trace("[MATELIB_INIT] el proceso ya existia en memoria");
@@ -19,12 +28,24 @@ uint32_t inicializar_proceso(uint32_t PID){
 	}
 }
 
+uint32_t frames_libres() {
+	uint32_t cant = 0;
+	for (int i = 0; i<list_size(listaFrames); i++) {
+		t_frame* f = (t_frame*) list_get(listaFrames,i);
+		if(f->estado == 0) cant++;
+	}
+	return cant;
+}
+
 uint32_t PID_listo(uint32_t PID){
 	if(existe_proceso(PID)){
+		loggear_warning("existe el proceso con el pid %d", PID);
 		alistar_proceso(PID);
+		loggear_warning("termine de alistar el proceso");
 		return 1;
-	}else
+	}else{
 		return 0;
+	}
 }
 
 int32_t memalloc(uint32_t pid, int32_t size) {
@@ -47,7 +68,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 				actualizar_proceso(pid,  (-1) * ptro,  size);
 				return (-1) * ptro;
 			}else {
-				loggear_warning("[MATELIB_MEM_ALLOC] - No se puede pedir mas memoria para el proceso %d", pid);
+				loggear_error("[MATELIB_MEM_ALLOC] - No se puede pedir mas memoria para el proceso %d", pid);
 				return no_se_asigna_proceso(pid, size);
 			}
 		}
@@ -74,7 +95,7 @@ int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALee
     if(!ptro_valido(pid, direccionLogicaALeer)){
         return -6; //MEM_READ_FAULT
     }else{
-    	loggear_trace("[MATELIB_MEM_READ] Leeremos el ptro %d del proceso %d", direccionLogicaALeer, pid);
+    	loggear_trace("[MATELIB_MEM_READ] Leeremos el ptro %d del proceso %d con tamanio %d", direccionLogicaALeer, pid, tamanioALeer);
         (*lectura) = leer_de_memoria(direccionLogicaALeer, pid, tamanioALeer);
 
         return 0;

@@ -15,6 +15,8 @@ void inicializar_estructuras_administrativas() {
     	t_frame* frame = malloc(sizeof(t_frame));
     	frame->nroFrame=i;
     	frame->estado=0;
+    	frame->proceso=-1;
+    	frame->pagina=-1;
     	list_add(listaFrames, frame);
     }
     tiempo = 0;
@@ -69,6 +71,7 @@ void destruir_proceso(void* proceso) {
 
 // FUNCIONES PUBLICAS
 int32_t existe_proceso(uint32_t PID){
+	loggear_trace("[existe_proceso] - voy a buscar el proceso con pid %d", PID);
 	t_proceso* proceso = get_proceso_PID(PID);
 	return proceso == NULL ? 0 : 1;
 
@@ -96,13 +99,23 @@ void iniciar_proceso_RAM(uint32_t PID){
 void alistar_proceso(uint32_t PID){
 
 	t_proceso* proceso = get_proceso_PID(PID);
-
+	loggear_warning("obtuve el proceso, de pid: %d", proceso->PID);
 	if(get_tipo_asignacion() == FIJA){
-		reservar_frames(proceso->lista_frames_reservados);
+		reservar_frames(proceso->lista_frames_reservados, PID);
+		//imprimir_lista_frames_reservados(proceso->lista_frames_reservados);
+
 		proceso->puntero_frames = 0;
 	}
 }
+void imprimir_lista_frames_reservados(t_list* l) {
 
+	for (int i = 0; i < list_size(l); i++) {
+		t_frame* frame = (t_frame*)list_get(l, i);
+		loggear_debug("FRAME:%d | ESTADO: %d | PROCESO: %d | PAGINA : %d", frame->nroFrame, frame->estado, frame->proceso, frame->pagina);
+
+	}
+
+}
 
 int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
@@ -210,8 +223,6 @@ void agregar_proceso(uint32_t PID, uint32_t tam){
 	agregar_HEAP_a_PID(PID,nuevoHeapPrimero);
 
 	guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
-
-	loggear_trace("guardado primer heap");
 
 
 	heap_metadata* nuevoHeapUltimo = malloc(sizeof(heap_metadata));
@@ -338,12 +349,11 @@ heap_metadata* encontrar_heap(uint32_t PID, uint32_t ptro){
 		leer_heap(heap, PID);
 		return (heap->currAlloc + 9) == ptro;
 	}
-	loggear_error("[RAM] - quiero encontrar el HEAP %d", ptro);
+	loggear_trace("[RAM] - quiero encontrar el HEAP %d", ptro);
 	heap_metadata* heap_encontrado = (heap_metadata*) list_find(lista_heaps, condicion);
 
 	if(heap_encontrado == NULL) {
-		loggear_error("[RAM] - quiero encontrar el HEAP %d", ptro);
-		loggear_error("problemas xd");
+		loggear_error("[RAM] - quiero encontrar el HEAP %d y no existe", ptro);
 	}
 
 	return heap_encontrado;
@@ -531,9 +541,11 @@ void* leer_heap(heap_metadata* heap, uint32_t PID){
 void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
 
 	heap_metadata* heap = encontrar_heap(PID, ptroHEAP);
-	int nroPag = calcular_pagina_de_puntero_logico(heap->currAlloc);
-	int offset = calcular_offset_puntero_en_pagina(heap->currAlloc);
+	int nroPag = calcular_pagina_de_puntero_logico(heap->currAlloc+9);
+	int offset = calcular_offset_puntero_en_pagina(heap->currAlloc+9);
+	loggear_warning("Leo el contenido del HEAP en la pag %d con el offset %d", nroPag, offset);
 	void* dataLeida = leer_de_memoria_paginada(PID, nroPag, offset, tamanioALeer);
+	loggear_warning("Lo leido en memoria fue %s (solo strings)", ((char*)dataLeida));
 	return dataLeida;
 }
 
@@ -600,7 +612,7 @@ void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t punt
 	encontrar_heap(pid, puntero);
 	uint32_t nro_pag = calcular_pagina_de_puntero_logico(puntero);
 	uint32_t offset = calcular_offset_puntero_en_pagina(puntero);
-	loggear_error("--- PID: %d, NRO PAG: %d, OFFSET: %d, VALOR: %s , DONDE: %d",pid, nro_pag, offset, valor, puntero);
+	//loggear_error("--- PID: %d, NRO PAG: %d, OFFSET: %d, VALOR: %s , DONDE: %d",pid, nro_pag, offset, valor, puntero);
 	guardar_en_memoria_paginada(pid, nro_pag, offset, valor, size);
 
 
@@ -610,10 +622,12 @@ void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t punt
 
 t_proceso* get_proceso_PID(uint32_t PID){
 
+
 	bool proceso_PID(void* element) {
 			t_proceso* proceso = (t_proceso*) element;
 			return proceso->PID == PID;
 	}
+
 
 	pthread_mutex_lock(&mutex_lista_procesos);
 	t_proceso* proceso = list_find(listaProcesos, proceso_PID);
@@ -679,20 +693,28 @@ void agregar_HEAP_a_PID(uint32_t PID, heap_metadata* heap){
 void* leer_de_memoria_paginada(uint32_t PID, int nroPag, int offset, int tamDato){
 	int desplazamientoEnDato = 0;
 	uint32_t marcoPag;
-	int ptro_escritura;
+	int ptro_lectura;
 	void* data = malloc(tamDato);
+
+	loggear_trace("VOY A LEER ALGO CON TAMANIO %d", tamDato);
 	while(tamDato>0){
+		loggear_warning("[RAM] - busco marco de pagina");
 		marcoPag = obtener_marco_de_pagina_en_memoria(PID, nroPag, 0);
-		ptro_escritura = marcoPag * get_tamanio_pagina() + offset;
+		loggear_trace("[RAM] - encontre marco %d de pagina", marcoPag);
+		ptro_lectura = marcoPag * get_tamanio_pagina() + offset;
 		if((offset+tamDato) <= get_tamanio_pagina()){
-			leer_directamente_de_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
+			loggear_trace("[RAM] - voy a leer ultima parte de datos en %d con tamanio de %d con un desplazamiento interno de %d", ptro_lectura, tamDato, desplazamientoEnDato);
+			leer_directamente_de_memoria(data + desplazamientoEnDato, tamDato, ptro_lectura);
 			tamDato=0;
 		}else{
+			loggear_trace("[RAM] - voy a leer parte parcial de los datos");
 			int tamDatoParcial = get_tamanio_pagina()- offset;
-			leer_directamente_de_memoria(data + desplazamientoEnDato, tamDatoParcial, ptro_escritura);
+			leer_directamente_de_memoria(data + desplazamientoEnDato, tamDatoParcial, ptro_lectura);
+
 			desplazamientoEnDato += tamDatoParcial;
 			tamDato -= tamDatoParcial;
 			offset = 0;
+			nroPag++;
 		}
 	}
 	return data;
@@ -702,7 +724,7 @@ void guardar_HEAP_en_memoria(uint32_t PID, heap_metadata* heap){
 
 	int nroPag = heap->currAlloc / get_tamanio_pagina();
 	int offset = heap->currAlloc % get_tamanio_pagina();
-	loggear_warning("[RAM] - Guardo heap en nro pag %d con offset %d",nroPag, offset);
+	loggear_trace("[RAM] - Voy a guardar heap en nro pag %d con offset %d",nroPag, offset);
 	void* dataHeap = serializar_HEAP(heap);
 	guardar_en_memoria_paginada(PID, nroPag, offset, dataHeap, 9);
 	free(dataHeap);
@@ -722,7 +744,7 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 		loggear_trace("[RAM] - encontre marco %d de pagina", marcoPag);
 		ptro_escritura = marcoPag * get_tamanio_pagina() + offset;
 		if((offset+tamDato) <= get_tamanio_pagina()){
-			loggear_trace("[RAM] - voy a escribir ultima parte de datos en %d con tamanio de %d con un desplazamiento de %d", ptro_escritura, tamDato, desplazamientoEnDato);
+			loggear_trace("[RAM] - voy a escribir ultima parte de datos en %d con tamanio de %d con un desplazamiento interno de %d", ptro_escritura, tamDato, desplazamientoEnDato);
 			escribir_directamente_en_memoria(data + desplazamientoEnDato, tamDato, ptro_escritura);
 			tamDato=0;
 		}else{
@@ -735,7 +757,6 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 			offset = 0;
 			nroPag++;
 		}
-		loggear_trace("[RAM] - guarde una parte del dato");
 	}
 
 }
@@ -759,7 +780,7 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 			actualizar_datos_pagina(PID, nroPag, bitModificado, false);
 
 		}else{
-			loggear_error("[RAM] - TENGO QUE TRAER PAGINA A MEMORIA");
+			loggear_warning("[RAM] - TENGO QUE TRAER PAGINA A MEMORIA");
 
 			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima. Tmbn tiene que actualizar la cant de Pags en asig FIJA
 
@@ -800,7 +821,7 @@ bool esta_en_RAM(uint32_t PID, uint32_t nroPag){
 	loggear_debug("la tabla de paginas tiene una longitud de %d y la pagina que quiero obtener es la %d", list_size(tabla_paginas), nroPag);
 	t_pagina* pag = (t_pagina*) list_get(tabla_paginas, nroPag);
 	if(pag==NULL) {
-		loggear_error("toi nula");
+		loggear_error("pagina nula, hay un error");
 	}
 	loggear_debug("el bit de presencia es: %d",pag->bit_presencia);
 	return pag->bit_presencia == 1 ? true : false;
@@ -905,17 +926,25 @@ int calcular_paginas_para_tamanio(uint32_t tam) {
 		return cantPags;
 }
 
-void reservar_frames(t_list* lista_frames_proceso){
+void reservar_frames(t_list* lista_frames_proceso, uint32_t pid){
 
 	bool frame_disponible_y_no_repetidos_en_lista(void* element){
 
 		return frame_disponible(element) && frame_no_pertenece_a_lista(listaFramesReservados, element);
 	}
 
+
 	for(int i=0; i<get_marcos_maximos();i++){
+
 		pthread_mutex_lock(&mutex_acceso_lista_frames_r);
+
 		pthread_mutex_lock(&mutex_acceso_lista_frames);
 		t_frame* frame = (t_frame*)list_find(listaFrames, frame_disponible_y_no_repetidos_en_lista);
+		//FIXME: ACA PUEDE SER QUE LE ESTE ERRANDO PERO POR AHORA QUIERO VER SI FUNCIONA
+		frame->proceso = pid;
+		frame->pagina = i;
+		loggear_info("reserve el frame %d", frame->nroFrame);
+
 		pthread_mutex_unlock(&mutex_acceso_lista_frames);
 
 		list_add(lista_frames_proceso, frame);
@@ -923,7 +952,9 @@ void reservar_frames(t_list* lista_frames_proceso){
 
 		pthread_mutex_unlock(&mutex_acceso_lista_frames_r);
 	}
+
 }
+
 
 bool frame_no_pertenece_a_lista(t_list* lista_frames, void* elementoBuscado){
 
