@@ -543,6 +543,13 @@ void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
 	heap_metadata* heap = encontrar_heap(PID, ptroHEAP);
 	int nroPag = calcular_pagina_de_puntero_logico(heap->currAlloc+9);
 	int offset = calcular_offset_puntero_en_pagina(heap->currAlloc+9);
+
+	void* sandwitch2 = malloc(33);
+	memcpy(sandwitch2, memoria_principal + 9, 23);
+	loggear_info("lo leido manualmente fue %s", ((char*) sandwitch2));
+	sleep(3);
+	free(sandwitch2);
+
 	loggear_warning("Leo el contenido del HEAP en la pag %d con el offset %d", nroPag, offset);
 	void* dataLeida = leer_de_memoria_paginada(PID, nroPag, offset, tamanioALeer);
 	loggear_warning("Lo leido en memoria fue %s (solo strings)", ((char*)dataLeida));
@@ -774,10 +781,10 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 	}else{
 		usleep(1000 *  get_retardo_fallo_tlb());
 		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
-			if(esta_en_RAM(PID, nroPag)){
-			loggear_trace("[RAM] - Estoy en la RAM");
-			marco = obtener_frame_de_RAM(PID, nroPag);
-			actualizar_datos_pagina(PID, nroPag, bitModificado, false);
+		if(esta_en_RAM(PID, nroPag)){
+		loggear_trace("[RAM] - Estoy en la RAM");
+		marco = obtener_frame_de_RAM(PID, nroPag);
+		actualizar_datos_pagina(PID, nroPag, bitModificado, false);
 
 		}else{
 			loggear_warning("[RAM] - TENGO QUE TRAER PAGINA A MEMORIA");

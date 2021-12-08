@@ -58,7 +58,7 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 	// fijarse si esta modificado, setear en 0 el bit de presencia de la pagina victima
 	loggear_warning("Veo consistencia de frame victima %d", pagina_victima->frame);
 	void* info_en_frame = obtener_info_en_frame(pagina_victima->frame);
-	loggear_warning("Leo lo que tiene frame victima %d", pagina_victima->frame);
+	loggear_warning("Leo lo que tiene frame victima %d con contenido %s", pagina_victima->frame, (info_en_frame+9));
 	uint32_t pid_pag_victima = obtener_pid_en_frame(pagina_victima->frame);
 	loggear_trace("[SWAP] pid de la victima: %d", pid_pag_victima);
 	uint32_t nro_pag_victima = obtener_pag_en_frame(pagina_victima->frame);
@@ -66,8 +66,9 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 
 	if(pagina_victima->bit_modificacion == 1) {
 		size_t tamanio;
-		t_write_s* mensaje = shared_crear_write_s(nro_pag_victima, pid_pag_victima, info_en_frame);
-		void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio, get_tamanio_pagina());
+		t_write_s* mensaje = shared_crear_write_s(nro_pag_victima, pid_pag_victima, get_tamanio_pagina(), info_en_frame);
+		void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio);
+		loggear_warning("Leo lo que tiene frame victima %d con contenido %s y serializamos con un tamanio total de %d", pagina_victima->frame, (mensaje_serializado +12 +9), tamanio);
 		pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 		enviar_mensaje_protocolo(socket_swap,R_S_ESCRIBIR_EN_PAGINA,tamanio,mensaje_serializado);
 		t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
@@ -351,8 +352,8 @@ void comunicar_eliminacion_proceso_SWAP(uint32_t PID){
 void enviar_pagina_a_SWAP(uint32_t PID, uint32_t nro_pag, void* data_pag){
 
 	size_t tamanio;
-	t_write_s* mensaje = shared_crear_write_s(nro_pag, PID, data_pag);
-	void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio, get_tamanio_pagina());
+	t_write_s* mensaje = shared_crear_write_s(nro_pag, PID, get_tamanio_pagina(), data_pag);
+	void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio);
 
 	pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 	enviar_mensaje_protocolo(socket_swap,R_S_ESCRIBIR_EN_PAGINA,tamanio,mensaje_serializado);
