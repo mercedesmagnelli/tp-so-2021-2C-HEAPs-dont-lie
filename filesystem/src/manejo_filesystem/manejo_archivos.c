@@ -6,21 +6,21 @@ int obtener_marco_desde_pagina(uint32_t pagina, t_carpincho_swamp* carpincho);
 
 int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
 
-	loggear_debug("SE COMIENZA A ESCRIBIR EL ARCHIVO %s PARA LA PAGINA %d DEL CARPINCHO %d", swamp->ruta_archivo, pagina, carpincho->pid_carpincho);
+	loggear_info("[ESCRIBIR_PARTICION] [PID: %zu] [ARCHIVO: %s] [PAG: %d] Se comienza a escribir", carpincho->pid_carpincho, swamp->ruta_archivo, pagina);
 	FILE* archivo;
 	char* ruta_particion = swamp->ruta_archivo;
 	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
 
-	loggear_debug("El carpincho tiene %d marcos reservados [PID: %d]", list_size(carpincho->marcos_reservados), carpincho->pid_carpincho);
+	loggear_debug("[ESCRIBIR_PARTICION] [PID: %zu] El carpincho tiene [MARCOS_RESERVADOS: %d]", carpincho->pid_carpincho, list_size(carpincho->marcos_reservados));
 
-	for(int i = 0; i < list_size(carpincho->dupla); i++){
+	for (int i = 0; i < list_size(carpincho->dupla); i++){
 		t_dupla_pagina_marco* dupla_busqueda = list_get(carpincho->dupla, i);
 		if(dupla_busqueda->pagina == pagina){
-			loggear_warning("TENGO LA PAGINA %d YA ESCRITA POR LO QUE SE SOBREESCRIBE CON LA NUEVA DATA [PID: %d]", pagina, carpincho->pid_carpincho);
+			loggear_warning("[ESCRIBIR_PARTICION] [PID: %zu] [PAG: %d] Tiene la pagina ya escrita, por lo que sobreescrive con nueva data", carpincho->pid_carpincho, pagina);
 			archivo = fopen(ruta_particion, "r+");
 
 			if(archivo == NULL){
-				loggear_error("Ocurrio un error al abrir el archivo %s, puede deberse a que no esta creado o no es la ruta correcta", ruta_particion);
+				loggear_error("[ESCRIBIR_PARTICION] [PID: %zu] [ARCHIVO: %s] Ocurrio un error al abrir el archivo, puede deberse a que no esta creado o no es la ruta correcta", carpincho->pid_carpincho, ruta_particion);
 				return -1;
 			}
 
@@ -29,7 +29,6 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 			fseek(archivo, posicion_escribir, SEEK_SET);
 
 			fwrite(texto_escribir, 1, get_tamanio_pagina(), archivo);
-			//fputs(texto_escribir, archivo);
 
 			fclose(archivo);
 			return 0;
@@ -38,77 +37,75 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 	uint32_t marco = atoi(list_get(carpincho->marcos_reservados, 0));
 
-	loggear_debug("SE PROCEDE A ESCRIBIR LA PAGINA %d EN EL MARCO %d DE LA PARTICION %s [PID: %d]", pagina, marco, ruta_particion, carpincho->pid_carpincho);
+	loggear_info("[ESCRIBIR_PARTICION] [PID: %d] Se escribe la [PAG: %d] en el [Marco: %d] de la [PARTICION: %s]", carpincho->pid_carpincho, pagina, marco, ruta_particion);
 
 	archivo = fopen(ruta_particion, "r+");
 
-		if(archivo == NULL){
-			loggear_error("Ocurrio un error al abrir el archivo %s, puede deberse a que no esta creado o no es la ruta correcta", ruta_particion);
-			return -1;
-		}
+	if(archivo == NULL){
+		loggear_error("[ESCRIBIR_PARTICION] [PID: %d] Ocurrio un error al abrir el [ARCHIVO: %s], puede deberse a que no esta creado o no es la ruta correcta", carpincho->pid_carpincho, ruta_particion);
+		return -1;
+	}
 
-		int posicion_escribir = marco * get_tamanio_pagina();
+	int posicion_escribir = marco * get_tamanio_pagina();
 
-		fseek(archivo, posicion_escribir, SEEK_SET);
+	fseek(archivo, posicion_escribir, SEEK_SET);
 
-		//fputs(texto_escribir, archivo);
-		fwrite(texto_escribir, 1, get_tamanio_pagina(), archivo);
-
-		loggear_error("[F_WRITE_SWAP] Se esta escribiendo %s", (char *)(texto_escribir + 9));
+	fwrite(texto_escribir, 1, get_tamanio_pagina(), archivo);
 
 	fclose(archivo);
-
 
 	dupla->marco = marco;
 	dupla->pagina = pagina;
 
-	loggear_warning("LA DUPLA ES MARCO %d, PAGINA %d, para el proceso PID: %d", marco, pagina, carpincho->pid_carpincho);
-
 	list_add(carpincho->dupla, dupla);
 
 	list_add(carpincho->marcos_usados, list_get(carpincho->marcos_reservados, 0));
+
 	list_remove(carpincho->marcos_reservados, 0);
 
-	loggear_debug("Se escribio con exito la pagina %d en el marco %d [PID: %d]", pagina, marco, carpincho->pid_carpincho);
+	loggear_info("[ESCRIBIR_PARTICION] [PID: %zu] Se escribio con exito la dupa es [MARCO: %d], [PAG: %d]", carpincho->pid_carpincho, marco, pagina);
 
 	return 0;
 }
 
 
 
-char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp* carpincho){
-	loggear_debug("SE PROCEDE A LEER LA PAGINA %d DEL ARCHIVO %s [PID: %d]",pagina, swamp->ruta_archivo, carpincho->pid_carpincho);
+char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp* carpincho, int * resultado){
+	loggear_info("[LEER_PARTICION] [PID: %zu] Se lee la [PAG: %d] [ARCHIVO: %s]", carpincho->pid_carpincho, pagina, swamp->ruta_archivo);
+
 	char* ruta_particion = swamp->ruta_archivo;
+	*resultado = 0;
 
 	int marco = obtener_marco_desde_pagina(pagina, carpincho);
 	if(marco < 0){
-		loggear_trace("NO EXISTE LA PAGINA %d del carpincho %d dentro de la swap", pagina, carpincho->pid_carpincho);
+		loggear_error("[LEER_PARTICION] [PID: %zu] No existe la [PAG: %d] del carpincho dentro del swap", carpincho->pid_carpincho, pagina);
+
 		return string_repeat('b', get_tamanio_pagina());
 	}
-	loggear_debug("Se comienza a leer el marco %d de la particion %s [PID: %d]", marco, ruta_particion, carpincho->pid_carpincho);
+
+	loggear_info("[LEER_PARTICION] [PID: %zu] Se comienza a leer el [MARCO: %d] de la [PARTICION: %s]", carpincho->pid_carpincho, marco, ruta_particion);
 
 	FILE* archivo_lectura;
 	void* contenido_pagina = malloc(get_tamanio_pagina());
 
 	archivo_lectura = fopen(ruta_particion, "r+");
 
-		if(archivo_lectura == NULL){
-			loggear_error("Ocurrio un error al abrir el archivo %s, puede deberse a que no esta creado o no es la ruta correcta", ruta_particion);
-			return "ERROR EN LECTURA IGNORAR MENSAJE"; // TODO pensar mejor esta parte para mandarle a la RAM o que control se puede hacer.
-		}
+	if(archivo_lectura == NULL){
+		loggear_error("[LEER_PARTICION] [PID: %zu] No se pudo abrir Ocurrio un error al abrir el [ARCHIVO: %s], puede deberse a que no esta creado o no es la ruta correcta", carpincho->pid_carpincho, ruta_particion);
+		*resultado = -1;
+
+		return "";
+	}
 
 	int posicion_a_leer = marco * get_tamanio_pagina();
 
 	fseek(archivo_lectura, posicion_a_leer, SEEK_SET);
 
 	fread(contenido_pagina, 1, get_tamanio_pagina(), archivo_lectura);
-	//fgets(contenido_pagina, get_tamanio_pagina() + 1, archivo_lectura);
-
-	loggear_error("[F_READ_SWAP] Se esta leyendo %s", (char *)(contenido_pagina + 9));
 
 	fclose(archivo_lectura);
 
-	loggear_debug("Se termino la lectura de la pagina %d de la particion %s [PID: %d]", marco, ruta_particion, carpincho->pid_carpincho);
+	loggear_info("[LEER_PARTICION] [PID: %zu] Se termino la lectura de la [PAG: %d] de la [PARTICION: %s]", carpincho->pid_carpincho, marco, ruta_particion);
 
 	return contenido_pagina;
 }
