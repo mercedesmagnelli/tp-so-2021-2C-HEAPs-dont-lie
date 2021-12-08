@@ -373,26 +373,30 @@ void* serializar_solicitud_espacio(t_mensaje_r_s* mensaje, size_t* size_final){
 
 
 }
-void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final, size_t tamanio_data){
+void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final){
 	size_t offset = 0;
-		size_t tamanio_buffer = SIZE_PID+ SIZE_NRO_PAG + tamanio_data;
-		void * buffer = malloc(tamanio_buffer);
+	size_t tamanio_buffer = SIZE_PID+ SIZE_NRO_PAG + sizeof(size_t)+ mensaje->tam_data;
+	void * buffer = malloc(tamanio_buffer);
 
 
-			memcpy(buffer + offset, &mensaje->nro_pag, SIZE_NRO_PAG);
-			offset += SIZE_NRO_PAG;
+	memcpy(buffer + offset, &mensaje->nro_pag, SIZE_NRO_PAG);
+	offset += SIZE_NRO_PAG;
 
-			memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
-			offset += SIZE_PID;
+	memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
+	offset += SIZE_PID;
 
-			memcpy(buffer+offset, mensaje->data, tamanio_data);
-			offset+=tamanio_data;
-			//aca creo que no sería necesario hacer otro desplazamiento porque ya es el final
-			if (size_final != NULL) {
-				*size_final = tamanio_buffer;
-			}
+	memcpy(buffer + offset, &mensaje->tam_data, sizeof(size_t));
+	offset+=sizeof(size_t);
 
-			return buffer;
+	memcpy(buffer + offset, mensaje->data, mensaje->tam_data);
+	offset += mensaje->tam_data;
+
+	//aca creo que no sería necesario hacer otro desplazamiento porque ya es el final
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
+
+	return buffer;
 
 
 
@@ -461,11 +465,12 @@ t_pedir_o_liberar_pagina_s* shared_crear_pedir_o_liberar(uint32_t pid, uint32_t 
 	return mensaje;
 }
 
-t_write_s* shared_crear_write_s(uint32_t nro_pag, uint32_t pid, void* data){
+t_write_s* shared_crear_write_s(uint32_t nro_pag, uint32_t pid, size_t tam_data, void* data){
 
 	t_write_s* mensaje = malloc(sizeof(t_write_s));
 	mensaje->nro_pag = nro_pag;
 	mensaje->pid = pid;
+	mensaje->tam_data = tam_data;
 	mensaje->data = data;
 
 	return mensaje;
@@ -507,9 +512,13 @@ t_write_s * deserializar_mensaje_write_s(void* puntero){
 	memcpy(&mensaje->pid, puntero + offset, SIZE_PID);
 		offset += SIZE_PID;
 
-		mensaje->data = string_new();
-		string_append(&mensaje->data, puntero + offset);
-		offset += string_length(mensaje->data) + 1;
+	memcpy(&mensaje->tam_data, puntero + offset, SIZE_PID);
+		offset += SIZE_PID;
+
+	size_t size_memoria_write = SIZE_CHAR * mensaje->tam_data;
+	mensaje->data = malloc(size_memoria_write);
+	memcpy(mensaje->data, puntero + offset, size_memoria_write);
+	offset += size_memoria_write;
 
 	return mensaje;
 }

@@ -80,6 +80,7 @@ uint32_t pid;
 typedef struct{
 	uint32_t nro_pag;
 	uint32_t pid;
+	size_t tam_data;
 	char* data;
 }t_write_s; //solicitud escritura
 
@@ -127,7 +128,7 @@ t_ram_read * deserializar_ram_read(void * puntero);
 
 
 void* serializar_solicitud_espacio(t_mensaje_r_s* mensaje, size_t* size_final);
-void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final, size_t tamanio_pagina);
+void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final);
 void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
 void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final);
 
@@ -136,7 +137,7 @@ void* deserializar_pedir_pagina(void* respuesta);
 
 
 t_pedir_o_liberar_pagina_s* shared_crear_pedir_o_liberar(uint32_t pid, uint32_t nro_pag);
-t_write_s* shared_crear_write_s(uint32_t nro_pag, uint32_t pid, void* data);
+t_write_s* shared_crear_write_s(uint32_t nro_pag, uint32_t pid, size_t tam_data, void* data);
 t_mensaje_r_s* shared_crear_t_mensaje_r_s(uint32_t cant_pag, uint32_t pid);
 
 //PARA EL SWAP

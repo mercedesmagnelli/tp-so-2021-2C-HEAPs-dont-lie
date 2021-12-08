@@ -14,8 +14,8 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 	loggear_debug("El carpincho tiene %d marcos reservados [PID: %d]", list_size(carpincho->marcos_reservados), carpincho->pid_carpincho);
 
 	for(int i = 0; i < list_size(carpincho->dupla); i++){
-		dupla = list_get(carpincho->dupla, i);
-		if(dupla->pagina == pagina){
+		t_dupla_pagina_marco* dupla_busqueda = list_get(carpincho->dupla, i);
+		if(dupla_busqueda->pagina == pagina){
 			loggear_warning("TENGO LA PAGINA %d YA ESCRITA POR LO QUE SE SOBREESCRIBE CON LA NUEVA DATA [PID: %d]", pagina, carpincho->pid_carpincho);
 			archivo = fopen(ruta_particion, "r+");
 
@@ -24,7 +24,7 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 				return -1;
 			}
 
-			int posicion_escribir = dupla->marco * get_tamanio_pagina();
+			int posicion_escribir = dupla_busqueda->marco * get_tamanio_pagina();
 
 			fseek(archivo, posicion_escribir, SEEK_SET);
 
@@ -57,6 +57,8 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 	dupla->marco = marco;
 	dupla->pagina = pagina;
+
+	loggear_warning("LA DUPLA ES MARCO %d, PAGINA %d, para el proceso PID: %d", marco, pagina, carpincho->pid_carpincho);
 
 	list_add(carpincho->dupla, dupla);
 
@@ -325,13 +327,11 @@ int eliminar_proceso(t_carpincho_swamp* carpincho){
 		if(carpi->pid_carpincho == carpincho->pid_carpincho){
 			loggear_trace("la posicion del carpincho en la lista es  %d [PID: %d]", w, carpincho->pid_carpincho);
 			list_remove(lista_carpinchos, w);
+			loggear_trace("se saco de la lista con exito");
 		}
 	}
 
 	destroy_carpinchos_swamp(carpincho);
-
-
-
 
 	return 0;
 }
