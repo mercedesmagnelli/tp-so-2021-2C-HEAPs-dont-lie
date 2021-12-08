@@ -38,19 +38,33 @@ void imprimir_tlb(){
 void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
 	if(max_entradas > 0) {
-	entrada_tlb* entrada = malloc(sizeof(entrada_tlb));
-	entrada->timestamp = obtener_timestamp_actual();
-	entrada->frame = frame;
-	entrada->hash_key = calcular_hash_key(proceso, pagina);
 
-	if(max_entradas == list_size(TLB)) {
-		uint32_t indice_victima = obtener_entrada_victima();
-		loggear_trace("[TLB] - Voy a reemplazar la entrada %d", indice_victima);
-		eliminar_entrada(indice_victima);
+		char* hash_KEY_del_ingresante = calcular_hash_key(proceso, pagina);
+
+		if(existe_la_KEY(hash_KEY_del_ingresante)){
+
+			bool soy_KEY_buscada(void* element){
+				entrada_tlb* elemento_iterado = (entrada_tlb*) element;
+				return strcmp(elemento_iterado->hash_key, hash_KEY_del_ingresante) == 0;
+			}
+
+			entrada_tlb* elemento_encontrado = list_find(TLB, soy_KEY_buscada);
+			elemento_encontrado->timestamp =  obtener_timestamp_actual();
+			elemento_encontrado->frame = frame;
+		}else{
+			entrada_tlb* entrada = malloc(sizeof(entrada_tlb));
+			entrada->timestamp = obtener_timestamp_actual();
+			entrada->frame = frame;
+			entrada->hash_key = calcular_hash_key(proceso, pagina);
+			if(max_entradas == list_size(TLB)) {
+				uint32_t indice_victima = obtener_entrada_victima();
+				loggear_trace("[TLB] - Voy a reemplazar la entrada %d", indice_victima);
+				eliminar_entrada(indice_victima);
+			}
+
+			list_add(TLB, entrada);
+		}
 	}
-
-	list_add(TLB, entrada);
-}
 }
 
 
@@ -174,6 +188,16 @@ uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina){
 	entrada_tlb* entrada_encontrada = (entrada_tlb*)list_find(TLB, buscar_key);
 	return entrada_encontrada->frame;
 	free(key);
+}
+
+bool existe_la_KEY (char* KEY){
+
+	bool soy_KEY_buscada(void* element){
+		entrada_tlb* elemento_iterado = (entrada_tlb*) element;
+		return strcmp(elemento_iterado->hash_key, KEY) == 0;
+	}
+
+	return list_any_satisfy(TLB, soy_KEY_buscada);
 }
 
 void destructor_de_entradas(void* entrada) {

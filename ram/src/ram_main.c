@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	//testeamos();
+	testeamos();
 
 	semaforo_wait_fin();
 
@@ -129,7 +129,7 @@ void testeamos() {
 //        inicializar_proceso(pid+4);
 
 	inicializar_proceso(pid);
-//        PID_listo(pid);
+	PID_listo(pid);
 //        inicializar_proceso(pid+1);
 //            PID_listo(pid+1);
 //
@@ -186,9 +186,14 @@ void testeamos() {
 	free(sandwitch3);
 
 	inicializar_proceso(pid+1);
+	PID_listo(pid+1);
 	//pido malloc
 	int b = memalloc(pid+1,33);
 	loggear_trace("Hice el memalloc en %d", b);
+	imprimir_tlb();
+	imprimir_frames();
+
+	suspender_PID(pid+1);
 	imprimir_tlb();
 	imprimir_frames();
 
@@ -199,6 +204,7 @@ void testeamos() {
 	free(sandwitch4);
 
 	//leo
+	PID_listo(pid);
 	void* ptro_tengo_q_leer;
 	memread(a, pid, 34, &ptro_tengo_q_leer);
 	loggear_info("lo leido de memoria fue %s", ((char*) ptro_tengo_q_leer));
