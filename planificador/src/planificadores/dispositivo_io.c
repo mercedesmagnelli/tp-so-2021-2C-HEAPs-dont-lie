@@ -2,8 +2,6 @@
 
 t_dictionary * dispositivos;
 
-pthread_mutex_t lock;
-
 int dispositivo_io_estructuras_crear() {
 	dispositivos = dictionary_create();
 

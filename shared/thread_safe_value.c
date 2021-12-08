@@ -19,7 +19,7 @@ t_safe_value * crear_value_safe_int(int new_value) {
 void set_value_safe(t_safe_value * safe_value, void * value) {
 	pthread_mutex_lock(&safe_value->mutex_t);
 
-	free(safe_value->value); // TODO: Si no tenia nada, falla el free
+	free(safe_value->value);
 	safe_value->value = value;
 
 	pthread_mutex_unlock(&safe_value->mutex_t);

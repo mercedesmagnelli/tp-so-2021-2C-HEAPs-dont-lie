@@ -1,5 +1,15 @@
-
 #include "matelib.h"
+
+uint32_t generar_pid() {
+	static uint32_t id = 0;
+	static pthread_mutex_t mutex_t = PTHREAD_MUTEX_INITIALIZER;
+
+	pthread_mutex_lock(&mutex_t);
+	id++;
+	pthread_mutex_unlock(&mutex_t);
+
+	return id;
+}
 
 void mate_instance_close(mate_instance * lib_ref){
 
