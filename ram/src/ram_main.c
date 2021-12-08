@@ -127,11 +127,12 @@ void testeamos() {
 //	    inicializar_proceso(pid+2);
 //	    inicializar_proceso(pid+3);
 //	    inicializar_proceso(pid+4);
+
 	    inicializar_proceso(pid);
-	    inicializar_proceso(pid+1);
-	    loggear_warning("voy a darle ready al proceso");
 	    PID_listo(pid);
-	    loggear_warning("ya le di ready al proceso");
+	    inicializar_proceso(pid+1);
+	   	 PID_listo(pid+1);
+
 	    //pido malloc
 	    int a = memalloc(pid,23);
 	    loggear_trace("Hice el memalloc en %d", a);
@@ -139,6 +140,18 @@ void testeamos() {
 	    a = memalloc(pid+1,23);
 	    loggear_trace("Hice el memalloc en %d", a);
 
+
+	    a = memalloc(pid,23);
+	 	loggear_trace("Hice el memalloc en %d", a);
+
+	 	a = memalloc(pid+1,23);
+	 	loggear_trace("Hice el memalloc en %d", a);
+
+	 	if(inicializar_proceso(pid+2) == 0){
+	 	PID_listo(pid+2);
+		a = memalloc(pid+2,23);
+		loggear_trace("Hice el memalloc en %d", a);
+	 	}
 	   imprimir_tlb();
 	   imprimir_frames();
 

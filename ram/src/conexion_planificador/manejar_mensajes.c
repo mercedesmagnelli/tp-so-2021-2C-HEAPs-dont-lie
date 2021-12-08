@@ -38,7 +38,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			t_matelib_nuevo_proceso* PID_proceso_nuevo = deserializar_crear_proceso(mensaje->payload);
 
 			int rtaInit = inicializar_proceso(PID_proceso_nuevo->pid);
-			uint32_t headerI;
+			int32_t headerI;
 
 			if(rtaInit == 0){
 				loggear_info("[MATELIB_INIT], proceso %d fue inicializado en la memoria", PID_proceso_nuevo->pid);
@@ -60,6 +60,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			t_matelib_nuevo_proceso* PID_proceso_eliminar = deserializar_crear_proceso(mensaje->payload);
 
 			int32_t rtaClose = close_PID(PID_proceso_eliminar->pid);
+			//close_pid: 1 lo hace bien, 0 lo hace mal
 			uint32_t headerC;
 
 			if(rtaClose){

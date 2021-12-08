@@ -24,7 +24,7 @@ void* memoria_principal;
  *   -43    espacio en SWAP insuficiente
  *   -47	el proceso ya existia
  */
-uint32_t inicializar_proceso(uint32_t PID);
+int32_t inicializar_proceso(uint32_t PID);
 
 /**
  * @NAME: PID_listo
@@ -128,4 +128,5 @@ int32_t close_PID(uint32_t PID);
  **/
 int32_t suspender_PID(uint32_t PID_a_suspender);
 
+uint32_t frames_libres();
 #endif /* MEMORIA_MEMORIA_C_ */
