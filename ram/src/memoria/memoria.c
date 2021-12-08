@@ -30,10 +30,12 @@ int32_t inicializar_proceso(uint32_t PID){
 
 uint32_t frames_libres() {
 	uint32_t cant = 0;
+	pthread_mutex_lock(&mutex_acceso_lista_frames);
 	for (int i = 0; i<list_size(listaFrames); i++) {
 		t_frame* f = (t_frame*) list_get(listaFrames,i);
 		if(f->estado == 0) cant++;
 	}
+	pthread_mutex_unlock(&mutex_acceso_lista_frames);
 	return cant;
 }
 

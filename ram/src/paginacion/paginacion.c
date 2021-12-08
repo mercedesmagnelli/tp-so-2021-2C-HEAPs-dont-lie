@@ -10,6 +10,7 @@ void inicializar_estructuras_administrativas() {
     listaProcesos = list_create();
     listaFrames = list_create();
     listaFramesReservados = list_create();
+    metricas = list_create();
     uint32_t cant_frames = get_tamanio_memoria() / get_tamanio_pagina();
     for(int i=0;i<cant_frames;i++){
     	t_frame* frame = malloc(sizeof(t_frame));
@@ -36,6 +37,7 @@ void inicializar_semaforos() {
 	pthread_mutex_init(&mutex_acceso_tiempo, NULL);
 	pthread_mutex_init(&mutex_swapping, NULL);
 	pthread_mutex_init(&mutex_lista_procesos, NULL);
+	pthread_mutex_init(&mutex_metricas, NULL);
 }
 
 void destruir_estructuras_administrativas() {
@@ -56,6 +58,7 @@ void destruir_semaforos() {
 		pthread_mutex_destroy(&mutex_acceso_tiempo);
 		pthread_mutex_destroy(&mutex_swapping);
 		pthread_mutex_destroy(&mutex_lista_procesos);
+		pthread_mutex_destroy(&mutex_metricas);
 }
 void destruir_proceso(void* proceso) {
 
@@ -89,6 +92,14 @@ void iniciar_proceso_RAM(uint32_t PID){
 	nuevoProceso->lista_frames_reservados = list_create();
 	nuevoProceso->hits_proceso = 0;
 	nuevoProceso->miss_proceso = 0;
+
+	historico_procesos* hp = malloc(sizeof(historico_procesos));
+	hp->pid = PID;
+	hp->hit = 0;
+	hp->miss = 0;
+	pthread_mutex_lock(&mutex_metricas);
+	list_add(metricas, hp);
+	pthread_mutex_unlock(&mutex_metricas);
 
 	pthread_mutex_lock(&mutex_lista_procesos);
 	list_add(listaProcesos, nuevoProceso);
@@ -545,6 +556,12 @@ void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
 	heap_metadata* heap = encontrar_heap(PID, ptroHEAP);
 	int nroPag = calcular_pagina_de_puntero_logico(heap->currAlloc+9);
 	int offset = calcular_offset_puntero_en_pagina(heap->currAlloc+9);
+
+	void* sandwitch2 = malloc(33);
+	memcpy(sandwitch2, memoria_principal + 9, 23);
+	loggear_info("lo leido manualmente fue %s", ((char*) sandwitch2));
+	free(sandwitch2);
+
 	loggear_warning("Leo el contenido del HEAP en la pag %d con el offset %d", nroPag, offset);
 	void* dataLeida = leer_de_memoria_paginada(PID, nroPag, offset, tamanioALeer);
 	//loggear_warning("Lo leido en memoria fue %s (solo strings)", ((char*)dataLeida));
@@ -776,10 +793,10 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 	}else{
 		usleep(1000 *  get_retardo_fallo_tlb());
 		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
-			if(esta_en_RAM(PID, nroPag)){
-			loggear_trace("[RAM] - Estoy en la RAM");
-			marco = obtener_frame_de_RAM(PID, nroPag);
-			actualizar_datos_pagina(PID, nroPag, bitModificado, false);
+		if(esta_en_RAM(PID, nroPag)){
+		loggear_trace("[RAM] - Estoy en la RAM");
+		marco = obtener_frame_de_RAM(PID, nroPag);
+		actualizar_datos_pagina(PID, nroPag, bitModificado, false);
 
 		}else{
 			loggear_warning("[RAM] - TENGO QUE TRAER PAGINA A MEMORIA");
@@ -836,12 +853,24 @@ uint32_t obtener_frame_de_RAM(uint32_t PID, uint32_t nroPag){
 	return pag->frame;
 }
 
+historico_procesos* get_historico_pid(uint32_t pid) {
+	bool historico_PID(void* element){
+		historico_procesos* proceso = (historico_procesos*) element;
+		return proceso->pid == pid;
+	}
+	pthread_mutex_lock(&mutex_metricas);
+	historico_procesos* historico = (historico_procesos*)list_find(metricas, historico_PID);
+	pthread_mutex_unlock(&mutex_metricas);
+	return historico;
+}
+
 void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModificado, bool bitTLB){
 	t_proceso* proceso = get_proceso_PID(PID);
+	historico_procesos* dic_p = get_historico_pid(PID);
 	if(bitTLB && max_entradas >0){
-		proceso->hits_proceso++;
+		dic_p->hit++;
 	}else{
-		proceso->miss_proceso++;
+		dic_p->miss++;
 	}
 	t_pagina* pag = list_get(proceso->tabla_paginas, nroPag);
 	pag->timestamp = obtener_timestamp_actual();
@@ -854,9 +883,9 @@ void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModifica
 
 void inicializar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t marco, uint32_t bitModificado){
 	t_proceso* proceso = get_proceso_PID(PID);
-	proceso->miss_proceso++;
-
-	if(max_entradas != 0){proceso->hits_proceso++;}
+	historico_procesos* dic_p = get_historico_pid(PID);
+	dic_p->miss++;
+	if(max_entradas != 0){dic_p->hit++;}
 	t_pagina* pag = list_get(proceso->tabla_paginas, nroPag);
 	pag->bit_presencia = 1;
 	pag->frame = marco;

@@ -14,8 +14,8 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 	loggear_debug("El carpincho tiene %d marcos reservados [PID: %d]", list_size(carpincho->marcos_reservados), carpincho->pid_carpincho);
 
 	for(int i = 0; i < list_size(carpincho->dupla); i++){
-		dupla = list_get(carpincho->dupla, i);
-		if(dupla->pagina == pagina){
+		t_dupla_pagina_marco* dupla_busqueda = list_get(carpincho->dupla, i);
+		if(dupla_busqueda->pagina == pagina){
 			loggear_warning("TENGO LA PAGINA %d YA ESCRITA POR LO QUE SE SOBREESCRIBE CON LA NUEVA DATA [PID: %d]", pagina, carpincho->pid_carpincho);
 			archivo = fopen(ruta_particion, "r+");
 
@@ -24,11 +24,12 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 				return -1;
 			}
 
-			int posicion_escribir = dupla->marco * get_tamanio_pagina();
+			int posicion_escribir = dupla_busqueda->marco * get_tamanio_pagina();
 
 			fseek(archivo, posicion_escribir, SEEK_SET);
 
-			fputs(texto_escribir, archivo);
+			fwrite(texto_escribir, 1, get_tamanio_pagina(), archivo);
+			//fputs(texto_escribir, archivo);
 
 			fclose(archivo);
 			return 0;
@@ -50,13 +51,18 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 		fseek(archivo, posicion_escribir, SEEK_SET);
 
-		fputs(texto_escribir, archivo);
+		//fputs(texto_escribir, archivo);
+		fwrite(texto_escribir, 1, get_tamanio_pagina(), archivo);
+
+		loggear_error("[F_WRITE_SWAP] Se esta escribiendo %s", (char *)(texto_escribir + 9));
 
 	fclose(archivo);
 
 
 	dupla->marco = marco;
 	dupla->pagina = pagina;
+
+	loggear_warning("LA DUPLA ES MARCO %d, PAGINA %d, para el proceso PID: %d", marco, pagina, carpincho->pid_carpincho);
 
 	list_add(carpincho->dupla, dupla);
 
@@ -82,7 +88,7 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 	loggear_debug("Se comienza a leer el marco %d de la particion %s [PID: %d]", marco, ruta_particion, carpincho->pid_carpincho);
 
 	FILE* archivo_lectura;
-	char* contenido_pagina = malloc(get_tamanio_pagina() + 1);
+	void* contenido_pagina = malloc(get_tamanio_pagina());
 
 	archivo_lectura = fopen(ruta_particion, "r+");
 
@@ -95,7 +101,10 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 
 	fseek(archivo_lectura, posicion_a_leer, SEEK_SET);
 
-	fgets(contenido_pagina, get_tamanio_pagina() + 1, archivo_lectura);
+	fread(contenido_pagina, 1, get_tamanio_pagina(), archivo_lectura);
+	//fgets(contenido_pagina, get_tamanio_pagina() + 1, archivo_lectura);
+
+	loggear_error("[F_READ_SWAP] Se esta leyendo %s", (char *)(contenido_pagina + 9));
 
 	fclose(archivo_lectura);
 
@@ -325,13 +334,11 @@ int eliminar_proceso(t_carpincho_swamp* carpincho){
 		if(carpi->pid_carpincho == carpincho->pid_carpincho){
 			loggear_trace("la posicion del carpincho en la lista es  %d [PID: %d]", w, carpincho->pid_carpincho);
 			list_remove(lista_carpinchos, w);
+			loggear_trace("se saco de la lista con exito");
 		}
 	}
 
 	destroy_carpinchos_swamp(carpincho);
-
-
-
 
 	return 0;
 }
