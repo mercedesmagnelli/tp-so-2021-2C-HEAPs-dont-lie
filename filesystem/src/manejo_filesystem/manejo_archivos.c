@@ -28,7 +28,8 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 			fseek(archivo, posicion_escribir, SEEK_SET);
 
-			fputs(texto_escribir, archivo);
+			fwrite(texto_escribir, 1, get_tamanio_pagina(), archivo);
+			//fputs(texto_escribir, archivo);
 
 			fclose(archivo);
 			return 0;
@@ -50,7 +51,10 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 		fseek(archivo, posicion_escribir, SEEK_SET);
 
-		fputs(texto_escribir, archivo);
+		//fputs(texto_escribir, archivo);
+		fwrite(texto_escribir, 1, get_tamanio_pagina(), archivo);
+
+		loggear_error("[F_WRITE_SWAP] Se esta escribiendo %s", (char *)(texto_escribir + 9));
 
 	fclose(archivo);
 
@@ -84,7 +88,7 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 	loggear_debug("Se comienza a leer el marco %d de la particion %s [PID: %d]", marco, ruta_particion, carpincho->pid_carpincho);
 
 	FILE* archivo_lectura;
-	char* contenido_pagina = malloc(get_tamanio_pagina() + 1);
+	void* contenido_pagina = malloc(get_tamanio_pagina());
 
 	archivo_lectura = fopen(ruta_particion, "r+");
 
@@ -97,7 +101,10 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 
 	fseek(archivo_lectura, posicion_a_leer, SEEK_SET);
 
-	fgets(contenido_pagina, get_tamanio_pagina() + 1, archivo_lectura);
+	fread(contenido_pagina, 1, get_tamanio_pagina(), archivo_lectura);
+	//fgets(contenido_pagina, get_tamanio_pagina() + 1, archivo_lectura);
+
+	loggear_error("[F_READ_SWAP] Se esta leyendo %s", (char *)(contenido_pagina + 9));
 
 	fclose(archivo_lectura);
 

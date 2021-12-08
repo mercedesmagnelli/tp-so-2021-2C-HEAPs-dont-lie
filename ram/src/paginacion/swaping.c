@@ -67,8 +67,13 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 	if(pagina_victima->bit_modificacion == 1) {
 		size_t tamanio;
 		t_write_s* mensaje = shared_crear_write_s(nro_pag_victima, pid_pag_victima, get_tamanio_pagina(), info_en_frame);
+
 		void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio);
-		loggear_warning("Leo lo que tiene frame victima %d con contenido %s y serializamos con un tamanio total de %d", pagina_victima->frame, (mensaje_serializado +12 +9), tamanio);
+		loggear_warning("[MENSAJE_SERIALIZADO] Leo lo que tiene frame victima %d con contenido %s y serializamos con un tamanio total de %d", pagina_victima->frame, (mensaje_serializado +12 +9), tamanio);
+
+		t_write_s * mensaje_deserializado = deserializar_mensaje_write_s(mensaje_serializado);
+		loggear_warning("[MENSAJE_DESERIALIZADO] Leo contenido %s", mensaje_deserializado->data + 9);
+
 		pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 		enviar_mensaje_protocolo(socket_swap,R_S_ESCRIBIR_EN_PAGINA,tamanio,mensaje_serializado);
 		t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
