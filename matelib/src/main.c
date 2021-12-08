@@ -86,7 +86,7 @@ void *carpincho(void *config)
   uint32_t current_value;
 
   int vuelta = 0;
-  while (vuelta < 1000)
+  while (vuelta < 100)
   {
     sem_wait(info->producer_sem);
     mate_memread(&mate_ref, key, thread_name, 10);

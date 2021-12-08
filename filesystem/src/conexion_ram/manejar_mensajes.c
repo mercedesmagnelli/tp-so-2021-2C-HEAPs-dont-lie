@@ -13,7 +13,6 @@ int recibir_mensaje(int socket_ram) {
 int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 	int error;
-	void* mensaje_serializado;
 	t_carpincho_swamp* carpincho;
 	usleep(1000 *  get_retardo_swap());
 	switch (mensaje->head) {
@@ -23,9 +22,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_PROCESO_NUEVO:
-		loggear_info("LLEGO UN PROCESO NUEVO");
-		mensaje_serializado = malloc(sizeof(t_mensaje_r_s));
-		memcpy(mensaje_serializado, mensaje->payload, sizeof(t_mensaje_r_s));
+		loggear_info("LLEGO UN PROCESO NUEVO");;
 
 		t_matelib_nuevo_proceso * mensaje_deserializado_nuevo = deserializar_crear_proceso(mensaje->payload);
 
@@ -44,7 +41,6 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 		}*/
 
-		free(mensaje_serializado);
 		free(mensaje_deserializado_nuevo);
 		destruir_mensaje(mensaje);
 		return 0;
