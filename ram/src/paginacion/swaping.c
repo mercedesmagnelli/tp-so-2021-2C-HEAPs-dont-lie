@@ -193,11 +193,8 @@ t_pagina* obtener_victima_LRU(t_list* lista_paginas){
 t_pagina* obtener_victima_Clock_Modificado(t_list* lista_paginas, uint32_t pid){
 
  	t_pagina* pagina_victima;
- 	loggear_warning("aa");
  	t_proceso* proc = get_proceso_PID(pid);
- 	loggear_warning("aa1");
  	uint32_t puntero = obtener_valor_puntero(proc);
- 	loggear_warning("aa2");
 
 
  	uint32_t indice_encontrado;
@@ -206,20 +203,17 @@ t_pagina* obtener_victima_Clock_Modificado(t_list* lista_paginas, uint32_t pid){
  	if(buscar_combinacion(lista_paginas,0,0, puntero, &indice_encontrado)){
  		loggear_trace("CUMPLO CON PRIMERA VERIFICACION (0,0)");
  		pagina_victima = (t_pagina*) list_get(lista_paginas, indice_encontrado);
- 		loggear_warning("aa3");
  	}else {
  		loggear_trace("PRIMERA VERIFICACION (0,1)");
  		if(buscar_combinacion(lista_paginas, 0,1, puntero, &indice_encontrado)) {
  			loggear_trace("CUMPLO CON PRIMERA VERIFICACION (0,1)");
  			pagina_victima =  (t_pagina*) list_get(lista_paginas, indice_encontrado);
- 			loggear_warning("aa4");
  		}else {
  			modificar_bit_uso(lista_paginas);
  			loggear_trace("SEGUNDA VERIFICACION (0,0)");
  			if(buscar_combinacion(lista_paginas, 0,0, puntero, &indice_encontrado)){
  				loggear_trace("ENCONTRÉ EN SEGUNDA VERIFICACION (0,0)");
  				pagina_victima = (t_pagina*) list_get(lista_paginas, indice_encontrado);
- 				loggear_warning("aa5");
  			}else {
  				loggear_trace("SEGUNDA VERIFICACION (0,1)");
  				buscar_combinacion(lista_paginas, 0, 1, puntero, &indice_encontrado);

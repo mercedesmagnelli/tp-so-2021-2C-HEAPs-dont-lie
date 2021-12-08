@@ -443,6 +443,6 @@ void  inicializar_semaforos();
 */
 
 void destruir_semaforos();
-
+void imprimir_lista_frames_reservados(t_list* l);
 
 #endif /* PAGINACION_PAGINACION_H_ */

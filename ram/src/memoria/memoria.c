@@ -50,7 +50,7 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 				actualizar_proceso(pid,  (-1) * ptro,  size);
 				return (-1) * ptro;
 			}else {
-				loggear_warning("[MATELIB_MEM_ALLOC] - No se puede pedir mas memoria para el proceso %d", pid);
+				loggear_error("[MATELIB_MEM_ALLOC] - No se puede pedir mas memoria para el proceso %d", pid);
 				return no_se_asigna_proceso(pid, size);
 			}
 		}

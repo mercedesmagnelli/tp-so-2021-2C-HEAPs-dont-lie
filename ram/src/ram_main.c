@@ -4,6 +4,7 @@ void debug_configuracion();
 void imprimir_hdm(t_list* lista_heaps);
 void imprimir_procesos();
 void testeamos();
+void imprimir_frames();
 
 void manejar_signal() {
 	signal(SIGINT, manejar_sigint);

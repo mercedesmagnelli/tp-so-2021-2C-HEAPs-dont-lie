@@ -102,7 +102,7 @@ void alistar_proceso(uint32_t PID){
 	loggear_warning("obtuve el proceso, de pid: %d", proceso->PID);
 	if(get_tipo_asignacion() == FIJA){
 		reservar_frames(proceso->lista_frames_reservados, PID);
-		imprimir_lista_frames_reservados(proceso->lista_frames_reservados);
+		//imprimir_lista_frames_reservados(proceso->lista_frames_reservados);
 
 		proceso->puntero_frames = 0;
 	}
@@ -353,8 +353,7 @@ heap_metadata* encontrar_heap(uint32_t PID, uint32_t ptro){
 	heap_metadata* heap_encontrado = (heap_metadata*) list_find(lista_heaps, condicion);
 
 	if(heap_encontrado == NULL) {
-		loggear_error("[RAM] - quiero encontrar el HEAP %d", ptro);
-		loggear_error("problemas xd");
+		loggear_error("[RAM] - quiero encontrar el HEAP %d y no existe", ptro);
 	}
 
 	return heap_encontrado;
@@ -613,7 +612,7 @@ void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t punt
 	encontrar_heap(pid, puntero);
 	uint32_t nro_pag = calcular_pagina_de_puntero_logico(puntero);
 	uint32_t offset = calcular_offset_puntero_en_pagina(puntero);
-	loggear_error("--- PID: %d, NRO PAG: %d, OFFSET: %d, VALOR: %s , DONDE: %d",pid, nro_pag, offset, valor, puntero);
+	//loggear_error("--- PID: %d, NRO PAG: %d, OFFSET: %d, VALOR: %s , DONDE: %d",pid, nro_pag, offset, valor, puntero);
 	guardar_en_memoria_paginada(pid, nro_pag, offset, valor, size);
 
 
@@ -781,7 +780,7 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 			actualizar_datos_pagina(PID, nroPag, bitModificado, false);
 
 		}else{
-			loggear_error("[RAM] - TENGO QUE TRAER PAGINA A MEMORIA");
+			loggear_warning("[RAM] - TENGO QUE TRAER PAGINA A MEMORIA");
 
 			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima. Tmbn tiene que actualizar la cant de Pags en asig FIJA
 
@@ -822,7 +821,7 @@ bool esta_en_RAM(uint32_t PID, uint32_t nroPag){
 	loggear_debug("la tabla de paginas tiene una longitud de %d y la pagina que quiero obtener es la %d", list_size(tabla_paginas), nroPag);
 	t_pagina* pag = (t_pagina*) list_get(tabla_paginas, nroPag);
 	if(pag==NULL) {
-		loggear_error("toi nula");
+		loggear_error("pagina nula, hay un error");
 	}
 	loggear_debug("el bit de presencia es: %d",pag->bit_presencia);
 	return pag->bit_presencia == 1 ? true : false;
