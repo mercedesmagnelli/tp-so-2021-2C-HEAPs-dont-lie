@@ -63,7 +63,7 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 	list_remove(carpincho->marcos_reservados, 0);
 
-	loggear_info("[ESCRIBIR_PARTICION] [PID: %zu] Se escribio con exito la dupa es [MARCO: %d], [PAG: %d]", carpincho->pid_carpincho, marco, pagina);
+	loggear_info("[ESCRIBIR_PARTICION] [PID: %zu] Se escribio con exito la dupla es [MARCO: %d], [PAG: %d]", carpincho->pid_carpincho, marco, pagina);
 
 	return 0;
 }
