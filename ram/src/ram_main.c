@@ -119,47 +119,59 @@ void debug_configuracion() {
 void testeamos() {
 	 	uint32_t pid = 1;
 
-	    loggear_trace("HOLA, soy dora!!");
+	  //  loggear_trace("HOLA, soy dora!!");
 	    sleep(10);
-	    inicializar_proceso(pid);
+
 //	    inicializar_proceso(pid+1);
 //	    inicializar_proceso(pid+2);
 //	    inicializar_proceso(pid+3);
 //	    inicializar_proceso(pid+4);
-
+	    inicializar_proceso(pid);
+	    inicializar_proceso(pid+1);
+	    loggear_warning("voy a darle ready al proceso");
+	    PID_listo(pid);
+	    loggear_warning("ya le di ready al proceso");
 	    //pido malloc
-	    int a = memalloc(pid,33);
+	    int a = memalloc(pid,23);
 	    loggear_trace("Hice el memalloc en %d", a);
-	    imprimir_tlb();
 
-	    //escribo
-	    char* pedido_Dora = "¿puedes hacerme un sanwitch? e_e";
-	    void* sandwitch = malloc(33);
-	    memcpy(sandwitch, pedido_Dora,33);
-	    loggear_info("lo que voy a guardar en memoria es %s", ((char*) sandwitch));
+	    a = memalloc(pid+1,23);
+	    loggear_trace("Hice el memalloc en %d", a);
 
-	    //loggear_error("Copie exitosamente de forma puntero el sig msj %s", ((char*) sandwitch));
-	    memwrite(sandwitch, a, pid, 33);
-	    free(sandwitch);
+	   imprimir_tlb();
+	   imprimir_frames();
 
-		void* sandwitch2 = malloc(33);
-		memcpy(sandwitch2, memoria_principal + 9, 33);
-		loggear_info("lo leido manualmente fue %s", ((char*) sandwitch2));
-		sleep(3);
-		free(sandwitch2);
+	   //
 
-	    //leo
-		void* ptro_tengo_q_leer;
-	    memread(a, pid, 34, &ptro_tengo_q_leer);
-	    loggear_info("lo leido manualmente fue %s", ((char*) ptro_tengo_q_leer));
-
-	    //variante 2
-
-	    //escribo
-
-	    //malloc 1
-
-	    //leo
+//
+//	    //escribo
+//	    char* pedido_Dora = "¿puedes hacerme un sanwitch? e_e";
+//	    void* sandwitch = malloc(33);
+//	    memcpy(sandwitch, pedido_Dora,33);
+//	    loggear_info("lo que voy a guardar en memoria es %s", ((char*) sandwitch));
+//
+//	    //loggear_error("Copie exitosamente de forma puntero el sig msj %s", ((char*) sandwitch));
+//	    memwrite(sandwitch, a, pid, 33);
+//	    free(sandwitch);
+//
+//		void* sandwitch2 = malloc(33);
+//		memcpy(sandwitch2, memoria_principal + 9, 33);
+//		loggear_info("lo leido manualmente fue %s", ((char*) sandwitch2));
+//		sleep(3);
+//		free(sandwitch2);
+//
+//	    //leo
+//		void* ptro_tengo_q_leer;
+//	    memread(a, pid, 34, &ptro_tengo_q_leer);
+//	    loggear_info("lo leido manualmente fue %s", ((char*) ptro_tengo_q_leer));
+//
+//	    //variante 2
+//
+//	    //escribo
+//
+//	    //malloc 1
+//
+//	    //leo
 
 
 //	    a = memalloc(pid + 1, 23);
@@ -260,6 +272,16 @@ void testeamos() {
 //    sleep(2000);
 
 
+
+}
+
+void imprimir_frames() {
+
+	for (int i = 0; i < list_size(listaFrames); i++) {
+		t_frame* frame = (t_frame*)list_get(listaFrames, i);
+		loggear_debug("FRAME:%d | ESTADO: %d | PROCESO: %d | PAGINA : %d", frame->nroFrame, frame->estado, frame->proceso, frame->pagina);
+
+	}
 
 }
 

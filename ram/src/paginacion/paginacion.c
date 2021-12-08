@@ -15,6 +15,8 @@ void inicializar_estructuras_administrativas() {
     	t_frame* frame = malloc(sizeof(t_frame));
     	frame->nroFrame=i;
     	frame->estado=0;
+    	frame->proceso=-1;
+    	frame->pagina=-1;
     	list_add(listaFrames, frame);
     }
     tiempo = 0;
@@ -69,6 +71,7 @@ void destruir_proceso(void* proceso) {
 
 // FUNCIONES PUBLICAS
 int32_t existe_proceso(uint32_t PID){
+	loggear_trace("[existe_proceso] - voy a buscar el proceso con pid %d", PID);
 	t_proceso* proceso = get_proceso_PID(PID);
 	return proceso == NULL ? 0 : 1;
 
@@ -96,13 +99,23 @@ void iniciar_proceso_RAM(uint32_t PID){
 void alistar_proceso(uint32_t PID){
 
 	t_proceso* proceso = get_proceso_PID(PID);
-
+	loggear_warning("obtuve el proceso, de pid: %d", proceso->PID);
 	if(get_tipo_asignacion() == FIJA){
-		reservar_frames(proceso->lista_frames_reservados);
+		reservar_frames(proceso->lista_frames_reservados, PID);
+		imprimir_lista_frames_reservados(proceso->lista_frames_reservados);
+
 		proceso->puntero_frames = 0;
 	}
 }
+void imprimir_lista_frames_reservados(t_list* l) {
 
+	for (int i = 0; i < list_size(l); i++) {
+		t_frame* frame = (t_frame*)list_get(l, i);
+		loggear_debug("FRAME:%d | ESTADO: %d | PROCESO: %d | PAGINA : %d", frame->nroFrame, frame->estado, frame->proceso, frame->pagina);
+
+	}
+
+}
 
 int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 
@@ -210,8 +223,6 @@ void agregar_proceso(uint32_t PID, uint32_t tam){
 	agregar_HEAP_a_PID(PID,nuevoHeapPrimero);
 
 	guardar_HEAP_en_memoria(PID, nuevoHeapPrimero);
-
-	loggear_trace("guardado primer heap");
 
 
 	heap_metadata* nuevoHeapUltimo = malloc(sizeof(heap_metadata));
@@ -612,10 +623,12 @@ void escribir_en_memoria(uint32_t pid, void* valor, uint32_t size, uint32_t punt
 
 t_proceso* get_proceso_PID(uint32_t PID){
 
+
 	bool proceso_PID(void* element) {
 			t_proceso* proceso = (t_proceso*) element;
 			return proceso->PID == PID;
 	}
+
 
 	pthread_mutex_lock(&mutex_lista_procesos);
 	t_proceso* proceso = list_find(listaProcesos, proceso_PID);
@@ -914,17 +927,25 @@ int calcular_paginas_para_tamanio(uint32_t tam) {
 		return cantPags;
 }
 
-void reservar_frames(t_list* lista_frames_proceso){
+void reservar_frames(t_list* lista_frames_proceso, uint32_t pid){
 
 	bool frame_disponible_y_no_repetidos_en_lista(void* element){
 
 		return frame_disponible(element) && frame_no_pertenece_a_lista(listaFramesReservados, element);
 	}
 
+
 	for(int i=0; i<get_marcos_maximos();i++){
+
 		pthread_mutex_lock(&mutex_acceso_lista_frames_r);
+
 		pthread_mutex_lock(&mutex_acceso_lista_frames);
 		t_frame* frame = (t_frame*)list_find(listaFrames, frame_disponible_y_no_repetidos_en_lista);
+		//FIXME: ACA PUEDE SER QUE LE ESTE ERRANDO PERO POR AHORA QUIERO VER SI FUNCIONA
+		frame->proceso = pid;
+		frame->pagina = i;
+		loggear_info("reserve el frame %d", frame->nroFrame);
+
 		pthread_mutex_unlock(&mutex_acceso_lista_frames);
 
 		list_add(lista_frames_proceso, frame);
@@ -932,7 +953,9 @@ void reservar_frames(t_list* lista_frames_proceso){
 
 		pthread_mutex_unlock(&mutex_acceso_lista_frames_r);
 	}
+
 }
+
 
 bool frame_no_pertenece_a_lista(t_list* lista_frames, void* elementoBuscado){
 
