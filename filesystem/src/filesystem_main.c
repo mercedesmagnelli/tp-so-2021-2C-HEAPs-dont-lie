@@ -1,7 +1,6 @@
 #include "filesystem_main.h"
 
 void cerrar_todo();
-void manejar_signal(int n);
 void debug_variables();
 
 /*PARA ACORDARME CONTINUAR CON LO DE DUPLA AL ESCRIBIR PARA LUEGO HACER LO MISMO PARA LA LECTURA
@@ -11,7 +10,6 @@ void debug_variables();
  */
 
 int main(int argc, char** argv) {
-	signal(SIGUSR1, manejar_signal);
 
 	int error = iniciar_configuracion(argc, argv);
 	if (error != STATUS_OK) {
@@ -178,9 +176,6 @@ void cerrar_todo() {
 }
 
 
-void manejar_signal(int n){
-	loggear_warning("Llego la signal para mandar sabotaje, TODO: Cambiar la funcion en filesystem_main.c:35 para que cumpla la funcion");
-}
 
 void debug_variables() {
 	loggear_debug("IP: %s", get_ip());

@@ -13,6 +13,4 @@ typedef struct {
 	int log_level_info;
 }t_instance_metadata;
 
-uint32_t generar_pid();
-
 #endif /* UTILS_UTILS_H_ */
