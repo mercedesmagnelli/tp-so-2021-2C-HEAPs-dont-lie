@@ -560,7 +560,6 @@ void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
 	void* sandwitch2 = malloc(33);
 	memcpy(sandwitch2, memoria_principal + 9, 23);
 	loggear_info("lo leido manualmente fue %s", ((char*) sandwitch2));
-	sleep(3);
 	free(sandwitch2);
 
 	loggear_warning("Leo el contenido del HEAP en la pag %d con el offset %d", nroPag, offset);
