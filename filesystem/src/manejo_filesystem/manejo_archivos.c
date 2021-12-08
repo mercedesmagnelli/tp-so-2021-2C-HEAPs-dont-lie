@@ -134,7 +134,7 @@ uint32_t marco_libre(t_archivo_swamp* swamp){
 				return -1;
 			}
 
-	loggear_trace("Es posible que se asigne el [MARCO: %d] de la solitud enviada");
+	loggear_trace("Es posible que se asigne el [MARCO: %d] de la solitud enviada", i);
 	return i;
 }
 
@@ -148,8 +148,8 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 	carpincho->dupla = list_create();
 	carpincho->estado_carpincho = 0;
 
-	t_archivo_swamp* archivo = archivo_a_escribir(pid_carpincho);
 	if(get_asignacion() == FIJA){
+		t_archivo_swamp* archivo = archivo_a_escribir(pid_carpincho);
 		loggear_debug("LLEGO LA SOLICITUD DE UN CARPINCHO Y COMO LA ASIGNACION ES FIJA SE PROCEDE A RESERVAR SUS MARCOS MAXIMOS [PID: %d] ", carpincho->pid_carpincho);
 		for(int i = 0; i < get_marcos_maximos(); i++){
 			int marco = marco_libre(archivo);

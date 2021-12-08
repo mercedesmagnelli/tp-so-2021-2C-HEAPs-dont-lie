@@ -11,7 +11,6 @@ t_archivo_swamp* particion_a_escribir(uint32_t pid_carpincho){ //TODO ver si est
 			return archivo;
 		}
 	}
-	loggear_error("NUNCA DEBERÍA INGRESAR POR ACA VA A FALLAR. ESTO ES EN PARTICION_A_ESCRIBIR");
 	return archivo_a_escribir(pid_carpincho);
 }
 

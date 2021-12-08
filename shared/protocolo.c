@@ -108,6 +108,7 @@ t_prot_mensaje* recibir_mensaje_protocolo(int socket_origen){
 	retorno->socket = socket_origen;
 
 	free(buffer);
+	//free(payload);//LO AGREGO PARA PROBAR
 
 	return retorno;
 }

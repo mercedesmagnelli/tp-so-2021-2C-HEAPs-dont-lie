@@ -74,6 +74,7 @@ int enviar_mate_close(t_instance_metadata* instancia, t_matelib_nuevo_proceso * 
 	return error;
 }
 
+
 int enviar_mate_sem_init(t_instance_metadata* instancia, t_matelib_semaforo* nuevo_semaforo){
 
 	int socket = conexiones_iniciar(instancia);
@@ -225,6 +226,7 @@ int enviar_mate_sem_destroy(t_instance_metadata* instancia, t_matelib_semaforo* 
 	return error;
 }
 
+
 int enviar_mate_call_io(t_instance_metadata* instancia, t_matelib_io* entrada_salida){
 
 	int socket = conexiones_iniciar(instancia);
@@ -261,6 +263,7 @@ int enviar_mate_call_io(t_instance_metadata* instancia, t_matelib_io* entrada_sa
 	return error;
 }
 
+
 int32_t enviar_mate_memalloc(t_instance_metadata* instancia, t_matelib_memoria_alloc* alloc){
 
 	int socket = conexiones_iniciar(instancia);
@@ -274,26 +277,29 @@ int32_t enviar_mate_memalloc(t_instance_metadata* instancia, t_matelib_memoria_a
 
 	int resultado = enviar_mensaje_protocolo(socket, MATELIB_MEM_ALLOC, *size, mensaje);
 	if (resultado < 0) {
-		loggear_error("Ocurrió un error al realizar el MATELIB_MEM_ALLOC, Error: %d", resultado);
+		loggear_error("[MATELIB_MEM_ALLOC] Ocurrió un error, Error: %d", resultado);
 
 		return resultado;
 	}
 	free(size);
 
-	t_prot_mensaje * mensajito = recibir_mensaje_protocolo(socket);
-	t_matelib_nuevo_proceso * el_pipi = deserializar_crear_proceso(mensajito->payload);
-	destruir_mensaje(mensajito);
-	uint32_t pasamanos_horrible = el_pipi->pid;
-	free(el_pipi);
+	int32_t respuesta_ram = -1;
 
-//	if (error != 0) {
-//		loggear_info("Nos descnocimos, no podemos trabajar");
-//		return error;
-//	}
+	// En realidad responde algo distinto al pid, pero asi ahorramos trabajo
+	t_prot_mensaje * mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
+		t_matelib_nuevo_proceso * el_pipi = deserializar_crear_proceso(mensaje_respuesta->payload);
+		respuesta_ram = el_pipi->pid;
+		free(el_pipi);
+	} else {
+		loggear_error("[MATE_MEM_ALLOC] Llego un error, %d", mensaje_respuesta->head);
+	}
+
+	destruir_mensaje(mensaje_respuesta);
 
 	close(socket);
 
-	return pasamanos_horrible;
+	return respuesta_ram;
 }
 
 int enviar_mate_memfree(t_instance_metadata* instancia, t_matelib_memoria_free* liberar){
@@ -315,16 +321,18 @@ int enviar_mate_memfree(t_instance_metadata* instancia, t_matelib_memoria_free* 
 	}
 	free(size);
 
-	int error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
+	int respuesta = 0;
+	t_prot_mensaje * mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head != EXITO_EN_LA_TAREA) {
+		loggear_error("[MATE_MEM_FREE] Llego un error, %d", mensaje_respuesta->head);
+		respuesta = -1;
 	}
+
+	destruir_mensaje(mensaje_respuesta);
 
 	close(socket);
 
-	return 0;
-
+	return respuesta;
 }
 
 int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* leer){
@@ -346,20 +354,27 @@ int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* 
 	}
 	free(size);
 
-	int error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
+	int32_t respuesta_ram = 0;
+
+	// En realidad responde algo distinto al pid, pero asi ahorramos trabajo
+	t_prot_mensaje * mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head != EXITO_EN_LA_TAREA) {
+		//t_ram_read * ram_read = deserializar_ram_read(mensaje_respuesta->payload);
+		//respuesta_ram = el_pipi->pid;
+		//free(el_pipi);
+		//TODO: Tal vez se necesita hacer free de lo que hay aca
+		loggear_error("[MATE_MEM_READ] Llego un error, %d", mensaje_respuesta->head);
+		respuesta_ram = -1;
 	}
+
+	destruir_mensaje(mensaje_respuesta);
 
 	close(socket);
 
-	return 0;
+	return respuesta_ram;
 }
 
-
 int enviar_mate_memwrite(t_instance_metadata* instancia, t_matelib_memoria_write* escribir){
-
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
 		loggear_error("[MATE_MEM_WRITE] [PID: %zu] [IP: %s] [PUERTO: %d] Error al conectar al servidor", instancia->pid, instancia->ip, instancia->port);
@@ -377,32 +392,21 @@ int enviar_mate_memwrite(t_instance_metadata* instancia, t_matelib_memoria_write
 	}
 	free(size);
 
-	int error = recibir_mensaje(socket);
-	if (error != 0) {
-		loggear_info("Nos descnocimos, no podemos trabajar");
-		return error;
+	int respuesta = 0;
+	t_prot_mensaje * mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head != EXITO_EN_LA_TAREA) {
+		loggear_error("[MATE_MEM_WRITE] Llego un error, %d", mensaje_respuesta->head);
+		respuesta = -1;
 	}
+
+	destruir_mensaje(mensaje_respuesta);
 
 	close(socket);
 
-	return 0;
-}
-/*
-// Publica
-void conexiones_cerrar_conexiones() {
-	avisar_desconexion();
-
-	loggear_trace("Cerrado los threads y sockets");
+	return respuesta;
 }
 
-void avisar_desconexion() {
-	int socket_avisar = conexiones_iniciar();
 
-	enviar_mensaje_protocolo(socket_avisar, DESCONEXION_TOTAL, 0, NULL);
-
-	close(socket_avisar);
-}
-*/
 int conexiones_iniciar(t_instance_metadata* instancia) {
 	char * ip = instancia->ip;
 	int puerto = instancia->port;
