@@ -94,7 +94,7 @@ int32_t memfree(int32_t direccionLogicaALiberar, uint32_t pid) {
 
 int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALeer, void** lectura) {
 
-    if(!ptro_valido(pid, direccionLogicaALeer)){
+    if(!existe_proceso(pid)  || !ptro_valido(pid, direccionLogicaALeer)){
         return -6; //MEM_READ_FAULT
     }else{
     	loggear_trace("[MATELIB_MEM_READ] Leeremos el ptro %d del proceso %d con tamanio %d", direccionLogicaALeer, pid, tamanioALeer);
@@ -106,7 +106,7 @@ int32_t memread(int32_t direccionLogicaALeer, uint32_t pid, uint32_t tamanioALee
 
 int32_t memwrite(void* valorAEscribir, int32_t direccionLogicaAEscribir,uint32_t pid, uint32_t tamanioAEscribir){
 
-    if(!ptro_valido(pid, direccionLogicaAEscribir)){
+    if(!existe_proceso(pid)  || !ptro_valido(pid, direccionLogicaAEscribir)){
             return -7; // MEM_WRITE_FAULT
     }else {
        loggear_trace("[MATELIB_MEM_WRITE - PID: %d] Escribiremos en el ptro %d", pid, direccionLogicaAEscribir);
@@ -145,16 +145,17 @@ bool cantidad_valida(int32_t size) {
 
 int32_t close_PID(uint32_t PID){
 	if(existe_proceso(PID)){
-		loggear_trace("[MATELIB_CLOSE] Cerraremos el proceso %d en memoria", PID);
+		loggear_trace("[MATELIB_CLOSE] - Eliminamos el proceso %d de memoria", PID);
 		eliminar_proceso(PID);
 		return 1;
 	}else
+		loggear_error("[MATELIB_CLOSE] - No se puede eliminar el proceso %d porque no existe", PID);
 		return 0;
 }
 
 int32_t suspender_PID(uint32_t PID){
 	if(existe_proceso(PID)){
-		loggear_trace("[SUSPENDER] Suspenderemos el proceso %d en memoria", PID);
+		loggear_trace("[SUSPENDER] - Suspenderemos el proceso %d en memoria", PID);
 		suspender_proceso(PID);
 		return 1;
 	}else
