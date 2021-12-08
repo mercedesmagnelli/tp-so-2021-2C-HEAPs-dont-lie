@@ -282,7 +282,7 @@ t_estado_ejecucion semaforo_post(t_matelib_semaforo * sem) {
 
 	t_hilo * hilo_wait = colas_obtener_hilo_en_exec(sem->pid);
 	if (hilo_wait == NULL) {
-		loggear_error("TODO: SEMAFORO, NO DEBERIA ENTRAR ACA SE ELIMINO EL HILO");
+		loggear_error("[SEMAFORO] No se encontro un hilo en EXEC, No debería ejecutarse esto nunca");
 		pthread_mutex_unlock(&(semaforo->mutex));
 		semaforo_imprimir_status();
 		return SEM_ERROR;

@@ -22,14 +22,14 @@
 /**
  * @NAME: colas_iniciar
  * @DESC: Inicia las estructuras de memoria necesarias para administrar los procesos
- * @RETURN: 0 si salio todo bien
+ * @RETURN: 0 si salio todos bien
  * */
 int colas_iniciar();
 
 /**
  * @NAME: colas_destruir
  * @DESC: Vacia y destruye todas las estructuras de memoria
- * @RETURN: 0 si salio todo bien
+ * @RETURN: 0 si salio todos bien
  * */
 int colas_destruir();
 
@@ -53,8 +53,6 @@ t_hilo * colas_mover_new_ready();
 /**
  * @NAME: colas_mover_ready_exec
  * @DESC: Dependiendo el algoritmo, hay que recorrer la lista de hilos en READY y elegir cual mover a EXEC
- *
- * TODO: Se necesita una funcion de orden superior que retorne el que hay que elegir
  * */
 t_hilo * colas_mover_ready_exec();
 

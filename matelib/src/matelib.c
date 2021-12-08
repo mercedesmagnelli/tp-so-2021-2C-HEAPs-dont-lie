@@ -8,7 +8,6 @@ void mate_instance_close(mate_instance * lib_ref){
 	free(metadata->ip);
 	free(metadata->log_app_name);
 	free(metadata);
-	// TODO: A veces falla el free(lib_ref)
 }
 
 
