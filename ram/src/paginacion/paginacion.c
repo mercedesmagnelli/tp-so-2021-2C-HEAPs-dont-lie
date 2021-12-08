@@ -129,7 +129,7 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 		bool heap_tam_min(void* element){
 			bool rta;
 			heap_metadata* heap = (heap_metadata*) element;
-			leer_heap(heap, PID);
+			void* aux = leer_heap(heap, PID);
 			if(heap->nextAlloc==-1){
 				loggear_trace("te voy a asignar el ultimo heap");
 				rta = true;
@@ -142,6 +142,7 @@ int32_t ptro_donde_entra_data(uint32_t PID, uint32_t tam){
 					rta = false;
 				}
 			}
+			free(aux);
 			return rta;
 		}
 
@@ -346,7 +347,8 @@ heap_metadata* encontrar_heap(uint32_t PID, uint32_t ptro){
 
 	bool condicion(void* heap_i) {
 		heap_metadata* heap = (heap_metadata*) heap_i;
-		leer_heap(heap, PID);
+		void* aux = leer_heap(heap, PID);
+		free(aux);
 		return (heap->currAlloc + 9) == ptro;
 	}
 	loggear_trace("[RAM] - quiero encontrar el HEAP %d", ptro);
@@ -545,7 +547,7 @@ void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
 	int offset = calcular_offset_puntero_en_pagina(heap->currAlloc+9);
 	loggear_warning("Leo el contenido del HEAP en la pag %d con el offset %d", nroPag, offset);
 	void* dataLeida = leer_de_memoria_paginada(PID, nroPag, offset, tamanioALeer);
-	loggear_warning("Lo leido en memoria fue %s (solo strings)", ((char*)dataLeida));
+	//loggear_warning("Lo leido en memoria fue %s (solo strings)", ((char*)dataLeida));
 	return dataLeida;
 }
 
