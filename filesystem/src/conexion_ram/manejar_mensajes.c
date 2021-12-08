@@ -78,7 +78,8 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		 t_write_s* write_deserializado = deserializar_mensaje_write_s(mensaje->payload);
 		 carpincho = buscar_carpincho_en_lista(write_deserializado->pid); //TODO HACER FUNCION
 		 loggear_warning("EL PROCESO QUE QUIERE ESCRIBIR ES %d", write_deserializado->pid);
-		 loggear_error("Se esta escribiendo %s", write_deserializado->data);
+		 loggear_error("[R_S_ESCRIBIR_EN_PAGINA] Se esta escribiendo %s", write_deserializado->data);
+
 		error = escribir_particion(carpincho, write_deserializado->nro_pag, write_deserializado->data, particion_a_escribir(carpincho->pid_carpincho));
 		if(error < 0){
 			loggear_debug("OCURRIO UN ERROR INESPERADO AL QUERER ESCRIBIR EL ARCHIVO DE SWAP NO SE GUARDO CORRECTAMENTE");
@@ -105,7 +106,8 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		carpincho  = buscar_carpincho_en_lista(pedir_deserializado->pid);
 
 		char* pagina_info = leer_particion(pedir_deserializado->nro_pag, particion_a_escribir(carpincho->pid_carpincho), carpincho); //TODO resta bien hacer lo del error en esto
-		int codigo_mensaje = enviar_mensaje_protocolo(mensaje->socket, R_S_PEDIR_PAGINA, string_length(pagina_info) + 1, pagina_info);
+
+		int codigo_mensaje = enviar_mensaje_protocolo(mensaje->socket, R_S_PEDIR_PAGINA, get_tamanio_pagina(), pagina_info);
 
 		if (codigo_mensaje < 0) {
 			loggear_error("Ocurrio un error al pedir la lectura de la pagina");
