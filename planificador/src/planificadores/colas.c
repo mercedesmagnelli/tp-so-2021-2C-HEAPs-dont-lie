@@ -207,8 +207,8 @@ t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante,
 	pthread_mutex_unlock(&mutex_exec_list);
 
 	if (hilo == NULL) {
-		loggear_error("TODO: Ver que pasa aca, no se puede mover exec a bloqueado un hilo que no existe");
-		loggear_error("PID: %zu, Dispositivo: %d, NOmbre: %s", ppid, dispositivo_bloqueante, nombre_bloqueante);
+		loggear_error("[COLAS] [PID: %zu] Mover exec a bloqueado, no se encontro el hilo en la cola de exec", ppid);
+		loggear_error("[COLAS] [PID: %zu] Dispositivo: %d, Nombre: %s", ppid, dispositivo_bloqueante, nombre_bloqueante);
 		return hilo;
 	}
 

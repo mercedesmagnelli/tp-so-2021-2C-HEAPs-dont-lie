@@ -38,14 +38,14 @@ t_semaforo * semaforo_get(char * nombre_semaforo);
 /**
  * @NAME: semaforo_estructuras_crear
  * @DESC: Crea todas las estructuras necesarias para manejar los semaforos del kernel.
- * @RETURN: 0 si salio todo bien.
+ * @RETURN: 0 si salio todos bien.
  * */
 int semaforo_estructuras_crear();
 
 /**
  * @NAME: semaforo_estructuras_destruir
  * @DESC: Vacia y destruye todas las estructuras de memoria que se usen para manejar los semaforos del kernel.
- * @RETURN: 0 si salio todo bien.
+ * @RETURN: 0 si salio todos bien.
  * */
 int semaforo_estructuras_destruir();
 

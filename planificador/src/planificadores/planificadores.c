@@ -52,7 +52,7 @@ void planificador_medio_plazo() {
 
 			int error_ram = ram_enviar_proceso_suspendido(pid(hilo));
 			if (error_ram != 0) {
-				loggear_error("TODO: HACER ALGO ACA");
+				loggear_error("[ENVIAR_PROCESO_SUSPENDIDO] [PID: %zu] Ocurrió un eror al avisar del proceso suspendido", pid(hilo));
 			}
 
 			hilos_post_multiprogramacion();

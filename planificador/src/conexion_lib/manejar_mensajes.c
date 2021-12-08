@@ -24,19 +24,19 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			loggear_info("[MATELIB_INIT], hay que crear un proceso");
 			t_matelib_nuevo_proceso * nuevo_proceso = deserializar_crear_proceso(mensaje->payload);
 
-			planificadores_proceso_iniciar(nuevo_proceso->pid); // AVISA AL PLANIFICADOR DE LARGO PLAZO Y CREA ESTRUCTURAS
+			planificadores_proceso_iniciar(nuevo_proceso->pid);
 
 			respuesta_ram = ram_enviar_init(nuevo_proceso);
 
-			hilos_wait_ejecucion(nuevo_proceso->pid); // ESPERAMOS A QUE ENTRE EN EJECUCION
+			hilos_wait_ejecucion(nuevo_proceso->pid);
 
 			if (respuesta_ram->respuesta == EXITO_EN_LA_TAREA) {
 				loggear_info("[PID: %zu] - [Mensaje] - Se creo el proceso y ya esta en ejecucion", nuevo_proceso->pid);
-				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, 0, NULL);
 			} else {
 				loggear_info("[PID: %zu] - [Mensaje] - Ocurrio un problema en la RAM al hacer MATE_INIT", nuevo_proceso->pid);
-				enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, 0, NULL);
 			}
+
+			enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, 0, NULL);
 
 			free(nuevo_proceso);
 			desconexion(mensaje);
@@ -56,8 +56,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 				respuesta_ram = ram_enviar_close(muerto_proceso);
 
-				// TODO: CAmbiar por respuesta_ram->respuesta cuando ande
-				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, respuesta_ram->size, respuesta_ram->mensaje);
+				enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, respuesta_ram->size, respuesta_ram->mensaje);
 
 				destruir_respuesta_ram(respuesta_ram);
 			} else {

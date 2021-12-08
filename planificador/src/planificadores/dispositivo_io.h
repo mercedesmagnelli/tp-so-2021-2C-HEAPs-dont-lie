@@ -31,14 +31,14 @@ typedef struct {
 /**
  * @NAME: dispositivo_io_estructuras_crear
  * @DESC: Crea las estructuras de memoria necesarias para administrar los hilos y los dispositivos de IO
- * @RETURN: 0 si salio todo bien.
+ * @RETURN: 0 si salio todos bien.
  * */
 int dispositivo_io_estructuras_crear();
 
 /**
  * @NAME: dispositivo_io_estructuras_destruir
  * @DESC: Vacia y destruye todas las estructuras de memoria que se usen para manejar los dispositivos de IO
- * @RETURN: 0 si salio todo bien.
+ * @RETURN: 0 si salio todos bien.
  * */
 int dispositivo_io_estructuras_destruir();
 

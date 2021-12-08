@@ -359,10 +359,6 @@ int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* 
 	// En realidad responde algo distinto al pid, pero asi ahorramos trabajo
 	t_prot_mensaje * mensaje_respuesta = recibir_mensaje_protocolo(socket);
 	if (mensaje_respuesta->head != EXITO_EN_LA_TAREA) {
-		//t_ram_read * ram_read = deserializar_ram_read(mensaje_respuesta->payload);
-		//respuesta_ram = el_pipi->pid;
-		//free(el_pipi);
-		//TODO: Tal vez se necesita hacer free de lo que hay aca
 		loggear_error("[MATE_MEM_READ] Llego un error, %d", mensaje_respuesta->head);
 		respuesta_ram = -1;
 	}
