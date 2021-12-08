@@ -21,6 +21,8 @@ int hilos_planificador_iniciar() {
 	list_hilos_ejecutando = list_create();
 	dict_hilos = dictionary_create();
 
+	pthread_mutex_init(&mutex_hilos, NULL);
+
 	sem_init(&hilos_semaforo_new, 0, 0);
 
 	sem_init(&hilos_semaforo_ready, 0, 0);

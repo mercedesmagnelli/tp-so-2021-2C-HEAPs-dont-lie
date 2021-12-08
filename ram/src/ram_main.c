@@ -92,6 +92,7 @@ void* manejo_seniales(void* s) {
 
 void cerrar_todo(bool cierro) {
 	cerrar_conexiones(cierro); // Hasta que no se cierre el hilo que escuchan las notificaciones no apaga
+	destruir_estructuras_administrativas();
 	destroy_configuracion();
 	destroy_log();
 }

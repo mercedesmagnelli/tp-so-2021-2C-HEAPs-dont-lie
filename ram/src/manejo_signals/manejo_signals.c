@@ -39,7 +39,7 @@ void manejar_sigint(){
 		imprimir_entrada_proceso(p);
 		}
 	}
-	imprimir_frames();
+	//imprimir_frames();
 	semaforo_post_fin();
 
 }

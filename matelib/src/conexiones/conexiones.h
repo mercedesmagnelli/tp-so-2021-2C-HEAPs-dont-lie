@@ -6,13 +6,12 @@
 #include <unistd.h>
 #include <stdio.h>
 
-
+#include "../../../shared/estructura_compartida.h"
 #include "../../../shared/conexion.h"
 #include "../../../shared/protocolo.h"
 #include "../../../shared/codigo_error.h"
 #include "../../../shared/logger.h"
 
-#include "../conexiones/manejar_mensajes.h"
 #include "../utils/utils.h"
 
 int conexiones_iniciar(t_instance_metadata* instancia);
