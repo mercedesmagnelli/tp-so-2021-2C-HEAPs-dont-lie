@@ -171,7 +171,7 @@ void testeamos() {
 
 	void* sandwitch2 = malloc(33);
 	memcpy(sandwitch2, memoria_principal + 9, 33);
-	loggear_info("lo leido manualmente fue %s", ((char*) sandwitch2));
+	loggear_info("lo leido manualmente luego del memwrite fue %s", ((char*) sandwitch2));
 	sleep(3);
 	free(sandwitch2);
 
@@ -179,10 +179,29 @@ void testeamos() {
 	imprimir_tlb();
 	imprimir_frames();
 
+	void* sandwitch3 = malloc(33);
+	memcpy(sandwitch3, memoria_principal + 9, 33);
+	loggear_info("lo leido manualmente dsps de suspender fue %s", ((char*) sandwitch3));
+	sleep(3);
+	free(sandwitch3);
+
+	inicializar_proceso(pid+1);
+	//pido malloc
+	int b = memalloc(pid+1,33);
+	loggear_trace("Hice el memalloc en %d", b);
+	imprimir_tlb();
+	imprimir_frames();
+
+	void* sandwitch4 = malloc(33);
+	memcpy(sandwitch4, memoria_principal + 9, 33);
+	loggear_info("lo leido manualmente fue %s", ((char*) sandwitch4));
+	sleep(3);
+	free(sandwitch4);
+
 	//leo
 	void* ptro_tengo_q_leer;
 	memread(a, pid, 34, &ptro_tengo_q_leer);
-	loggear_info("lo leido manualmente fue %s", ((char*) ptro_tengo_q_leer));
+	loggear_info("lo leido de memoria fue %s", ((char*) ptro_tengo_q_leer));
 
 	imprimir_tlb();
 	imprimir_frames();
