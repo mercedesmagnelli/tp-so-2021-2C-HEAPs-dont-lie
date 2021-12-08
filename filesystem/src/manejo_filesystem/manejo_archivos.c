@@ -282,8 +282,6 @@ int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_
 			list_remove_and_destroy_element(carpincho->marcos_usados, j - i - 1, free); // ver si hace falta un remove.
 			bitarray_clean_bit(archivo->bitmap_bitarray, aux);
 
-			// TODO: @Alan revisa esto si tiene sentido
-			loggear_error("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %zu] Se suma 1 al espacio libre de la pagina", carpincho->pid_carpincho);
 			archivo->espacio_libre = archivo->espacio_libre + 1;
 			//vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
 		}
