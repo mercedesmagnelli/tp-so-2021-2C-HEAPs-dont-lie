@@ -355,22 +355,20 @@ t_ram_read * deserializar_ram_read(void * puntero) {
 
 void* serializar_solicitud_espacio(t_mensaje_r_s* mensaje, size_t* size_final){
 	size_t offset = 0;
-		size_t tamanio_buffer = SIZE_PID + SIZE_CANT_PAG;
-		void * buffer = malloc(tamanio_buffer);
+	size_t tamanio_buffer = SIZE_PID + SIZE_CANT_PAG;
+	void * buffer = malloc(tamanio_buffer);
 
+	memcpy(buffer + offset, &mensaje->cant_pag, SIZE_CANT_PAG);
+	offset += SIZE_CANT_PAG;
 
-			memcpy(buffer + offset, &mensaje->cant_pag, SIZE_CANT_PAG);
-			offset += SIZE_CANT_PAG;
+	memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
+	offset += SIZE_PID;
 
-			memcpy(buffer + offset, &mensaje->pid, SIZE_PID);
-			offset += SIZE_PID;
+	if (size_final != NULL) {
+		*size_final = tamanio_buffer;
+	}
 
-			if (size_final != NULL) {
-				*size_final = tamanio_buffer;
-			}
-
-			return buffer;
-
+	return buffer;
 
 }
 void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final){
@@ -397,10 +395,8 @@ void* serializar_escribir_en_memoria(t_write_s* mensaje, size_t* size_final){
 	}
 
 	return buffer;
-
-
-
 }
+
 void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_final){
 	size_t offset = 0;
 	size_t tamanio_buffer = SIZE_PID + SIZE_NRO_PAG;
@@ -413,7 +409,6 @@ void* serializar_pedir_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* size_
 	loggear_trace("pagina %d", mensaje->nro_pag);
 	memcpy(buffer + offset, &mensaje->nro_pag, SIZE_NRO_PAG);
 	offset += SIZE_NRO_PAG;
-
 
 	//aca creo que no sería necesario hacer otro desplazamiento porque ya es el final
 	if (size_final != NULL) {
@@ -445,17 +440,9 @@ void* serializar_liberar_pagina(t_pedir_o_liberar_pagina_s* mensaje, size_t* siz
 }
 
 
-
-
-
-
 void* deserializar_pedir_pagina(void* respuesta){
-
 	return respuesta;
-
 }
-
-
 
 t_pedir_o_liberar_pagina_s* shared_crear_pedir_o_liberar(uint32_t pid, uint32_t nro_pag){
 
@@ -507,13 +494,13 @@ t_write_s * deserializar_mensaje_write_s(void* puntero){
 	t_write_s * mensaje = malloc(sizeof(t_write_s));
 
 	memcpy(&mensaje->nro_pag, puntero + offset, SIZE_PID);
-		offset += SIZE_PID;
+	offset += SIZE_PID;
 
 	memcpy(&mensaje->pid, puntero + offset, SIZE_PID);
-		offset += SIZE_PID;
+	offset += SIZE_PID;
 
 	memcpy(&mensaje->tam_data, puntero + offset, SIZE_PID);
-		offset += SIZE_PID;
+	offset += SIZE_PID;
 
 	size_t size_memoria_write = SIZE_CHAR * mensaje->tam_data;
 	mensaje->data = malloc(size_memoria_write);
@@ -529,12 +516,10 @@ t_pedir_o_liberar_pagina_s* deserializar_mensaje_peticion_liberacion_pagina(void
 	t_pedir_o_liberar_pagina_s * mensaje = malloc(sizeof(t_pedir_o_liberar_pagina_s));
 
 	memcpy(&mensaje->pid, puntero + offset, SIZE_NRO_PAG);
-		offset += SIZE_PID;
+	offset += SIZE_PID;
 
 	memcpy(&mensaje->nro_pag, puntero + offset, SIZE_NRO_PAG);
-		offset += SIZE_NRO_PAG;
-
-
+	offset += SIZE_NRO_PAG;
 
 	return mensaje;
 }
