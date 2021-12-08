@@ -820,7 +820,7 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 		agregar_entrada_tlb(PID, nroPag, marco);
 		loggear_trace("ya agregue una entrada a la TLB");
 		}else {
-			loggear_warning("---EL TAMANIO DE LA TLB ES 0, ENTONCES NO AGREGO NINGUNA ENTRADA");
+			loggear_warning("EL TAMANIO DE LA TLB ES 0, ENTONCES NO AGREGO NINGUNA ENTRADA");
 		}
 	}
 	return marco;
@@ -1024,6 +1024,8 @@ void liberar_frames_eliminar_proceso(t_proceso* proceso){
 			pthread_mutex_lock(&mutex_acceso_lista_frames);
 			frameLiberar = list_get(listaFrames, paginaIterada->frame);
 			frameLiberar->estado=0;
+			frameLiberar->pagina=-1;
+			frameLiberar->proceso=-1;
 			pthread_mutex_unlock(&mutex_acceso_lista_frames);
 		}
 
