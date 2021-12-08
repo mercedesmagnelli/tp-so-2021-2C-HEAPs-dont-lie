@@ -126,6 +126,13 @@ void eliminar_entrada(uint32_t indice_victima);
 uint32_t obtener_entrada_victima();
 
 /**
+ * @NAME: existe_la_KEY
+ * @DESC: retorno si existe una entrada en la TLB con una KEY igual a la pasada por parametro
+ */
+
+bool existe_la_KEY (char* KEY);
+
+/**
  * @NAME: destructor_de_entradas
  * @DESC: funcion intermedia para eliminar una entrada. Se usa para eliminar entrada con las funciones de listas de las commons
  */

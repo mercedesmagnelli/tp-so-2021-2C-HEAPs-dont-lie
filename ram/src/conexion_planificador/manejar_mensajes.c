@@ -56,7 +56,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			return 0;
 		case MATELIB_CLOSE:
-			loggear_info("[MATELIB_CLOSE], hay que cerrar el proceso");
+			loggear_info("[MATELIB_CLOSE] - Se solicita eliminar el proceso de memoria");
 			t_matelib_nuevo_proceso* PID_proceso_eliminar = deserializar_crear_proceso(mensaje->payload);
 
 			int32_t rtaClose = close_PID(PID_proceso_eliminar->pid);

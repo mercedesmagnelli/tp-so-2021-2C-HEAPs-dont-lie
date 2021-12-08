@@ -556,12 +556,6 @@ void* leer_de_memoria(int32_t ptroHEAP, uint32_t PID, uint32_t tamanioALeer){
 	heap_metadata* heap = encontrar_heap(PID, ptroHEAP);
 	int nroPag = calcular_pagina_de_puntero_logico(heap->currAlloc+9);
 	int offset = calcular_offset_puntero_en_pagina(heap->currAlloc+9);
-
-	void* sandwitch2 = malloc(33);
-	memcpy(sandwitch2, memoria_principal + 9, 23);
-	loggear_info("lo leido manualmente fue %s", ((char*) sandwitch2));
-	free(sandwitch2);
-
 	loggear_warning("Leo el contenido del HEAP en la pag %d con el offset %d", nroPag, offset);
 	void* dataLeida = leer_de_memoria_paginada(PID, nroPag, offset, tamanioALeer);
 	//loggear_warning("Lo leido en memoria fue %s (solo strings)", ((char*)dataLeida));
@@ -593,7 +587,8 @@ void suspender_proceso(uint32_t PID){
 			pthread_mutex_lock(&mutex_acceso_lista_frames);
 			frameLiberar = list_get(listaFrames, paginaIterada->frame);
 			frameLiberar->estado=0;
-			 pthread_mutex_unlock(&mutex_acceso_lista_frames);
+			pthread_mutex_unlock(&mutex_acceso_lista_frames);
+			paginaIterada->bit_presencia = 0;
 			if(paginaIterada->bit_modificacion){
 				data = malloc(get_tamanio_pagina());
 				leer_directamente_de_memoria(data, get_tamanio_pagina(), paginaIterada->frame * get_tamanio_pagina());
@@ -820,7 +815,7 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 		agregar_entrada_tlb(PID, nroPag, marco);
 		loggear_trace("ya agregue una entrada a la TLB");
 		}else {
-			loggear_warning("---EL TAMANIO DE LA TLB ES 0, ENTONCES NO AGREGO NINGUNA ENTRADA");
+			loggear_warning("EL TAMANIO DE LA TLB ES 0, ENTONCES NO AGREGO NINGUNA ENTRADA");
 		}
 	}
 	return marco;
@@ -1024,6 +1019,8 @@ void liberar_frames_eliminar_proceso(t_proceso* proceso){
 			pthread_mutex_lock(&mutex_acceso_lista_frames);
 			frameLiberar = list_get(listaFrames, paginaIterada->frame);
 			frameLiberar->estado=0;
+			frameLiberar->pagina=-1;
+			frameLiberar->proceso=-1;
 			pthread_mutex_unlock(&mutex_acceso_lista_frames);
 		}
 

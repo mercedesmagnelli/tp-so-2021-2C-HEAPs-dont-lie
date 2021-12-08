@@ -9,12 +9,10 @@ void manejar_sigint(){
 
 	void sumar_miss(void* pr) {
 		historico_procesos* p = (historico_procesos*) pr;
-		loggear_trace("AHORA VOY A SUMARLE AL CONTADOR %d DEL PROCESO %d", p->miss, p->pid);
 		total_miss+= (p->miss);
 	}
 	void sumar_hits(void* pr) {
 		historico_procesos* p = (historico_procesos*) pr;
-		loggear_trace("AHORA VOY A SUMARLE AL CONTADOR %d DEL PROCESO %d", p->hit, p->pid);
 		total_hits+= (p->hit);
 	}
 	if(list_size(metricas) == 0){
@@ -39,6 +37,19 @@ void manejar_sigint(){
 		imprimir_entrada_proceso(p);
 		}
 	}
+
+
+	if(list_size(listaProcesos)==0){
+		loggear_trace("[SIGINT] - No quedaron procesos vivos en memoria al momento de cerrar todo");
+	}else{
+		loggear_trace("[SIGINT] - Ademas, quedaron vivos estos procesos en memoria");
+	for (int i = 0; i <list_size(listaProcesos);i++) {
+		t_proceso* p = (t_proceso*) list_get(listaProcesos, i);
+		loggear_trace("PID: %d", p->PID);
+
+	}
+}
+
 	//imprimir_frames();
 	semaforo_post_fin();
 
