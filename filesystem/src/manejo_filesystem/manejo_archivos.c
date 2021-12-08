@@ -62,12 +62,6 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 	list_add(carpincho->dupla, dupla);
 
-	loggear_warning("el size de dupla del PID: %d es %d", carpincho->pid_carpincho, list_size(carpincho->dupla));
-	for(int w = 0; w < list_size(carpincho->dupla); w++){
-		t_dupla_pagina_marco* dupla1 = list_get(carpincho->dupla, w);
-		loggear_error("dupla %d = marco %d, pagina %d", w, dupla1->marco, dupla1->pagina);
-	}
-
 	list_add(carpincho->marcos_usados, list_get(carpincho->marcos_reservados, 0));
 	list_remove(carpincho->marcos_reservados, 0);
 

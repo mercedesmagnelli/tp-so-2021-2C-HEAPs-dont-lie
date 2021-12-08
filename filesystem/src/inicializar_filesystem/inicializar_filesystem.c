@@ -49,28 +49,9 @@ int crear_particion(){
 }
 
 void destroy_carpinchos_swamp(t_carpincho_swamp* carpincho){
-	if(carpincho->dupla != NULL){
-	loggear_error("EL SIZE DE CARPINCHO DUPLA ES %d PID: %d", list_size(carpincho->dupla), carpincho->pid_carpincho);
-	for(int i = 0; i < list_size(carpincho->dupla); i++){
-	t_dupla_pagina_marco* dupl = list_get(carpincho->dupla, i);
-	loggear_error("dupla %d = (%d, %d", i, dupl->marco, dupl->pagina);
-	}
-	for(int j = 0; j < list_size(carpincho->dupla); j++){
-		t_dupla_pagina_marco* dupl2 = list_get(carpincho->dupla, j);
-		free(dupl2);
-		loggear_warning("VA %d", j);
-	}
-	list_destroy(carpincho->dupla);
-	}
-	loggear_error("rompemos aca");
-	if(carpincho->marcos_reservados != NULL){
-		loggear_warning("debo entrar aca1");
+	list_destroy_and_destroy_elements(carpincho->dupla, free);
 	list_destroy_and_destroy_elements(carpincho->marcos_reservados, free);
-	}
-	if(carpincho->marcos_usados != NULL){
-		loggear_warning("debo entrar aca2");
 	list_destroy_and_destroy_elements(carpincho->marcos_usados, free);
-	}
 	free(carpincho);
 }
 
