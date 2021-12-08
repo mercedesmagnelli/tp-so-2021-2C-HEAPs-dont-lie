@@ -10,6 +10,7 @@ t_list* listaFrames;//casos: traer_pagina_de_SWAP, liberar_paginas
 t_list* listaFramesReservados;//lista de frames reservados por todos los procesos
 t_dictionary* cant_frames_por_proceso;//casos: traer_pagina_de_SWAP, liberar_paginas
 uint32_t puntero_global;
+t_list* metricas;
 
 pthread_mutex_t mutex_acceso_memoria;
 pthread_mutex_t mutex_acceso_lista_frames;
@@ -19,6 +20,8 @@ pthread_mutex_t mutex_enviar_mensaje_swap;
 pthread_mutex_t mutex_acceso_tiempo;
 pthread_mutex_t mutex_swapping;
 pthread_mutex_t mutex_lista_procesos;
+pthread_mutex_t mutex_metricas;
+
 typedef struct{
     uint32_t en_mp; //me sirve de flag para comprobar cuando realmente hacer el swap
     uint32_t en_mv; // me sirve para tener el control de la cant maxima por proceso
@@ -39,6 +42,11 @@ typedef struct{
 	uint32_t pagina;
 }t_frame;
 
+typedef struct{
+	uint32_t pid;
+	uint32_t hit;
+	uint32_t miss;
+}historico_procesos;
 
 typedef struct {
 	uint32_t PID;

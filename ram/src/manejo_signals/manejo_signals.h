@@ -49,6 +49,6 @@ void cerrar_todo(bool cierre);
  * @NAME: imprimir_entrada_proceso
  * @DESC: funcion auxiliar que terciariza la impresión por pantalla de una línea de info en el informe de procesos
 */
-void imprimir_entrada_proceso(t_proceso* p);
+void imprimir_entrada_proceso(historico_procesos* p);
 
 #endif /* MANEJO_SIGNALS_MANEJO_SIGNALS_H_ */

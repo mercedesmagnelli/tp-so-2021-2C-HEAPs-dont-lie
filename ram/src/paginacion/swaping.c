@@ -173,6 +173,7 @@ t_pagina* obtener_pagina_victima(t_list* lista_paginas, uint32_t pid) {
 t_pagina* obtener_victima_LRU(t_list* lista_paginas){
 	t_pagina* pagina_victima;
 	t_pagina* pagina_actual;
+	loggear_error("el tamano de la lista de paginas es: %d", list_size(lista_paginas));
 	t_pagina* pagina_anterior = (t_pagina*) list_get(lista_paginas, 0);
 	loggear_info("el primer frame de la lista tiene una pagina con un timestamp %d", pagina_anterior->timestamp);
 	for(int i = 0; i < list_size(lista_paginas); i++) {
