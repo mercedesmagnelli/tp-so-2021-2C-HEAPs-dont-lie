@@ -404,7 +404,7 @@ int calcular_paginas_para_tamanio(uint32_t tam);
  * @NAME: reservar_frames
  * @DESC: Toma la lista pasada por parametro y la llena con los frames reservados para el proceso dentro de la RAM
 */
-void reservar_frames(t_list* lista_frames);
+void reservar_frames(t_list* lista_frames, uint32_t pid);
 
 /**
  * @NAME: frame_no_pertenece_a_lista
@@ -443,6 +443,6 @@ void  inicializar_semaforos();
 */
 
 void destruir_semaforos();
-
+void imprimir_lista_frames_reservados(t_list* l);
 
 #endif /* PAGINACION_PAGINACION_H_ */
