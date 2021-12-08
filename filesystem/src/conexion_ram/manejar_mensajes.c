@@ -22,12 +22,8 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		destruir_mensaje(mensaje);
 		return 0;
 	case R_S_PROCESO_NUEVO:
-<<<<<<< HEAD
-		loggear_info("LLEGO UN PROCESO NUEVO");
-=======
 		loggear_info("LLEGO UN PROCESO NUEVO");;
 
->>>>>>> main
 		t_matelib_nuevo_proceso * mensaje_deserializado_nuevo = deserializar_crear_proceso(mensaje->payload);
 
 		loggear_debug("Se procede a crear la estructura administrativa del carpincho [PID: %d]", mensaje_deserializado_nuevo->pid);
