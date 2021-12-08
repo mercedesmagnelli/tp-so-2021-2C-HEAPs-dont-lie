@@ -175,10 +175,7 @@ void testeamos() {
 	sleep(3);
 	free(sandwitch2);
 
-	inicializar_proceso(pid+1);
-	//pido malloc
-	int b = memalloc(pid+1,33);
-	loggear_trace("Hice el memalloc en %d", b);
+	suspender_PID(pid);
 	imprimir_tlb();
 	imprimir_frames();
 
