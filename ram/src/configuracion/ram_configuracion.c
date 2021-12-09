@@ -41,6 +41,7 @@ bool son_validos_los_parametros(int argc, char ** argv) {
 void destroy_configuracion() {
 	free(config_guardada.log_route);
 	free(config_guardada.log_app_name);
+	free(config_guardada.path_dump_tlb);
 }
 
 int cargar_archivo(char * path) {
@@ -120,6 +121,8 @@ int set_variable_enum(t_config * config, char * param_leer, int * param, int (*t
 	}
 
 	*param = resultado;
+
+	free(parametro_guardar);
 
 	return 0;
 }
