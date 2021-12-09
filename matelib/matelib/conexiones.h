@@ -14,10 +14,9 @@
 #include "utils.h"
 
 int conexiones_iniciar(t_instance_metadata* instancia);
-/**
- * @NAME: enviar_mate_init
- * @DESC: Envia el nuevo proceso a la memoria o al Kernel
- */
+
+uint32_t enviar_get_nuevo_pid(t_instance_metadata* instancia);
+
 int enviar_mate_init(t_instance_metadata* instancia, t_matelib_nuevo_proceso * nuevo_proceso);
 
 int enviar_mate_close(t_instance_metadata* instancia, t_matelib_nuevo_proceso * nuevo_proceso);

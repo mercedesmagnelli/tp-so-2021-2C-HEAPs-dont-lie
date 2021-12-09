@@ -9,13 +9,39 @@ int recibir_mensaje(int socket) {
 	return manejar_mensaje(mensaje);
 }
 
+uint32_t get_nuevo_pid() {
+	static uint32_t id = 0;
+	static pthread_mutex_t mutex_t = PTHREAD_MUTEX_INITIALIZER;
+
+	pthread_mutex_lock(&mutex_t);
+	id++;
+	pthread_mutex_unlock(&mutex_t);
+
+	return id;
+}
+
 int manejar_mensaje(t_prot_mensaje * mensaje) {
 	bool seguir_esperando_mensajes = true;
 	void dejar_de_esperar_mensajes() { seguir_esperando_mensajes = false; }
 
 	while (seguir_esperando_mensajes) {
 
+		t_matelib_nuevo_proceso * nuevo_proceso;
+
 		switch (mensaje->head) {
+		case GENERAR_PID:
+			nuevo_proceso = shared_crear_nuevo_proceso(get_nuevo_pid());
+
+			size_t size = sizeof(uint32_t);
+			void * serializado = serializiar_crear_proceso(nuevo_proceso, &size);
+
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, size, serializado);
+
+			free(serializado);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+
+			return 0;
 		case HANDSHAKE_P_R:
 			enviar_mensaje_protocolo(mensaje->socket, HANDSHAKE_R_P, 0, NULL);
 

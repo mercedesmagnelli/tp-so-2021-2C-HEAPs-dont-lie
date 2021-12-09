@@ -10,6 +10,17 @@ int lib_recibir_mensaje(int socket_ram) {
 	return manejar_mensaje(mensaje);
 }
 
+uint32_t get_nuevo_pid() {
+	static uint32_t id = 0;
+	static pthread_mutex_t mutex_t = PTHREAD_MUTEX_INITIALIZER;
+
+	pthread_mutex_lock(&mutex_t);
+	id++;
+	pthread_mutex_unlock(&mutex_t);
+
+	return id;
+}
+
 int manejar_mensaje(t_prot_mensaje * mensaje) {
 	bool seguir_esperando_mensajes = true;
 	void dejar_de_esperar_mensajes() { seguir_esperando_mensajes = false; }
@@ -19,7 +30,22 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 		t_estado_ejecucion ejecucion_semaforo;
 		t_ram_respuesta * respuesta_ram;
 
+		t_matelib_nuevo_proceso * nuevo_proceso;
+
 		switch (mensaje->head) {
+		case GENERAR_PID:
+			nuevo_proceso = shared_crear_nuevo_proceso(get_nuevo_pid());
+
+			size_t size = sizeof(uint32_t);
+			void * serializado = serializiar_crear_proceso(nuevo_proceso, &size);
+
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, size, serializado);
+
+			free(serializado);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+
+			return 0;
 		case MATELIB_INIT:
 			loggear_info("[MATELIB_INIT], hay que crear un proceso");
 			t_matelib_nuevo_proceso * nuevo_proceso = deserializar_crear_proceso(mensaje->payload);

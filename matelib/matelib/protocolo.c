@@ -8,7 +8,6 @@ void destruir_mensaje(t_prot_mensaje* mensaje);
 t_prot_mensaje* mensaje_error_al_recibir(int socket);
 t_prot_mensaje* mensaje_desconexion_al_recibir(int socket);
 
-
 // Publico
 int aceptar_conexion_protocolo(int socket_servidor) {
 	struct sockaddr_in direccionCliente;

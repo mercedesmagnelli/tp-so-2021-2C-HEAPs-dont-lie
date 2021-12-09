@@ -2,6 +2,37 @@
 
 void avisar_desconexion();
 
+uint32_t enviar_get_nuevo_pid(t_instance_metadata* instancia) {
+	int socket = conexiones_iniciar(instancia);
+	if (socket < 0) {
+		loggear_error("[GENERAR_PID] Error al conectar al servidor");
+		return 0;
+	}
+
+	int resultado = enviar_mensaje_protocolo(socket, GENERAR_PID, 0, NULL);
+	if (resultado < 0) {
+		loggear_error("[GENERAR_PID] Ocurrió un error, Error: %d", resultado);
+
+		return 0;
+	}
+
+	uint32_t pid_generado = 0;
+	t_prot_mensaje* mensaje_respuesta = recibir_mensaje_protocolo(socket);
+	if (mensaje_respuesta->head == EXITO_EN_LA_TAREA) {
+		void * mensaje_serializado = mensaje_respuesta->payload;
+		t_matelib_nuevo_proceso * proceso_deserializado = deserializar_crear_proceso(mensaje_serializado);
+		pid_generado = proceso_deserializado->pid;
+		free(proceso_deserializado);
+	} else {
+		loggear_error("[GENERAR_PID] Ocurrio un error al pedir el pid");
+	}
+
+	destruir_mensaje(mensaje_respuesta);
+	close(socket);
+
+	return pid_generado;
+}
+
 // Publica
 int enviar_mate_init(t_instance_metadata* instancia, t_matelib_nuevo_proceso * nuevo_proceso) {
 	int socket = conexiones_iniciar(instancia);

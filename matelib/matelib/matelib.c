@@ -1,14 +1,13 @@
 #include "matelib.h"
 
-uint32_t generar_pid() {
-	static uint32_t id = 0;
-	static pthread_mutex_t mutex_t = PTHREAD_MUTEX_INITIALIZER;
+uint32_t generar_pid(t_instance_metadata* metadata) {
+	uint32_t pid = enviar_get_nuevo_pid(metadata);
 
-	pthread_mutex_lock(&mutex_t);
-	id++;
-	pthread_mutex_unlock(&mutex_t);
+	if (pid == 0) {
+		loggear_error("Devolvio un PID = 0, no se puede continuar");
+	}
 
-	return id;
+	return pid;
 }
 
 void mate_instance_close(mate_instance * lib_ref){
@@ -26,8 +25,9 @@ int mate_init(mate_instance *lib_ref, char *config) {
 	int error = 0;
 
 	t_instance_metadata* metadata = malloc(sizeof(t_instance_metadata));
-	metadata->pid = generar_pid();
 	error = cargar_archivo(metadata, config);
+
+	metadata->pid = generar_pid(metadata);
 
 	init_mutex_log(metadata->log_route, metadata->log_app_name, metadata->log_in_console, metadata->log_level_info);
 
