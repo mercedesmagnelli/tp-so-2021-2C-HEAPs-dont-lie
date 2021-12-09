@@ -366,7 +366,7 @@ int enviar_mate_memfree(t_instance_metadata* instancia, t_matelib_memoria_free* 
 	return respuesta;
 }
 
-int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* leer){
+int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* leer, void *dest, int size_leer) {
 
 	int socket = conexiones_iniciar(instancia);
 	if (socket < 0) {
@@ -392,6 +392,12 @@ int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* 
 	if (mensaje_respuesta->head != EXITO_EN_LA_TAREA) {
 		loggear_error("[MATE_MEM_READ] Llego un error, %d", mensaje_respuesta->head);
 		respuesta_ram = -1;
+	} else {
+		t_ram_read * memoria_read = deserializar_ram_read(mensaje_respuesta->payload);
+
+		memcpy(dest, memoria_read->mem_read, size_leer);
+
+		//*dest = memoria_read->memoria_mate_pointer;
 	}
 
 	destruir_mensaje(mensaje_respuesta);

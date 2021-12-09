@@ -164,7 +164,7 @@ int mate_memread(mate_instance *lib_ref, mate_pointer origin, void *dest, int si
 
 	t_matelib_memoria_read* read = shared_crear_nuevo_read(metadata->pid, size, origin);
 
-	int error = enviar_mate_memread(metadata, read);
+	int error = enviar_mate_memread(metadata, read, dest, size);
 
 	return error;
 }

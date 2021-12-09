@@ -78,7 +78,9 @@ typedef enum {
 	EXITO_PROCESO_ELIMINADO, // Se elimino el proceso por deadlock
 
 	// Pruebas
-	CACHO_DE_TEXTO
+	CACHO_DE_TEXTO,
+
+	GENERAR_PID, // Retorna los nuevos IDs
 
 } t_header;
 

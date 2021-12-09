@@ -35,7 +35,7 @@ int32_t enviar_mate_memalloc(t_instance_metadata* instancia, t_matelib_memoria_a
 
 int enviar_mate_memfree(t_instance_metadata* instancia, t_matelib_memoria_free* free);
 
-int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* read);
+int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* read, void *dest, int size);
 
 int enviar_mate_memwrite(t_instance_metadata* instancia, t_matelib_memoria_write* write);
 
