@@ -48,6 +48,8 @@ void destruir_estructuras_administrativas() {
     dictionary_destroy(cant_frames_por_proceso);
     destruir_tlb();
     destruir_semaforos();
+    list_destroy_and_destroy_elements(metricas, free);
+    list_destroy(listaFramesReservados);
 }
 void destruir_semaforos() {
 		pthread_mutex_destroy(&mutex_acceso_lista_frames);
@@ -290,6 +292,8 @@ int32_t memoria_suficiente_en_swap(uint32_t pid, uint32_t size) {
 	loggear_trace("El numero de cantidad de paginas extras a agregar al proceso es: %d", cantidad_paginas_extras);
 
 	free(mensaje);
+	free(respuesta->payload);
+	free(respuesta);
 	return respuesta_final;
 
 }

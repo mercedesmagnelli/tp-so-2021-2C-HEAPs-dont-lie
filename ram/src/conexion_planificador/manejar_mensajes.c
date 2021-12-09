@@ -178,12 +178,15 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				loggear_info("[MATELIB_MEM_READ], proceso %d pudo leer el espacio seleccionado", read->pid);
 				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, *tamanioBuffer, readSerializado);
 				free(readSerializado);
+				free(estructuraRead); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS
+				free(tamanioBuffer); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS
 			}else{
 				loggear_info("[MATELIB_MEM_READ], proceso %d NO pudo leer el espacio seleccionado", read->pid);
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
 			free(ptroLectura);
+			free(read); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 
@@ -208,6 +211,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			enviar_mensaje_protocolo(mensaje->socket, headerW, 0, NULL);
 
+			free(write_memoria_write);
 			free(escritura);
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
