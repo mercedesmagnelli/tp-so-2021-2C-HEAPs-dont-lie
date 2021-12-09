@@ -33,7 +33,9 @@ uint32_t frames_libres() {
 	pthread_mutex_lock(&mutex_acceso_lista_frames);
 	for (int i = 0; i<list_size(listaFrames); i++) {
 		t_frame* f = (t_frame*) list_get(listaFrames,i);
-		if(f->estado == 0) cant++;
+		if(f->estado == 0 && f->proceso == -1) {
+			cant++;
+		}
 	}
 	pthread_mutex_unlock(&mutex_acceso_lista_frames);
 	return cant;

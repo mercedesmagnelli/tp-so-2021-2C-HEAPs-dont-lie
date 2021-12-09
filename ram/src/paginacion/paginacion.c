@@ -113,6 +113,7 @@ void alistar_proceso(uint32_t PID){
 	loggear_warning("obtuve el proceso, de pid: %d", proceso->PID);
 	if(get_tipo_asignacion() == FIJA){
 		reservar_frames(proceso->lista_frames_reservados, PID);
+		loggear_warning("SE reservo el frame pid: %d", proceso->PID);
 		//imprimir_lista_frames_reservados(proceso->lista_frames_reservados);
 
 		proceso->puntero_frames = 0;
@@ -954,11 +955,13 @@ int calcular_paginas_para_tamanio(uint32_t tam) {
 
 void reservar_frames(t_list* lista_frames_proceso, uint32_t pid){
 
-	bool frame_disponible_y_no_repetidos_en_lista(void* element){
-
-		return frame_disponible(element) && frame_no_pertenece_a_lista(listaFramesReservados, element);
+	if (list_size(listaFramesReservados) == 0) {
+		loggear_error("[PID: %zu] La lista de frames reservados esta vacia", pid);
 	}
 
+	bool frame_disponible_y_no_repetidos_en_lista(void* element){
+		return frame_disponible(element) && frame_no_pertenece_a_lista(listaFramesReservados, element);
+	}
 
 	for(int i=0; i<get_marcos_maximos();i++){
 
@@ -966,10 +969,12 @@ void reservar_frames(t_list* lista_frames_proceso, uint32_t pid){
 
 		pthread_mutex_lock(&mutex_acceso_lista_frames);
 		t_frame* frame = (t_frame*)list_find(listaFrames, frame_disponible_y_no_repetidos_en_lista);
-		//FIXME: ACA PUEDE SER QUE LE ESTE ERRANDO PERO POR AHORA QUIERO VER SI FUNCIONA
+		if (frame == NULL) {
+			loggear_error("[PID: %zu] No se encontro frame libre en la lista de frames", pid);
+		}
+
 		frame->proceso = pid;
 		frame->pagina = i;
-		loggear_info("reserve el frame %d", frame->nroFrame);
 
 		pthread_mutex_unlock(&mutex_acceso_lista_frames);
 
