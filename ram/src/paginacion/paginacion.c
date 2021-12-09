@@ -786,6 +786,7 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 		loggear_debug("[RAM] - TLB HIT para Proceso %d Pagina %d en el marco %d", PID, nroPag, marco);
 		actualizar_datos_TLB(PID, nroPag);
 		actualizar_datos_pagina(PID, nroPag, bitModificado, true);
+
 	}else{
 		usleep(1000 *  get_retardo_fallo_tlb());
 		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
@@ -863,12 +864,18 @@ historico_procesos* get_historico_pid(uint32_t pid) {
 void actualizar_datos_pagina(uint32_t PID, uint32_t nroPag, uint32_t bitModificado, bool bitTLB){
 	t_proceso* proceso = get_proceso_PID(PID);
 	historico_procesos* dic_p = get_historico_pid(PID);
+	if(dic_p == NULL) {
+		loggear_error("otro error mas; el dic_p esta nulo");
+	}
 	if(bitTLB && max_entradas >0){
 		dic_p->hit++;
 	}else{
 		dic_p->miss++;
 	}
 	t_pagina* pag = list_get(proceso->tabla_paginas, nroPag);
+	if(pag == NULL) {
+		loggear_error("la pagina %d del proceso %d que obtuve es nula", nroPag, PID);
+	}
 	pag->timestamp = obtener_timestamp_actual();
 	pag->bit_uso = 1;
 	if(bitModificado){
