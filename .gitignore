@@ -70,6 +70,9 @@ ram/tests/build/*/
 matelib/tests/build/
 matelib/tests/build/*/
 
+carpinchos-pruebas/build/
+carpinchos-pruebas/build/*/
+
 shared/tests/build/
 shared/tests/build/*/
 

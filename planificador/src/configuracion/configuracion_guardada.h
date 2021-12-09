@@ -22,8 +22,6 @@ char ** get_dispositivos_io();
 int get_cantidad_duraciones_io();
 char ** get_duraciones_io();
 
-int get_retardo_cpu();
-
 int get_grado_multiprogramacion();
 int get_grado_multiprocesamiento();
 
@@ -50,8 +48,6 @@ typedef struct {
 
 	int cantidad_duraciones_io;
 	char ** duraciones_io;
-
-	int retardo_cpu;
 
 	int grado_multiprogramacion;
 	int grado_multiprocesamiento;

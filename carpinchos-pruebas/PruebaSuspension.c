@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <matelib.h>
+#include <matelib/matelib.h>
 
 
 void* carpincho1_func(void* config){
