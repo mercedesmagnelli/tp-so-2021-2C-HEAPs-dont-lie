@@ -10,8 +10,8 @@
 #include <commons/config.h>
 #include <commons/string.h>
 
-#include "../../../shared/codigo_error.h"
-#include "../matelib.h"
+#include "codigo_error.h"
+#include "utils.h"
 
 
 /**

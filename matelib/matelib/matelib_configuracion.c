@@ -8,8 +8,6 @@ int set_variable_str(t_config * config, char * param_leer, char ** param); // Se
 int set_variable_int(t_config * config, char * param_leer, int * param); // Se usa para setear un int leyendo del archivo config
 
 
-
-
 int cargar_archivo(t_instance_metadata * lib_ref, char * path) {
 	t_config * config = config_create(path);
 	int error = 0;

@@ -5,13 +5,11 @@
 #include <stdint.h>
 #include <pthread.h>
 
-#include "utils/utils.h"
-#include "conexiones/conexiones.h"
-
-#include "configuracion/matelib_configuracion.h"
-
-#include "../../shared/estructura_compartida.h"
-#include "../../shared/logger.h"
+#include "utils.h"
+#include "conexiones.h"
+#include "matelib_configuracion.h"
+#include "estructura_compartida.h"
+#include "logger.h"
 
 //-------------------Type Definitions----------------------/
 typedef struct mate_instance {

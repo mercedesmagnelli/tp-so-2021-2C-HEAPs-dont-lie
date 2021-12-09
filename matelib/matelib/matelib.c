@@ -32,7 +32,7 @@ int mate_init(mate_instance *lib_ref, char *config) {
 	init_mutex_log(metadata->log_route, metadata->log_app_name, metadata->log_in_console, metadata->log_level_info);
 
 	if(error != STATUS_OK){
-		loggear_error("Hubo un error al leer el archivo");
+		loggear_error("[MATE_INIT] Hubo un error al leer el archivo");
 		return EXIT_FAILURE;
 	}
 
@@ -40,12 +40,10 @@ int mate_init(mate_instance *lib_ref, char *config) {
 
 	t_matelib_nuevo_proceso * nuevo_proceso = shared_crear_nuevo_proceso(metadata->pid);
 
-	loggear_debug("[PID: %zu] --- MATE_INIT ", metadata->pid);
-
 	error = enviar_mate_init(metadata, nuevo_proceso);
 
 	if(error !=STATUS_OK){
-		loggear_error("Hubo un error al enviar el mensaje");
+		loggear_error("[MATE_INIT] Hubo un error al enviar el mensaje");
 		return EXIT_FAILURE;
 	}
 
@@ -62,8 +60,6 @@ int mate_close(mate_instance *lib_ref) {
 	int error = enviar_mate_close(metadata, nuevo_proceso);
 	mate_instance_close(lib_ref);
 
-	loggear_debug("[PID: %zu] - Se ejecutó mate_close", pid);
-
 	return error;
 
 }
@@ -76,8 +72,6 @@ int mate_sem_init(mate_instance *lib_ref, mate_sem_name sem, unsigned int value)
 
 	t_matelib_semaforo* nuevo_semaforo = shared_crear_nuevo_semaforo(metadata->pid, sem, value);
 
-	loggear_debug("[PID: %zu] --- MATE_SEM_INIT ", metadata->pid);
-
 	int error = enviar_mate_sem_init(metadata, nuevo_semaforo);
 
 	return error;
@@ -89,12 +83,10 @@ int mate_sem_wait(mate_instance *lib_ref, mate_sem_name sem) {
 
 	t_matelib_semaforo* semaforo = shared_crear_usar_semaforo(metadata->pid, sem);
 
-	loggear_debug("[PID: %zu] --- MATE_SEM_WAIT ", metadata->pid);
-
 	int error = enviar_mate_sem_wait(metadata, semaforo);
 
 	if (error == EXITO_PROCESO_ELIMINADO) {
-	   loggear_warning("[PID: %zu] - Entro en deadlock y murio, cerramos el hilo", metadata->pid);
+	   loggear_warning("[MATE_SEM_WAIT] [PID: %zu] - Entro en deadlock y murio, cerramos el hilo", metadata->pid);
 	   mate_instance_close(lib_ref);
 	   pthread_exit(NULL);
 	}
@@ -121,7 +113,7 @@ int mate_sem_destroy(mate_instance *lib_ref, mate_sem_name sem) {
 
 	t_matelib_semaforo* semaforo = shared_crear_usar_semaforo(metadata->pid, sem);
 
-	loggear_debug("[PID: %zu] --- MATE_SEM_DESTROY ", metadata->pid);
+	loggear_debug("[MATE_SEM_DESTROY] [PID: %zu] --- MATE_SEM_DESTROY ", metadata->pid);
 
 	int error = enviar_mate_sem_destroy(metadata, semaforo);
 

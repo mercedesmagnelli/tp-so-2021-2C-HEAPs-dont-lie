@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <matelib.h>
+#include <matelib/matelib.h>
 
 void* carpincho1_func(void *config);
 void* carpincho2_func(void *config);

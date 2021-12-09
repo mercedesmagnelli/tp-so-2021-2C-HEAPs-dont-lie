@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <lib/matelib.h>
+#include <matelib/matelib.h>
 #include <commons/log.h>
 #include <semaphore.h>
 
