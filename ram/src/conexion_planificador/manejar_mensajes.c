@@ -279,6 +279,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			enviar_mensaje_protocolo(mensaje->socket, headerR, 0, NULL);
 
+			free(PID_proceso_ready);
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 			return 0;
