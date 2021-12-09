@@ -24,13 +24,13 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			loggear_info("[MATELIB_INIT], hay que crear un proceso");
 			t_matelib_nuevo_proceso * nuevo_proceso = deserializar_crear_proceso(mensaje->payload);
 
-			planificadores_proceso_iniciar(nuevo_proceso->pid);
-
 			respuesta_ram = ram_enviar_init(nuevo_proceso);
 
-			hilos_wait_ejecucion(nuevo_proceso->pid);
-
 			if (respuesta_ram->respuesta == EXITO_EN_LA_TAREA) {
+				planificadores_proceso_iniciar(nuevo_proceso->pid);
+
+				hilos_wait_ejecucion(nuevo_proceso->pid);
+
 				loggear_info("[PID: %zu] - [Mensaje] - Se creo el proceso y ya esta en ejecucion", nuevo_proceso->pid);
 			} else {
 				loggear_info("[PID: %zu] - [Mensaje] - Ocurrio un problema en la RAM al hacer MATE_INIT", nuevo_proceso->pid);
