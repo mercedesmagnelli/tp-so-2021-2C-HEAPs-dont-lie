@@ -17,8 +17,6 @@ char ** get_dispositivos_io() { return config_guardada.dispositivos_io; }
 int get_cantidad_duraciones_io() { return config_guardada.cantidad_duraciones_io; }
 char ** get_duraciones_io() { return config_guardada.duraciones_io; }
 
-int get_retardo_cpu() { return config_guardada.retardo_cpu; }
-
 int get_grado_multiprogramacion() { return config_guardada.grado_multiprogramacion; }
 int get_grado_multiprocesamiento() { return config_guardada.grado_multiprocesamiento; }
 
