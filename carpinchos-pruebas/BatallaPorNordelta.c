@@ -246,7 +246,7 @@ void* carpincho6_func(void *config) {
 	printf("C6 - Un par de vueltas con la memoria... \n");
 	int a = 1;
 	int b = 0;
-	while (a <= 500) {
+	while (a <= 256) {
 		usleep(5000);
 		mate_memwrite(&instance, &a, alloc, 4);
 		mate_memread(&instance, alloc, &b, 4);
