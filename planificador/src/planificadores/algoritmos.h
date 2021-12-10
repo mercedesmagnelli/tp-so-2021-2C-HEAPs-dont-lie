@@ -4,6 +4,7 @@
 
 #include <commons/collections/list.h>
 
+#include "../../../shared/logger.h"
 #include "../configuracion/configuracion_guardada.h"
 
 #include "estructuras.h"

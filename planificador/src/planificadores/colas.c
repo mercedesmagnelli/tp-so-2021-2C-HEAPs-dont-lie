@@ -80,13 +80,12 @@ t_hilo * colas_insertar_new(uint32_t pid) {
 
 	hilo->pid = pid;
 	hilo->estado = ESTADO_NEW;
-	hilo->estimacion_anterior = get_estimacion_inicial();
+	hilo->estimacion_anterior = (double) get_estimacion_inicial();
 	hilo->timestamp_tiempo_exec = 0.0;
 	hilo->sera_eliminado_por_deadlock = false;
 	//hilo->bloqueante = NINGUNO;
 	//hilo->nombre_bloqueante = "";
 	hilo->semaforos_pedidos = list_create();
-
 
 	pthread_mutex_lock(&mutex_new_queue);
 	queue_push(new_queue, hilo);

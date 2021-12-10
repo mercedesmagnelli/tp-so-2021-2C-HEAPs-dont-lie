@@ -35,17 +35,19 @@ typedef struct {
 
     t_estado_hilo estado; // Inicia como NEW
 
-    float estimacion_anterior; // Viene de la LIB
-    float estimacion_actual_sjf;
-    float estimacion_actual_hrrn;
+    double estimacion_anterior; // Viene de la LIB
+    double estimacion_actual_sjf;
+    double estimacion_actual_hrrn;
+
+    double estimacion_temporal_sjf;
 
     bool sera_eliminado_por_deadlock;
 
-    t_timestamp timestamp_entrar_exec;
-    t_timestamp timestamp_salir_exec;
-    float timestamp_tiempo_exec; // 0 la primera vez
+    double timestamp_entrar_exec;
+    double timestamp_salir_exec;
+    double timestamp_tiempo_exec; // 0 la primera vez
 
-    t_timestamp timestamp_entrar_ready;
+    double timestamp_entrar_ready;
 
     t_dispositivo_bloqueante bloqueante;
     char * nombre_bloqueante;
@@ -62,12 +64,12 @@ uint32_t pid(t_hilo * hilo);
  * @NAME: estructuras_current_timestamp
  * @DESC: Retorna el timestamp actual
  */
-t_timestamp estructuras_current_timestamp();
+double estructuras_current_timestamp();
 
 /**
- * @NAME: float estructuras_timestamp_diff(t_timestamp time1, t_timestamp time2
+ * @NAME: double estructuras_timestamp_diff(t_timestamp time1, t_timestamp time2
  * @DESC: Retorna la diferencia de tiempo entre los 2
  */
-float estructuras_timestamp_diff(t_timestamp time1, t_timestamp time2);
+double estructuras_timestamp_diff(double time1, double time2);
 
 #endif /* PLANIFICADORES_ESTRUCTURAS_H_ */

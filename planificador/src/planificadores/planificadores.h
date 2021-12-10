@@ -15,7 +15,7 @@
 
 #include "../../../shared/logger.h"
 
-const float alfa; // Definido por archivo de configuracion para calcular estimaciones por HRRN.
+const double alfa; // Definido por archivo de configuracion para calcular estimaciones por HRRN.
 
 /**
  * @NAME: suspender_hilo
