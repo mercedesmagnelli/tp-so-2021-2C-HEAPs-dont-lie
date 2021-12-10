@@ -197,10 +197,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			void* ptroLectura;
 			int32_t rtaRead = memread(read->memoria_mate_pointer, read->pid, read->memoria_size, &ptroLectura);
 
-			loggear_warning("[MATELIB_MEM_READ] TEXTO A LEER: %d", *((int *) ptroLectura));
+			loggear_warning("[MATELIB_MEM_READ] TEXTO A LEER: %s con un tamanio de %d", ((char *) ptroLectura),read->memoria_size);
 
 			if(rtaRead>=0){
-				t_ram_read* estructuraRead = shared_crear_ram_read(rtaRead, ptroLectura);
+				t_ram_read* estructuraRead = shared_crear_ram_read(read->memoria_size, ptroLectura);
 				size_t* tamanioBuffer = malloc(sizeof(size_t));
 				void* readSerializado = serializar_ram_read(estructuraRead, tamanioBuffer);
 				loggear_info("[MATELIB_MEM_READ], proceso %d pudo leer el espacio seleccionado", read->pid);
@@ -229,7 +229,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			void * write_memoria_write = escritura->memoria_write;
 
-			loggear_warning("[MATELIB_MEM_WRITE] TEXTO A ESCRIBIR: %d", *((int *) write_memoria_write));
+			loggear_warning("[MATELIB_MEM_WRITE] TEXTO A ESCRIBIR: %s", ((char *) write_memoria_write));
 
 			int32_t rtaWrite = memwrite(write_memoria_write, escritura->memoria_mate_pointer, escritura->pid, escritura->memoria_size);
 			uint32_t headerW;
