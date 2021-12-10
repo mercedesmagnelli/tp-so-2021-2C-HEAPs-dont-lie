@@ -116,6 +116,9 @@ t_ram_respuesta * ram_enviar_read(t_matelib_memoria_read * memoria_read) {
 
 	t_ram_read * ram_read = deserializar_ram_read(respuesta_ram->payload);
 
+	//loggear_warning("[ram_enviar_read] SIZE A LEER: %d", ram_read->size);
+	//loggear_warning("[ram_enviar_read] TEXTO A LEER: %d", *((int *) ram_read->mem_read));
+
 	size_t * size_mensaje_serializado = malloc(sizeof(size_t));
 	void * mensaje_serializado = serializar_ram_read(ram_read, size_mensaje_serializado);
 

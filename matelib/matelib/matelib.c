@@ -113,8 +113,6 @@ int mate_sem_destroy(mate_instance *lib_ref, mate_sem_name sem) {
 
 	t_matelib_semaforo* semaforo = shared_crear_usar_semaforo(metadata->pid, sem);
 
-	loggear_debug("[MATE_SEM_DESTROY] [PID: %zu] --- MATE_SEM_DESTROY ", metadata->pid);
-
 	int error = enviar_mate_sem_destroy(metadata, semaforo);
 
 	return error;

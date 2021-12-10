@@ -316,7 +316,11 @@ t_matelib_memoria_free * deserializar_memoria_free(void * puntero) {
 t_ram_read * shared_crear_ram_read(size_t size, void * memoria_ready) {
 	t_ram_read * mensaje = malloc(sizeof(t_ram_read));
 	mensaje->size = size;
-	mensaje->mem_read = memoria_ready;
+
+	mensaje->mem_read = malloc(size);
+	memcpy(mensaje->mem_read, memoria_ready, size);
+
+	//mensaje->mem_read = memoria_ready;
 	return mensaje;
 }
 void * serializar_ram_read(t_ram_read * mensaje, size_t * size_final) {
