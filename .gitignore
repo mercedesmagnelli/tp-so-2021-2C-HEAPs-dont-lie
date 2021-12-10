@@ -80,3 +80,9 @@ planificador/Debug/
 ram/Debug/
 filesystem/Debug/
 matelib/Debug/
+
+filesystem.config
+matelib.config
+planificador.config
+ram.config
+

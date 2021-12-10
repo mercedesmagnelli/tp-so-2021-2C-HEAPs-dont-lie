@@ -147,31 +147,36 @@ CONFIGURACIONES_RUTA := configs
 
 help:
 	-@echo "$(GREEN) Pruebas Kernel $(NOCOLOR)"
+	-@echo "$(YELLOW) ----- Planificacion ----- $(NOCOLOR)"
 	-@echo "make run-kernel-1-sjf"
 	-@echo "make run-kernel-1-hrrn"
-	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+	-@echo "$(YELLOW) ----- Deadlock ----- $(NOCOLOR)"
 	-@echo "make run-kernel-2-sjf"
 	-@echo "make run-kernel-2-hrrn"
-	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+	-@echo "$(YELLOW) ----- Suspensión ----- $(NOCOLOR)"
 	-@echo "make run-kernel-3-sjf"
 	-@echo "make run-kernel-3-hrrn"
 	-@echo "$(GREEN) -------------- $(NOCOLOR)"
 	-@echo "$(GREEN) Pruebas Memoria $(NOCOLOR)"
+	-@echo "$(YELLOW) ----- Reemplazo MMU ----- $(NOCOLOR)"
 	-@echo "make run-memoria-1-clockm"
 	-@echo "make run-memoria-1-lru"
-	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+	-@echo "$(YELLOW) ----- Asignación ----- $(NOCOLOR)"
 	-@echo "make run-memoria-2-fija"
 	-@echo "make run-memoria-2-dinamica"
-	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+	-@echo "$(YELLOW) ----- TLB ----- $(NOCOLOR)"
 	-@echo "make run-memoria-3-fifo"
 	-@echo "make run-memoria-3-lru"
 	-@echo "$(GREEN) -------------- $(NOCOLOR)"
 	-@echo "$(GREEN) Pruebas SWAP $(NOCOLOR)"
+	-@echo "$(YELLOW) ----- Default ----- $(NOCOLOR)"
 	-@echo "make run-swap-1"
 	-@echo "$(GREEN) -------------- $(NOCOLOR)"
 	-@echo "$(GREEN) Pruebas GENERALES $(NOCOLOR)"
-	-@echo "make run-general-1 (Saludo al humedal)"
-	-@echo "make run-general-2 (Batala por Nordelta)"
+	-@echo "$(YELLOW) ----- Saludo al humedal ----- $(NOCOLOR)"
+	-@echo "make run-general-1"
+	-@echo "$(YELLOW) ----- Batalla por Nordelta ----- $(NOCOLOR)"
+	-@echo "make run-general-2"
 	-@echo "$(GREEN) -------------- $(NOCOLOR)"
 
 remover-config:
@@ -291,8 +296,8 @@ run-general-1:
 	-cp $(CONFIGURACIONES_RUTA)/general_1/ram.config $(RAM_ARCHIVO_CONFIG)
 	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
 	-@echo "$(GREEN) Se copiaron todas las configs, ahora queda ejecutar los procesos $(NOCOLOR)"
-	-@echo "Ejecutar ./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaBAse_Carpincho1 $(MATELIB_ARCHIVO_CONFIG)"
-	-@echo "Ejecutar ./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaBAse_Carpincho2 $(MATELIB_ARCHIVO_CONFIG)"
+	-@echo "Ejecutar (sin make) ./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaBAse_Carpincho1 $(MATELIB_ARCHIVO_CONFIG)"
+	-@echo "Ejecutar (sin make) ./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaBAse_Carpincho2 $(MATELIB_ARCHIVO_CONFIG)"
 
 run-general-2:
 	-@$(MAKE) remover-config
