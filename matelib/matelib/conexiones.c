@@ -399,9 +399,8 @@ int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* 
 
 		memcpy(dest, memoria_read->mem_read, size_leer);
 
-		loggear_warning("[MATE_MEM_READ] Texto llego, %d", *((int *) dest));
-
-		//*dest = memoria_read->memoria_mate_pointer;
+		free(memoria_read->mem_read);
+		free(memoria_read);
 	}
 
 	destruir_mensaje(mensaje_respuesta);
@@ -423,7 +422,7 @@ int enviar_mate_memwrite(t_instance_metadata* instancia, t_matelib_memoria_write
 
 	int resultado = enviar_mensaje_protocolo(socket, MATELIB_MEM_WRITE, *size, mensaje);
 	if (resultado < 0) {
-		loggear_error("Ocurrió un error al realizar el MATELIB_MEM_WRITE, Error: %d", resultado);
+		loggear_error("[MATE_MEM_WRITE] [PID: %zu] Ocurrió un error al realizar el MATELIB_MEM_WRITE, Error: %d", instancia->pid, resultado);
 
 		return resultado;
 	}

@@ -258,13 +258,13 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			loggear_info("[MATELIB_MEM_READ], Enviamos mensaje a la ram");
 
-			loggear_warning("[MATELIB_MEM_READ], PID: %zu - SIZE: %zu - Pointer: %d", read_memoria->pid, read_memoria->memoria_size, read_memoria->memoria_mate_pointer);;
+			//loggear_warning("[MATELIB_MEM_READ], PID: %zu - SIZE: %zu - Pointer: %d", read_memoria->pid, read_memoria->memoria_size, read_memoria->memoria_mate_pointer);;
 
 			respuesta_ram = ram_enviar_read(read_memoria);
 
 			loggear_info("[MATELIB_MEM_READ], Recibimos respuesta, respondemos a la matelib");
 
-			loggear_warning("[MATELIB_MEM_READ] TEXTO A LEER: %d", *((int *) respuesta_ram->mensaje));
+			//loggear_warning("[MATELIB_MEM_READ] TEXTO A LEER: %d", *((int *) respuesta_ram->mensaje));
 
 			enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, respuesta_ram->size, respuesta_ram->mensaje);
 
@@ -282,14 +282,18 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			loggear_info("[MATELIB_MEM_WRITE], Enviamos mensaje a la ram");
 
-			loggear_warning("[MATELIB_MEM_WRITE] TEXTO A ESCRIBIR: %d", *((int *) write_memoria->memoria_write));
+			//loggear_warning("[MATELIB_MEM_WRITE] TEXTO A ESCRIBIR: %d", *((int *) write_memoria->memoria_write));
 
 			respuesta_ram = ram_enviar_write(write_memoria);
 
-			loggear_info("[MATELIB_MEM_WRITE], Recibimos respuesta, respondemos a la matelib");
+			//loggear_info("[MATELIB_MEM_WRITE], Recibimos respuesta, respondemos a la matelib");
 
 			enviar_mensaje_protocolo(mensaje->socket, respuesta_ram->respuesta, respuesta_ram->size, respuesta_ram->mensaje);
 
+			if (write_memoria->memoria_size > 0) {
+				free(write_memoria->memoria_write);
+			}
+			free(write_memoria);
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 			destruir_respuesta_ram(respuesta_ram);

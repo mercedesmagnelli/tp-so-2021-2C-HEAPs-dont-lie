@@ -197,7 +197,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			void* ptroLectura;
 			int32_t rtaRead = memread(read->memoria_mate_pointer, read->pid, read->memoria_size, &ptroLectura);
 
-			loggear_warning("[MATELIB_MEM_READ] TEXTO A LEER: %s con un tamanio de %d", ((char *) ptroLectura),read->memoria_size);
+			//loggear_warning("[MATELIB_MEM_READ] TEXTO A LEER: %s con un tamanio de %d", ((char *) ptroLectura),read->memoria_size);
 
 			if(rtaRead>=0){
 				t_ram_read* estructuraRead = shared_crear_ram_read(read->memoria_size, ptroLectura);
@@ -206,8 +206,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				loggear_info("[MATELIB_MEM_READ], proceso %d pudo leer el espacio seleccionado", read->pid);
 				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, *tamanioBuffer, readSerializado);
 
-				t_ram_read* asdasdasd = deserializar_ram_read(readSerializado);
-				loggear_warning("[MATELIB_MEM_READ] SE ENVIO: %d", *((int *) asdasdasd->mem_read));
+				//t_ram_read* asdasdasd = deserializar_ram_read(readSerializado);
+				//loggear_warning("[MATELIB_MEM_READ] SE ENVIO: %d", *((int *) asdasdasd->mem_read));
 
 				free(readSerializado);
 				free(estructuraRead); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS

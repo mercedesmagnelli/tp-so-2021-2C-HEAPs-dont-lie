@@ -113,8 +113,6 @@ int mate_sem_destroy(mate_instance *lib_ref, mate_sem_name sem) {
 
 	t_matelib_semaforo* semaforo = shared_crear_usar_semaforo(metadata->pid, sem);
 
-	loggear_debug("[MATE_SEM_DESTROY] [PID: %zu] --- MATE_SEM_DESTROY ", metadata->pid);
-
 	int error = enviar_mate_sem_destroy(metadata, semaforo);
 
 	return error;
@@ -174,8 +172,6 @@ int mate_memwrite(mate_instance *lib_ref, void *origin, mate_pointer dest, int s
 	t_instance_metadata * metadata = (t_instance_metadata*) lib_ref->group_info;
 
 	t_matelib_memoria_write* write = shared_crear_nuevo_write(metadata->pid, size, dest, origin);
-
-	loggear_warning("[MATE_MEMWRITE] Numero a escribir: %d", *((int *) (write->memoria_write)));
 
 	int error = enviar_mate_memwrite(metadata, write);
 

@@ -18,10 +18,6 @@ void imprimir_estado_proceso(void * h) {
 		loggear_trace("\tEstimacion HRRN: %2.4f", hilo->estimacion_actual_hrrn);
 	}
 	loggear_trace("\tEstimacion Anterior: %f", hilo->estimacion_anterior);
-	loggear_trace("\tTimestamp Entrar Exec: %f", hilo->timestamp_entrar_exec);
-	loggear_trace("\tTimestamp Entrar Ready: %f", hilo->timestamp_entrar_ready);
-	loggear_trace("\tTimestamp Salir Exec: %f", hilo->timestamp_salir_exec);
-	loggear_trace("\tTimestamp Tiempo Exec: %f", hilo->timestamp_tiempo_exec);
 }
 
 void imprimir_estado_colas(t_list * procesos_ready, t_hilo * hilo_seleccionado) {

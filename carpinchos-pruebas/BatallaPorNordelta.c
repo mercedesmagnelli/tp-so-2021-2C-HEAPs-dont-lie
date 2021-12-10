@@ -31,23 +31,23 @@ int main(int argc, char *argv[]) {
 
 	printf("MAIN - Utilizando el archivo de config: %s\n", argv[1]);
 
-	//pthread_create(&carpincho1, NULL, carpincho1_func, argv[1]);
-	//pthread_create(&carpincho2, NULL, carpincho2_func, argv[1]);
-	//pthread_create(&carpincho3, NULL, carpincho3_func, argv[1]);
-	//pthread_create(&carpincho4, NULL, carpincho4_func, argv[1]);
-	//pthread_create(&carpincho5, NULL, carpincho5_func, argv[1]);
+	pthread_create(&carpincho1, NULL, carpincho1_func, argv[1]);
+	pthread_create(&carpincho2, NULL, carpincho2_func, argv[1]);
+	pthread_create(&carpincho3, NULL, carpincho3_func, argv[1]);
+	pthread_create(&carpincho4, NULL, carpincho4_func, argv[1]);
+	pthread_create(&carpincho5, NULL, carpincho5_func, argv[1]);
 	pthread_create(&carpincho6, NULL, carpincho6_func, argv[1]);
-	//pthread_create(&carpincho7, NULL, carpincho7_func, argv[1]);
-	//pthread_create(&carpincho8, NULL, carpincho8_func, argv[1]);
+	pthread_create(&carpincho7, NULL, carpincho7_func, argv[1]);
+	pthread_create(&carpincho8, NULL, carpincho8_func, argv[1]);
 
-	//pthread_join(carpincho8, NULL);
-	//pthread_join(carpincho7, NULL);
+	pthread_join(carpincho8, NULL);
+	pthread_join(carpincho7, NULL);
 	pthread_join(carpincho6, NULL);
-	//pthread_join(carpincho5, NULL);
-	//pthread_join(carpincho4, NULL);
-	//pthread_join(carpincho3, NULL);
-	//pthread_join(carpincho2, NULL);
-	//pthread_join(carpincho1, NULL);
+	pthread_join(carpincho5, NULL);
+	pthread_join(carpincho4, NULL);
+	pthread_join(carpincho3, NULL);
+	pthread_join(carpincho2, NULL);
+	pthread_join(carpincho1, NULL);
 	printf("MAIN - Retirados los carpinchos de la pelea, hora de analizar los hechos\n");
 
 	return EXIT_SUCCESS;
@@ -246,7 +246,7 @@ void* carpincho6_func(void *config) {
 	printf("C6 - Un par de vueltas con la memoria... \n");
 	int a = 1;
 	int b = 0;
-	while (a <= 10) {
+	while (a <= 500) {
 		usleep(5000);
 		mate_memwrite(&instance, &a, alloc, 4);
 		mate_memread(&instance, alloc, &b, 4);
