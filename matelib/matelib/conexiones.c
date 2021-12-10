@@ -326,7 +326,7 @@ int32_t enviar_mate_memalloc(t_instance_metadata* instancia, t_matelib_memoria_a
 		loggear_error("[MATE_MEM_ALLOC] Llego un error, %d", mensaje_respuesta->head);
 	}
 
-	loggear_warning("[MATE_MEM_ALLOC] Direccion: %d", respuesta_ram);
+	//loggear_warning("[MATE_MEM_ALLOC] Direccion: %d", respuesta_ram);
 
 	destruir_mensaje(mensaje_respuesta);
 
