@@ -15,7 +15,7 @@ uint32_t max_entradas;
 typedef struct{
 	char* hash_key;
 	uint32_t frame;
-	double timestamp; //ver si es necesario, lo agrego por ahora porque no sé como vamos a hacer para seleccionar la entrada que vuela
+	int timestamp;
 }entrada_tlb;
 
 int tiempo;

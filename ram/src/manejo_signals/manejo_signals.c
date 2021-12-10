@@ -62,17 +62,22 @@ void imprimir_entrada_proceso(historico_procesos* p){
 
 }
 void manejar_sigusr1(){
-	loggear_info("[SIGUSR1] - Se va a generar el archivo dump en la ruta: %s");
 
 	char* timestamp = temporal_get_string_time("%s%y%m%d%H%M%S.txt");
 	char* ruta = string_from_format("DUMP_%s", timestamp);
 
+	loggear_info("[SIGUSR1] - Se va a generar el archivo dump en la ruta: %s");
+
 	FILE* dump = fopen(ruta, "wb+");
+
 	char** pid_pag;
 	char* info_entrada;
 	if(list_size(TLB) == 0){
 		loggear_warning("[SIGUSR1] - La TLB no tiene ninguna entrada aún");
+		fputs("NO HAY ENTRADAS AUN", dump);
 	}else{
+
+
 	for(int i = 0; i < list_size(TLB); i++){
 	entrada_tlb* e = (entrada_tlb*) list_get(TLB, i);
 	pid_pag = string_split(e->hash_key, "-");
@@ -87,23 +92,29 @@ void manejar_sigusr1(){
 			fputs(info_entrada, dump);
 		}
 	}
-}
+
 	free(info_entrada);
 	free(pid_pag[0]);
 	free(pid_pag[1]);
 	free(pid_pag);
 
-	//semaforo_post_fin();
+
+}
+	fclose(dump);
+
 
 }
 
 void manejar_sigusr2(){
 
-	loggear_warning("[SIGUSR2] - Se van a limpiar todas las entradas de la tlb");
+
 	if(list_size(TLB)==0) {
-		loggear_warning("[SIGNURS2] - No hay ninguna entrada para eliminar");
+		loggear_warning("[SIGURS2] - No hay ninguna entrada para eliminar");
 	}else {
+		loggear_warning("[SIGUSR2] - Se van a limpiar todas las entradas de la tlb");
 		limpiar_tlb();
+
+
 
 	}
 
