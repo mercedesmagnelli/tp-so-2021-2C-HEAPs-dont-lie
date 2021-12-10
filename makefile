@@ -301,12 +301,12 @@ run-general-1:
 
 run-general-2:
 	-@$(MAKE) remover-config
-	-cp $(CONFIGURACIONES_RUTA)/general_1/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
-	-cp $(CONFIGURACIONES_RUTA)/general_1/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
-	-cp $(CONFIGURACIONES_RUTA)/general_1/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/general_2/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/general_2/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/general_2/ram.config $(RAM_ARCHIVO_CONFIG)
 	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
 	-@echo "$(YELLOW) ------- BATALLA POR NORDELTA ------- $(NOCOLOR)"
-	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/BatallaPorNOrdelta $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/BatallaPorNordelta $(MATELIB_ARCHIVO_CONFIG)
 
 .PHONY: all test clean planificador filesystem ram matelib shared
 
