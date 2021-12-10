@@ -197,17 +197,23 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			void* ptroLectura;
 			int32_t rtaRead = memread(read->memoria_mate_pointer, read->pid, read->memoria_size, &ptroLectura);
 
+			loggear_warning("[MATELIB_MEM_READ] TEXTO A LEER: %d", *((int *) ptroLectura));
+
 			if(rtaRead>=0){
 				t_ram_read* estructuraRead = shared_crear_ram_read(rtaRead, ptroLectura);
 				size_t* tamanioBuffer = malloc(sizeof(size_t));
 				void* readSerializado = serializar_ram_read(estructuraRead, tamanioBuffer);
 				loggear_info("[MATELIB_MEM_READ], proceso %d pudo leer el espacio seleccionado", read->pid);
 				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, *tamanioBuffer, readSerializado);
+
+				t_ram_read* asdasdasd = deserializar_ram_read(readSerializado);
+				loggear_warning("[MATELIB_MEM_READ] SE ENVIO: %d", *((int *) asdasdasd->mem_read));
+
 				free(readSerializado);
 				free(estructuraRead); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS
 				free(tamanioBuffer); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS
 			}else{
-				loggear_info("[MATELIB_MEM_READ], proceso %d NO pudo leer el espacio seleccionado", read->pid);
+				loggear_error("[MATELIB_MEM_READ], proceso %d NO pudo leer el espacio seleccionado", read->pid);
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
@@ -222,6 +228,8 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			 t_matelib_memoria_write* escritura = deserializar_memoria_write(mensaje->payload);
 
 			void * write_memoria_write = escritura->memoria_write;
+
+			loggear_warning("[MATELIB_MEM_WRITE] TEXTO A ESCRIBIR: %d", *((int *) write_memoria_write));
 
 			int32_t rtaWrite = memwrite(write_memoria_write, escritura->memoria_mate_pointer, escritura->pid, escritura->memoria_size);
 			uint32_t headerW;

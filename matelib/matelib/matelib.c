@@ -175,6 +175,8 @@ int mate_memwrite(mate_instance *lib_ref, void *origin, mate_pointer dest, int s
 
 	t_matelib_memoria_write* write = shared_crear_nuevo_write(metadata->pid, size, dest, origin);
 
+	loggear_warning("[MATE_MEMWRITE] Numero a escribir: %d", *((int *) (write->memoria_write)));
+
 	int error = enviar_mate_memwrite(metadata, write);
 
 	return error;

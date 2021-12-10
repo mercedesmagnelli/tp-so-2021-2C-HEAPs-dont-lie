@@ -149,6 +149,27 @@ context(test_shared_estructura_compartida) {
 			free(proceso2);
 		} end
 
+		it ("T_RAM_READ - serializar - deserializar") {
+			void* ptroLectura = malloc(sizeof(int));
+			*((int *) ptroLectura) = 15;
+
+			t_ram_read* ram_read_1 = shared_crear_ram_read(1, ptroLectura);
+
+			size_t* size = malloc(sizeof(size_t));
+			void* readSerializado = serializar_ram_read(ram_read_1, size);
+
+			t_ram_read * ram_read_2 = deserializar_ram_read(readSerializado);
+
+			should_int(ram_read_1->size) be equal to (ram_read_2->size);
+			should_int(*((int *) ram_read_1->mem_read)) be equal to (*((int *) ram_read_2->mem_read));
+
+			free(ptroLectura);
+			free(size);
+			free(ram_read_1);
+			free(readSerializado);
+			free(ram_read_2);
+		} end
+
 		it ("GET_TEXT_SHARED: Retorna 'Este texto viene de la lib shared'") {
 			char * value = get_text_shared();
 

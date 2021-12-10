@@ -326,6 +326,8 @@ int32_t enviar_mate_memalloc(t_instance_metadata* instancia, t_matelib_memoria_a
 		loggear_error("[MATE_MEM_ALLOC] Llego un error, %d", mensaje_respuesta->head);
 	}
 
+	loggear_warning("[MATE_MEM_ALLOC] Direccion: %d", respuesta_ram);
+
 	destruir_mensaje(mensaje_respuesta);
 
 	close(socket);
@@ -396,6 +398,8 @@ int enviar_mate_memread(t_instance_metadata* instancia, t_matelib_memoria_read* 
 		t_ram_read * memoria_read = deserializar_ram_read(mensaje_respuesta->payload);
 
 		memcpy(dest, memoria_read->mem_read, size_leer);
+
+		loggear_warning("[MATE_MEM_READ] Texto llego, %d", *((int *) dest));
 
 		//*dest = memoria_read->memoria_mate_pointer;
 	}
