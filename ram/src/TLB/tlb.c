@@ -27,7 +27,7 @@ void imprimir_tlb(){
 	loggear_trace("----------------------------------------------------------");
 	for(int i = 0; i < list_size(TLB); i++) {
 	entrada_tlb* entrada = (entrada_tlb*) list_get(TLB,i);
-	loggear_trace("ENTRADA: %d | KEY: %s | FRAME: %d | TIMESTAMP %f", i, entrada->hash_key, entrada->frame, entrada->timestamp);
+	loggear_trace("ENTRADA: %d | KEY: %s | FRAME: %d | TIMESTAMP %d", i, entrada->hash_key, entrada->frame, entrada->timestamp);
 
 }
 	loggear_trace("----------------------------------------------------------");
@@ -168,6 +168,7 @@ int obtener_timestamp_actual(){
 //	clock_gettime(CLOCK_REALTIME, &timestamp);
 //
 //	return timestamp.tv_sec + 1e-9 * timestamp.tv_nsec;
+
 	int valor;
 
 	pthread_mutex_lock(&mutex_acceso_tiempo);
@@ -175,7 +176,25 @@ int obtener_timestamp_actual(){
 	tiempo++;
 	pthread_mutex_unlock(&mutex_acceso_tiempo);
 	return valor;
+
+//	struct timeval tv;
+//	gettimeofday(&tv, NULL);
+//	unsigned long long result = (((unsigned long long)tv.tv_sec) * 1000 + ((unsigned long long)tv.tv_usec) / 1000);
+//	double a = result;
+//	return a;
 }
+
+//float estructuras_timestamp_diff(t_timestamp time1, t_timestamp time2) {
+//	return (time2.tv_sec - time1.tv_sec) + 1e-9 * (time2.tv_nsec - time1.tv_nsec);
+//}
+//
+//t_timestamp estructuras_current_timestamp() {
+//	struct timespec timestamp;
+//
+//	clock_gettime(CLOCK_REALTIME, &timestamp);
+//
+//	return timestamp;
+//}
 
 uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina){
 
