@@ -12,8 +12,11 @@ void imprimir_estado_proceso(void * h) {
 
 	loggear_trace("****************************************");
 	loggear_trace("PID: %zu", hilo->pid);
-	loggear_trace("\tEstimacion SJF: %2.4f", hilo->estimacion_actual_sjf);
-	loggear_trace("\tEstimacion HRRN: %2.4f", hilo->estimacion_actual_hrrn);
+	if (algoritmo == SJF) {
+		loggear_trace("\tEstimacion SJF: %2.4f", hilo->estimacion_actual_sjf);
+	} else {
+		loggear_trace("\tEstimacion HRRN: %2.4f", hilo->estimacion_actual_hrrn);
+	}
 	loggear_trace("\tEstimacion Anterior: %f", hilo->estimacion_anterior);
 	loggear_trace("\tTimestamp Entrar Exec: %f", hilo->timestamp_entrar_exec);
 	loggear_trace("\tTimestamp Entrar Ready: %f", hilo->timestamp_entrar_ready);
