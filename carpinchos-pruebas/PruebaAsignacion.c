@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <semaphore.h>
 #include <pthread.h>
-#include <matelib.h>
+#include <matelib/matelib.h>
 
 sem_t semCarpincho1;
 sem_t semCarpincho2;

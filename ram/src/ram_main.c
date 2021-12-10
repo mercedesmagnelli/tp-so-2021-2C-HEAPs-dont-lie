@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 	semaforo_wait_fin();
 
 	cerrar_todo(false);
-	destruir_estructuras_administrativas();
+	//destruir_estructuras_administrativas();
 
 	return EXIT_SUCCESS;
 }

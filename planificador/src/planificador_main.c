@@ -80,7 +80,6 @@ void debug_variables() {
 	for (int i = 0; i < get_cantidad_duraciones_io(); ++i) {
 		loggear_debug("DURACIONES_IO[%d]: \t\t%s", i, get_duraciones_io()[i]);
 	}
-	loggear_debug("RETARDO_CPU: \t\t\t%d", get_retardo_cpu());
 	loggear_debug("GRADO_MULTIPROGRAMACION: \t%d", get_grado_multiprogramacion());
 	loggear_debug("GRADO_MULTIPROCESAMIENTO: \t%d", get_grado_multiprocesamiento());
 	loggear_debug("LOG_ROUTE: \t\t\t%s", get_log_route());

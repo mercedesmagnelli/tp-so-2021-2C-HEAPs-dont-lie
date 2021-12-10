@@ -61,7 +61,6 @@ int cargar_archivo(char * path) {
 	error += set_variable_array_str(config, "DISPOSITIVOS_IO", 	&config_guardada.dispositivos_io, &config_guardada.cantidad_dispositivos_io);
 	error += set_variable_array_str(config, "DURACIONES_IO", 	&config_guardada.duraciones_io, &config_guardada.cantidad_duraciones_io);
 
-	error += set_variable_int(config, "RETARDO_CPU", 			&config_guardada.retardo_cpu);
 	error += set_variable_int(config,"GRADO_MULTIPROGRAMACION",	&config_guardada.grado_multiprogramacion);
 	error += set_variable_int(config,"GRADO_MULTIPROCESAMIENTO",&config_guardada.grado_multiprocesamiento);
 

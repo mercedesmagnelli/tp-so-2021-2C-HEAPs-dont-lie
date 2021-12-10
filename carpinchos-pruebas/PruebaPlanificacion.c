@@ -3,7 +3,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <lib/matelib.h>
+#include <matelib/matelib.h>
 #include <commons/log.h>
 
 char *LOG_PATH = "./planificacion.log";

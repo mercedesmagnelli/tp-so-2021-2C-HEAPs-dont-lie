@@ -9,13 +9,39 @@ int recibir_mensaje(int socket) {
 	return manejar_mensaje(mensaje);
 }
 
+uint32_t get_nuevo_pid() {
+	static uint32_t id = 0;
+	static pthread_mutex_t mutex_t = PTHREAD_MUTEX_INITIALIZER;
+
+	pthread_mutex_lock(&mutex_t);
+	id++;
+	pthread_mutex_unlock(&mutex_t);
+
+	return id;
+}
+
 int manejar_mensaje(t_prot_mensaje * mensaje) {
 	bool seguir_esperando_mensajes = true;
 	void dejar_de_esperar_mensajes() { seguir_esperando_mensajes = false; }
 
 	while (seguir_esperando_mensajes) {
 
+		t_matelib_nuevo_proceso * nuevo_proceso;
+
 		switch (mensaje->head) {
+		case GENERAR_PID:
+			nuevo_proceso = shared_crear_nuevo_proceso(get_nuevo_pid());
+
+			size_t size = sizeof(uint32_t);
+			void * serializado = serializiar_crear_proceso(nuevo_proceso, &size);
+
+			enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, size, serializado);
+
+			free(serializado);
+			desconexion(mensaje);
+			destruir_mensaje(mensaje);
+
+			return 0;
 		case HANDSHAKE_P_R:
 			enviar_mensaje_protocolo(mensaje->socket, HANDSHAKE_R_P, 0, NULL);
 
@@ -178,12 +204,15 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				loggear_info("[MATELIB_MEM_READ], proceso %d pudo leer el espacio seleccionado", read->pid);
 				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, *tamanioBuffer, readSerializado);
 				free(readSerializado);
+				free(estructuraRead); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS
+				free(tamanioBuffer); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS
 			}else{
 				loggear_info("[MATELIB_MEM_READ], proceso %d NO pudo leer el espacio seleccionado", read->pid);
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
 			free(ptroLectura);
+			free(read); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 
@@ -208,6 +237,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			enviar_mensaje_protocolo(mensaje->socket, headerW, 0, NULL);
 
+			free(write_memoria_write);
 			free(escritura);
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
@@ -249,6 +279,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			enviar_mensaje_protocolo(mensaje->socket, headerR, 0, NULL);
 
+			free(PID_proceso_ready);
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
 			return 0;

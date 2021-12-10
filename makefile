@@ -35,10 +35,10 @@ FILESYSTEM_ARCHIVO_CONFIG := filesystem.config
 
 # MATELIB
 MATELIB_NAME := MATELIB
-MATELIB_ROUTE := matelib/src
-MATELIB_TEST_ROUTE := matelib/tests
-MATELIB_COMPILADO := matelib.out
+MATELIB_ROUTE := matelib
 MATELIB_ARCHIVO_CONFIG := matelib.config
+MATELIB_PRUEBAS_RUTA := carpinchos-pruebas
+
 
 all: p r f m
 	
@@ -66,10 +66,12 @@ f:
 	
 m:
 	-@echo "$(YELLOW) COMPILANDO '$(MATELIB_NAME)' 📝 📝 📝$(NOCOLOR)"
-	-@cd $(MATELIB_ROUTE) && $(MAKE) all
-	-@echo "$(YELLOW) COMPILANDO TESTS '$(MATELIB_NAME)' 📝 📝 📝 $(NOCOLOR)"
-	-@cd $(MATELIB_TEST_ROUTE) && $(MAKE) all
-	-@echo "$(GREEN) COMPILADO Tests '$(MATELIB_NAME)' ✔️✔️✔️✔️✔️✔️✔️✔️✔️✔️ $(NOCOLOR)"
+	-@cd $(MATELIB_ROUTE) && $(MAKE) uninstall
+	-@echo "$(GREEN) DESINSTALADA MATELIB '$(MATELIB_NAME)' ✔️✔️✔️✔️✔️✔️✔️✔️✔️✔️ $(NOCOLOR)"
+	-@cd $(MATELIB_ROUTE) && $(MAKE) install
+	-@echo "$(GREEN) INSTALADA MATELIB '$(MATELIB_NAME)' ✔️✔️✔️✔️✔️✔️✔️✔️✔️✔️ $(NOCOLOR)"
+	-@cd $(MATELIB_PRUEBAS_RUTA) && $(MAKE) compile
+	-@echo "$(GREEN) COMPILADOS LOS TEST CASES '$(MATELIB_NAME)' ✔️✔️✔️✔️✔️✔️✔️✔️✔️✔️ $(NOCOLOR)"
 	
 # Trabajos de clean "make clean-d" "make clean-r" "make clean-m" "make clean-s" "make clean"
 clean-p:
@@ -88,8 +90,8 @@ clean-s:
 	-@cd $(SHARED_ROUTE) && $(MAKE) clean
 	
 clean-m:
-	-@cd $(MATELIB_ROUTE) && $(MAKE) clean
-	-@cd $(MATELIB_TEST_ROUTE) && $(MAKE) clean
+	-@cd $(MATELIB_ROUTE) && $(MAKE) clean && $(MAKE) uninstall
+	-@cd $(MATELIB_PRUEBAS_RUTA) && $(MAKE) clean
 
 clean: clean-p clean-r clean-f clean-s clean-m
 	-@find . -name "*.o" -type f -delete
@@ -108,9 +110,6 @@ test-r:
 	
 test-f:
 	-@cd $(FILESYSTEM_TEST_ROUTE) && $(MAKE) test
-	
-test-m:
-	-@cd $(MATELIB_TEST_ROUTE) && $(MAKE) test
 
 test-s:
 	-@cd $(SHARED_ROUTE) && $(MAKE) test
@@ -133,9 +132,6 @@ valgrind-r:
 valgrind-f:
 	-@cd $(FILESYSTEM_ROUTE) && $(MAKE) valgrind
 	
-valgrind-m:
-	-@cd $(MATELIB_ROUTE) && $(MAKE) valgrind
-
 # Trabajos para ejecutar los archivos compilados "make run-d" "make run-r" "make run-m"
 run-p:
 	-@./$(PLANIFICADOR_COMPILADO) $(PLANIFICADOR_ARCHIVO_CONFIG)
@@ -146,7 +142,171 @@ run-r:
 run-f:
 	-@./$(FILESYSTEM_COMPILADO) $(FILESYSTEM_ARCHIVO_CONFIG)
 
-run-m:
-	-@./$(MATELIB_COMPILADO) $(MATELIB_ARCHIVO_CONFIG)
+MATELIB_PRUEBAS_RUTA_BUILD := carpinchos-pruebas/build
+CONFIGURACIONES_RUTA := configs
+
+help:
+	-@echo "$(GREEN) Pruebas Kernel $(NOCOLOR)"
+	-@echo "make run-kernel-1-sjf"
+	-@echo "make run-kernel-1-hrrn"
+	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+	-@echo "make run-kernel-2-sjf"
+	-@echo "make run-kernel-2-hrrn"
+	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+	-@echo "make run-kernel-3-sjf"
+	-@echo "make run-kernel-3-hrrn"
+	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+	-@echo "$(GREEN) Pruebas Memoria $(NOCOLOR)"
+	-@echo "make run-memoria-1-clockm"
+	-@echo "make run-memoria-1-lru"
+	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+	-@echo "make run-memoria-2-fija"
+	-@echo "make run-memoria-2-dinamica"
+	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+	-@echo "make run-memoria-3-fifo"
+	-@echo "make run-memoria-3-lru"
+	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+	-@echo "$(GREEN) Pruebas SWAP $(NOCOLOR)"
+	-@echo "make run-swap-1"
+	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+	-@echo "$(GREEN) Pruebas GENERALES $(NOCOLOR)"
+	-@echo "make run-general-1 (Saludo al humedal)"
+	-@echo "make run-general-2 (Batala por Nordelta)"
+	-@echo "$(GREEN) -------------- $(NOCOLOR)"
+
+remover-config:
+	-rm -f $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-rm -f $(RAM_ARCHIVO_CONFIG)
+	-rm -f $(FILESYSTEM_ARCHIVO_CONFIG)
+	-rm -f $(MATELIB_ARCHIVO_CONFIG)
+
+run-kernel-1-sjf:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/planificador_1_sjf/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_1_sjf/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_1_sjf/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaPlanificacion $(MATELIB_ARCHIVO_CONFIG)
+
+run-kernel-1-hrrn:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/planificador_1_hrrn/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_1_hrrn/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_1_hrrn/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaPlanificacion $(MATELIB_ARCHIVO_CONFIG)
+
+run-kernel-2-sjf:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/planificador_2_sjf/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_2_sjf/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_2_sjf/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaDeadlock $(MATELIB_ARCHIVO_CONFIG)
+
+run-kernel-2-hrrn:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/planificador_2_hrrn/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_2_hrrn/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_2_hrrn/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaDeadlock $(MATELIB_ARCHIVO_CONFIG)
+
+run-kernel-3-sjf:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/planificador_3_sjf/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_3_sjf/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_3_sjf/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaSuspension $(MATELIB_ARCHIVO_CONFIG)
+	
+run-kernel-3-hrrn:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/planificador_3_hrrn/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_3_hrrn/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/planificador_3_hrrn/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaSuspension $(MATELIB_ARCHIVO_CONFIG)	
+	
+run-memoria-1-clockm:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/memoria_1_clock_m/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_1_clock_m/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_1_clock_m/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaMMU $(MATELIB_ARCHIVO_CONFIG)
+
+run-memoria-1-lru:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/memoria_1_lru/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_1_lru/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_1_lru/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaMMU $(MATELIB_ARCHIVO_CONFIG)
+
+run-memoria-2-fija:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/memoria_2_fija/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_2_fija/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_2_fija/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaAsignacion $(MATELIB_ARCHIVO_CONFIG)
+
+run-memoria-2-dinamica:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/memoria_2_dinamica/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_2_dinamica/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_2_dinamica/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaAsignacion $(MATELIB_ARCHIVO_CONFIG)
+
+run-memoria-3-fifo:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/memoria_3_fifo/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_3_fifo/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_3_fifo/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/prueba_tlb_fifo $(MATELIB_ARCHIVO_CONFIG)
+	
+run-memoria-3-lru:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/memoria_3_lru/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_3_lru/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/memoria_3_lru/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/prueba_tlb_lru $(MATELIB_ARCHIVO_CONFIG)
+
+run-swap-1:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/swap_1/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/swap_1/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/swap_1/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/swap_1/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/prueba_swamp $(MATELIB_ARCHIVO_CONFIG)
+	
+run-general-1:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/general_1/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/general_1/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/general_1/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@echo "$(GREEN) Se copiaron todas las configs, ahora queda ejecutar los procesos $(NOCOLOR)"
+	-@echo "Ejecutar ./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaBAse_Carpincho1 $(MATELIB_ARCHIVO_CONFIG)"
+	-@echo "Ejecutar ./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaBAse_Carpincho2 $(MATELIB_ARCHIVO_CONFIG)"
+
+run-general-2:
+	-@$(MAKE) remover-config
+	-cp $(CONFIGURACIONES_RUTA)/general_1/planificador.config $(PLANIFICADOR_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/general_1/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/general_1/ram.config $(RAM_ARCHIVO_CONFIG)
+	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
+	-@echo "$(YELLOW) ------- BATALLA POR NORDELTA ------- $(NOCOLOR)"
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/BatallaPorNOrdelta $(MATELIB_ARCHIVO_CONFIG)
 
 .PHONY: all test clean planificador filesystem ram matelib shared
+
+
+
+
+
+

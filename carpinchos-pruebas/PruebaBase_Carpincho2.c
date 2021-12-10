@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <matelib.h>
+#include <matelib/matelib.h>
 #include <string.h>
 
 #define SEMAFORO_SALUDO "SEM_HELLO"

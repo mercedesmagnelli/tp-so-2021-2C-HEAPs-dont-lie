@@ -21,6 +21,9 @@ uint32_t crear_proceso_SWAP(uint32_t PID){
 	}
 
 	free(mensaje);
+	free(respuesta->payload);
+	free(respuesta);
+	free(mensaje_serializado);
 	return respuesta_final;
 
 }
@@ -51,6 +54,7 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 	f->proceso=PID;
 	f->pagina=nroPag;
 	escribir_directamente_en_memoria(info_a_guardar, get_tamanio_pagina(), frame * get_tamanio_pagina());
+	free(info_a_guardar);
 	return frame;
 }
 
@@ -132,6 +136,10 @@ void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir) {
 	}
 
 	void* info = deserializar_pedir_pagina(rec->payload);
+
+	free(pedido);
+	//free(rec->payload);
+	free(rec);
 	return info;
 
 }
@@ -349,6 +357,10 @@ void comunicar_eliminacion_proceso_SWAP(uint32_t PID){
 	if(rec->head == FALLO_EN_LA_TAREA){
 		loggear_error("[RAM] - Hubo un problema en la eliminacion del proceso %d en swamp",PID);
 	}
+
+	free(pid);
+	free(rec->payload);
+	free(rec);
 }
 
 void enviar_pagina_a_SWAP(uint32_t PID, uint32_t nro_pag, void* data_pag){
