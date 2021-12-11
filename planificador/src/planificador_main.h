@@ -4,6 +4,9 @@
 
 #include <pthread.h>
 #include <readline/readline.h>
+#include <signal.h>
+
+#include <semaphore.h>
 
 #include "planificadores/planificadores.h"
 

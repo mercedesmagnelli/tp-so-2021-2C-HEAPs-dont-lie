@@ -89,7 +89,9 @@ void hilos_agregar_nuevo_hilo(uint32_t pid) {
 
 	hilo_semaforo->finalizo = false;
 
-	dictionary_put(dict_hilos, hilos_get_key(pid), hilo_semaforo);
+	char * key = hilos_get_key(pid);
+	dictionary_put(dict_hilos, key, hilo_semaforo);
+	free(key);
 }
 
 void hilos_destruir_hilo_finish(uint32_t pid) {
