@@ -445,5 +445,6 @@ void  inicializar_semaforos();
 void destruir_semaforos();
 void imprimir_lista_frames_reservados(t_list* l);
 historico_procesos* get_historico_pid(uint32_t pid);
+void imprimir_tlb3();
 
 #endif /* PAGINACION_PAGINACION_H_ */
