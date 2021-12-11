@@ -172,6 +172,8 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 
 	}else{ //ACA SERIA SI LA ASGINACION ES GLOBAL
 		loggear_debug("LLEGO UNA SOLICITUD DE UN CARPINCHO Y COMO LA ASIGNACION ES GLOBAL SOLO SE CREA LA ESTRUCTURA ADMINISTRATIVA PARA EL PID: ", carpincho->pid_carpincho);
+		t_archivo_swamp* archivo = archivo_a_escribir(pid_carpincho);
+		archivo->espacio_libre = archivo->espacio_libre - 1;
 		/*if(cantidad_paginas_reservadas <= archivo->espacio_libre){
 			for(int j = 0; j < cantidad_paginas_reservadas; j++){
 				int marco_global = marco_libre(archivo);
