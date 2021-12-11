@@ -87,7 +87,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			return 0;
 		case MATELIB_CLOSE:
 
-			//imprimir_frames2();
+			imprimir_frames2();
 			//imprimir_tlb2();
 
 			loggear_info("[MATELIB_CLOSE] - Se solicita eliminar el proceso de memoria");
