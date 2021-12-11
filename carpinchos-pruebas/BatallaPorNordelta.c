@@ -152,7 +152,7 @@ void* carpincho3_func(void *config) {
 	}
 
 	printf("C3 - Se retira a descansar\n");
-	//mate_close(&instance);
+	mate_close(&instance);
 
 	return 0;
 }
