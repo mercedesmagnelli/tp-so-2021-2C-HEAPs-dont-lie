@@ -222,6 +222,8 @@ t_hilo * colas_mover_exec_block(t_dispositivo_bloqueante dispositivo_bloqueante,
 	list_add(blocked_list, hilo);
 	pthread_mutex_unlock(&mutex_blocked_list);
 
+	loggear_debug("[PID: %d] --- Se movió de EXEC a BLOCK", ppid);
+
 	hilos_post_nuevo_bloqueado();
 
     return hilo;
@@ -401,8 +403,6 @@ t_hilo * colas_finalizar_proceso_bloqueado(t_hilo * hilo_bloqueado) {
 		colas_mover_susp_block_finish(hilo_bloqueado);
 	} else {
 		loggear_error("[COLAS] - El hilo a finalizar no esta bloqueado");
-		loggear_error("[COLAS] - Si entro acá significa que al eliminar un hilo del deadlock, se le liberaron los recursos y eso hizo que este hilo se desbloqueara");
-		loggear_error("[COLAS] - Arreglar funcion deadlock.eliminar_proceso_deadlock para que controle esto");
 		return NULL;
 	}
 
