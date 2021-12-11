@@ -58,7 +58,7 @@ valgrind: all
 clean: # Tarea para eliminar todos los .o y el binario
 	-find . -name "*.o" -type f -delete
 	-rm -f $(TARGET)
-	-rm -rf $(SWAP1)
-	-rm -rf $(SWAP2)
-	-rm -rf $(SWAP3)
+	-rm -f $(SWAP1)
+	-rm -f $(SWAP2)
+	-rm -f $(SWAP3)
 	
