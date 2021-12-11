@@ -135,7 +135,7 @@ void* carpincho3_func(void *config) {
 	printf("C3 - Llamo a mate_init\n");
 	mate_init(&instance, (char*) config);
 
-	//sleep(5);
+	sleep(5);
 
 	printf("C3 - Vamos a tomar un smirnoff\n");
 	//mate_sem_init(&instance, "smirnoffc2", 1);
