@@ -1,4 +1,3 @@
-
 #include "manejar_mensajes.h"
 
 t_carpincho_swamp* buscar_carpincho_en_lista(uint32_t pid); //busca el carpincho en la lista, no se si debería estar aca pero para avanzar por el momento queda aqui.

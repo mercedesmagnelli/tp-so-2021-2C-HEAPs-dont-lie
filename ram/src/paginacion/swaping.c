@@ -53,6 +53,11 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 	f->estado=1;
 	f->proceso=PID;
 	f->pagina=nroPag;
+	void* pasamanos = malloc(sizeof(int));
+	loggear_trace("puto el que lee");
+	memcpy(pasamanos,info_a_guardar,sizeof(int));
+	loggear_trace("espejito rebotin");
+	loggear_trace("frame en el que voy a guardar: %d, un heap con un puntero a %d", frame, (char*)pasamanos);
 	escribir_directamente_en_memoria(info_a_guardar, get_tamanio_pagina(), frame * get_tamanio_pagina());
 	free(info_a_guardar);
 	return frame;
@@ -60,9 +65,8 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 
 void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_pag_a_pedir, uint32_t pid_a_pedir) {
 	// fijarse si esta modificado, setear en 0 el bit de presencia de la pagina victima
-	loggear_warning("Veo consistencia de frame victima %d", pagina_victima->frame);
+	loggear_debug("Veo consistencia de frame victima %d", pagina_victima->frame);
 	void* info_en_frame = obtener_info_en_frame(pagina_victima->frame);
-	loggear_warning("Leo lo que tiene frame victima %d con contenido %s", pagina_victima->frame, (info_en_frame+9));
 	uint32_t pid_pag_victima = obtener_pid_en_frame(pagina_victima->frame);
 	loggear_trace("[SWAP] pid de la victima: %d", pid_pag_victima);
 	uint32_t nro_pag_victima = obtener_pag_en_frame(pagina_victima->frame);
@@ -73,11 +77,6 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 		t_write_s* mensaje = shared_crear_write_s(nro_pag_victima, pid_pag_victima, get_tamanio_pagina(), info_en_frame);
 
 		void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio);
-		loggear_warning("[MENSAJE_SERIALIZADO] Leo lo que tiene frame victima %d con contenido %s y serializamos con un tamanio total de %d", pagina_victima->frame, (mensaje_serializado +12 +9), tamanio);
-
-		t_write_s * mensaje_deserializado = deserializar_mensaje_write_s(mensaje_serializado);
-		loggear_warning("[MENSAJE_DESERIALIZADO] Leo contenido %s", mensaje_deserializado->data + 9);
-
 		pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 		enviar_mensaje_protocolo(socket_swap,R_S_ESCRIBIR_EN_PAGINA,tamanio,mensaje_serializado);
 		t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
@@ -231,7 +230,7 @@ t_pagina* obtener_victima_Clock_Modificado(t_list* lista_paginas, uint32_t pid){
  				loggear_trace("el victima es: %d", indice_encontrado);
  				pagina_victima =  (t_pagina*) list_get(lista_paginas, indice_encontrado);
 
- 				loggear_warning("ENCONTRE EN SEGUNDA VERIFICACION (0,1) ");
+ 				loggear_trace("ENCONTRE EN SEGUNDA VERIFICACION (0,1) ");
  			}
  		}
  	}
@@ -293,7 +292,7 @@ bool buscar_combinacion(t_list* paginas, uint32_t uso, uint32_t mod, uint32_t pu
 	while(!encontrado && cantidad_iteraciones < list_size(paginas)){
 		indice = calcular_indice(puntero, cantidad_iteraciones, list_size(paginas));
 		t_pagina* pagina_apuntada = (t_pagina*) list_get(paginas, indice);
-		loggear_warning("la pagina apuntada tiene (U,M) : (%d , %d) ", pagina_apuntada->bit_uso, pagina_apuntada->bit_modificacion);
+		loggear_trace("la pagina apuntada tiene (U,M) : (%d , %d) ", pagina_apuntada->bit_uso, pagina_apuntada->bit_modificacion);
 		if(pagina_apuntada->bit_modificacion == mod && pagina_apuntada->bit_uso == uso) {
 			loggear_info("SE ENCONTRO PAGINA VICTIMA EN EL INDICE %d", indice);
 			encontrado = true;

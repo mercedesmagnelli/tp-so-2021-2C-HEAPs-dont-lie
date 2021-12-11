@@ -159,7 +159,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			int32_t ptroAlloc = memalloc(alloc->pid, alloc->memoria_size);
 
 			if(ptroAlloc>=0){
-				loggear_warning("[MATELIB_MEM_ALLOC], proceso %d se le asigna espacio solicitado en el ptro %d", alloc->pid, ptroAlloc);
+				loggear_trace("[MATELIB_MEM_ALLOC], proceso %d se le asigna espacio solicitado en el ptro %d", alloc->pid, ptroAlloc);
 				void* paquete_enviar = malloc(sizeof(int32_t));
 				memcpy(paquete_enviar, &ptroAlloc, sizeof(int32_t));
 				enviar_mensaje_protocolo(mensaje->socket, EXITO_EN_LA_TAREA, sizeof(int32_t), paquete_enviar);
