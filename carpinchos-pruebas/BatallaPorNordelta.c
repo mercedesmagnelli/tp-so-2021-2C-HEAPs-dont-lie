@@ -31,23 +31,23 @@ int main(int argc, char *argv[]) {
 
 	printf("MAIN - Utilizando el archivo de config: %s\n", argv[1]);
 
-	pthread_create(&carpincho1, NULL, carpincho1_func, argv[1]);
-	pthread_create(&carpincho2, NULL, carpincho2_func, argv[1]);
+	//pthread_create(&carpincho1, NULL, carpincho1_func, argv[1]);
+	//pthread_create(&carpincho2, NULL, carpincho2_func, argv[1]);
 	pthread_create(&carpincho3, NULL, carpincho3_func, argv[1]);
-	pthread_create(&carpincho4, NULL, carpincho4_func, argv[1]);
-	pthread_create(&carpincho5, NULL, carpincho5_func, argv[1]);
-	pthread_create(&carpincho6, NULL, carpincho6_func, argv[1]);
-	pthread_create(&carpincho7, NULL, carpincho7_func, argv[1]);
-	pthread_create(&carpincho8, NULL, carpincho8_func, argv[1]);
+	//pthread_create(&carpincho4, NULL, carpincho4_func, argv[1]);
+	//pthread_create(&carpincho5, NULL, carpincho5_func, argv[1]);
+	//pthread_create(&carpincho6, NULL, carpincho6_func, argv[1]);
+	//pthread_create(&carpincho7, NULL, carpincho7_func, argv[1]);
+	//pthread_create(&carpincho8, NULL, carpincho8_func, argv[1]);
 
-	pthread_join(carpincho8, NULL);
-	pthread_join(carpincho7, NULL);
-	pthread_join(carpincho6, NULL);
-	pthread_join(carpincho5, NULL);
-	pthread_join(carpincho4, NULL);
+	//pthread_join(carpincho8, NULL);
+	//pthread_join(carpincho7, NULL);
+	//pthread_join(carpincho6, NULL);
+	//pthread_join(carpincho5, NULL);
+	//pthread_join(carpincho4, NULL);
 	pthread_join(carpincho3, NULL);
-	pthread_join(carpincho2, NULL);
-	pthread_join(carpincho1, NULL);
+	//pthread_join(carpincho2, NULL);
+	//pthread_join(carpincho1, NULL);
 	printf("MAIN - Retirados los carpinchos de la pelea, hora de analizar los hechos\n");
 
 	return EXIT_SUCCESS;
@@ -123,7 +123,7 @@ void* carpincho2_func(void *config) {
 	}
 
 	printf("C2 - Ya agotado, se retira a descansar\n");
-	mate_close(&instance);
+	//mate_close(&instance);
 
 	return 0;
 }
@@ -135,11 +135,11 @@ void* carpincho3_func(void *config) {
 	printf("C3 - Llamo a mate_init\n");
 	mate_init(&instance, (char*) config);
 
-	sleep(5);
+	//sleep(5);
 
 	printf("C3 - Vamos a tomar un smirnoff\n");
-	mate_sem_init(&instance, "smirnoffc2", 1);
-	mate_sem_post(&instance, "smirnoffc2");
+	//mate_sem_init(&instance, "smirnoffc2", 1);
+	//mate_sem_post(&instance, "smirnoffc2");
 
 	printf("C3 - Vamos a protestar por nuestro lugar\n");
 	int a = 1;
@@ -152,7 +152,7 @@ void* carpincho3_func(void *config) {
 	}
 
 	printf("C3 - Se retira a descansar\n");
-	mate_close(&instance);
+	//mate_close(&instance);
 
 	return 0;
 }

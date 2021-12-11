@@ -132,7 +132,7 @@ void* recibir_info_en_pagina(uint32_t pag_a_pedir, uint32_t pid_a_pedir) {
 
 	free(mensaje_serializado);
 	if(rec->head == FALLO_EN_LA_TAREA){
-				loggear_error("[RAM] - Hubo un problema en la recepcion de la info de la pagina %d del proceso %d en swamp", pag_a_pedir, pid_a_pedir);
+		loggear_error("[RAM] - Hubo un problema en la recepcion de la info de la pagina %d del proceso %d en swamp", pag_a_pedir, pid_a_pedir);
 	}
 
 	void* info = deserializar_pedir_pagina(rec->payload);
