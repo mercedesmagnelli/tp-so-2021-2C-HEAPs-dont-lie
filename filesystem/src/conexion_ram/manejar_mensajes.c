@@ -1,4 +1,3 @@
-
 #include "manejar_mensajes.h"
 
 t_carpincho_swamp* buscar_carpincho_en_lista(uint32_t pid); //busca el carpincho en la lista, no se si debería estar aca pero para avanzar por el momento queda aqui.
@@ -62,12 +61,12 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 			}
 		}
 
-		loggear_warning("[R_S_SOLICITUD_ESPACIO] [PID: %zu] [PAG: %zu] El carpincho solicita espacio", mensaje_deserializado->pid, mensaje_deserializado->cant_pag);
+		loggear_trace("[R_S_SOLICITUD_ESPACIO] [PID: %zu] [PAG: %zu] El carpincho solicita espacio", mensaje_deserializado->pid, mensaje_deserializado->cant_pag);
 
 		carpincho = buscar_carpincho_en_lista(mensaje_deserializado->pid);
 
 		if (carpincho == NULL) {
-			loggear_warning("[R_S_SOLICITUD_ESPACIO] [PID: %zu] El carpincho no esta en la lista", mensaje_deserializado->pid);
+			loggear_trace("[R_S_SOLICITUD_ESPACIO] [PID: %zu] El carpincho no esta en la lista", mensaje_deserializado->pid);
 			carpincho = crear_carpincho(mensaje_deserializado->pid,mensaje_deserializado->cant_pag);
 			if(get_asignacion() == GLOBAL){
 				reservar_marcos_carpincho();
@@ -87,7 +86,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		 carpincho = buscar_carpincho_en_lista(pid); //TODO HACER FUNCION
 		 if (carpincho == NULL) {
-			 loggear_error("[R_S_ESCRIBIR_EN_PAGINA] [PID: %zu] No se encontro el carpincho en la lista", pid);
+			 loggear_error("[R_S_ESCRIBIR_EN_PAGINA] [PID: %zu] No se encontro el carpincho en la lista, por lo que no se puede escribir", pid);
 			 enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 
 			 free(write_deserializado->data);
@@ -96,7 +95,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 			 return 0;
 		 }
 
-		 loggear_warning("[R_S_ESCRIBIR_EN_PAGINA] [PID: %zu] El carpincho va a escribir particion", pid);
+		 loggear_trace("[R_S_ESCRIBIR_EN_PAGINA] [PID: %zu] El carpincho va a escribir particion", pid);
 
 		 error = escribir_particion(carpincho, write_deserializado->nro_pag, write_deserializado->data, particion_a_escribir(pid));
 		 if (error < 0){
