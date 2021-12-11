@@ -138,8 +138,8 @@ void* carpincho3_func(void *config) {
 	sleep(5);
 
 	printf("C3 - Vamos a tomar un smirnoff\n");
-	//mate_sem_init(&instance, "smirnoffc2", 1);
-	//mate_sem_post(&instance, "smirnoffc2");
+	mate_sem_init(&instance, "smirnoffc2", 1);
+	mate_sem_post(&instance, "smirnoffc2");
 
 	printf("C3 - Vamos a protestar por nuestro lugar\n");
 	int a = 1;
