@@ -47,14 +47,14 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 				entrada_tlb* elemento_iterado = (entrada_tlb*) element;
 				bool resultado = strcmp(elemento_iterado->hash_key, hash_KEY_del_ingresante) == 0;
 
-				free(hash_KEY_del_ingresante);
-
 				return resultado;
 			}
 
 			entrada_tlb* elemento_encontrado = list_find(TLB, soy_KEY_buscada);
 			elemento_encontrado->timestamp =  obtener_timestamp_actual();
 			elemento_encontrado->frame = frame;
+
+			free(hash_KEY_del_ingresante);
 		}else{
 			entrada_tlb* entrada = malloc(sizeof(entrada_tlb));
 			entrada->timestamp = obtener_timestamp_actual();
@@ -69,6 +69,7 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 			list_add(TLB, entrada);
 		}
 	}
+
 }
 
 
