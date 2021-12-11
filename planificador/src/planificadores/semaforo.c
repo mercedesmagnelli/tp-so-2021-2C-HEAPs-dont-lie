@@ -48,7 +48,7 @@ void semaforo_imprimir_status() {
 t_semaforo * crear_semaforo(t_matelib_semaforo * semaforo) {
 	t_semaforo * sem = malloc(sizeof(t_semaforo));
 
-	sem->nombre = semaforo->semaforo_nombre;
+	sem->nombre = string_from_format("%s", semaforo->semaforo_nombre);
 	sem->valor = semaforo->semaforo_valor;
 	pthread_mutex_init(&(sem->mutex), NULL);
 	sem->list_procesos_retienen = list_create();
@@ -63,6 +63,7 @@ void destruir_semaforo(void * sem) {
 	pthread_mutex_destroy(&(semaforo->mutex));
 	list_destroy(semaforo->list_procesos_retienen);
 	list_destroy(semaforo->list_procesos_bloqueados);
+	free(semaforo->nombre);
 	free(sem);
 }
 

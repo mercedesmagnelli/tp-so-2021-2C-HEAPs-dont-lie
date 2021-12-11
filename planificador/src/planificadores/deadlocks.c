@@ -88,6 +88,8 @@ t_list * dfs(t_hilo * first_hilo, t_hilo * hilo_preguntar, int nivel) {
 		if (lista != NULL) {
 			list_add(lista, hilo_ocupan);
 
+			list_destroy(procesos_ocupan_semaforo);
+
 			return lista;
 		}
 	}
@@ -191,7 +193,9 @@ void imprimir_mensaje_deadlock(t_list * hilos) {
 	char * hilos_deadlock = string_new();
 
 	for (int i = 0; i < list_size(hilos); ++i) {
-		string_append(&hilos_deadlock, string_from_format("  PID: %zu --", pid(list_get(hilos, i))));
+		char * nuevo_string = string_from_format("  PID: %zu --", pid(list_get(hilos, i)));
+		string_append(&hilos_deadlock, nuevo_string);
+		free(nuevo_string);
 	}
 
 	char * get_semaforos_retenidos(t_hilo * hilo) {
@@ -199,7 +203,9 @@ void imprimir_mensaje_deadlock(t_list * hilos) {
 
 		for (int i = 0; i < list_size(hilo->semaforos_pedidos); ++i) {
 			t_semaforo * semaforo_reservado = list_get(hilo->semaforos_pedidos, i);
-			string_append(&semaforos, string_from_format("%s, ", semaforo_reservado->nombre));
+			char * texto = string_from_format("%s, ", semaforo_reservado->nombre);
+			string_append(&semaforos, texto);
+			free(texto);
 		}
 
 		return semaforos;
@@ -221,7 +227,9 @@ void imprimir_mensaje_deadlock(t_list * hilos) {
 
 	for (int i = 0; i < list_size(hilos); ++i) {
 		t_hilo * hilo = list_get(hilos, i);
-		loggear_warning("[DEADLOCK] ||| PID: %zu \t||| %s \t||| SEM: %s  ||| [ %s]", pid(hilo), get_estado_nombre(hilo), hilo->nombre_bloqueante, get_semaforos_retenidos(hilo));
+		char * semaforos_retenidos = get_semaforos_retenidos(hilo);
+		loggear_warning("[DEADLOCK] ||| PID: %zu \t||| %s \t||| SEM: %s  ||| [ %s]", pid(hilo), get_estado_nombre(hilo), hilo->nombre_bloqueante, semaforos_retenidos);
+		free(semaforos_retenidos);
 	}
 	loggear_warning("[DEADLOCK] -----------------------------------------------------------");
 

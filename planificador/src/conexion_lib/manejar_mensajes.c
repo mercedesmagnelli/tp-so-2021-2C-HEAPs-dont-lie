@@ -110,6 +110,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
+			free(semaforo->semaforo_nombre);
 			free(semaforo);
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
