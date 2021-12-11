@@ -12,7 +12,9 @@ TARGET := ../../filesystem.out # Nombre del archivo al compilar
 LIBS := -lreadline -lcommons -lcspecs -lpthread # Dependencias necesarias
 CC := gcc # Compilador a utilizar
 CFLAGS := -g -Wall # Flags en la comilación (g: Debug) (Wall: Muestra todos los warnings)
-POLUS := ../../../../polus # Esto hay que eliminarlo.
+SWAP1 := ../../../../swap1.bin # Esto hay que eliminarlo.
+SWAP2 := ../../../../swap2.bin # Esto hay que eliminarlo.
+SWAP3 := ../../../../swap3.bin # Esto hay que eliminarlo.
 
 CONFIG_ROUTE := ../../filesystem.config
 
@@ -58,7 +60,9 @@ valgrind: all
 clean: # Tarea para eliminar todos los .o y el binario
 	-find . -name "*.o" -type f -delete
 	-rm -f $(TARGET)
-	-rm -rf $(POLUS)
+	-rm -f $(SWAP1)
+	-rm -f $(SWAP2)
+	-rm -f $(SWAP3)
 	-rm -rf /home/utnso/dumps
-	
+  
 	
