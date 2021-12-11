@@ -818,6 +818,7 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 		if(max_entradas > 0){
 			agregar_entrada_tlb(PID, nroPag, marco);
 			loggear_trace("ya agregue una entrada a la TLB");
+			imprimir_tlb3();
 		} else {
 			loggear_warning("EL TAMANIO DE LA TLB ES 0, ENTONCES NO AGREGO NINGUNA ENTRADA");
 		}
@@ -1061,4 +1062,19 @@ void eliminar_frames_reservados(t_proceso* proceso){
 		list_remove_by_condition(listaFramesReservados, frame_numero);
 		pthread_mutex_unlock(&mutex_acceso_lista_frames_r);
 	}
+}
+
+void imprimir_tlb3(){
+
+    loggear_trace("----------------------------------------------------------");
+    loggear_trace("-----------------VOY A IMPRIMIR LA TLB--------------------");
+    loggear_trace("----------------------------------------------------------");
+    for(int i = 0; i < list_size(TLB); i++) {
+    entrada_tlb* entrada = (entrada_tlb*) list_get(TLB,i);
+    loggear_trace("ENTRADA: %d | KEY: %s | FRAME: %d | TIMESTAMP %d", i, entrada->hash_key, entrada->frame, entrada->timestamp);
+
+}
+    loggear_trace("----------------------------------------------------------");
+    loggear_trace("-----------------------I'M DONE---------------------------");
+    loggear_trace("----------------------------------------------------------");
 }

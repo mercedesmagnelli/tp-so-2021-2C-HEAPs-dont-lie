@@ -80,7 +80,7 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 	if(marco < 0){
 		loggear_debug("[LEER_PARTICION] [PID: %zu] enviamos la pagina [PAG: %d] del carpincho dentro del swap [1]", carpincho->pid_carpincho, pagina);
 
-		return string_repeat('b', get_tamanio_pagina());
+		return string_repeat('\0', get_tamanio_pagina());
 	}
 
 	loggear_info("[LEER_PARTICION] [PID: %zu] Se comienza a leer el [MARCO: %d] de la [PARTICION: %s]", carpincho->pid_carpincho, marco, ruta_particion);
@@ -172,6 +172,8 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 
 	}else{ //ACA SERIA SI LA ASGINACION ES GLOBAL
 		loggear_debug("LLEGO UNA SOLICITUD DE UN CARPINCHO Y COMO LA ASIGNACION ES GLOBAL SOLO SE CREA LA ESTRUCTURA ADMINISTRATIVA PARA EL PID: ", carpincho->pid_carpincho);
+		t_archivo_swamp* archivo = archivo_a_escribir(pid_carpincho);
+		archivo->espacio_libre = archivo->espacio_libre - 1;
 		/*if(cantidad_paginas_reservadas <= archivo->espacio_libre){
 			for(int j = 0; j < cantidad_paginas_reservadas; j++){
 				int marco_global = marco_libre(archivo);

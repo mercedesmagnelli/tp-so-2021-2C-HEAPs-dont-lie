@@ -53,11 +53,6 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 	f->estado=1;
 	f->proceso=PID;
 	f->pagina=nroPag;
-	void* pasamanos = malloc(sizeof(int));
-	loggear_trace("puto el que lee");
-	memcpy(pasamanos,info_a_guardar,sizeof(int));
-	loggear_trace("espejito rebotin");
-	loggear_trace("frame en el que voy a guardar: %d, un heap con un puntero a %d", frame, (char*)pasamanos);
 	escribir_directamente_en_memoria(info_a_guardar, get_tamanio_pagina(), frame * get_tamanio_pagina());
 	free(info_a_guardar);
 	return frame;
