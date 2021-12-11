@@ -31,7 +31,7 @@ void lib_cerrar_conexiones(bool safe_close) {
 	if (safe_close) {
 		pthread_join(thread_escuchar_notificaciones, NULL);
 	} else {
-		pthread_detach(thread_escuchar_notificaciones);
+		pthread_cancel(thread_escuchar_notificaciones);
 	}
 
 	loggear_trace("Cerramos todos los threads que no hayan terminado");

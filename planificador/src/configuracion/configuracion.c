@@ -38,6 +38,12 @@ void destroy_configuracion() {
 	free(config_guardada.ip_ram);
 	free(config_guardada.log_app_name);
 	free(config_guardada.log_route);
+
+	for (int i = 0; i < config_guardada.cantidad_dispositivos_io; ++i) { free(config_guardada.dispositivos_io[i]); }
+	for (int i = 0; i < config_guardada.cantidad_duraciones_io; ++i) { free(config_guardada.duraciones_io[i]); }
+
+	free(config_guardada.dispositivos_io);
+	free(config_guardada.duraciones_io);
 }
 
 int cargar_archivo(char * path) {
