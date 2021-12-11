@@ -25,7 +25,9 @@ LOG_FILE_VALGRIND := valgrind.log
 
 default: $(TARGET) # Regla por defecto
 all: default # Si ejecutan all va a default
-
+	-mkdir /home/utnso/dumps/
+	-mkdir /home/utnso/dumps/tlb
+	
 OBJECTS := $(patsubst %.c, %.o, $(wildcard *.c)) # Remplaza en el 3er parametro lo que está en el 1ro con el 2do.
 OBJECTS_ALL := $(patsubst %.c, %.o, $(wildcard **/*.c))
 OBJECTS_SHARED := $(patsubst %.c, %.o, $(wildcard ../../shared/*.c))
@@ -61,4 +63,6 @@ clean: # Tarea para eliminar todos los .o y el binario
 	-rm -f $(SWAP1)
 	-rm -f $(SWAP2)
 	-rm -f $(SWAP3)
+	-rm -rf /home/utnso/dumps
+  
 	

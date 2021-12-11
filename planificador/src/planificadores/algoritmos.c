@@ -56,7 +56,7 @@ t_hilo * hilo_obtener_siguiente_hilo_a_mover_exec(t_list * procesos_ready) {
 		hilo_mover = hilo_obtener_siguiente_hrrn(procesos_ready);
 	}
 
-	imprimir_estado_colas(procesos_ready, hilo_mover);
+	//imprimir_estado_colas(procesos_ready, hilo_mover);
 
 	return hilo_mover;
 }

@@ -20,34 +20,34 @@ void* carpincho8_func(void *config);
 
 int main(int argc, char *argv[]) {
 
-	pthread_t carpincho1;
-	pthread_t carpincho2;
+//	pthread_t carpincho1;
+//	pthread_t carpincho2;
 	pthread_t carpincho3;
-	pthread_t carpincho4;
-	pthread_t carpincho5;
-	pthread_t carpincho6;
-	pthread_t carpincho7;
-	pthread_t carpincho8;
+//	pthread_t carpincho4;
+//	pthread_t carpincho5;
+//	pthread_t carpincho6;
+//	pthread_t carpincho7;
+//	pthread_t carpincho8;
 
 	printf("MAIN - Utilizando el archivo de config: %s\n", argv[1]);
 
-	pthread_create(&carpincho1, NULL, carpincho1_func, argv[1]);
-	pthread_create(&carpincho2, NULL, carpincho2_func, argv[1]);
+//	pthread_create(&carpincho1, NULL, carpincho1_func, argv[1]);
+//	pthread_create(&carpincho2, NULL, carpincho2_func, argv[1]);
 	pthread_create(&carpincho3, NULL, carpincho3_func, argv[1]);
-	pthread_create(&carpincho4, NULL, carpincho4_func, argv[1]);
-	pthread_create(&carpincho5, NULL, carpincho5_func, argv[1]);
-	pthread_create(&carpincho6, NULL, carpincho6_func, argv[1]);
-	pthread_create(&carpincho7, NULL, carpincho7_func, argv[1]);
-	pthread_create(&carpincho8, NULL, carpincho8_func, argv[1]);
+//	pthread_create(&carpincho4, NULL, carpincho4_func, argv[1]);
+//	pthread_create(&carpincho5, NULL, carpincho5_func, argv[1]);
+//	pthread_create(&carpincho6, NULL, carpincho6_func, argv[1]);
+//	pthread_create(&carpincho7, NULL, carpincho7_func, argv[1]);
+//	pthread_create(&carpincho8, NULL, carpincho8_func, argv[1]);
 
-	pthread_join(carpincho8, NULL);
-	pthread_join(carpincho7, NULL);
-	pthread_join(carpincho6, NULL);
-	pthread_join(carpincho5, NULL);
-	pthread_join(carpincho4, NULL);
+//	pthread_join(carpincho8, NULL);
+//	pthread_join(carpincho7, NULL);
+//	pthread_join(carpincho6, NULL);
+//	pthread_join(carpincho5, NULL);
+//	pthread_join(carpincho4, NULL);
 	pthread_join(carpincho3, NULL);
-	pthread_join(carpincho2, NULL);
-	pthread_join(carpincho1, NULL);
+//	pthread_join(carpincho2, NULL);
+//	pthread_join(carpincho1, NULL);
 	printf("MAIN - Retirados los carpinchos de la pelea, hora de analizar los hechos\n");
 
 	return EXIT_SUCCESS;

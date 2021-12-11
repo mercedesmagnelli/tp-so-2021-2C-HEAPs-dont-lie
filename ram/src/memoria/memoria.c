@@ -43,9 +43,9 @@ uint32_t frames_libres() {
 
 uint32_t PID_listo(uint32_t PID){
 	if(existe_proceso(PID)){
-		loggear_warning("existe el proceso con el pid %d", PID);
+		loggear_trace("existe el proceso con el pid %d", PID);
 		alistar_proceso(PID);
-		loggear_warning("termine de alistar el proceso");
+		loggear_trace("termine de alistar el proceso");
 		return 1;
 	}else{
 		return 0;
