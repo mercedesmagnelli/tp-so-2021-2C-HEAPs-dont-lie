@@ -51,6 +51,7 @@ void manejar_sigint(){
 }
 
 	//imprimir_frames();
+	//imprimir_tlb();
 	semaforo_post_fin();
 
 }

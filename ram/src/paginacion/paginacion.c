@@ -364,8 +364,8 @@ heap_metadata* encontrar_heap(uint32_t PID, uint32_t ptro){
 
 	bool condicion(void* heap_i) {
 		heap_metadata* heap = (heap_metadata*) heap_i;
-		void* aux = leer_heap(heap, PID);
-		free(aux);
+		//void* aux = leer_heap(heap, PID);
+		//free(aux);
 		return (heap->currAlloc + 9) == ptro;
 	}
 	loggear_trace("[RAM] - quiero encontrar el HEAP %d", ptro);
