@@ -798,9 +798,9 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 		usleep(1000 *  get_retardo_fallo_tlb());
 		loggear_debug("[RAM] - TLB MISS para Proceso %d Pagina %d", PID, nroPag);
 		if(esta_en_RAM(PID, nroPag)){
-		loggear_trace("[RAM] - Estoy en la RAM");
-		marco = obtener_frame_de_RAM(PID, nroPag);
-		actualizar_datos_pagina(PID, nroPag, bitModificado, false);
+			loggear_trace("[RAM] - Estoy en la RAM");
+			marco = obtener_frame_de_RAM(PID, nroPag);
+			actualizar_datos_pagina(PID, nroPag, bitModificado, false);
 
 		}else{
 			loggear_warning("[RAM] - TENGO QUE TRAER PAGINA A MEMORIA");

@@ -265,7 +265,7 @@ int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_
 	loggear_trace("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] El tamaño de la lista de marcos usados del carpincho es %d",  carpincho->pid_carpincho, j);
 
 	if (j == 0) {
-		loggear_error("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] El carpincho tiene 0 marcos usados, no se puede borrar ninguno", carpincho->pid_carpincho);
+		loggear_warning("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] El carpincho tiene 0 marcos usados, no se puede borrar ninguno", carpincho->pid_carpincho);
 
 		//return 0;
 	}
@@ -276,6 +276,11 @@ int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_
 		for(int i = 0; i < cantidad_paginas; i++){
 			void* marco = list_remove(carpincho->marcos_usados, j - i - 1); //ver si hace falta un remove.
 
+			if (marco == NULL) {
+				loggear_warning("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] FIJA - No tiene marcos en uso", carpincho->pid_carpincho);
+				return 0;
+			}
+
 			loggear_trace("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] EL MARCO QUE SE VA A ELIMINAR ES [MARCO: %s]", carpincho->pid_carpincho, marco);
 
 			list_add(carpincho->marcos_reservados, marco); //validar si se agrega bien
@@ -283,7 +288,13 @@ int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_
 	}else{
 		t_archivo_swamp* archivo = particion_a_escribir(carpincho->pid_carpincho);
 		for(int i = 0; i < cantidad_paginas; i++){
-			char* marco = list_get(carpincho->marcos_usados, j - i - 1);
+			int index_borrar = j - i - 1;
+			if (index_borrar < 0) {
+				loggear_warning("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] GLOBAL - No tiene marcos en uso", carpincho->pid_carpincho);
+				return 0;
+			}
+
+			char* marco = list_get(carpincho->marcos_usados, index_borrar);
 			int aux = atoi(marco);
 			loggear_debug("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] Se libera el [Marco: %d] por peticion de la RAM ya que se borro informacion del proceso del [ARCHIVO: %s]", carpincho->pid_carpincho, aux, archivo->ruta_archivo);
 			list_remove_and_destroy_element(carpincho->marcos_usados, j - i - 1, free); // ver si hace falta un remove.
