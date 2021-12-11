@@ -70,7 +70,7 @@ void planificador_destruir_de_hilos() {
 
 		hilos_se_movio_finalizado(pid(hilo));
 
-		sleep(5); // TODO: Ver una forma mejor de no detener esto asi. Pero sino puede fallar cuando se responde un WAIT
+		sleep(5);
 
 		loggear_info("[Finish] - [PID: %zu] - Se va a eliminar toda la informacion", pid(hilo));
 
