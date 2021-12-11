@@ -78,7 +78,7 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 
 	int marco = obtener_marco_desde_pagina(pagina, carpincho);
 	if(marco < 0){
-		loggear_error("[LEER_PARTICION] [PID: %zu] No existe la [PAG: %d] del carpincho dentro del swap", carpincho->pid_carpincho, pagina);
+		loggear_debug("[LEER_PARTICION] [PID: %zu] enviamos la pagina [PAG: %d] del carpincho dentro del swap [1]", carpincho->pid_carpincho, pagina);
 
 		return string_repeat('b', get_tamanio_pagina());
 	}
@@ -270,6 +270,7 @@ int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_
 		//return 0;
 	}
 
+	int aux = cantidad_paginas;
 	if(get_asignacion() == FIJA){
 		loggear_trace("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] Asignacion FIJA", carpincho->pid_carpincho);
 
@@ -290,18 +291,38 @@ int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_
 		for(int i = 0; i < cantidad_paginas; i++){
 			int index_borrar = j - i - 1;
 			if (index_borrar < 0) {
-				loggear_warning("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] GLOBAL - No tiene marcos en uso", carpincho->pid_carpincho);
-				return 0;
+				loggear_trace("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] GLOBAL - No tiene marcos en uso", carpincho->pid_carpincho);
+				break;
 			}
 
 			char* marco = list_get(carpincho->marcos_usados, index_borrar);
-			int aux = atoi(marco);
-			loggear_debug("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] Se libera el [Marco: %d] por peticion de la RAM ya que se borro informacion del proceso del [ARCHIVO: %s]", carpincho->pid_carpincho, aux, archivo->ruta_archivo);
+			int aux_marco = atoi(marco);
+			loggear_debug("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] Se libera el [Marco: %d] por peticion de la RAM ya que se borro informacion del proceso del [ARCHIVO: %s]", carpincho->pid_carpincho, aux_marco, archivo->ruta_archivo);
 			list_remove_and_destroy_element(carpincho->marcos_usados, j - i - 1, free); // ver si hace falta un remove.
-			bitarray_clean_bit(archivo->bitmap_bitarray, aux);
+			bitarray_clean_bit(archivo->bitmap_bitarray, aux_marco);
 
 			archivo->espacio_libre = archivo->espacio_libre + 1;
+			aux = aux - 1;
+			loggear_error("aux tiene un valor de %d", aux);
+			loggear_error("cantidad de pags tienen un valor de %d", cantidad_paginas);
 			//vaciar_marco_del_archivo(aux, archivo->ruta_archivo);
+		}
+		if(cantidad_paginas > 0){
+			int w = list_size(carpincho->marcos_reservados);
+			for(int x = 0; x < aux; x++){
+				int index_reservados = w - x - 1;
+				if(index_reservados < 0){
+					loggear_trace("Ya se eliminaron todos los marcos para el carpincho [PID: %d]", carpincho->pid_carpincho);
+					return 0; //entiendo igual que nunca debería ingresar aca si se hace bien las cosas desde la ram
+				}
+				char* marco = list_get(carpincho->marcos_reservados, index_reservados);
+				int aux_marco = atoi(marco);
+				loggear_debug("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] Se libera el [Marco: %d] por peticion de la RAM ya que se borro informacion del proceso del [ARCHIVO: %s]", carpincho->pid_carpincho, aux_marco, archivo->ruta_archivo);
+				list_remove_and_destroy_element(carpincho->marcos_reservados, w - x - 1, free); // ver si hace falta un remove.
+				bitarray_clean_bit(archivo->bitmap_bitarray, aux_marco);
+
+				archivo->espacio_libre = archivo->espacio_libre + 1;
+			}
 		}
 	}
 
