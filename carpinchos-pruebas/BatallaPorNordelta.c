@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
 	pthread_join(carpincho5, NULL);
 	pthread_join(carpincho4, NULL);
 	pthread_join(carpincho3, NULL);
-	//pthread_join(carpincho2, NULL);
-	//pthread_join(carpincho1, NULL);
+	pthread_join(carpincho2, NULL);
+	pthread_join(carpincho1, NULL);
 	printf("MAIN - Retirados los carpinchos de la pelea, hora de analizar los hechos\n");
 
 	return EXIT_SUCCESS;
