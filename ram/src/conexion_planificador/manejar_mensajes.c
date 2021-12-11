@@ -3,6 +3,10 @@
 
 void desconexion(t_prot_mensaje * mensaje);
 
+void imprimir_frames2();
+
+void imprimir_tlb2();
+
 int recibir_mensaje(int socket) {
 	t_prot_mensaje * mensaje = recibir_mensaje_protocolo(socket);
 
@@ -82,6 +86,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			return 0;
 		case MATELIB_CLOSE:
+
+			//imprimir_frames2();
+			//imprimir_tlb2();
+
 			loggear_info("[MATELIB_CLOSE] - Se solicita eliminar el proceso de memoria");
 			t_matelib_nuevo_proceso* PID_proceso_eliminar = deserializar_crear_proceso(mensaje->payload);
 
@@ -161,6 +169,9 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
+			//imprimir_frames2();
+			//imprimir_tlb2();
+
 			free(alloc);
 			desconexion(mensaje);
 			destruir_mensaje(mensaje);
@@ -217,6 +228,9 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
+			//imprimir_frames2();
+			//imprimir_tlb2();
+
 			free(ptroLectura);
 			free(read); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS
 			desconexion(mensaje);
@@ -244,6 +258,9 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			}
 
 			enviar_mensaje_protocolo(mensaje->socket, headerW, 0, NULL);
+
+			//imprimir_frames2();
+			//imprimir_tlb2();
 
 			free(write_memoria_write);
 			free(escritura);
@@ -330,3 +347,27 @@ void desconexion(t_prot_mensaje * mensaje) {
 	close(mensaje->socket);
 }
 
+void imprimir_frames2() {
+
+	for (int i = 0; i < list_size(listaFrames); i++) {
+		t_frame* frame = (t_frame*)list_get(listaFrames, i);
+		loggear_debug("FRAME:%d | ESTADO: %d | PROCESO: %d | PAGINA : %d", frame->nroFrame, frame->estado, frame->proceso, frame->pagina);
+
+	}
+
+}
+
+void imprimir_tlb2(){
+
+	loggear_trace("----------------------------------------------------------");
+	loggear_trace("-----------------VOY A IMPRIMIR LA TLB--------------------");
+	loggear_trace("----------------------------------------------------------");
+	for(int i = 0; i < list_size(TLB); i++) {
+	entrada_tlb* entrada = (entrada_tlb*) list_get(TLB,i);
+	loggear_trace("ENTRADA: %d | KEY: %s | FRAME: %d | TIMESTAMP %d", i, entrada->hash_key, entrada->frame, entrada->timestamp);
+
+}
+	loggear_trace("----------------------------------------------------------");
+	loggear_trace("-----------------------I'M DONE---------------------------");
+	loggear_trace("----------------------------------------------------------");
+}

@@ -260,25 +260,32 @@ int obtener_marco_desde_pagina(uint32_t pagina, t_carpincho_swamp* carpincho){
 
 int borrar_x_cantidad_de_marcos(t_carpincho_swamp* carpincho, uint32_t cantidad_paginas){
 
-	loggear_debug("SE PROCEDE A BORRAR %d cantidad de paginas[PID: %d]", cantidad_paginas, carpincho->pid_carpincho);
+	loggear_debug("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] Borrar %d paginas", cantidad_paginas, carpincho->pid_carpincho);
 	int j = list_size(carpincho->marcos_usados);
-	loggear_trace("el tamaño de la lista de marcos usados del carpincho es %d [PID: %d]", j, carpincho->pid_carpincho);
+	loggear_trace("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] El tamaño de la lista de marcos usados del carpincho es %d",  carpincho->pid_carpincho, j);
+
+	if (j == 0) {
+		loggear_error("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] El carpincho tiene 0 marcos usados, no se puede borrar ninguno", carpincho->pid_carpincho);
+
+		//return 0;
+	}
 
 	if(get_asignacion() == FIJA){
-		loggear_trace("la asignacion es FIJA");
+		loggear_trace("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] Asignacion FIJA", carpincho->pid_carpincho);
 
 		for(int i = 0; i < cantidad_paginas; i++){
-			void* marco = list_get(carpincho->marcos_usados, j - i - 1);
-			loggear_trace("EL MARCO QUE SE VA A ELIMINAR ES %s [PID: %d]", marco, carpincho->pid_carpincho);
+			void* marco = list_remove(carpincho->marcos_usados, j - i - 1); //ver si hace falta un remove.
+
+			loggear_trace("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] EL MARCO QUE SE VA A ELIMINAR ES [MARCO: %s]", carpincho->pid_carpincho, marco);
+
 			list_add(carpincho->marcos_reservados, marco); //validar si se agrega bien
-			list_remove(carpincho->marcos_usados, j - i - 1); //ver si hace falta un remove.
 		}
 	}else{
 		t_archivo_swamp* archivo = particion_a_escribir(carpincho->pid_carpincho);
 		for(int i = 0; i < cantidad_paginas; i++){
 			char* marco = list_get(carpincho->marcos_usados, j - i - 1);
 			int aux = atoi(marco);
-			loggear_debug("se libera el marco %d por peticion de la RAM ya que se borro informacion del proceso del archivo %s [PID: %d]", aux, archivo->ruta_archivo, carpincho->pid_carpincho);
+			loggear_debug("[BORRAR_X_CANTIDAD_DE_MARCOS] [PID: %d] Se libera el [Marco: %d] por peticion de la RAM ya que se borro informacion del proceso del [ARCHIVO: %s]", carpincho->pid_carpincho, aux, archivo->ruta_archivo);
 			list_remove_and_destroy_element(carpincho->marcos_usados, j - i - 1, free); // ver si hace falta un remove.
 			bitarray_clean_bit(archivo->bitmap_bitarray, aux);
 

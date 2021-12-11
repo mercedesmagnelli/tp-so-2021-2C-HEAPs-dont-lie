@@ -182,6 +182,7 @@ void actualizar_proceso(uint32_t PID, int32_t ptro, uint32_t tamanio){
 
 	t_list* listaHMD = conseguir_listaHMD_mediante_PID(PID);
 	if(list_is_empty(listaHMD)) {
+		loggear_warning("[ACTUALIZAR_PROCESO] [PID: %zu] Se va a agregar un proceso nuevo", PID);
 		agregar_proceso(PID, tamanio);
 	}else {
 		loggear_trace("Se va a actualizar algo que ya tenia un alloc previo");
@@ -363,8 +364,8 @@ heap_metadata* encontrar_heap(uint32_t PID, uint32_t ptro){
 
 	bool condicion(void* heap_i) {
 		heap_metadata* heap = (heap_metadata*) heap_i;
-		void* aux = leer_heap(heap, PID);
-		free(aux);
+		//void* aux = leer_heap(heap, PID);
+		//free(aux);
 		return (heap->currAlloc + 9) == ptro;
 	}
 	loggear_trace("[RAM] - quiero encontrar el HEAP %d", ptro);
@@ -412,8 +413,17 @@ void consolidar_memoria(uint32_t PID){
 	heap_metadata* ultimo_heap = (heap_metadata*)list_get(heaps, list_size(heaps) - 1);
 	t_list* tabla_paginas = obtener_tabla_paginas_mediante_PID(PID);
 
-	if(el_ultimo_heap_libera_paginas(ultimo_heap)){
+	if (el_ultimo_heap_libera_paginas(ultimo_heap)) {
+		loggear_warning("Parte %d", 1);
 		liberar_paginas(ultimo_heap, tabla_paginas, PID);
+		loggear_warning("Parte %d", 2);
+		if (list_is_empty(tabla_paginas)) {
+			loggear_warning("Parte %d", 3);
+			t_list * lista_HDM = conseguir_listaHMD_mediante_PID(PID);
+			loggear_warning("Parte %d", 4);
+			list_remove_and_destroy_element(lista_HDM, 0, free);
+			loggear_warning("Parte %d", 5);
+		}
 	}
 
 }
@@ -783,7 +793,12 @@ void guardar_en_memoria_paginada(uint32_t PID, int nroPag, int offset, void* dat
 uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t bitModificado){
 	uint32_t marco;
 	t_proceso* proceso = get_proceso_PID(PID);
+	loggear_warning("[OBTENER_MARCO_DE_PAGINA] [PID: %zu] [NroPag: %d] [BIT: %zu]", PID, nroPag, bitModificado);
+	loggear_warning("[OBTENER_MARCO_DE_PAGINA] PRCOESO PID [PID: %zu]", proceso->PID);
+	loggear_warning("[OBTENER_MARCO_DE_PAGINA] [PID: %zu] [SIZE TABLA: %d]", PID, list_size(proceso->tabla_paginas));
 	t_pagina* pag = list_get(proceso->tabla_paginas ,nroPag);
+	loggear_warning("[OBTENER_MARCO_DE_PAGINA] [PID: %zu] [FRAME_PAG: %zu]", PID, pag->frame);
+
 	if(pag->bit_presencia==1 && esta_en_tlb(PID, nroPag)){
 		marco = obtener_frame_de_tlb(PID, nroPag);
 		usleep(1000 *  get_retardo_acierto_tlb());
