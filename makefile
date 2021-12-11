@@ -247,7 +247,7 @@ run-memoria-1-lru:
 	-cp $(CONFIGURACIONES_RUTA)/memoria_1_lru/filesystem.config $(FILESYSTEM_ARCHIVO_CONFIG)
 	-cp $(CONFIGURACIONES_RUTA)/memoria_1_lru/ram.config $(RAM_ARCHIVO_CONFIG)
 	-cp $(CONFIGURACIONES_RUTA)/matelib.config $(MATELIB_ARCHIVO_CONFIG)
-	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaMMU $(MATELIB_ARCHIVO_CONFIG)
+	-@./$(MATELIB_PRUEBAS_RUTA_BUILD)/PruebaAsignacion $(MATELIB_ARCHIVO_CONFIG)
 
 run-memoria-2-fija:
 	-@$(MAKE) remover-config
