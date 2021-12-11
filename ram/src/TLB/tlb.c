@@ -41,11 +41,15 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
 		char* hash_KEY_del_ingresante = calcular_hash_key(proceso, pagina);
 
-		if(existe_la_KEY(hash_KEY_del_ingresante)){
+		if (existe_la_KEY(hash_KEY_del_ingresante)){
 
 			bool soy_KEY_buscada(void* element){
 				entrada_tlb* elemento_iterado = (entrada_tlb*) element;
-				return strcmp(elemento_iterado->hash_key, hash_KEY_del_ingresante) == 0;
+				bool resultado = strcmp(elemento_iterado->hash_key, hash_KEY_del_ingresante) == 0;
+
+				free(hash_KEY_del_ingresante);
+
+				return resultado;
 			}
 
 			entrada_tlb* elemento_encontrado = list_find(TLB, soy_KEY_buscada);
@@ -104,28 +108,22 @@ uint32_t conseguir_victima_entrada_LRU() {
 }
 
 bool esta_en_tlb(uint32_t pid, uint32_t pag) {
-
-	if(max_entradas == 0){
+	if (max_entradas == 0){
 		return false;
-	}else {
+	} else {
+		char* key = calcular_hash_key(pid, pag);
 
-	char* key = calcular_hash_key(pid, pag);
+		bool condicion(void* entrada_i){
+			entrada_tlb* entrada = (entrada_tlb*) entrada_i;
 
-	bool condicion(void* entrada_i){
-
-		entrada_tlb* entrada = (entrada_tlb*) entrada_i;
-
-		if(strcmp(entrada->hash_key, key) == 0) {
-
-			return true;
-		}else {
-
-			return false;
+			return strcmp(entrada->hash_key, key) == 0;
 		}
-		//return strcmp(entrada->hash_key, key) == 0 ? 1: 0;
-	}
 
-	return list_any_satisfy(TLB, condicion);
+		bool value_to_return = list_any_satisfy(TLB, condicion);
+
+		free(key);
+
+		return value_to_return;
 	}
 }
 
@@ -205,8 +203,9 @@ uint32_t obtener_frame_de_tlb(uint32_t proceso, uint32_t pagina){
 	}
 
 	entrada_tlb* entrada_encontrada = (entrada_tlb*)list_find(TLB, buscar_key);
-	return entrada_encontrada->frame;
 	free(key);
+
+	return entrada_encontrada->frame;
 }
 
 bool existe_la_KEY (char* KEY){

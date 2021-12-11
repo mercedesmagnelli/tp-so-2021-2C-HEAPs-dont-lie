@@ -221,6 +221,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				//loggear_warning("[MATELIB_MEM_READ] SE ENVIO: %d", *((int *) asdasdasd->mem_read));
 
 				free(readSerializado);
+				free(estructuraRead->mem_read); // LO AGREGO ALEXANDER PARA ELIMINAR VALGRINDS
 				free(estructuraRead); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS
 				free(tamanioBuffer); // LO AGREGO ALAN PARA ELIMINAR VALGRINDS
 			}else{
@@ -242,8 +243,6 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			 t_matelib_memoria_write* escritura = deserializar_memoria_write(mensaje->payload);
 
 			void * write_memoria_write = escritura->memoria_write;
-
-			loggear_warning("[MATELIB_MEM_WRITE] TEXTO A ESCRIBIR: %s", ((char *) write_memoria_write));
 
 			int32_t rtaWrite = memwrite(write_memoria_write, escritura->memoria_mate_pointer, escritura->pid, escritura->memoria_size);
 			uint32_t headerW;

@@ -486,36 +486,25 @@ bool el_ultimo_heap_libera_paginas(heap_metadata* ultimo_heap){
 void modificar_heaps(t_list* heaps, uint32_t indice, uint32_t pid, uint32_t cantidad){
 
 	heap_metadata* heap_inicial = (heap_metadata*) list_get(heaps, indice);
-
 	heap_metadata* heap_final = (heap_metadata*) list_get(heaps, MIN(indice+cantidad,list_size(heaps)-1));
 
-	if(heap_final->nextAlloc == -1){
-
+	if (heap_final->nextAlloc == -1) {
 		heap_inicial->nextAlloc = -1;
-
-	}else{
+	} else {
 		heap_inicial->nextAlloc = heap_final->currAlloc;
 		heap_final->prevAlloc = heap_inicial->currAlloc;
 	}
 
-
-	for(int i = 0; i < cantidad -1; i++){
-
-		list_remove_and_destroy_element(heaps, indice+1, free);
-
-	}
-
-
 	guardar_HEAP_en_memoria(pid, heap_inicial);
 
 	//TODO: esto esta bien??
-	if(heap_final->nextAlloc == -1) {
+	if (heap_final->nextAlloc == -1) {
 		guardar_HEAP_en_memoria(pid, heap_final);//verificar que  heap_inicial != -1 para hacer esto
 	}
 
-
-
-
+	for (int i = 0; i < cantidad -1; i++){
+		list_remove_and_destroy_element(heaps, indice+1, free);
+	}
 }
 
 
@@ -797,7 +786,6 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 	loggear_warning("[OBTENER_MARCO_DE_PAGINA] PRCOESO PID [PID: %zu]", proceso->PID);
 	loggear_warning("[OBTENER_MARCO_DE_PAGINA] [PID: %zu] [SIZE TABLA: %d]", PID, list_size(proceso->tabla_paginas));
 	t_pagina* pag = list_get(proceso->tabla_paginas ,nroPag);
-	loggear_warning("[OBTENER_MARCO_DE_PAGINA] [PID: %zu] [FRAME_PAG: %zu]", PID, pag->frame);
 
 	if(pag->bit_presencia==1 && esta_en_tlb(PID, nroPag)){
 		marco = obtener_frame_de_tlb(PID, nroPag);
@@ -833,9 +821,9 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 		}
 
 		if(max_entradas > 0){
-		agregar_entrada_tlb(PID, nroPag, marco);
-		loggear_trace("ya agregue una entrada a la TLB");
-		}else {
+			agregar_entrada_tlb(PID, nroPag, marco);
+			loggear_trace("ya agregue una entrada a la TLB");
+		} else {
 			loggear_warning("EL TAMANIO DE LA TLB ES 0, ENTONCES NO AGREGO NINGUNA ENTRADA");
 		}
 	}
