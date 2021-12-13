@@ -29,6 +29,7 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 			fseek(archivo, posicion_escribir, SEEK_SET);
 
 			fwrite(texto_escribir, 1, get_tamanio_pagina(), archivo);
+			//fputs(texto_escribir, archivo);
 
 			fclose(archivo);
 			return 0;
@@ -172,8 +173,8 @@ t_carpincho_swamp* crear_carpincho(uint32_t pid_carpincho, uint32_t cantidad_pag
 
 	}else{ //ACA SERIA SI LA ASGINACION ES GLOBAL
 		loggear_debug("LLEGO UNA SOLICITUD DE UN CARPINCHO Y COMO LA ASIGNACION ES GLOBAL SOLO SE CREA LA ESTRUCTURA ADMINISTRATIVA PARA EL PID: ", carpincho->pid_carpincho);
-		t_archivo_swamp* archivo = archivo_a_escribir(pid_carpincho);
-		archivo->espacio_libre = archivo->espacio_libre - 1;
+		//t_archivo_swamp* archivo = archivo_a_escribir(pid_carpincho);
+		//archivo->espacio_libre = archivo->espacio_libre - 1;
 		/*if(cantidad_paginas_reservadas <= archivo->espacio_libre){
 			for(int j = 0; j < cantidad_paginas_reservadas; j++){
 				int marco_global = marco_libre(archivo);
