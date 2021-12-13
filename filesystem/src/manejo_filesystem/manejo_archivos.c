@@ -3,17 +3,34 @@
 uint32_t marco_libre(t_archivo_swamp* swamp);
 bool puedo_darle_marco(t_carpincho_swamp* carpincho, uint32_t cantidad_marcos);
 int obtener_marco_desde_pagina(uint32_t pagina, t_carpincho_swamp* carpincho);
+int mapear_archivo(char* ruta_archivo, void* contenido_particion);
+int escribir_marco(int marco_a_escribir, void* texto_escribir, void* swap);
 
 int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* texto_escribir, t_archivo_swamp* swamp){
 
 	loggear_info("[ESCRIBIR_PARTICION] [PID: %zu] [ARCHIVO: %s] [PAG: %d] Se comienza a escribir", carpincho->pid_carpincho, swamp->ruta_archivo, pagina);
-	FILE* archivo;
 	char* ruta_particion = swamp->ruta_archivo;
 	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
+
+	//escribir_marco(marco_a_escribir, texto_escribir, swap)
+
 
 	loggear_debug("[ESCRIBIR_PARTICION] [PID: %zu] El carpincho tiene [MARCOS_RESERVADOS: %d]", carpincho->pid_carpincho, list_size(carpincho->marcos_reservados));
 
 	for (int i = 0; i < list_size(carpincho->dupla); i++){
+			t_dupla_pagina_marco* dupla_busqueda = list_get(carpincho->dupla, i);
+			if(dupla_busqueda->pagina == pagina){
+				loggear_trace("[ESCRIBIR_PARTICION] [PID: %zu] [PAG: %d] Tiene la pagina ya escrita, por lo que sobreescrive con nueva data", carpincho->pid_carpincho, pagina);
+			//	archivo = fopen(ruta_particion, "r+");
+
+				escribir_marco(dupla_busqueda->marco, texto_escribir, swamp->data);
+
+				return 0;
+			}
+	}
+
+
+	/*for (int i = 0; i < list_size(carpincho->dupla); i++){
 		t_dupla_pagina_marco* dupla_busqueda = list_get(carpincho->dupla, i);
 		if(dupla_busqueda->pagina == pagina){
 			loggear_trace("[ESCRIBIR_PARTICION] [PID: %zu] [PAG: %d] Tiene la pagina ya escrita, por lo que sobreescrive con nueva data", carpincho->pid_carpincho, pagina);
@@ -28,19 +45,22 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 			fseek(archivo, posicion_escribir, SEEK_SET);
 
-			fwrite(texto_escribir, 1, get_tamanio_pagina(), archivo);
-			//fputs(texto_escribir, archivo);
+			//fwrite(texto_escribir, 1, get_tamanio_pagina(), archivo);
+			fputs(texto_escribir, archivo);
 
 			fclose(archivo);
 			return 0;
 		}
-	}
+	}*/
 
 	uint32_t marco = atoi(list_get(carpincho->marcos_reservados, 0));
 
 	loggear_info("[ESCRIBIR_PARTICION] [PID: %d] Se escribe la [PAG: %d] en el [Marco: %d] de la [PARTICION: %s]", carpincho->pid_carpincho, pagina, marco, ruta_particion);
 
-	archivo = fopen(ruta_particion, "r+");
+
+	escribir_marco(marco, texto_escribir, swamp->data);
+
+	/*archivo = fopen(ruta_particion, "r+");
 
 	if(archivo == NULL){
 		loggear_error("[ESCRIBIR_PARTICION] [PID: %d] Ocurrio un error al abrir el [ARCHIVO: %s], puede deberse a que no esta creado o no es la ruta correcta", carpincho->pid_carpincho, ruta_particion);
@@ -54,7 +74,7 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 	fwrite(texto_escribir, 1, get_tamanio_pagina(), archivo);
 
 	fclose(archivo);
-
+*/
 	dupla->marco = marco;
 	dupla->pagina = pagina;
 
@@ -113,16 +133,26 @@ char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 
 t_archivo_swamp* archivo_a_escribir(uint32_t pid_carpincho){
 	int libre = 0;
+	int j = 0;
 	t_archivo_swamp* archivo_a_escribir = list_get(lista_swamp, 0);
-	for(int i = 0; i < list_size(lista_swamp); i++){
+	for( int i = 0; i < list_size(lista_swamp); i++){
 		t_archivo_swamp* archivo = list_get(lista_swamp, i);
 		if(archivo->espacio_libre > libre){
 			libre = archivo->espacio_libre;
 			archivo_a_escribir = archivo;
 		}
+		j++;
 	}
 
+
+	int fd_blocks;
+	size_t t = get_tamanio_swap();
+	fd_blocks = open(archivo_a_escribir->ruta_archivo, O_RDWR);
+	archivo_a_escribir->data = mmap(NULL,t, PROT_WRITE, MAP_SHARED, fd_blocks, 0);
+
 	loggear_trace("EL archivo a escribir es  %s", archivo_a_escribir->ruta_archivo);
+
+
 
 	list_add(archivo_a_escribir->carpinchos, string_itoa(pid_carpincho));
 	return archivo_a_escribir;
@@ -377,6 +407,43 @@ int eliminar_proceso(t_carpincho_swamp* carpincho){
 	}
 
 	destroy_carpinchos_swamp(carpincho);
+
+	return 0;
+}
+
+
+int mapear_archivo(char* ruta_archivo, void* contenido_particion){
+
+	int fd_blocks;
+	size_t t = get_tamanio_swap();
+	fd_blocks = open(ruta_archivo, O_RDWR);
+	//blocks = malloc(cantidad_blocks * tamanio_blocks);
+	contenido_particion = mmap(NULL,t, PROT_WRITE, MAP_SHARED, fd_blocks, 0);
+
+	return 0;
+}
+
+
+int escribir_marco(int marco_a_escribir, void* texto_escribir, void* swap){
+	int a = 0;
+
+	/*if(posicion == 0){
+	list_add(bloques_escritos, string_itoa(bloque_a_escribir));
+	}*/
+
+	if(marco_a_escribir < 0){
+		loggear_error("No hay marcos disponibles para escribir en el archivo de swap");
+		return -1;
+	}
+
+
+		memcpy(swap + a * get_tamanio_pagina(), texto_escribir, get_tamanio_pagina());
+		loggear_debug("SE ESCRIBIO EL MARCO %d", marco_a_escribir);
+		//escribir_superbloque(bloque_a_escribir, '1');
+		loggear_debug("SE ESCRIBIO EL MARCO -  %d", marco_a_escribir);
+		//escribir_superbloque(bloque_a_escribir, '1');
+
+	msync(swap, get_tamanio_swap(), MS_SYNC);
 
 	return 0;
 }

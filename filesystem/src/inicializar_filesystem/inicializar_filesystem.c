@@ -13,6 +13,7 @@ void iniciar_swamp(){
 	lista_carpinchos = list_create();
 
 
+
 	loggear_info("SE INICIO EL SWAMP");
 
 }
@@ -36,6 +37,7 @@ int crear_particion(){
 			truncate(get_archivos_swap()[i], get_tamanio_swap()); // Por el momento se inicializan todas las particiones con el tamaño del swap.
 
 			loggear_trace("SE REALIZARON LAS PARTICIONES CORRESPONDIENTE CON TAMAÑO %d", get_tamanio_swap());
+
 
 		}else{
 

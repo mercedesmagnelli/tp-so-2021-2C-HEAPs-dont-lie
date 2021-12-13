@@ -85,6 +85,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		 uint32_t pid = write_deserializado->pid;
 
 		 carpincho = buscar_carpincho_en_lista(pid); //TODO HACER FUNCION
+
 		 if (carpincho == NULL) {
 			 loggear_error("[R_S_ESCRIBIR_EN_PAGINA] [PID: %zu] No se encontro el carpincho en la lista, por lo que no se puede escribir", pid);
 			 enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
@@ -96,6 +97,8 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		 }
 
 		 loggear_trace("[R_S_ESCRIBIR_EN_PAGINA] [PID: %zu] El carpincho va a escribir particion", pid);
+
+		 loggear_error("[ALAN]DE LA RAM NOS LLEGA PARA ESCRIBIR %s", (char*)write_deserializado->data);
 
 		 error = escribir_particion(carpincho, write_deserializado->nro_pag, write_deserializado->data, particion_a_escribir(pid));
 		 if (error < 0){

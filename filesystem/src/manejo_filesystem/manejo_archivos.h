@@ -12,6 +12,9 @@
 #include "../inicializar_filesystem/inicializar_filesystem.h"
 #include "logica_almacenamiento.h"
 
+#include <sys/mman.h>
+#include <fcntl.h>
+
 /*
  * escribir_particion
  *
