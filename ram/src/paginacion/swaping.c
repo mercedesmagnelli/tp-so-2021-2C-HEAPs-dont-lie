@@ -72,6 +72,20 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 		t_write_s* mensaje = shared_crear_write_s(nro_pag_victima, pid_pag_victima, get_tamanio_pagina(), info_en_frame);
 
 		void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio);
+
+		t_write_s *  elemento_deserealizado = deserializar_mensaje_write_s(mensaje_serializado);
+
+		char* f1 = mem_hexstring(info_en_frame, 32);
+		char* f2 = mem_hexstring(elemento_deserealizado->data, 32);
+
+		loggear_error("[RAM-JM] pre-serializacion enviado a SWAP es \n %s", f1);
+
+		loggear_error("[RAM-JM] post-serializacion enviado a SWAP es \n %s", f2);
+
+		//loggear_error("[RAM-JM] numero de 4 bytes preserialización de valor %d", *((int*)info_en_frame +28));
+
+		//loggear_error("[RAM-JM] numero de 4 bytes postserialización de valor %d", *((int*)elemento_deserealizado->data +28));
+
 		pthread_mutex_lock(&mutex_enviar_mensaje_swap);
 		enviar_mensaje_protocolo(socket_swap,R_S_ESCRIBIR_EN_PAGINA,tamanio,mensaje_serializado);
 		t_prot_mensaje* rec = recibir_mensaje_protocolo(socket_swap);
@@ -88,6 +102,10 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 	pagina_victima->bit_presencia = 0;
 
 	void* info_en_pagina = recibir_info_en_pagina(nro_pag_a_pedir, pid_a_pedir);
+
+	char* f3 = mem_hexstring(info_en_pagina, 32);
+
+	loggear_error("[RAM-JM] recibido de SWAP es \n %s", f3);
 
 	return info_en_pagina;
 }

@@ -91,7 +91,7 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 
 
-char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp* carpincho, int * resultado){
+void* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp* carpincho, int * resultado){
 	loggear_info("[LEER_PARTICION] [PID: %zu] Se lee la [PAG: %d] [ARCHIVO: %s]", carpincho->pid_carpincho, pagina, swamp->ruta_archivo);
 
 	char* ruta_particion = swamp->ruta_archivo;

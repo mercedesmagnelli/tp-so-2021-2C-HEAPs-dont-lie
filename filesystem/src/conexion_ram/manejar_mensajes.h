@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <commons/memory.h>
 
 #include "../../../shared/logger.h"
 #include "../../../shared/protocolo.h"
