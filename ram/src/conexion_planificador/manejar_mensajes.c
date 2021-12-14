@@ -169,7 +169,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
-			//imprimir_frames2();
+			char * r1 = mem_hexstring(memoria_principal, get_tamanio_memoria());
+			loggear_error("[RAM-JM] mostramos la memoria dsps de realizar un alloc \n %s", r1);
+
+			imprimir_frames2();
 			//imprimir_tlb2();
 
 			free(alloc);
@@ -233,7 +236,10 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
-			//imprimir_frames2();
+			char * r2 = mem_hexstring(memoria_principal, get_tamanio_memoria());
+			loggear_error("[RAM-JM] mostramos la memoria dsps de leer en ella \n %s", r2);
+
+			imprimir_frames2();
 			//imprimir_tlb2();
 
 			free(ptroLectura);
@@ -249,7 +255,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			void * write_memoria_write = escritura->memoria_write;
 
 			char * x = mem_hexstring(memoria_principal, get_tamanio_memoria());
-			loggear_error("[RAM-JM] mostramos la memoria antes de leer de ella \n %s", x);
+			loggear_error("[RAM-JM] mostramos la memoria antes de escribir en ella \n %s", x);
 
 			loggear_error("[RAM-JM] lo que me llego de la matelib es un string %s", (char*)write_memoria_write);
 
@@ -272,7 +278,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			enviar_mensaje_protocolo(mensaje->socket, headerW, 0, NULL);
 
-			//imprimir_frames2();
+			imprimir_frames2();
 			//imprimir_tlb2();
 
 			free(write_memoria_write);

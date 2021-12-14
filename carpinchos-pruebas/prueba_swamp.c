@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
   th_3_info->mate_cfg_path = config_path;
   th_3_info->th_number = 3;
 
-  //pthread_create(&carpincho_th_3, NULL, &carpincho_acaparador, (void *)th_3_info);
+  pthread_create(&carpincho_th_3, NULL, &carpincho_acaparador, (void *)th_3_info);
   pthread_create(&carpincho_th_1, NULL, &carpincho, (void *)th_1_info);
   pthread_create(&carpincho_th_2, NULL, &carpincho, (void *)th_2_info);
   

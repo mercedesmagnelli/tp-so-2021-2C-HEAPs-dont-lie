@@ -30,13 +30,15 @@ uint32_t crear_proceso_SWAP(uint32_t PID){
 
 uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 
-
+	pthread_mutex_lock(&mutex_acceso_lista_frames);
 	uint32_t frame;
 	void* info_a_guardar;
 	if(hay_frame_disponible_en_RAM(PID)) {
 		loggear_info("Hay frame disponible para pagina traida a RAM");
 		frame = obtener_frame_libre(PID);
 		info_a_guardar =  recibir_info_en_pagina(nroPag, PID);
+		char* f3 = mem_hexstring(info_a_guardar, 32);
+		loggear_error("[RAM-JM] recibido de SWAP es \n %s", f3);
 	}else {
 		loggear_info("Tengo que hacer swaping para pagina traida a RAM");
 		pthread_mutex_lock(&mutex_swapping);
@@ -53,6 +55,7 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 	f->estado=1;
 	f->proceso=PID;
 	f->pagina=nroPag;
+	pthread_mutex_unlock(&mutex_acceso_lista_frames);
 	escribir_directamente_en_memoria(info_a_guardar, get_tamanio_pagina(), frame * get_tamanio_pagina());
 	free(info_a_guardar);
 	return frame;
@@ -111,15 +114,11 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 }
 
 uint32_t obtener_pid_en_frame(uint32_t frame) {
-	pthread_mutex_lock(&mutex_acceso_lista_frames);
 	t_frame* frame_i = (t_frame*) list_get(listaFrames, frame);
-	pthread_mutex_unlock(&mutex_acceso_lista_frames);
 	return frame_i->proceso;
 }
 uint32_t obtener_pag_en_frame(uint32_t frame) {
-	pthread_mutex_lock(&mutex_acceso_lista_frames);
 	t_frame* frame_i = (t_frame*) list_get(listaFrames, frame);
-	pthread_mutex_unlock(&mutex_acceso_lista_frames);
 	return frame_i->pagina;
 }
 void* obtener_info_en_frame(uint32_t frame) {
