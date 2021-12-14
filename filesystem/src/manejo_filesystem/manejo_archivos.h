@@ -14,6 +14,7 @@
 
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <commons/memory.h>
 
 /*
  * escribir_particion

@@ -106,7 +106,19 @@ void* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 
 	loggear_info("[LEER_PARTICION] [PID: %zu] Se comienza a leer el [MARCO: %d] de la [PARTICION: %s]", carpincho->pid_carpincho, marco, ruta_particion);
 
-	FILE* archivo_lectura;
+
+	int posicion_a_leer = marco * get_tamanio_pagina();
+	void* data = malloc(get_tamanio_pagina());
+
+	memcpy(data, swamp->data + posicion_a_leer, get_tamanio_pagina());
+
+
+	char* f1 = mem_hexstring(data, get_tamanio_pagina());
+
+	loggear_warning("[ALAN] [PID: %d] LO QUE LEO DEL ARCHIVO DE SWAP ES \n %s", carpincho->pid_carpincho, f1);
+
+
+	/*FILE* archivo_lectura;
 	void* contenido_pagina = malloc(get_tamanio_pagina());
 
 	archivo_lectura = fopen(ruta_particion, "r+");
@@ -124,11 +136,11 @@ void* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 
 	fread(contenido_pagina, 1, get_tamanio_pagina(), archivo_lectura);
 
-	fclose(archivo_lectura);
+	fclose(archivo_lectura);*/
 
 	loggear_info("[LEER_PARTICION] [PID: %zu] Se termino la lectura de la [PAG: %d] de la [PARTICION: %s]", carpincho->pid_carpincho, marco, ruta_particion);
 
-	return contenido_pagina;
+	return data;
 }
 
 t_archivo_swamp* archivo_a_escribir(uint32_t pid_carpincho){
@@ -425,7 +437,7 @@ int mapear_archivo(char* ruta_archivo, void* contenido_particion){
 
 
 int escribir_marco(int marco_a_escribir, void* texto_escribir, void* swap){
-	int a = 0;
+
 
 	/*if(posicion == 0){
 	list_add(bloques_escritos, string_itoa(bloque_a_escribir));
@@ -437,7 +449,16 @@ int escribir_marco(int marco_a_escribir, void* texto_escribir, void* swap){
 	}
 
 
-		memcpy(swap + a * get_tamanio_pagina(), texto_escribir, get_tamanio_pagina());
+	char* antes = mem_hexstring(swap, get_tamanio_swap());
+	loggear_warning("[ALAN] [MARCO: %d] ESCRIBI \n %s", marco_a_escribir, antes);
+
+		memcpy(swap + marco_a_escribir * get_tamanio_pagina(), texto_escribir, get_tamanio_pagina());
+
+	char* despues = mem_hexstring(swap, get_tamanio_swap());
+
+	loggear_warning("[ALAN] [MARCO: %d] ESCRIBI \n %s", marco_a_escribir, despues);
+
+
 		loggear_debug("SE ESCRIBIO EL MARCO %d", marco_a_escribir);
 		//escribir_superbloque(bloque_a_escribir, '1');
 		loggear_debug("SE ESCRIBIO EL MARCO -  %d", marco_a_escribir);

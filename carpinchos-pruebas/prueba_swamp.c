@@ -87,7 +87,7 @@ void *carpincho(void *config)
   int vuelta = 0;
   while (vuelta < 1000)
   {
-    //sem_wait(info->producer_sem);
+    sem_wait(info->producer_sem);
     mate_memread(&mate_ref, key, thread_name, 10);
     mate_memread(&mate_ref, value, &current_value, sizeof(uint32_t));
     log_info(logger, "el valor leido de memoria fue: %d para el CARPINCHO%d para el puntero logico %d", current_value, info->th_number, value);
@@ -99,7 +99,7 @@ void *carpincho(void *config)
     print_thread_info(thread_name, current_value);
 
     mate_memwrite(&mate_ref, &current_value, value, sizeof(uint32_t));
-    //sem_post(info->consumer_sem);
+    sem_post(info->consumer_sem);
     vuelta++;
   }
 
@@ -144,10 +144,10 @@ int main(int argc, char *argv[])
   th_3_info->th_number = 3;
 
   //pthread_create(&carpincho_th_3, NULL, &carpincho_acaparador, (void *)th_3_info);
-  //pthread_create(&carpincho_th_1, NULL, &carpincho, (void *)th_1_info);
+  pthread_create(&carpincho_th_1, NULL, &carpincho, (void *)th_1_info);
   pthread_create(&carpincho_th_2, NULL, &carpincho, (void *)th_2_info);
   
-  //pthread_join(carpincho_th_1, NULL);
+  pthread_join(carpincho_th_1, NULL);
   pthread_join(carpincho_th_2, NULL);
   
   return 0;
