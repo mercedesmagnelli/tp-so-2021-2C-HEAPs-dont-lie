@@ -1,0 +1,44 @@
+[INFO] 23:07:40:591 planificacion/(1435:1436): El proceso [PID: 1] se creó exitosamente
+[INFO] 23:07:40:591 planificacion/(1435:1436): EJECUTANDO Carpincho 1
+[INFO] 23:07:42:593 planificacion/(1435:1437): El proceso [PID: 2] se creó exitosamente
+[INFO] 23:07:42:593 planificacion/(1435:1437): EJECUTANDO Carpincho 2
+[INFO] 23:07:44:596 planificacion/(1435:1438): El proceso [PID: 3] se creó exitosamente
+[INFO] 23:07:44:597 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:07:46:598 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:07:48:599 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:07:50:603 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:07:52:611 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:07:54:776 planificacion/(1435:1437): El proceso [PID: 2] llamó al recurso pelopincho
+[INFO] 23:07:54:777 planificacion/(1435:1437): EJECUTANDO Carpincho 2
+[INFO] 23:07:56:780 planificacion/(1435:1436): El proceso [PID: 1] llamó al recurso pelopincho
+[INFO] 23:07:56:780 planificacion/(1435:1436): EJECUTANDO Carpincho 1
+[INFO] 23:07:58:781 planificacion/(1435:1437): El proceso [PID: 2] llamó al recurso pelopincho
+[INFO] 23:07:58:782 planificacion/(1435:1437): EJECUTANDO Carpincho 2
+[INFO] 23:08:00:785 planificacion/(1435:1436): El proceso [PID: 1] llamó al recurso pelopincho
+[INFO] 23:08:00:785 planificacion/(1435:1436): EJECUTANDO Carpincho 1
+[INFO] 23:08:02:785 planificacion/(1435:1437): El proceso [PID: 2] llamó al recurso pelopincho
+[INFO] 23:08:02:785 planificacion/(1435:1437): EJECUTANDO Carpincho 2
+[INFO] 23:08:04:789 planificacion/(1435:1436): El proceso [PID: 1] llamó al recurso pelopincho
+[INFO] 23:08:04:789 planificacion/(1435:1436): EJECUTANDO Carpincho 1
+[INFO] 23:08:05:291 planificacion/(1435:1437): El proceso [PID: 2] terminó exitosamente
+[INFO] 23:08:06:792 planificacion/(1435:1438): El proceso [PID: 3] llamó al recurso pelopincho
+[INFO] 23:08:06:792 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:07:296 planificacion/(1435:1436): El proceso [PID: 1] terminó exitosamente
+[INFO] 23:08:08:795 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:10:801 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:12:803 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:14:803 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:18:823 planificacion/(1435:1438): El proceso [PID: 3] llamó al recurso pelopincho
+[INFO] 23:08:18:823 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:20:823 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:22:846 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:24:863 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:26:873 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:30:886 planificacion/(1435:1438): El proceso [PID: 3] llamó al recurso pelopincho
+[INFO] 23:08:30:886 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:32:887 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:34:888 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:36:893 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:38:895 planificacion/(1435:1438): EJECUTANDO Carpincho 3
+[INFO] 23:08:41:407 planificacion/(1435:1438): El proceso [PID: 3] terminó exitosamente
+Termine!

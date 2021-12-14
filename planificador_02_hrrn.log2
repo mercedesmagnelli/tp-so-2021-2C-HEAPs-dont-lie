@@ -1,0 +1,44 @@
+[INFO] 23:16:24:608 planificacion/(2026:2027): El proceso [PID: 1] se creó exitosamente
+[INFO] 23:16:24:609 planificacion/(2026:2027): EJECUTANDO Carpincho 1
+[INFO] 23:16:26:609 planificacion/(2026:2028): El proceso [PID: 2] se creó exitosamente
+[INFO] 23:16:26:609 planificacion/(2026:2028): EJECUTANDO Carpincho 2
+[INFO] 23:16:28:621 planificacion/(2026:2029): El proceso [PID: 3] se creó exitosamente
+[INFO] 23:16:28:621 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:16:30:622 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:16:32:633 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:16:34:639 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:16:36:663 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:16:38:665 planificacion/(2026:2027): El proceso [PID: 1] llamó al recurso pelopincho
+[INFO] 23:16:38:665 planificacion/(2026:2027): EJECUTANDO Carpincho 1
+[INFO] 23:16:40:666 planificacion/(2026:2028): El proceso [PID: 2] llamó al recurso pelopincho
+[INFO] 23:16:40:666 planificacion/(2026:2028): EJECUTANDO Carpincho 2
+[INFO] 23:16:42:682 planificacion/(2026:2029): El proceso [PID: 3] llamó al recurso pelopincho
+[INFO] 23:16:42:682 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:16:44:683 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:16:46:684 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:16:48:685 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:16:50:690 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:16:52:693 planificacion/(2026:2027): El proceso [PID: 1] llamó al recurso pelopincho
+[INFO] 23:16:52:693 planificacion/(2026:2027): EJECUTANDO Carpincho 1
+[INFO] 23:16:54:697 planificacion/(2026:2028): El proceso [PID: 2] llamó al recurso pelopincho
+[INFO] 23:16:54:697 planificacion/(2026:2028): EJECUTANDO Carpincho 2
+[INFO] 23:16:56:705 planificacion/(2026:2029): El proceso [PID: 3] llamó al recurso pelopincho
+[INFO] 23:16:56:705 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:16:58:707 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:17:00:710 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:17:02:711 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:17:04:712 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:17:06:717 planificacion/(2026:2027): El proceso [PID: 1] llamó al recurso pelopincho
+[INFO] 23:17:06:717 planificacion/(2026:2027): EJECUTANDO Carpincho 1
+[INFO] 23:17:08:720 planificacion/(2026:2028): El proceso [PID: 2] llamó al recurso pelopincho
+[INFO] 23:17:08:720 planificacion/(2026:2028): EJECUTANDO Carpincho 2
+[INFO] 23:17:09:227 planificacion/(2026:2027): El proceso [PID: 1] terminó exitosamente
+[INFO] 23:17:10:736 planificacion/(2026:2029): El proceso [PID: 3] llamó al recurso pelopincho
+[INFO] 23:17:10:736 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:17:11:238 planificacion/(2026:2028): El proceso [PID: 2] terminó exitosamente
+[INFO] 23:17:12:736 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:17:14:737 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:17:16:738 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:17:18:738 planificacion/(2026:2029): EJECUTANDO Carpincho 3
+[INFO] 23:17:21:243 planificacion/(2026:2029): El proceso [PID: 3] terminó exitosamente
+Termine!
