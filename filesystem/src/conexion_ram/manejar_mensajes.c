@@ -85,7 +85,7 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		 uint32_t pid = write_deserializado->pid;
 
 		 char* f1 = mem_hexstring(write_deserializado->data , 32);
- 		 loggear_error("[ALAN] lo recibido de la RAM es \n %s", f1);
+ 		 loggear_error("[R_S_ESCRIBIR_EN_PAGINA] lo recibido de la RAM es \n %s", f1);
 
 		 carpincho = buscar_carpincho_en_lista(pid); //TODO HACER FUNCION
 
