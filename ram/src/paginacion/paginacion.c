@@ -823,6 +823,10 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 			loggear_warning("EL TAMANIO DE LA TLB ES 0, ENTONCES NO AGREGO NINGUNA ENTRADA");
 		}
 	}
+
+	imprimir_tlb();
+
+
 	return marco;
 }
 

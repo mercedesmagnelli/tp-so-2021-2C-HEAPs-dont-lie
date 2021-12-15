@@ -1,11 +1,4 @@
 #include "tlb.h"
-
-
-
-
-
-
-
 //	FUNCIONES PUBLICAS
 
 void inicializar_tlb() {
@@ -23,16 +16,13 @@ void limpiar_tlb(){
 void imprimir_tlb(){
 
 	loggear_trace("----------------------------------------------------------");
-	loggear_trace("-----------------VOY A IMPRIMIR LA TLB--------------------");
+	loggear_trace("----------------ESTADO DE LA TLB ACTUAL-------------------");
 	loggear_trace("----------------------------------------------------------");
 	for(int i = 0; i < list_size(TLB); i++) {
 	entrada_tlb* entrada = (entrada_tlb*) list_get(TLB,i);
 	loggear_trace("ENTRADA: %d | KEY: %s | FRAME: %d | TIMESTAMP %d", i, entrada->hash_key, entrada->frame, entrada->timestamp);
 
 }
-	loggear_trace("----------------------------------------------------------");
-	loggear_trace("-----------------------I'M DONE---------------------------");
-	loggear_trace("----------------------------------------------------------");
 }
 
 void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {

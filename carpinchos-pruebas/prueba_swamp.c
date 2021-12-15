@@ -90,7 +90,6 @@ void *carpincho(void *config)
     sem_wait(info->producer_sem);
     mate_memread(&mate_ref, key, thread_name, 10);
     mate_memread(&mate_ref, value, &current_value, sizeof(uint32_t));
-    log_info(logger, "el valor leido de memoria fue: %d para el CARPINCHO%d para el puntero logico %d", current_value, info->th_number, value);
 
     // Pido memoria sin guardar el puntero. No creo que sea un problema
     mate_memalloc(&mate_ref, 1);
