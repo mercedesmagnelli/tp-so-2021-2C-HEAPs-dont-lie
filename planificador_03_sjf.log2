@@ -1,0 +1,30 @@
+C1 - Toma SEM1
+C2 - toma SEM2
+C3 - toma SEM3
+C4 - toma SEM4
+C1 - Toma SEM2
+C2 - toma SEM3
+C5 - toma SEM5
+C3 - toma SEM4
+C6 - toma SEM6
+C4 - toma SEM1
+C5 - toma SEM6
+C6 - toma SEM1
+C3 - libera SEM3
+C3 - libera SEM4
+C3 - Se retira a descansar
+C2 - libera SEM2
+C2 - libera SEM3
+C2 - Se retira a descansar (este es C2)
+C1 - libera SEM1
+C1 - libera SEM2
+C2 - Se retira a descansar (este es C1)
+C6 - Libera SEM1
+C6 - toma SEM5
+C5 - toma SEM5
+C5 - toma SEM6
+C5 - Se retira a descansar
+MAIN 
+- Como no sabemos a quienes va a matar el algoritmo, 
+entonces hacemos el free de los semáforos acáMAIN 
+- Retirados los carpinchos de la pelea, hora de analizar los hechos
