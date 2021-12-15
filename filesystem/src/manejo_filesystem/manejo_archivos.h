@@ -12,6 +12,10 @@
 #include "../inicializar_filesystem/inicializar_filesystem.h"
 #include "logica_almacenamiento.h"
 
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <commons/memory.h>
+
 /*
  * escribir_particion
  *
@@ -30,7 +34,7 @@ int escribir_particion(t_carpincho_swamp* pid_carpincho, uint32_t pagina, char* 
  *
  */
 
-char* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp* carpincho, int * resultado);
+void* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp* carpincho, int * resultado);
 
 
 /*

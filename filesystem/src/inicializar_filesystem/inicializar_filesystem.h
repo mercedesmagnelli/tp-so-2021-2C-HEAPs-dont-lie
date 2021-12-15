@@ -31,6 +31,7 @@ typedef struct {
 t_list* lista_carpinchos;
 
 
+
 /*
  * Esta funcion inicializa el swamp creando las particiones del mismo con la configuracion correspondiente.
  * Inicia los archivos vacios.

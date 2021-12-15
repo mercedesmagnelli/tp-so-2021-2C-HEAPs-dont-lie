@@ -26,8 +26,10 @@ int main(int argc, char** argv) {
 
 	iniciar_swamp();
 
+
+
 // ULTIMAS PRUEBAS REALIZADAS, ACA ESTA EL CAMINO QEU SE DEBE HACER SIEMPRE AL CREAR UN CARPINCHO. NO BORRAAAAAR
-/*  t_carpincho_swamp* carpincho = crear_carpincho(14,5); // 1 	5
+ /* t_carpincho_swamp* carpincho = crear_carpincho(14,5); // 1 	5
     t_carpincho_swamp* carpincho1 = crear_carpincho(13,4); // 2 4
     t_carpincho_swamp* carpincho2 = crear_carpincho(11,12); // 2 16
     t_carpincho_swamp* carpincho3 = crear_carpincho(10,9); // 1 13
@@ -40,17 +42,19 @@ int main(int argc, char** argv) {
     loggear_error("%d", carpincho4->pid_carpincho);
 
     reservar_marcos(carpincho,7, particion_a_escribir(carpincho->pid_carpincho));
-
+    */
+/*
     t_archivo_swamp* archivo1 = list_get(lista_swamp, 0);
     t_archivo_swamp* archivo2 = list_get(lista_swamp, 1);
-    char* carpincho1_str = list_get(archivo1->carpinchos, 0);
+    */
+ /*   char* carpincho1_str = list_get(archivo1->carpinchos, 0);
     char* carpincho2_str = list_get(archivo1->carpinchos, 1);
     char* carpincho3_str = list_get(archivo1->carpinchos, 2);
 
     char* carpincho4_str = list_get(archivo2->carpinchos, 0);
     char* carpincho5_str = list_get(archivo2->carpinchos, 1);
-
-    loggear_warning("espacio libre archivo 1 %d", archivo1->espacio_libre);
+*/
+/*    loggear_warning("espacio libre archivo 1 %d", archivo1->espacio_libre);
     loggear_warning("espacio libre archivo 2 %d", archivo2->espacio_libre);
 
     loggear_warning("carpincho 1 %s", carpincho1_str);
@@ -72,22 +76,25 @@ int main(int argc, char** argv) {
     //loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,10));
     //loggear_error("asdadas %s", list_get(carpincho->marcos_reservados,11));
 
-
-    escribir_particion(carpincho, 11, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
+*/
+/*    escribir_particion(carpincho, 11, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
     escribir_particion(carpincho, 15, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
     escribir_particion(carpincho, 16, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
     escribir_particion(carpincho, 18, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
     escribir_particion(carpincho, 20, "gola don pepito9", particion_a_escribir(carpincho->pid_carpincho));
-
+    */
+/*
     loggear_error("asdadas %s", list_get(carpincho->marcos_usados,0));
     loggear_error("asdadas %s", list_get(carpincho->marcos_usados,1));
     loggear_error("asdadas %s", list_get(carpincho->marcos_usados,2));
     loggear_error("asdadas %s", list_get(carpincho->marcos_usados,3));
     loggear_error("asdadas %s", list_get(carpincho->marcos_usados,4));
+*/
+//    escribir_particion(carpincho, 2, "CARPINCHO 1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", particion_a_escribir(carpincho->pid_carpincho));
 
 
    // borrar_x_cantidad_de_marcos(carpincho, 3);
-
+/*
     eliminar_proceso(carpincho);
 
    // loggear_error("usados %s", list_get(carpincho->marcos_usados,2));

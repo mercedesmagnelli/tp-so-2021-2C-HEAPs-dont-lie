@@ -2,6 +2,7 @@
 #define PAGINACION_SWAPING_H_
 
 #include <stdint.h>
+#include <commons/memory.h>
 #include <commons/collections/list.h>
 #include "../../src/configuracion/ram_config_guardada.h"
 #include "estructuras_paginacion.h"

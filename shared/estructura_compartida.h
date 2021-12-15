@@ -81,7 +81,7 @@ typedef struct{
 	uint32_t nro_pag;
 	uint32_t pid;
 	size_t tam_data;
-	char* data;
+	void* data;
 }t_write_s; //solicitud escritura
 
 typedef struct{

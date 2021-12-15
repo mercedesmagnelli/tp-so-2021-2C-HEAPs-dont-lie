@@ -802,7 +802,7 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 
 			marco = traer_pagina_de_SWAP(PID, nroPag);//carga los frames con los datos necesarios, elige victima y cambia paginas, actualiza pagina victima. Tmbn tiene que actualizar la cant de Pags en asig FIJA
 
-			loggear_info("[RAM] - El marco que voy a usar es: %d", marco);
+			loggear_info("[RAM] - Para el proceso %d el marco que voy a usar es: %d", PID, marco);
 
 			inicializar_datos_pagina(PID, nroPag, marco, bitModificado);//podriamos poner esta funcion dentro de obtener fram asi tmbn se encarga de modificar lo administrativo dsps del cambio de pags?
 
@@ -823,6 +823,10 @@ uint32_t obtener_marco_de_pagina_en_memoria(uint32_t PID, int nroPag, uint32_t b
 			loggear_warning("EL TAMANIO DE LA TLB ES 0, ENTONCES NO AGREGO NINGUNA ENTRADA");
 		}
 	}
+
+	imprimir_tlb();
+
+
 	return marco;
 }
 

@@ -3,6 +3,7 @@
 #define CONEXION_PLANIFICADOR_MANEJAR_MENSAJES_H_
 
 #include <string.h>
+#include <commons/memory.h>
 
 #include "../../../shared/logger.h"
 #include "../../../shared/protocolo.h"

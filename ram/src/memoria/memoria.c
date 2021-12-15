@@ -77,6 +77,8 @@ int32_t memalloc(uint32_t pid, int32_t size) {
 			}
 		}
 	}
+	t_list* lista_tp_pid =obtener_tabla_paginas_mediante_PID(pid);
+	imprimir_tabla_paginas(lista_tp_pid);
 }
 
 
@@ -162,4 +164,12 @@ int32_t suspender_PID(uint32_t PID){
 		return 1;
 	}else
 		return 0;
+}
+
+void imprimir_tabla_paginas(t_list* p)
+{
+  for (int i = 0; i < list_size(p); i++) {
+	  t_pagina* pag = (t_pagina*) list_get(p, i);
+	  loggear_debug("PAGINA %d, FRAME %d, BP: %d", i, pag->frame, pag->bit_presencia);
+  }
 }

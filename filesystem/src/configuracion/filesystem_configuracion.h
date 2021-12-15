@@ -23,6 +23,7 @@ typedef struct {
 	int espacio_libre;
 	void* puntero_a_bits;
 	t_bitarray* bitmap_bitarray;
+	void* data;
 } t_archivo_swamp;
 
 

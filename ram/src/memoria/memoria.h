@@ -130,5 +130,7 @@ int32_t suspender_PID(uint32_t PID_a_suspender);
 
 uint32_t frames_libres();
 
+void imprimir_tabla_paginas(t_list* p);
+
 
 #endif /* MEMORIA_MEMORIA_C_ */
