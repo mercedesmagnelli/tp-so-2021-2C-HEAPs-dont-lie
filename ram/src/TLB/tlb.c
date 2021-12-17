@@ -44,7 +44,7 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 			elemento_encontrado->timestamp =  obtener_timestamp_actual();
 			elemento_encontrado->frame = frame;
 
-			free(hash_KEY_del_ingresante);
+			//free(hash_KEY_del_ingresante);
 		}else{
 			entrada_tlb* entrada = malloc(sizeof(entrada_tlb));
 			entrada->timestamp = obtener_timestamp_actual();
@@ -58,6 +58,7 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
 			list_add(TLB, entrada);
 		}
+		free(hash_KEY_del_ingresante);
 	}
 
 }

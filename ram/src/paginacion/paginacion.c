@@ -440,8 +440,13 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
 	for(int i = 0; i < cantPagABorrar; i++){
 	        paginaEliminar = (t_pagina*)list_get(tp, cantPagNOBORRAR);
 	        if(paginaEliminar->bit_presencia==1){
-	            t_frame* frameLiberado = list_get(listaFrames, paginaEliminar->frame);
+	        	pthread_mutex_lock(&mutex_acceso_lista_frames);
+	        	t_frame* frameLiberado = list_get(listaFrames, paginaEliminar->frame);
 	            frameLiberado->estado=0;
+//	            frameLiberado->pagina=-1;
+//				frameLiberado->proceso=-1;
+				pthread_mutex_unlock(&mutex_acceso_lista_frames);
+
 	        }
 	        list_remove_and_destroy_element(tp, cantPagNOBORRAR, free);
 	 }
