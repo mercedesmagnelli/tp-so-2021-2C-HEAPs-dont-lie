@@ -169,9 +169,6 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
-			char * r1 = mem_hexstring(memoria_principal, get_tamanio_memoria());
-			loggear_error("[RAM-JM] mostramos la memoria dsps de realizar un alloc \n %s", r1);
-
 			imprimir_frames2();
 			//imprimir_tlb2();
 
@@ -207,9 +204,6 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 			loggear_info("[MATELIB_MEM_READ], un proceso quiere leer algo de la RAM");
 			t_matelib_memoria_read* read = deserializar_memoria_read(mensaje->payload);
 
-			char* y = mem_hexstring(memoria_principal, get_tamanio_memoria());
-			loggear_error("[RAM-JM] mostramos la memoria antes de leer de ella \n %s", y);
-
 			imprimir_frames2();
 
 			void* ptroLectura;
@@ -236,9 +230,6 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 				enviar_mensaje_protocolo(mensaje->socket, FALLO_EN_LA_TAREA, 0, NULL);
 			}
 
-			char * r2 = mem_hexstring(memoria_principal, get_tamanio_memoria());
-			loggear_error("[RAM-JM] mostramos la memoria dsps de leer en ella \n %s", r2);
-
 			imprimir_frames2();
 			//imprimir_tlb2();
 
@@ -254,19 +245,9 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 
 			void * write_memoria_write = escritura->memoria_write;
 
-			char * x = mem_hexstring(memoria_principal, get_tamanio_memoria());
-			loggear_error("[RAM-JM] mostramos la memoria antes de escribir en ella \n %s", x);
-
-			loggear_error("[RAM-JM] lo que me llego de la matelib es un string %s", (char*)write_memoria_write);
-
-			loggear_error("[RAM-JM] lo que me llego de la matelib es un numero de 4 bytes de valor %d", *((int*)write_memoria_write));
-
 			int32_t rtaWrite = memwrite(write_memoria_write, escritura->memoria_mate_pointer, escritura->pid, escritura->memoria_size);
 			uint32_t headerW;
-
-			char * z = mem_hexstring(memoria_principal, get_tamanio_memoria());
-			loggear_error("[RAM-JM] mostramos la memoria dsps de escribir en ella \n %s",z);
-
+			
 			if(rtaWrite>=0){
 				loggear_info("[MATELIB_MEM_WRITE], proceso %d pudo escribir en el espacio seleccionado", escritura->pid);
 				headerW = EXITO_EN_LA_TAREA;

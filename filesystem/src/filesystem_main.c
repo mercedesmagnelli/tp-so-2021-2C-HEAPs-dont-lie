@@ -176,10 +176,10 @@ int main(int argc, char** argv) {
 }
 
 void cerrar_todo() {
+	destroy_lista_carpinchos();
 	destroy_configuracion();
 	destroy_log();
 	destroy_lista_swamp();
-	destroy_lista_carpinchos();
 }
 
 

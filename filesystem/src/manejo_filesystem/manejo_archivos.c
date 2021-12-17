@@ -10,7 +10,6 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 	loggear_info("[ESCRIBIR_PARTICION] [PID: %zu] [ARCHIVO: %s] [PAG: %d] Se comienza a escribir", carpincho->pid_carpincho, swamp->ruta_archivo, pagina);
 	char* ruta_particion = swamp->ruta_archivo;
-	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
 
 	//escribir_marco(marco_a_escribir, texto_escribir, swap)
 
@@ -75,6 +74,9 @@ int escribir_particion(t_carpincho_swamp* carpincho, uint32_t pagina, char* text
 
 	fclose(archivo);
 */
+
+	t_dupla_pagina_marco* dupla = malloc(sizeof(t_dupla_pagina_marco));
+
 	dupla->marco = marco;
 	dupla->pagina = pagina;
 
@@ -111,11 +113,6 @@ void* leer_particion(uint32_t pagina, t_archivo_swamp* swamp, t_carpincho_swamp*
 	void* data = malloc(get_tamanio_pagina());
 
 	memcpy(data, swamp->data + posicion_a_leer, get_tamanio_pagina());
-
-
-	char* f1 = mem_hexstring(data, get_tamanio_pagina());
-
-	loggear_warning("[ALAN] [PID: %d] LO QUE LEO DEL ARCHIVO DE SWAP ES \n %s", carpincho->pid_carpincho, f1);
 
 
 	/*FILE* archivo_lectura;
@@ -448,16 +445,7 @@ int escribir_marco(int marco_a_escribir, void* texto_escribir, void* swap){
 		return -1;
 	}
 
-
-	char* antes = mem_hexstring(swap, get_tamanio_swap());
-	loggear_warning("[ALAN] [MARCO: %d] ESCRIBI \n %s", marco_a_escribir, antes);
-
 		memcpy(swap + marco_a_escribir * get_tamanio_pagina(), texto_escribir, get_tamanio_pagina());
-
-	char* despues = mem_hexstring(swap, get_tamanio_swap());
-
-	loggear_warning("[ALAN] [MARCO: %d] ESCRIBI \n %s", marco_a_escribir, despues);
-
 
 		loggear_debug("SE ESCRIBIO EL MARCO %d", marco_a_escribir);
 		//escribir_superbloque(bloque_a_escribir, '1');

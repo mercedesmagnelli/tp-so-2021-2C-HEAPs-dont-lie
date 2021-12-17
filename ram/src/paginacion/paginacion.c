@@ -463,6 +463,9 @@ void liberar_paginas(heap_metadata* ultimo_heap, t_list* tp, uint32_t pid) {
     if(respuesta->head == FALLO_EN_LA_TAREA){
         loggear_error("[RAM] - Hubo un problema en la liberacion de la paginas del proceos %d en swamp", pid);
     }
+    free(respuesta->payload);//LO AGREGUE RECIEN
+    free(respuesta);
+    free(mensaje); //TAMBIEN LO AGREGUE RECIEN
   }
 }
 

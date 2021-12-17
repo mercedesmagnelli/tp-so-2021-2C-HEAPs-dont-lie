@@ -84,9 +84,6 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 		 t_write_s* write_deserializado = deserializar_mensaje_write_s(mensaje->payload);
 		 uint32_t pid = write_deserializado->pid;
 
-		 char* f1 = mem_hexstring(write_deserializado->data , 32);
- 		 loggear_error("[R_S_ESCRIBIR_EN_PAGINA] lo recibido de la RAM es \n %s", f1);
-
 		 carpincho = buscar_carpincho_en_lista(pid); //TODO HACER FUNCION
 
 		 if (carpincho == NULL) {
@@ -137,9 +134,6 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		int resultado;
 		void* pagina_info = leer_particion(pedir_deserializado->nro_pag, particion_a_escribir(carpincho->pid_carpincho), carpincho, &resultado);
-
-		char* f2 = mem_hexstring(pagina_info , 32);
-		loggear_error("[ALAN] lo que se le enviara a la RAM del proceso %d con pag %d \n %s", pedir_deserializado->pid, pedir_deserializado->nro_pag, f2);
 
 		if (resultado != 0) {
 			loggear_error("[R_S_PEDIR_PAGINA] [PID: %zu] Ocurrio un error al leer la pagina", carpincho->pid_carpincho);
