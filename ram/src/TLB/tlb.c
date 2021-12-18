@@ -49,7 +49,7 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 			entrada_tlb* entrada = malloc(sizeof(entrada_tlb));
 			entrada->timestamp = obtener_timestamp_actual();
 			entrada->frame = frame;
-			entrada->hash_key = calcular_hash_key(proceso, pagina);
+			entrada->hash_key = hash_KEY_del_ingresante;
 			if(max_entradas == list_size(TLB)) {
 				uint32_t indice_victima = obtener_entrada_victima();
 				loggear_trace("[TLB] - Voy a reemplazar la entrada %d", indice_victima);
@@ -58,6 +58,7 @@ void agregar_entrada_tlb(uint32_t proceso, uint32_t pagina, uint32_t frame) {
 
 			list_add(TLB, entrada);
 		}
+		//free(hash_KEY_del_ingresante);
 	}
 
 }
@@ -130,7 +131,9 @@ void actualizar_datos_TLB(uint32_t PID, uint32_t nroPag){
 	}
 
 		entrada_tlb* entrada_encontrada = (entrada_tlb*)list_find(TLB, buscar_key);
-
+		if(entrada_encontrada == NULL) {
+			loggear_error("entrada_encontrada es nula");
+		}
 		entrada_encontrada->timestamp = obtener_timestamp_actual();
 
 		free(key);

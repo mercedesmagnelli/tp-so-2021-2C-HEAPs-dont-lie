@@ -88,7 +88,7 @@ int manejar_mensaje(t_prot_mensaje * mensaje) {
 		case MATELIB_CLOSE:
 
 			imprimir_frames2();
-			imprimir_tlb2();
+			//imprimir_tlb2();
 
 			loggear_info("[MATELIB_CLOSE] - Se solicita eliminar el proceso de memoria");
 			t_matelib_nuevo_proceso* PID_proceso_eliminar = deserializar_crear_proceso(mensaje->payload);
