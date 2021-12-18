@@ -98,8 +98,6 @@ int manejar_mensajes(t_prot_mensaje * mensaje) {
 
 		 loggear_trace("[R_S_ESCRIBIR_EN_PAGINA] [PID: %zu] El carpincho va a escribir particion", pid);
 
-		 loggear_error("[ALAN]DE LA RAM NOS LLEGA PARA ESCRIBIR %s", (char*)write_deserializado->data);
-
 		 error = escribir_particion(carpincho, write_deserializado->nro_pag, write_deserializado->data, particion_a_escribir(pid));
 		 if (error < 0){
 			 loggear_error("[R_S_ESCRIBIR_EN_PAGINA] [PID: %zu] Error al escribir en particion", pid);
