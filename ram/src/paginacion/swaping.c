@@ -45,9 +45,11 @@ uint32_t traer_pagina_de_SWAP(uint32_t PID, int nroPag){
 		t_list* lista_paginas = obtener_lista_paginas_de_frames(lista_frames);
 		t_pagina* pagina_victima = obtener_pagina_victima(lista_paginas, PID);
 		loggear_info("[SWAP] - Se eligio la pagina victima");
+		list_destroy(lista_paginas); //valgrind agregado - mecha
 		frame = pagina_victima->frame;
 		info_a_guardar = traer_y_controlar_consistencia_paginas(pagina_victima, nroPag, PID);
 		pthread_mutex_unlock(&mutex_swapping);
+
 
 	}
 	t_frame* f = (t_frame*) list_get(listaFrames, frame);
@@ -75,6 +77,9 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 
 		void* mensaje_serializado = serializar_escribir_en_memoria(mensaje, &tamanio);
 
+		free(mensaje->data); //agregado por valgrind - mecha
+		free(mensaje); //agregado por valgrind - mecha
+
 		//loggear_error("[RAM-JM] numero de 4 bytes preserialización de valor %d", *((int*)info_en_frame +28));
 
 		//loggear_error("[RAM-JM] numero de 4 bytes postserialización de valor %d", *((int*)elemento_deserealizado->data +28));
@@ -89,6 +94,11 @@ void* traer_y_controlar_consistencia_paginas(t_pagina* pagina_victima, int nro_p
 		}else {
 			loggear_trace("[RAM] - Se escribio bien la pagina en swap");
 		}
+		free(rec->payload); //agregado por valgrind - mecha
+		free(rec); // agregado por valgrind - mecha
+
+	}else  {
+		free(info_en_frame);
 
 	}
 
