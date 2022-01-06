@@ -1,0 +1,121 @@
+23:58:55:783 [PID: 1] --- [SYSTEM] --- Se movió a NEW
+23:58:55:784 [PID: 1] --- [Largo Plazo] --- Se movió de NEW a READY
+23:58:55:784 [PID: 1] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:58:55:785 [PID: 1] --- Se movió de EXEC a BLOCK
+23:58:55:785 [IO] [PID: 1] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:58:55:785 [IO] [PID: 1] está usando el dispositivo [PILETA]
+23:58:56:801 [PID: 2] --- [SYSTEM] --- Se movió a NEW
+23:58:56:801 [PID: 2] --- [Largo Plazo] --- Se movió de NEW a READY
+23:58:56:801 [PID: 2] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:58:56:802 [PID: 2] --- Se movió de EXEC a BLOCK
+23:58:56:802 [IO] [PID: 2] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:58:57:812 [PID: 3] --- [SYSTEM] --- Se movió a NEW
+23:58:58:817 [PID: 4] --- [SYSTEM] --- Se movió a NEW
+23:59:00:860 [IO] [PID: 1] se desbloqueo de la llamada a [PILETA]
+23:59:00:861 [PID: 1] - Se desbloqueo el hilo y se envio a READY
+23:59:00:861 [IO] [PID: 2] está usando el dispositivo [PILETA]
+23:59:00:861 [PID: 1] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:00:861 [PID: 1] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:00:862 [PID: 1] --- Se movió de EXEC a BLOCK
+23:59:00:863 [PID: 1] --- [Mediano Plazo] --- Se movió de BLOCK a SUSP-BLOCK
+23:59:00:863 [IO] [PID: 1] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:59:00:864 [PID: 3] --- [Largo Plazo] --- Se movió de NEW a READY
+23:59:00:864 [PID: 3] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:00:865 [PID: 3] --- Se movió de EXEC a BLOCK
+23:59:00:865 [IO] [PID: 3] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:59:00:865 [PID: 3] --- [Mediano Plazo] --- Se movió de BLOCK a SUSP-BLOCK
+23:59:00:866 [PID: 4] --- [Largo Plazo] --- Se movió de NEW a READY
+23:59:00:866 [PID: 4] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:00:869 [PID: 4] --- Se movió de EXEC a BLOCK
+23:59:00:869 [IO] [PID: 4] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:59:05:865 [IO] [PID: 2] se desbloqueo de la llamada a [PILETA]
+23:59:05:866 [PID: 2] - Se desbloqueo el hilo y se envio a READY
+23:59:05:866 [PID: 2] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:05:866 [IO] [PID: 1] está usando el dispositivo [PILETA]
+23:59:05:866 [PID: 2] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:05:867 [PID: 2] --- Se movió de EXEC a BLOCK
+23:59:05:867 [IO] [PID: 2] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:59:10:867 [IO] [PID: 1] se desbloqueo de la llamada a [PILETA]
+23:59:10:867 [IO] [PID: 3] está usando el dispositivo [PILETA]
+23:59:10:867 [PID: 1] - Se desbloqueo el hilo y se envio a SUSPENDIDO-READY
+23:59:15:868 [IO] [PID: 3] se desbloqueo de la llamada a [PILETA]
+23:59:15:868 [PID: 3] - Se desbloqueo el hilo y se envio a SUSPENDIDO-READY
+23:59:15:868 [IO] [PID: 4] está usando el dispositivo [PILETA]
+23:59:20:872 [IO] [PID: 4] se desbloqueo de la llamada a [PILETA]
+23:59:20:872 [PID: 4] - Se desbloqueo el hilo y se envio a READY
+23:59:20:872 [IO] [PID: 2] está usando el dispositivo [PILETA]
+23:59:20:872 [PID: 4] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:20:873 [PID: 4] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:20:874 [PID: 4] --- Se movió de EXEC a BLOCK
+23:59:20:874 [IO] [PID: 4] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:59:25:873 [IO] [PID: 2] se desbloqueo de la llamada a [PILETA]
+23:59:25:873 [PID: 2] - Se desbloqueo el hilo y se envio a READY
+23:59:25:872 [PID: 2] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:25:876 [PID: 2] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:25:876 [IO] [PID: 4] está usando el dispositivo [PILETA]
+23:59:25:877 [PID: 2] --- Se movió de EXEC a BLOCK
+23:59:25:877 [IO] [PID: 2] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:59:30:879 [IO] [PID: 4] se desbloqueo de la llamada a [PILETA]
+23:59:30:880 [PID: 4] - Se desbloqueo el hilo y se envio a READY
+23:59:30:880 [IO] [PID: 2] está usando el dispositivo [PILETA]
+23:59:30:879 [PID: 4] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:30:880 [PID: 4] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:30:882 [PID: 4] --- Se movió de EXEC a BLOCK
+23:59:30:882 [IO] [PID: 4] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:59:35:880 [IO] [PID: 2] se desbloqueo de la llamada a [PILETA]
+23:59:35:880 [PID: 2] - Se desbloqueo el hilo y se envio a READY
+23:59:35:880 [IO] [PID: 4] está usando el dispositivo [PILETA]
+23:59:35:880 [PID: 2] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:35:881 [PID: 2] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:35:881 [MATELIB_CLOSE], hay que cerrar el proceso
+23:59:35:882 [SYSTEM] --- Llego un proceso para cerrar en el planificador
+23:59:35:882 [PID: 2] --- [SYSTEM] --- Se movió a FINISH
+23:59:35:882 [MATELIB_CLOSE], se cerro el proceso
+23:59:35:882 [PID: 1] --- [Mediano Plazo] --- Se movió de SUSP-READY a READY
+23:59:35:881 [PID: 1] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:35:882 [PID: 1] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:35:883 [PID: 1] --- Se movió de EXEC a BLOCK
+23:59:35:883 [IO] [PID: 1] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:59:40:881 [IO] [PID: 4] se desbloqueo de la llamada a [PILETA]
+23:59:40:881 [PID: 4] - Se desbloqueo el hilo y se envio a READY
+23:59:40:881 [IO] [PID: 1] está usando el dispositivo [PILETA]
+23:59:40:881 [PID: 4] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:40:881 [SEMAFORO] -- Se hizo POST de todos los semaforos ocupados por el PID: 2
+23:59:40:882 [PID: 4] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:40:883 [MATELIB_CLOSE], hay que cerrar el proceso
+23:59:40:883 [SYSTEM] --- Llego un proceso para cerrar en el planificador
+23:59:40:884 [PID: 4] --- [SYSTEM] --- Se movió a FINISH
+23:59:40:884 [MATELIB_CLOSE], se cerro el proceso
+23:59:40:885 [PID: 3] --- [Mediano Plazo] --- Se movió de SUSP-READY a READY
+23:59:40:884 [PID: 3] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:40:885 [PID: 3] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:40:887 [PID: 3] --- Se movió de EXEC a BLOCK
+23:59:40:887 [IO] [PID: 3] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:59:44:463 [DEADLOCK] - Pasaron 50000 milisegundos, controlamos deadlock
+23:59:44:463 [DEADLOCK] - No hay procesos bloqueados
+23:59:45:884 [IO] [PID: 1] se desbloqueo de la llamada a [PILETA]
+23:59:45:884 [PID: 1] - Se desbloqueo el hilo y se envio a READY
+23:59:45:884 [IO] [PID: 3] está usando el dispositivo [PILETA]
+23:59:45:885 [PID: 1] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:45:886 [SEMAFORO] -- Se hizo POST de todos los semaforos ocupados por el PID: 4
+23:59:45:887 [PID: 1] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:45:887 [MATELIB_CLOSE], hay que cerrar el proceso
+23:59:45:887 [SYSTEM] --- Llego un proceso para cerrar en el planificador
+23:59:45:887 [PID: 1] --- [SYSTEM] --- Se movió a FINISH
+23:59:45:887 [MATELIB_CLOSE], se cerro el proceso
+23:59:50:888 [IO] [PID: 3] se desbloqueo de la llamada a [PILETA]
+23:59:50:888 [PID: 3] - Se desbloqueo el hilo y se envio a READY
+23:59:50:888 [PID: 3] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:50:888 [SEMAFORO] -- Se hizo POST de todos los semaforos ocupados por el PID: 1
+23:59:50:889 [PID: 3] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:50:890 [PID: 3] --- Se movió de EXEC a BLOCK
+23:59:50:890 [IO] [PID: 3] se va a bloquear para usar [PILETA] durante 5000 milisegundos
+23:59:50:891 [IO] [PID: 3] está usando el dispositivo [PILETA]
+23:59:55:891 [IO] [PID: 3] se desbloqueo de la llamada a [PILETA]
+23:59:55:892 [PID: 3] - Se desbloqueo el hilo y se envio a READY
+23:59:55:892 [PID: 3] --- [Corto Plazo] --- Se movió de READY a EXEC
+23:59:55:893 [PID: 3] - [Mensaje] - Retornamos a la LIB que termino con el dispositivo
+23:59:55:893 [MATELIB_CLOSE], hay que cerrar el proceso
+23:59:55:893 [SYSTEM] --- Llego un proceso para cerrar en el planificador
+23:59:55:893 [PID: 3] --- [SYSTEM] --- Se movió a FINISH
+23:59:55:894 [MATELIB_CLOSE], se cerro el proceso
